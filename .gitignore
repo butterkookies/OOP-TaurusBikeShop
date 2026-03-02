@@ -1,0 +1,13 @@
+# Visual Studio temporary files
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.sln.docstates
+
+# ASP.NET Core runtime
+wwwroot/lib/
+node_modules/
+*.db
+*.log
