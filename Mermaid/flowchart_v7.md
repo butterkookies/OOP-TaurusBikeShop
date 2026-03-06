@@ -43,14 +43,8 @@ A7 --> DB1
 DB1 --> A8[Login]
 
 A2 -->|Yes| A9[/Enter Credentials/]
-
 A8 --> A10[/Enter Credentials/]
 A9 --> A11{Credentials Valid?}
-
-A11 --> DB1
-DB1 --> A11
-
-A10 --> A11
 
 A11 -->|No| A9
 A11 -->|Yes| A12[Login Success]
@@ -82,56 +76,48 @@ B4 -->|Buy Now| B7
 %% CHECKOUT
 
 B7 --> B8[/Review Order/]
-B8 --> B9[/Checkout/]
+B8 --> B9[/Proceed to Checkout/]
 
 B9 --> B20{Order Type}
-
 B20 -->|Pickup| B21[Pickup in Store]
+B20 -->|Delivery| B22{Select Courier}
 
-B20 -->|Delivery| B22{Courier}
-
-B22 -->|Lalamove| B23[/Enter Address/]
+B22 -->|Lalamove| B23[/Enter Delivery Address/]
 B22 -->|LBC| B23
-
-B23 --> B10
+B23 --> B10[Confirm Payment Method]
 B21 --> B10
 
 %% PAYMENT
 
-B10[/Select Payment Method/]
-
-B10 -->|GCash| B11[GCash Payment]
+B10 -->|GCash| B11[Pay via GCash]
 B11 --> EXT1
 EXT1 --> B12{Payment Successful?}
 
-B10 -->|Bank Transfer| B29[/Upload Payment Proof/]
+B10 -->|Bank Transfer| B29[/Upload Bank Transfer Proof/]
 B29 --> EXT5
 EXT5 --> B30{Payment Verified?}
 
-B30 -->|No| B29
-B30 -->|Yes| B14
-
+B12 -->|Yes| B14[Create Order Record]
 B12 -->|No| B13{Retry Payment?}
 B13 -->|Yes| B10
 B13 -->|Cancel| Z1([Order Cancelled])
 
-B12 -->|Yes| B14 
+B30 -->|Yes| B14
+B30 -->|No| B29
 
 %% ORDER RECORD
 
-B14 --> B15[Create Order Record]
+B14 --> B15[Set Order Status: Pending]
 B15 --> DB3
+DB3 --> B16[Processing Order]
+B16 --> B17[/Order Confirmation Sent/]
 
-DB3 --> B16[Order Pending]
-B16 --> B17[Processing]
-B17 --> B18[/Order Confirmation/]
+B17 --> B18[/Wait for Delivery or Pickup/]
 
-B18 --> B19[/Wait for Delivery or Pickup/]
-
-B19 --> B25{Order Received?}
-
+B18 --> B25{Order Received?}
+B25 -->|No| B18
 B25 -->|Yes| B26[/Confirm Order Received/]
-B26 --> B27[/Add Review/]
+B26 --> B27[/Add Customer Review/]
 
 B27 --> DB3
 B27 --> B28([Transaction Complete])
@@ -145,15 +131,11 @@ end
 subgraph ADMIN["Admin System"]
 
 C0([Admin Start]) --> C1[/Admin Login/]
-
 C1 --> C2{Credentials Valid?}
-C2 --> DB1
-
 C2 -->|No| C1
 C2 -->|Yes| C3[/Admin Dashboard/]
 
-C3 --> C4{Module}
-
+C3 --> C4{Select Module}
 C4 -->|Online Orders| D1
 C4 -->|Walk-In POS| W1
 C4 -->|Online History| E1
@@ -169,44 +151,34 @@ end
 
 subgraph ORDERS["Online Orders"]
 
-D1[/View Online Orders/]
-D1 --> DB3
+D1[/View Online Orders/] --> DB3
+DB3 --> D2[/Select Specific Order/]
 
-DB3 --> D2[/Select Order/]
-
-D2 --> D5{Delivery Type}
-
-D5 -->|Pickup| D3
-
-D5 -->|Delivery| D6{Courier}
+D2 --> D5{Delivery Type?}
+D5 -->|Pickup| D3[Update Status for Pickup]
+D5 -->|Delivery| D6{Courier Selected?}
 
 D6 -->|Lalamove| D7[Book Lalamove]
 D7 --> EXT2
 
-D6 -->|LBC| D8[Arrange LBC]
+D6 -->|LBC| D8[Arrange LBC Delivery]
 D8 --> EXT3
 
-EXT2 --> D9[Get Tracking Link]
-EXT3 --> D9
+D7 --> D9[Generate Tracking Link]
+D8 --> D9
+D9 --> D10[Send Tracking Email]
+D10 --> EXT4
 
-D9 --> EXT4
-EXT4 --> D10[Send Tracking Email]
-
-D10 --> D11[Courier Delivers]
-
+D10 --> D11[Courier Delivers Order]
 D11 --> D12[Customer Pays Delivery Fee]
-
 D12 --> D3
 
-D3{Update Status}
-
-D3 -->|Processing| D4
+D3 -->|Processing| D4[Save Order Status]
 D3 -->|Packed| D4
 D3 -->|Out for Delivery| D4
 D3 -->|Delivered| D4
 D3 -->|Cancelled| D4
 
-D4[Save Status]
 D4 --> DB3
 DB3 --> C3
 
@@ -219,42 +191,46 @@ end
 subgraph POS["Walk-In POS System"]
 
 W1[/Open POS/]
-
 W1 --> W2[/Scan Product/]
 W2 --> DB2
 
 DB2 --> W3{Stock Available?}
-W3 --> DB4
-
 W3 -->|No| W2
+W3 -->|Yes| W4[Add Product to Cart]
 
-W3 -->|Yes| W4[Add to Cart]
-
-W4 --> W5{Add More?}
-
+W4 --> W5{Add More Items?}
 W5 -->|Yes| W2
 W5 -->|No| W6[/Show Total/]
 
-W6 --> W7{Payment}
-
-W7 -->|Cash| W8[Accept Cash]
-
-W7 -->|GCash| W9[Process GCash]
+W6 --> W7{Payment Method?}
+W7 -->|Cash| W8[Accept Cash Payment]
+W7 -->|GCash| W9[Process GCash Payment]
 W9 --> EXT1
 
 W8 --> W10[Create Walk-In Order]
 W9 --> W10
 
 W10 --> DB3
-
 W10 --> W11[Update Inventory]
 W11 --> DB4
 
 W11 --> W12[/Print Receipt/]
-
 W12 --> W13([Transaction Complete])
-
 W13 --> C3
+
+end
+
+%% =====================================================
+%% ORDER HISTORY
+%% =====================================================
+
+subgraph HISTORY["Order History"]
+
+E1[/View Online Order History/] --> DB3
+DB3 --> C3
+
+H1[/View Walk-In Order History/] --> DB3
+DB3 --> C3
 
 end
 
@@ -263,7 +239,6 @@ end
 %% =====================================================
 
 F1[/Shop Analytics/]
-
 F1 --> DB2
 F1 --> DB3
 F1 --> DB4
@@ -288,15 +263,10 @@ classDef admin fill:#B2DFDB,stroke:#00695C,stroke-width:2px,color:#000
 
 class A0,B28,C0,C5,W13 startend
 class Z1 cancel
-
-class A4,A7,A8,A12,B5,B15,B16,B17,D4,W4,W10,W11 process
-
+class A4,A7,A8,A12,B5,B14,B15,B16,B17,B18,B27,D4,W4,W10,W11 process
 class A2,A6,A11,B4,B6,B12,B13,C2,D3,BINV,B20,B22,W3,W5,W7,D5,D6,B30 decision
-
-class A1,A3,A5,A9,A10,A6A,B1,B2,B3,B7,B8,B9,B10,B18,B21,B23,W1,W2,W6,W12,B26,B27,B29 io
-
+class A1,A3,A5,A9,A10,A6A,B1,B2,B3,B7,B8,B9,B10,B18,B21,B23,W1,W2,W6,W12,B26,B29 io
 class DB1,DB2,DB3,DB4 database
 class EXT1,EXT2,EXT3,EXT4,EXT5 external
-
-class C0,C1,C2,C3,C4,C5,D1,D2,D3,D4,F1,W1,W2,W3,W4,W5,W6,W7,W8,W9,W10,W11,W12 admin
+class C0,C1,C2,C3,C4,C5,D1,D2,D3,D4,F1,W1,W2,W3,W4,W5,W6,W7,W8,W9,W10,W11,W12,E1,H1 admin
 ```
