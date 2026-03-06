@@ -115,7 +115,7 @@ B12 -->|No| B13{Retry Payment?}
 B13 -->|Yes| B10
 B13 -->|Cancel| Z1([Order Cancelled])
 
-B12 -->|Yes| B14 
+B12 -->|Yes| B14
 
 %% ORDER RECORD
 

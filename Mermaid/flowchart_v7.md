@@ -18,7 +18,7 @@ EXT1[[GCash Payment Gateway]]
 EXT2[[Lalamove Delivery Service]]
 EXT3[[LBC Delivery Service]]
 EXT4[[Gmail Notification Service]]
-EXT5[[Bank Transfer System]]
+EXT5[[Bank Transfer to Admin's Bank Account]]
 
 %% =====================================================
 %% CUSTOMER ONLINE FLOW
@@ -80,11 +80,14 @@ B8 --> B9[/Proceed to Checkout/]
 
 B9 --> B20{Order Type}
 B20 -->|Pickup| B21[Pickup in Store]
-B20 -->|Delivery| B22{Select Courier}
+B20 -->|Delivery| B22[/System: Determine Courier Based on Delivery Address/]
 
-B22 -->|Lalamove| B23[/Enter Delivery Address/]
-B22 -->|LBC| B23
-B23 --> B10[Confirm Payment Method]
+B22 --> B23[/Enter Delivery Address/]
+B23 --> B24{Delivery Location?}
+B24 -->|Within Bulacan or Manila| B31[/System message: "Lalamove selected for your delivery (based on your address)"/]
+B24 -->|Outside Bulacan & Manila| B32[/System message: "LBC selected for your delivery (based on your address)"/]
+B31 --> B10[Confirm Payment Method]
+B32 --> B10
 B21 --> B10
 
 %% PAYMENT
@@ -93,9 +96,9 @@ B10 -->|GCash| B11[Pay via GCash]
 B11 --> EXT1
 EXT1 --> B12{Payment Successful?}
 
-B10 -->|Bank Transfer| B29[/Upload Bank Transfer Proof/]
+B10 -->|Bank Transfer| B29[/Make bank transfer to the admin's bank account and upload proof/]
 B29 --> EXT5
-EXT5 --> B30{Payment Verified?}
+EXT5 --> B30{Payment Verified by Admin?}
 
 B12 -->|Yes| B14[Create Order Record]
 B12 -->|No| B13{Retry Payment?}
@@ -156,12 +159,12 @@ DB3 --> D2[/Select Specific Order/]
 
 D2 --> D5{Delivery Type?}
 D5 -->|Pickup| D3[Update Status for Pickup]
-D5 -->|Delivery| D6{Courier Selected?}
+D5 -->|Delivery| D6[/Courier assigned by system based on customer's delivery address/]
 
-D6 -->|Lalamove| D7[Book Lalamove]
+D6 -->|Lalamove| D7[Admin books Lalamove (system suggested)]
 D7 --> EXT2
 
-D6 -->|LBC| D8[Arrange LBC Delivery]
+D6 -->|LBC| D8[Admin arranges LBC (system suggested)]
 D8 --> EXT3
 
 D7 --> D9[Generate Tracking Link]
@@ -170,7 +173,7 @@ D9 --> D10[Send Tracking Email]
 D10 --> EXT4
 
 D10 --> D11[Courier Delivers Order]
-D11 --> D12[Customer Pays Delivery Fee]
+D11 --> D12[Customer Pays Delivery Fee on Delivery]
 D12 --> D3
 
 D3 -->|Processing| D4[Save Order Status]
