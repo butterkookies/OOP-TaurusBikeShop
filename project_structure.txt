@@ -1,0 +1,307 @@
+Folder PATH listing
+Volume serial number is BA29-06A1
+C:.
+|   .gitignore
+|   OOP-TaurusBikeShop.sln
+|   project_structure.txt
+|   README.md
+|   Tools.txt
+|   
++---.github
+|   \---workflows
++---.postman
+|       resources.yaml
+|       
++---.vs
+|   |   slnx.sqlite
+|   |   VSWorkspaceState.json
+|   |   
+|   +---OOP-TaurusBikeShop
+|   |   +---copilot-chat
+|   |   |   \---16054b38
+|   |   |       \---sessions
+|   |   +---CopilotIndices
+|   |   |   \---18.4.89.4080
+|   |   |           CodeChunks.db
+|   |   |           SemanticSymbols.db
+|   |   |           
+|   |   +---DesignTimeBuild
+|   |   |       .dtbcache.v2
+|   |   |       
+|   |   +---FileContentIndex
+|   |   |       b4b955e7-168b-45d2-a192-35def0dec471.vsidx
+|   |   |       
+|   |   \---v18
+|   |           .futdcache.v2
+|   |           DocumentLayout.json
+|   |           
+|   +---OOP-TaurusBikeShop.slnx
+|   |   +---copilot-chat
+|   |   |   \---16054b38
+|   |   |       \---sessions
+|   |   +---FileContentIndex
+|   |   |       b32e39a7-e757-4698-b732-44d0f142a9e6.vsidx
+|   |   |       
+|   |   \---v18
+|   |           DocumentLayout.json
+|   |           
+|   \---ProjectEvaluation
+|           oop-taurusbikeshop.metadata.v10.bin
+|           oop-taurusbikeshop.projects.v10.bin
+|           oop-taurusbikeshop.strings.v10.bin
+|           
++---Mermaid
+|       flowchart_v1.md
+|       flowchart_v2.md
+|       flowchart_v3.md
+|       flowchart_v4.md
+|       flowchart_v5.md
+|       flowchart_v6.md
+|       flowchart_v7.md
+|       flowchart_v8.md
+|       flowchart_v9.md
+|       Index.html
+|       Test.md
+|       
++---postman
+|   \---globals
+|           workspace.globals.yaml
+|           
+\---WebApplication
+    |   appsettings.Development.json
+    |   appsettings.json
+    |   Program.cs
+    |   WebApplication.csproj
+    |   WebApplication.csproj.user
+    |   WebApplication.slnx
+    |   
+    +---.vs
+    |   |   slnx.sqlite
+    |   |   VSWorkspaceState.json
+    |   |   
+    |   +---WebApplication
+    |   |   \---CopilotIndices
+    |   |       \---18.4.89.4080
+    |   |               CodeChunks.db
+    |   |               CodeChunks.db-shm
+    |   |               CodeChunks.db-wal
+    |   |               SemanticSymbols.db
+    |   |               SemanticSymbols.db-shm
+    |   |               SemanticSymbols.db-wal
+    |   |               
+    |   \---WebApplication.slnx
+    |       +---copilot-chat
+    |       |   \---16054b38
+    |       |       \---sessions
+    |       +---DesignTimeBuild
+    |       |       .dtbcache.v2
+    |       |       
+    |       +---FileContentIndex
+    |       |       2c8b7181-0cf7-468f-b782-ffa13d8cdbec.vsidx
+    |       |       b906d861-a3eb-490c-9469-dfd29f3f2c36.vsidx
+    |       |       d76fb57b-a138-4c92-9745-86ce55061648.vsidx
+    |       |       ed41b490-634e-4b76-8c9d-dfe268ddf7d2.vsidx
+    |       |       
+    |       \---v18
+    |               .suo
+    |               DocumentLayout.json
+    |               
+    +---bin
+    |   +---Debug
+    |   |   \---net10.0
+    |   \---Release
+    |       \---net10.0
+    +---Controllers
+    |       HomeController.cs
+    |       
+    +---Models
+    |       ErrorViewModel.cs
+    |       
+    +---obj
+    |   |   project.assets.json
+    |   |   project.nuget.cache
+    |   |   WebApplication.csproj.nuget.dgspec.json
+    |   |   WebApplication.csproj.nuget.g.props
+    |   |   WebApplication.csproj.nuget.g.targets
+    |   |   
+    |   +---Debug
+    |   |   \---net10.0
+    |   |       |   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+    |   |       |   rpswa.dswa.cache.json
+    |   |       |   staticwebassets.removed.txt
+    |   |       |   WebApplication.AssemblyInfo.cs
+    |   |       |   WebApplication.AssemblyInfoInputs.cache
+    |   |       |   WebApplication.assets.cache
+    |   |       |   WebApplication.GeneratedMSBuildEditorConfig.editorconfig
+    |   |       |   WebApplication.GlobalUsings.g.cs
+    |   |       |   WebApplication.RazorAssemblyInfo.cache
+    |   |       |   WebApplication.RazorAssemblyInfo.cs
+    |   |       |   
+    |   |       +---ref
+    |   |       +---refint
+    |   |       \---staticwebassets
+    |   \---Release
+    |       \---net10.0
+    |           |   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+    |           |   WebApplication.AssemblyInfo.cs
+    |           |   WebApplication.AssemblyInfoInputs.cache
+    |           |   WebApplication.GeneratedMSBuildEditorConfig.editorconfig
+    |           |   WebApplication.GlobalUsings.g.cs
+    |           |   WebApplication.RazorAssemblyInfo.cache
+    |           |   WebApplication.RazorAssemblyInfo.cs
+    |           |   
+    |           +---ref
+    |           \---refint
+    +---Properties
+    |       launchSettings.json
+    |       
+    +---Views
+    |   |   _ViewImports.cshtml
+    |   |   _ViewStart.cshtml
+    |   |   
+    |   +---Admin
+    |   +---Customer
+    |   +---Home
+    |   |       Index.cshtml
+    |   |       Privacy.cshtml
+    |   |       
+    |   \---Shared
+    |           Error.cshtml
+    |           _Layout.cshtml
+    |           _Layout.cshtml.css
+    |           _ValidationScriptsPartial.cshtml
+    |           
+    \---wwwroot
+        |   favicon.ico
+        |   
+        +---css
+        |       bootstrap-grid.css
+        |       bootstrap-grid.css.map
+        |       bootstrap-grid.min.css
+        |       bootstrap-grid.min.css.map
+        |       bootstrap-grid.rtl.css
+        |       bootstrap-grid.rtl.css.map
+        |       bootstrap-grid.rtl.min.css
+        |       bootstrap-grid.rtl.min.css.map
+        |       bootstrap-reboot.css
+        |       bootstrap-reboot.css.map
+        |       bootstrap-reboot.min.css
+        |       bootstrap-reboot.min.css.map
+        |       bootstrap-reboot.rtl.css
+        |       bootstrap-reboot.rtl.css.map
+        |       bootstrap-reboot.rtl.min.css
+        |       bootstrap-reboot.rtl.min.css.map
+        |       bootstrap-utilities.css
+        |       bootstrap-utilities.css.map
+        |       bootstrap-utilities.min.css
+        |       bootstrap-utilities.min.css.map
+        |       bootstrap-utilities.rtl.css
+        |       bootstrap-utilities.rtl.css.map
+        |       bootstrap-utilities.rtl.min.css
+        |       bootstrap-utilities.rtl.min.css.map
+        |       bootstrap.css
+        |       bootstrap.css.map
+        |       bootstrap.min.css
+        |       bootstrap.min.css.map
+        |       bootstrap.rtl.css
+        |       bootstrap.rtl.css.map
+        |       bootstrap.rtl.min.css
+        |       bootstrap.rtl.min.css.map
+        |       site.css
+        |       
+        +---images
+        +---js
+        |       bootstrap.bundle.js
+        |       bootstrap.bundle.js.map
+        |       bootstrap.bundle.min.js
+        |       bootstrap.bundle.min.js.map
+        |       bootstrap.esm.js
+        |       bootstrap.esm.js.map
+        |       bootstrap.esm.min.js
+        |       bootstrap.esm.min.js.map
+        |       bootstrap.js
+        |       bootstrap.js.map
+        |       bootstrap.min.js
+        |       bootstrap.min.js.map
+        |       site.js
+        |       
+        \---lib
+            +---bootstrap
+            |   |   LICENSE
+            |   |   
+            |   \---dist
+            |       +---css
+            |       |       bootstrap-grid.css
+            |       |       bootstrap-grid.css.map
+            |       |       bootstrap-grid.min.css
+            |       |       bootstrap-grid.min.css.map
+            |       |       bootstrap-grid.rtl.css
+            |       |       bootstrap-grid.rtl.css.map
+            |       |       bootstrap-grid.rtl.min.css
+            |       |       bootstrap-grid.rtl.min.css.map
+            |       |       bootstrap-reboot.css
+            |       |       bootstrap-reboot.css.map
+            |       |       bootstrap-reboot.min.css
+            |       |       bootstrap-reboot.min.css.map
+            |       |       bootstrap-reboot.rtl.css
+            |       |       bootstrap-reboot.rtl.css.map
+            |       |       bootstrap-reboot.rtl.min.css
+            |       |       bootstrap-reboot.rtl.min.css.map
+            |       |       bootstrap-utilities.css
+            |       |       bootstrap-utilities.css.map
+            |       |       bootstrap-utilities.min.css
+            |       |       bootstrap-utilities.min.css.map
+            |       |       bootstrap-utilities.rtl.css
+            |       |       bootstrap-utilities.rtl.css.map
+            |       |       bootstrap-utilities.rtl.min.css
+            |       |       bootstrap-utilities.rtl.min.css.map
+            |       |       bootstrap.css
+            |       |       bootstrap.css.map
+            |       |       bootstrap.min.css
+            |       |       bootstrap.min.css.map
+            |       |       bootstrap.rtl.css
+            |       |       bootstrap.rtl.css.map
+            |       |       bootstrap.rtl.min.css
+            |       |       bootstrap.rtl.min.css.map
+            |       |       
+            |       \---js
+            |               bootstrap.bundle.js
+            |               bootstrap.bundle.js.map
+            |               bootstrap.bundle.min.js
+            |               bootstrap.bundle.min.js.map
+            |               bootstrap.esm.js
+            |               bootstrap.esm.js.map
+            |               bootstrap.esm.min.js
+            |               bootstrap.esm.min.js.map
+            |               bootstrap.js
+            |               bootstrap.js.map
+            |               bootstrap.min.js
+            |               bootstrap.min.js.map
+            |               
+            +---jquery
+            |   |   LICENSE.txt
+            |   |   
+            |   \---dist
+            |           jquery.js
+            |           jquery.min.js
+            |           jquery.min.map
+            |           jquery.slim.js
+            |           jquery.slim.min.js
+            |           jquery.slim.min.map
+            |           
+            +---jquery-validation
+            |   |   LICENSE.md
+            |   |   
+            |   \---dist
+            |           additional-methods.js
+            |           additional-methods.min.js
+            |           jquery.validate.js
+            |           jquery.validate.min.js
+            |           
+            \---jquery-validation-unobtrusive
+                |   LICENSE.txt
+                |   
+                \---dist
+                        jquery.validate.unobtrusive.js
+                        jquery.validate.unobtrusive.min.js
+                        
