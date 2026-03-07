@@ -1,5 +1,5 @@
 Folder PATH listing
-Volume serial number is 3853-0BCF
+Volume serial number is BA29-06A1
 C:.
 |   .gitignore
 |   OOP-TaurusBikeShop.sln
@@ -12,6 +12,44 @@ C:.
 +---.postman
 |       resources.yaml
 |       
++---.vs
+|   |   slnx.sqlite
+|   |   VSWorkspaceState.json
+|   |   
+|   +---OOP-TaurusBikeShop
+|   |   +---copilot-chat
+|   |   |   \---16054b38
+|   |   |       \---sessions
+|   |   +---CopilotIndices
+|   |   |   \---18.4.89.4080
+|   |   |           CodeChunks.db
+|   |   |           SemanticSymbols.db
+|   |   |           
+|   |   +---DesignTimeBuild
+|   |   |       .dtbcache.v2
+|   |   |       
+|   |   +---FileContentIndex
+|   |   |       b4b955e7-168b-45d2-a192-35def0dec471.vsidx
+|   |   |       
+|   |   \---v18
+|   |           .futdcache.v2
+|   |           DocumentLayout.json
+|   |           
+|   +---OOP-TaurusBikeShop.slnx
+|   |   +---copilot-chat
+|   |   |   \---16054b38
+|   |   |       \---sessions
+|   |   +---FileContentIndex
+|   |   |       b32e39a7-e757-4698-b732-44d0f142a9e6.vsidx
+|   |   |       
+|   |   \---v18
+|   |           DocumentLayout.json
+|   |           
+|   \---ProjectEvaluation
+|           oop-taurusbikeshop.metadata.v10.bin
+|           oop-taurusbikeshop.projects.v10.bin
+|           oop-taurusbikeshop.strings.v10.bin
+|           
 +---Mermaid
 |       flowchart_v1.md
 |       flowchart_v2.md
@@ -26,13 +64,9 @@ C:.
 |       Test.md
 |       
 +---postman
-|   +---collections
-|   +---environments
-|   +---flows
-|   +---globals
-|   |       workspace.globals.yaml
-|   |       
-|   \---specs
+|   \---globals
+|           workspace.globals.yaml
+|           
 \---WebApplication
     |   appsettings.Development.json
     |   appsettings.json
@@ -41,17 +75,53 @@ C:.
     |   WebApplication.csproj.user
     |   WebApplication.slnx
     |   
+    +---.vs
+    |   |   slnx.sqlite
+    |   |   VSWorkspaceState.json
+    |   |   
+    |   +---ProjectEvaluation
+    |   |       webapplication.metadata.v10.bin
+    |   |       webapplication.projects.v10.bin
+    |   |       webapplication.strings.v10.bin
+    |   |       
+    |   +---WebApplication
+    |   |   \---CopilotIndices
+    |   |       \---18.4.89.4080
+    |   |               CodeChunks.db
+    |   |               SemanticSymbols.db
+    |   |               
+    |   \---WebApplication.slnx
+    |       +---copilot-chat
+    |       |   \---16054b38
+    |       |       \---sessions
+    |       +---DesignTimeBuild
+    |       |       .dtbcache.v2
+    |       |       
+    |       +---FileContentIndex
+    |       |       2c8b7181-0cf7-468f-b782-ffa13d8cdbec.vsidx
+    |       |       7d1606c0-b044-476d-896c-27aa7d12d26c.vsidx
+    |       |       b906d861-a3eb-490c-9469-dfd29f3f2c36.vsidx
+    |       |       d76fb57b-a138-4c92-9745-86ce55061648.vsidx
+    |       |       ed41b490-634e-4b76-8c9d-dfe268ddf7d2.vsidx
+    |       |       
+    |       \---v18
+    |               .futdcache.v2
+    |               DocumentLayout.backup.json
+    |               DocumentLayout.json
+    |               
     +---bin
-    |   \---Debug
+    |   +---Debug
+    |   |   \---net10.0
+    |   \---Release
     |       \---net10.0
     +---BusinessLogic
-    |       test.txt
+    |       .gitkeep
     |       
     +---Controllers
     |       HomeController.cs
     |       
     +---DataAccess
-    |       test.txt
+    |       .gitkeep
     |       
     +---Models
     |       ErrorViewModel.cs
@@ -63,26 +133,34 @@ C:.
     |   |   WebApplication.csproj.nuget.g.props
     |   |   WebApplication.csproj.nuget.g.targets
     |   |   
-    |   \---Debug
+    |   +---Debug
+    |   |   \---net10.0
+    |   |       |   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+    |   |       |   rpswa.dswa.cache.json
+    |   |       |   staticwebassets.removed.txt
+    |   |       |   WebApplication.AssemblyInfo.cs
+    |   |       |   WebApplication.AssemblyInfoInputs.cache
+    |   |       |   WebApplication.assets.cache
+    |   |       |   WebApplication.GeneratedMSBuildEditorConfig.editorconfig
+    |   |       |   WebApplication.GlobalUsings.g.cs
+    |   |       |   WebApplication.RazorAssemblyInfo.cache
+    |   |       |   WebApplication.RazorAssemblyInfo.cs
+    |   |       |   
+    |   |       +---ref
+    |   |       +---refint
+    |   |       \---staticwebassets
+    |   \---Release
     |       \---net10.0
     |           |   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
-    |           |   rpswa.dswa.cache.json
-    |           |   staticwebassets.removed.txt
     |           |   WebApplication.AssemblyInfo.cs
     |           |   WebApplication.AssemblyInfoInputs.cache
-    |           |   WebApplication.assets.cache
-    |           |   WebApplication.csproj.CoreCompileInputs.cache
-    |           |   WebApplication.csproj.FileListAbsolute.txt
     |           |   WebApplication.GeneratedMSBuildEditorConfig.editorconfig
     |           |   WebApplication.GlobalUsings.g.cs
-    |           |   WebApplication.MvcApplicationPartsAssemblyInfo.cache
     |           |   WebApplication.RazorAssemblyInfo.cache
     |           |   WebApplication.RazorAssemblyInfo.cs
-    |           |   WebApplication.sourcelink.json
     |           |   
     |           +---ref
-    |           +---refint
-    |           \---staticwebassets
+    |           \---refint
     +---Properties
     |       launchSettings.json
     |       
@@ -91,10 +169,10 @@ C:.
     |   |   _ViewStart.cshtml
     |   |   
     |   +---Admin
-    |   |       test.txt
+    |   |       .gitkeep
     |   |       
     |   +---Customer
-    |   |       test.txt
+    |   |       .gitkeep
     |   |       
     |   +---Home
     |   |       Index.cshtml
@@ -144,6 +222,7 @@ C:.
         |       bootstrap.rtl.min.css.map
         |       site.css
         |       
+        +---images
         +---js
         |       bootstrap.bundle.js
         |       bootstrap.bundle.js.map
