@@ -1,0 +1,48 @@
+WebApplication
+└── Views
+    ├── _ViewImports.cshtml
+    ├── _ViewStart.cshtml
+    ├── Shared
+    │   ├── Error.cshtml
+    │   ├── _Layout.cshtml
+    │   ├── _Layout.cshtml.css
+    │   └── _ValidationScriptsPartial.cshtml
+    ├── Home
+    │   🟢 Index.cshtml
+    │   🟢 Privacy.cshtml
+    ├── Customer
+    │   🟢 Register.cshtml           // Enter Email & Password, OTP, Full Address
+    │   🟢 Login.cshtml              // Enter Credentials
+    │   🟢 ProductCatalog.cshtml     // View Product Catalog
+    │   🟢 ProductDetails.cshtml     // View Product Details
+    │   🟢 Cart.cshtml               // Open Cart / Review Order
+    │   🟢 Checkout.cshtml           // Checkout Flow, Select Delivery/Pickup
+    │   🟢 Payment.cshtml            // GCash / Bank Transfer Payment
+    │   🟢 Confirmation.cshtml       // Order Confirmation, Tracking, Success
+    │   🟢 OrderHistory.cshtml       // View Past Orders, Add Review
+    │   
+    │   └── Partials
+    │       🟢 _OTPModal.cshtml          // OTP Entry / Validation
+    │       🟢 _CartItem.cshtml         // Individual Cart Item Component
+    │       🟢 _PaymentMethod.cshtml    // Payment Option Card / Selection
+    │       🟢 _OrderSummary.cshtml     // Order Summary Table / Checkout
+    │       🟢 _DeliverySelection.cshtml// Pickup / Courier Choice
+    │       🟢 _ConfirmationModal.cshtml// Payment / Order Confirmation Pop-up
+    │
+    └── Assets
+        ├── css
+        │   🟢 customer.css             // Customer-wide styles
+        │   🟢 cart.css                 // Cart component styles
+        │   🟢 checkout.css             // Checkout / Delivery / Payment styles
+        │   🟢 confirmation.css         // Confirmation modal / tracking styles
+        │   🟢 product-catalog.css      // Product catalog & details page
+        │   🟢 order-history.css        // Order history / review styles
+        │
+        └── js
+            🟢 customer.js              // Customer-wide scripts
+            🟢 cart.js                  // Cart behavior & events
+            🟢 checkout.js              // Checkout, courier selection, order submission
+            🟢 payment.js               // Payment integration (GCash / Bank Transfer)
+            🟢 confirmation.js          // Confirmation modal / tracking updates
+            🟢 product-catalog.js       // Product catalog, filters, search, details
+            🟢 order-history.js         // Order history interactions, review submission

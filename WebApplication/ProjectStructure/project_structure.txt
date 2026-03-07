@@ -4,6 +4,7 @@ C:.
 |   .gitignore
 |   OOP-TaurusBikeShop.sln
 |   project_structure.txt
+|   project_strucute.txt
 |   README.md
 |   Tools.txt
 |   
@@ -51,18 +52,22 @@ C:.
 |           oop-taurusbikeshop.strings.v10.bin
 |           
 +---Mermaid
-|       flowchart_v1.md
-|       flowchart_v2.md
-|       flowchart_v3.md
-|       flowchart_v4.md
-|       flowchart_v5.md
-|       flowchart_v6.md
-|       flowchart_v7.md
-|       flowchart_v8.md
-|       flowchart_v9.md
-|       Index.html
-|       Test.md
-|       
+|   +---ProgramFlow
+|   |       flowchart_v1.md
+|   |       flowchart_v2.md
+|   |       flowchart_v3.md
+|   |       flowchart_v4.md
+|   |       flowchart_v5.md
+|   |       flowchart_v6.md
+|   |       flowchart_v7.md
+|   |       flowchart_v8.md
+|   |       flowchart_v9.md
+|   |       
+|   \---TechnicalFlow
+|           admin_to_customer_v1.md
+|           tf_v1.md
+|           tf_v2.md
+|           
 +---postman
 |   \---globals
 |           workspace.globals.yaml
