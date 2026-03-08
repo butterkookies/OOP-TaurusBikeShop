@@ -11,7 +11,7 @@ WebApplication
     │   🟢 Index.cshtml
     │   🟢 Privacy.cshtml
     ├── Customer
-    │   🟢 Register.cshtml           // Enter Email & Password, OTP, Full Address
+    │   🟢 Register.cshtml           // Enter Email & Password, credentials, contact no etc, OTP, Full Address.
     │   🟢 Login.cshtml              // Enter Credentials
     │   🟢 ProductCatalog.cshtml     // View Product Catalog
     │   🟢 ProductDetails.cshtml     // View Product Details

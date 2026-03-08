@@ -1,0 +1,60 @@
+/* PAGE BACKGROUND */
+
+.register-page {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+}
+
+/* CARD */
+
+.register-card {
+    background: white;
+    padding: 40px;
+    border-radius: 14px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+}
+
+/* BRAND */
+
+.brand-title {
+    font-weight: 700;
+    color: #8B0000;
+    /* muted bulls red */
+}
+
+/* BUTTON */
+
+.btn-taurus {
+    background-color: #8B0000;
+    color: white;
+    border: none;
+}
+
+.btn-taurus:hover {
+    background-color: #6d0000;
+    color: white;
+}
+
+/* SECTION TITLES */
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.section-divider {
+    margin: 25px 0;
+}
+
+/* LOGIN LINK */
+
+.login-link {
+    color: #8B0000;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+}
