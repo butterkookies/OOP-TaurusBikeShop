@@ -1,0 +1,76 @@
+%% =====================================================
+%% BIKE SHOP - PART 1: CUSTOMER REGISTRATION & LOGIN
+%% =====================================================
+%% This diagram covers: User authentication and registration
+%% Connected to: Part 2 (Customer Dashboard)
+%% =====================================================
+
+flowchart TD
+
+%% =====================================================
+%% EXTERNAL SERVICES
+%% =====================================================
+
+EXT4["Email/SMS Service"]
+DB1[("User Database")]
+
+%% =====================================================
+%% REGISTRATION & LOGIN FLOW
+%% =====================================================
+
+A0([Start: Customer Opens App])
+A0 --> A1[/"Display Home Screen"/]
+A1 --> A2{"Already Logged In?"}
+
+%% OPTION 1: GUEST CHECKOUT
+A2 -->|No| A2A{"What Would You Like?"}
+A2A -->|Continue as Guest| A2B["Set Guest Session ID"]
+A2B --> SHOP_START["Shop as Guest"]
+
+%% OPTION 2: LOGIN
+A2A -->|Login to Account| A11[/"Enter Email & Password"/]
+A11 --> A11A{"Credentials Valid?"}
+A11A -->|No| A11B["Show Error Message"]
+A11B --> A11
+A11A -->|Yes| A13["Login Success"]
+
+%% OPTION 3: NEW REGISTRATION
+A2A -->|Create New Account| A3[/"Enter Email & Password"/]
+A3 --> A4["Send OTP via Email"]
+A4 --> EXT4
+EXT4 --> A5[/"Enter OTP Code"/]
+A5 --> A6{"OTP Valid?"}
+
+A6 -->|No| A6B["Show Error: Invalid OTP"]
+A6B --> A5
+A6 -->|Yes| A7[/"Enter Full Address"/]
+
+A7 --> A8["Create Account"]
+A8 --> DB1
+DB1 --> A9["Send Welcome Email"]
+A9 --> A13
+
+%% CONVERGE PATHS
+A2 -->|Yes| A13
+
+A13 --> A_END
+
+%% OFF-PAGE CONNECTOR TO NEXT DIAGRAM
+SHOP_START --> A_END(["CONTINUE TO: Part 2: Customer Dashboard"])
+%% =====================================================
+%% STYLING
+%% =====================================================
+
+classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef decision fill:#FFF59D,stroke:#F9A825,stroke-width:2px,color:#000
+classDef io fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef external fill:#80DEEA,stroke:#00838F,stroke-width:2px,color:#000
+
+class A0,A_END startend
+class A4,A8,A9,A13 process
+class A2,A2A,A6,A11A decision
+class A1,A3,A5,A7,A11 io
+class DB1 database
+class EXT4 external

@@ -1,0 +1,74 @@
+%% =====================================================
+%% BIKE SHOP - PART 13: SUPPORT TICKET SYSTEM
+%% =====================================================
+%% This diagram covers: Customer support and ticket management
+%% Connected from: Part 7 (Admin Dashboard)
+%% =====================================================
+
+flowchart TD
+
+%% =====================================================
+%% DATABASES & EXTERNAL SERVICES
+%% =====================================================
+
+DB6[("Notification Queue")]
+EXT4["Email/SMS Service"]
+
+%% =====================================================
+%% ENTRY POINT FROM PART 7
+%% =====================================================
+
+SUP_START(["FROM Part 7:<br/>Support Tickets"])
+
+%% =====================================================
+%% SUPPORT TICKET MANAGEMENT
+%% =====================================================
+
+SUP_START --> SUP3[/"View Support Tickets"/]
+
+SUP3 --> DB6
+DB6 --> SUP4[/"Filter by Status<br/>Open / In Progress / Resolved"/]
+
+SUP4 --> SUP5[/"Select Ticket"/]
+SUP5 --> SUP6[/"Display Ticket Details<br/>Category, Description, Attachments"/]
+
+SUP6 --> SUP7{{"Action?"}}
+
+%% REPLY TO CUSTOMER
+SUP7 -->|Reply| SUP8[/"Type Response Message"/]
+SUP8 --> EXT4
+EXT4 --> SUP9["Send Reply Email"]
+
+%% CREATE FOLLOW-UP TASK
+SUP7 -->|Create Task| SUP10[/"Create Follow-up Task<br/>e.g., Ship replacement"/]
+SUP10 --> DB6
+
+%% RESOLVE TICKET
+SUP7 -->|Resolve| SUP11["Mark as Resolved"]
+SUP11 --> DB6
+
+%% UPDATE STATUS
+SUP9 --> SUP12["Update Ticket Status<br/>Change to 'Awaiting Response'"]
+SUP12 --> DB6
+DB6 --> END1(["BACK TO<br/>Part 7: Admin Dashboard"])
+
+SUP11 --> END1
+
+%% =====================================================
+%% STYLING
+%% =====================================================
+
+classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef decision fill:#FFF59D,stroke:#F9A825,stroke-width:2px,color:#000
+classDef io fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef external fill:#80DEEA,stroke:#00838F,stroke-width:2px,color:#000
+classDef connector fill:#FFB6C1,stroke:#FF1493,stroke-width:3px,color:#000,font-weight:bold
+
+class SUP_START,END1 startend
+class SUP9,SUP11,SUP12 process
+class SUP7 decision
+class SUP3,SUP4,SUP5,SUP6,SUP8,SUP10 io
+class DB6 database
+class EXT4 external
