@@ -1,0 +1,61 @@
+@{
+    ViewData["Title"] = "Order Confirmation - Taurus Bike Shop";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/confirmation.css" />
+}
+
+<div class="confirmation-page">
+    <div class="confirmation-card">
+        <h1>✅ Order Confirmed!</h1>
+        <p class="order-number">Order #<span id="orderNumber">TB123456</span></p>
+        <p>Thank you for shopping with <strong>Taurus Bike Shop</strong>! Your order is being processed and will be shipped soon.</p>
+
+        <div class="confirmation-details">
+            <h2>Order Summary</h2>
+            <ul id="order-items">
+                <!-- Dynamically populated -->
+            </ul>
+            <p class="total">Total Paid: <span id="totalPaid">$0.00</span></p>
+        </div>
+
+        <div class="confirmation-actions">
+            <a href="/" class="btn-home">🏠 Back to Home</a>
+            <a href="/Orders" class="btn-orders">📦 View My Orders</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const order = {
+            number: 'TB123456',
+            items: [
+                { name: "Taurus MTB Bike", qty: 1, price: 1200 },
+                { name: "Helmet Pro Series", qty: 2, price: 80 }
+            ]
+        };
+
+        const orderNumberEl = document.getElementById('orderNumber');
+        const orderItemsEl = document.getElementById('order-items');
+        const totalPaidEl = document.getElementById('totalPaid');
+
+        function renderOrder() {
+            orderNumberEl.textContent = order.number;
+            orderItemsEl.innerHTML = '';
+            let total = 0;
+            order.items.forEach(item => {
+                const li = document.createElement('li');
+                const itemTotal = item.qty * item.price;
+                total += itemTotal;
+                li.textContent = `${item.qty} x ${item.name} - $${itemTotal.toFixed(2)}`;
+                orderItemsEl.appendChild(li);
+            });
+            totalPaidEl.textContent = `$${total.toFixed(2)}`;
+        }
+
+        renderOrder();
+    </script>
+}

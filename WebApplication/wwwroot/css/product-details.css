@@ -1,0 +1,126 @@
+/* File: wwwroot/css/productdetails.css */
+
+.product-page {
+    display: flex;
+    flex-wrap: wrap;
+    font-family: 'Segoe UI', sans-serif;
+    background: #fff5f5;
+    padding: 30px 20px;
+    color: #1a1a1a;
+    gap: 30px;
+}
+
+.product-gallery {
+    flex: 1 1 400px;
+}
+
+.product-gallery #main-image {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+}
+
+.thumbnail-row {
+    display: flex;
+    gap: 10px;
+}
+
+.thumbnail-row .thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.thumbnail-row .thumb.active,
+.thumbnail-row .thumb:hover {
+    border-color: #d32f2f;
+}
+
+.product-info {
+    flex: 1 1 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.product-info h1 {
+    color: #d32f2f;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.product-info .price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #b71c1c;
+}
+
+.product-info .description {
+    line-height: 1.6;
+}
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-selector input {
+    width: 70px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.product-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.product-actions button {
+    flex: 1;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#add-to-cart {
+    background: #d32f2f;
+    color: #fff;
+}
+
+#add-to-cart:hover {
+    background: #b71c1c;
+}
+
+#buy-now {
+    background: #fff;
+    color: #d32f2f;
+    border: 2px solid #d32f2f;
+}
+
+#buy-now:hover {
+    background: #d32f2f;
+    color: #fff;
+}
+
+@media (max-width: 768px){
+    .product-page {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .thumbnail-row .thumb {
+        width: 60px;
+        height: 60px;
+    }
+}

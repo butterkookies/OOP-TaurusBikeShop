@@ -1,0 +1,74 @@
+/* File: wwwroot/css/ordersummary.css */
+
+.order-summary {
+    max-width: 450px;
+    margin: 30px auto;
+    background: #fff;
+    border-radius: 16px;
+    padding: 25px 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    font-family: 'Segoe UI', sans-serif;
+    color: #1a1a1a;
+    text-align: center;
+}
+
+.order-summary h2 {
+    color: #d32f2f;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.summary-items {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+}
+
+.summary-items li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ffe5e5;
+    font-weight: bold;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #b71c1c;
+}
+
+.btn-proceed {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    background: #d32f2f;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-proceed:hover {
+    background: #b71c1c;
+}
+
+@media (max-width: 480px){
+    .order-summary {
+        padding: 20px 15px;
+    }
+    .summary-items li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    .summary-total {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
