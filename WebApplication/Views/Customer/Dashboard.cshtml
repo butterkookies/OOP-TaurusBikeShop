@@ -1,0 +1,106 @@
+@{
+    ViewData["Title"] = "Dashboard - Taurus Bike Shop";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/dashboard.css" />
+}
+
+<div class="dashboard-page">
+    <aside class="sidebar">
+        <div class="brand">
+            <h2>Taurus 🐂</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/Dashboard" class="active">Dashboard</a>
+            <a href="/Orders">Orders</a>
+            <a href="/Products">Products</a>
+            <a href="/Customers">Customers</a>
+            <a href="/Reports">Reports</a>
+            <a href="/Settings">Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h1>Welcome, Admin</h1>
+            <div class="header-actions">
+                <button id="notifications-btn">🔔 Notifications</button>
+                <button id="profile-btn">👤 Profile</button>
+            </div>
+        </header>
+
+        <section class="stats-cards">
+            <div class="card">
+                <h3>Total Orders</h3>
+                <p id="total-orders">0</p>
+            </div>
+            <div class="card">
+                <h3>Revenue</h3>
+                <p id="revenue">$0.00</p>
+            </div>
+            <div class="card">
+                <h3>Products</h3>
+                <p id="total-products">0</p>
+            </div>
+            <div class="card">
+                <h3>Customers</h3>
+                <p id="total-customers">0</p>
+            </div>
+        </section>
+
+        <section class="recent-orders">
+            <h2>Recent Orders</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-table">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+
+@section Scripts {
+    <script>
+        const stats = {
+            totalOrders: 124,
+            revenue: 15480.75,
+            totalProducts: 42,
+            totalCustomers: 68
+        };
+
+        document.getElementById('total-orders').textContent = stats.totalOrders;
+        document.getElementById('revenue').textContent = `$${stats.revenue.toFixed(2)}`;
+        document.getElementById('total-products').textContent = stats.totalProducts;
+        document.getElementById('total-customers').textContent = stats.totalCustomers;
+
+        const recentOrders = [
+            { id: 'TB001', customer: 'John Doe', items: 2, total: 250, status: 'Shipped' },
+            { id: 'TB002', customer: 'Jane Smith', items: 1, total: 1200, status: 'Processing' },
+            { id: 'TB003', customer: 'Mike Brown', items: 3, total: 560, status: 'Delivered' }
+        ];
+
+        const ordersTable = document.getElementById('orders-table');
+        recentOrders.forEach(order => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${order.id}</td>
+                <td>${order.customer}</td>
+                <td>${order.items}</td>
+                <td>$${order.total.toFixed(2)}</td>
+                <td>${order.status}</td>
+            `;
+            ordersTable.appendChild(tr);
+        });
+    </script>
+}

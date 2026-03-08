@@ -1,0 +1,65 @@
+@{
+    ViewData["Title"] = "Order History - Taurus Bike Shop";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/order-history.css" />
+}
+
+<div class="orderhistory-page">
+    <header class="orderhistory-header">
+        <h1>📦 Order History</h1>
+        <a href="/" class="btn-home">← Back to Shop</a>
+    </header>
+
+    <main class="orderhistory-main">
+        <table class="orderhistory-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="orders-table">
+                <!-- Populated by JS -->
+            </tbody>
+        </table>
+    </main>
+</div>
+
+@section Scripts {
+    <script>
+        const orders = [
+            { id: 'TB001', date: '2026-03-01', items: 2, total: 250, status: 'Shipped' },
+            { id: 'TB002', date: '2026-03-03', items: 1, total: 1200, status: 'Processing' },
+            { id: 'TB003', date: '2026-03-05', items: 3, total: 560, status: 'Delivered' }
+        ];
+
+        const ordersTable = document.getElementById('orders-table');
+
+        orders.forEach(order => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${order.id}</td>
+                <td>${order.date}</td>
+                <td>${order.items}</td>
+                <td>$${order.total.toFixed(2)}</td>
+                <td>${order.status}</td>
+                <td><button class="btn-view" data-id="${order.id}">View</button></td>
+            `;
+            ordersTable.appendChild(tr);
+        });
+
+        ordersTable.addEventListener('click', e => {
+            if(e.target.classList.contains('btn-view')){
+                const id = e.target.dataset.id;
+                alert('Viewing order ' + id);
+            }
+        });
+    </script>
+}

@@ -1,0 +1,47 @@
+@{
+    ViewData["Title"] = "Profile - Taurus Bike Shop";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" />
+}
+
+<div class="profile-page">
+    <header class="profile-header">
+        <h1>👤 My Profile</h1>
+        <a href="/" class="btn-home">← Back to Shop</a>
+    </header>
+
+    <main class="profile-main">
+        <div class="profile-card">
+            <div class="profile-avatar">
+                <img src="~/images/avatar.png" alt="User Avatar" />
+            </div>
+            <form id="profile-form">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" value="John Doe" required />
+
+                <label for="email">Email</label>
+                <input type="email" id="email" value="john@example.com" required />
+
+                <label for="phone">Phone</label>
+                <input type="text" id="phone" value="+63 912 345 6789" required />
+
+                <label for="address">Address</label>
+                <input type="text" id="address" value="123 Taurus St., Manila" required />
+
+                <button type="submit" class="btn-update">Update Profile</button>
+            </form>
+        </div>
+    </main>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('profile-form').addEventListener('submit', e => {
+            e.preventDefault();
+            alert('Profile updated successfully!');
+        });
+    </script>
+}

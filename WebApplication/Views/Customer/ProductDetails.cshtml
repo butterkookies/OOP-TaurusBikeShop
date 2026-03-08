@@ -1,0 +1,63 @@
+@{
+    ViewData["Title"] = "Product Details - Taurus Bike Shop";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/productdetails.css" />
+}
+
+<div class="product-page">
+    <div class="product-gallery">
+        <img id="main-image" src="~/images/bike1.jpg" alt="Taurus MTB Bike" />
+        <div class="thumbnail-row">
+            <img src="~/images/bike1.jpg" alt="Taurus MTB Bike" class="thumb active" />
+            <img src="~/images/bike2.jpg" alt="Taurus MTB Bike Side" class="thumb" />
+            <img src="~/images/bike3.jpg" alt="Taurus MTB Bike Closeup" class="thumb" />
+        </div>
+    </div>
+
+    <div class="product-info">
+        <h1>Taurus MTB Bike</h1>
+        <p class="price">$1,200.00</p>
+        <p class="description">
+            Experience the thrill of the trail with the Taurus MTB Bike, built for speed, durability, and style. Perfect for both beginners and seasoned riders.
+        </p>
+
+        <div class="quantity-selector">
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" min="1" value="1" />
+        </div>
+
+        <div class="product-actions">
+            <button id="add-to-cart">Add to Cart 🛒</button>
+            <button id="buy-now">Buy Now 💳</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const mainImage = document.getElementById('main-image');
+        const thumbs = document.querySelectorAll('.thumb');
+
+        thumbs.forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                mainImage.src = thumb.src;
+                thumbs.forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+            });
+        });
+
+        document.getElementById('add-to-cart').addEventListener('click', () => {
+            const qty = parseInt(document.getElementById('quantity').value);
+            alert(`Added ${qty} Taurus MTB Bike(s) to your cart!`);
+        });
+
+        document.getElementById('buy-now').addEventListener('click', () => {
+            const qty = parseInt(document.getElementById('quantity').value);
+            alert(`Proceeding to buy ${qty} Taurus MTB Bike(s)...`);
+            window.location.href = '/Checkout';
+        });
+    </script>
+}

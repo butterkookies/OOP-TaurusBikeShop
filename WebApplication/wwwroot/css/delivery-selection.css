@@ -1,0 +1,74 @@
+/* File: wwwroot/css/deliveryselection.css */
+
+.delivery-modal {
+    max-width: 450px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    color: #1a1a1a;
+}
+
+.delivery-modal h2 {
+    color: #d32f2f;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.delivery-option {
+    display: block;
+    background: #fff5f5;
+    border: 2px solid #d32f2f;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.delivery-option:hover {
+    background: #ffe5e5;
+}
+
+.delivery-option input {
+    margin-right: 10px;
+}
+
+.delivery-details {
+    margin: 15px 0 25px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.btn-confirm {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    background: #d32f2f;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-confirm:hover {
+    background: #b71c1c;
+}
+
+@media (max-width: 480px){
+    .delivery-modal {
+        padding: 20px 15px;
+    }
+    .delivery-option {
+        padding: 12px;
+    }
+    .btn-confirm {
+        padding: 12px;
+    }
+}
