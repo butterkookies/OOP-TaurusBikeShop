@@ -1,0 +1,84 @@
+/* ===========================
+   PRODUCT CATALOG GRID
+   =========================== */
+.catalog-container {
+    padding: 40px 20px;
+    background: #f5f5f5;
+}
+
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+/* ===========================
+   PRODUCT CARD
+   =========================== */
+.catalog-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.catalog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+/* ===========================
+   PRODUCT IMAGE
+   =========================== */
+.catalog-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+/* ===========================
+   PRODUCT TITLE & DESC
+   =========================== */
+.catalog-card h5 {
+    color: #8B0000;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.catalog-card p {
+    font-size: 0.95rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* ===========================
+   BUTTON
+   =========================== */
+.catalog-card .btn-taurus {
+    width: 100%;
+    padding: 10px 0;
+    font-weight: 600;
+}
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+@media (max-width: 768px) {
+    .catalog-container {
+        padding: 20px 10px;
+    }
+
+    .catalog-card h5 {
+        font-size: 1rem;
+    }
+
+    .catalog-card p {
+        font-size: 0.9rem;
+    }
+}

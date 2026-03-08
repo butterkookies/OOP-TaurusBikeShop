@@ -1,34 +1,53 @@
-/* PAGE BACKGROUND */
-
+/* ===========================
+   PAGE BACKGROUND
+   =========================== */
 .register-page {
     min-height: 90vh;
     display: flex;
     align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: #f8f8f8;
+    /* subtle light gray to make cards pop */
 }
 
-/* CARD */
-
+/* ===========================
+   CARD
+   =========================== */
 .register-card {
     background: white;
-    padding: 40px;
+    padding: 30px 25px;
     border-radius: 14px;
     box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* BRAND */
+.register-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
 
+/* ===========================
+   BRAND
+   =========================== */
 .brand-title {
     font-weight: 700;
     color: #8B0000;
     /* muted bulls red */
+    font-size: 2.5rem;
 }
 
-/* BUTTON */
-
+/* ===========================
+   BUTTON
+   =========================== */
 .btn-taurus {
     background-color: #8B0000;
     color: white;
     border: none;
+    padding: 10px 25px;
+    font-size: 1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
 }
 
 .btn-taurus:hover {
@@ -36,19 +55,26 @@
     color: white;
 }
 
-/* SECTION TITLES */
-
+/* ===========================
+   SECTION TITLES
+   =========================== */
 .section-title {
     font-weight: 600;
     margin-bottom: 15px;
+    color: #8B0000;
 }
 
 .section-divider {
     margin: 25px 0;
+    border-top: 2px solid #8B0000;
+    width: 50px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* LOGIN LINK */
-
+/* ===========================
+   LOGIN LINK
+   =========================== */
 .login-link {
     color: #8B0000;
     font-weight: 500;
@@ -57,4 +83,22 @@
 
 .login-link:hover {
     text-decoration: underline;
+}
+
+/* ===========================
+   RESPONSIVE TYPOGRAPHY
+   =========================== */
+@media (max-width: 768px) {
+    .brand-title {
+        font-size: 2rem;
+    }
+
+    .register-card {
+        padding: 20px;
+    }
+
+    .btn-taurus {
+        padding: 8px 20px;
+        font-size: 0.95rem;
+    }
 }

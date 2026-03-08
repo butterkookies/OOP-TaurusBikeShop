@@ -1,8 +1,43 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Taurus Bike Shop";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="register-page">
+    <div class="container text-center">
+        <!-- Hero Section -->
+        <h1 class="brand-title mb-3">Welcome to Taurus Bike Shop</h1>
+        <p class="mb-4">Ride with strength, style, and performance. Explore our premium collection of bikes.</p>
+        <a href="/Customer/ProductCatalog" class="btn btn-taurus btn-lg">Shop Now</a>
+
+        <hr class="section-divider my-5">
+
+        <!-- Feature Section -->
+        <div class="row justify-content-center">
+            <div class="col-md-4 mb-4">
+                <div class="register-card">
+                    <h4 class="section-title">Mountain Bikes</h4>
+                    <p>Conquer any terrain with our rugged mountain bikes.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="register-card">
+                    <h4 class="section-title">Road Bikes</h4>
+                    <p>Fast and light bikes perfect for daily commutes and racing.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="register-card">
+                    <h4 class="section-title">City Cruisers</h4>
+                    <p>Comfortable and stylish bikes for urban riding.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="mt-5">
+            <p>Already have an account? <a href="/Customer/Login" class="login-link">Login here</a></p>
+        </div>
+    </div>
 </div>
