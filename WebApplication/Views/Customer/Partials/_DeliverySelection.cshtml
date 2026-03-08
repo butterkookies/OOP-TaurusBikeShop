@@ -1,0 +1,49 @@
+@model dynamic
+
+<div class="delivery-modal">
+    <h2>🚚 Select Delivery Option</h2>
+    <form id="deliveryForm">
+        <label class="delivery-option">
+            <input type="radio" name="delivery" value="lalamove" checked />
+            <span>Lalamove Express Delivery</span>
+        </label>
+        <label class="delivery-option">
+            <input type="radio" name="delivery" value="pickup" />
+            <span>Store Pickup</span>
+        </label>
+
+        <div class="delivery-details" id="lalamoveDetails">
+            <p>Estimated Delivery: 1-2 days. Tracking available via Lalamove app.</p>
+        </div>
+
+        <div class="delivery-details" id="pickupDetails" style="display:none;">
+            <p>Pickup from Taurus Bike Shop main store. Available immediately.</p>
+        </div>
+
+        <button type="submit" class="btn-confirm">Confirm Delivery</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        const form = document.getElementById('deliveryForm');
+        const lalamoveDetails = document.getElementById('lalamoveDetails');
+        const pickupDetails = document.getElementById('pickupDetails');
+
+        form.addEventListener('change', () => {
+            const selected = form.delivery.value;
+            if(selected === 'lalamove'){
+                lalamoveDetails.style.display = 'block';
+                pickupDetails.style.display = 'none';
+            } else {
+                lalamoveDetails.style.display = 'none';
+                pickupDetails.style.display = 'block';
+            }
+        });
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            alert(`Delivery option '${form.delivery.value}' confirmed!`);
+        });
+    </script>
+}

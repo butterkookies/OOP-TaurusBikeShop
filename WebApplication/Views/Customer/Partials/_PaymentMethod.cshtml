@@ -1,0 +1,52 @@
+@model dynamic
+
+<div class="payment-method-modal">
+    <h2>💳 Select Payment Method</h2>
+    <form id="paymentForm">
+        <label class="payment-option">
+            <input type="radio" name="payment" value="gcash" checked />
+            <span>GCash</span>
+        </label>
+        <label class="payment-option">
+            <input type="radio" name="payment" value="credit" />
+            <span>Credit/Debit Card</span>
+        </label>
+        <label class="payment-option">
+            <input type="radio" name="payment" value="cod" />
+            <span>Cash on Delivery</span>
+        </label>
+
+        <div class="payment-details" id="gcashDetails">
+            <p>Pay securely via GCash QR or account.</p>
+        </div>
+        <div class="payment-details" id="creditDetails" style="display:none;">
+            <p>Enter card details at checkout.</p>
+        </div>
+        <div class="payment-details" id="codDetails" style="display:none;">
+            <p>Pay with cash upon delivery.</p>
+        </div>
+
+        <button type="submit" class="btn-confirm">Confirm Payment</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        const form = document.getElementById('paymentForm');
+        const gcashDetails = document.getElementById('gcashDetails');
+        const creditDetails = document.getElementById('creditDetails');
+        const codDetails = document.getElementById('codDetails');
+
+        form.addEventListener('change', () => {
+            const selected = form.payment.value;
+            gcashDetails.style.display = selected === 'gcash' ? 'block' : 'none';
+            creditDetails.style.display = selected === 'credit' ? 'block' : 'none';
+            codDetails.style.display = selected === 'cod' ? 'block' : 'none';
+        });
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            alert(`Payment method '${form.payment.value}' confirmed!`);
+        });
+    </script>
+}
