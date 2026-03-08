@@ -12,7 +12,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Home/Error"); 
     app.UseHsts();
 }
 
@@ -24,5 +24,8 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Urls.Add("http://0.0.0.0:5064"); // Allows all devices on LAN to connect
+app.Urls.Add("https://0.0.0.0:7177"); // optional for PC only
 
 app.Run();

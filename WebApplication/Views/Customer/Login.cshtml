@@ -1,0 +1,48 @@
+@{
+    ViewData["Title"] = "Customer Login";
+}
+
+<link rel="stylesheet" href="~/css/customer.css" />
+
+<div class="register-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="register-card">
+
+                    <!-- Brand -->
+                    <h2 class="brand-title text-center mb-4">Taurus Bike Shop</h2>
+
+                    <!-- Section Title -->
+                    <h4 class="section-title text-center">Customer Login</h4>
+                    <div class="section-divider"></div>
+
+                    <!-- Login Form -->
+                    <form method="post" action="/Customer/Login">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   placeholder="Enter your email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   placeholder="Enter your password" required>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-taurus btn-lg">Login</button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <span>Don't have an account? </span>
+                            <a href="/Customer/Register" class="login-link">Register here</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
