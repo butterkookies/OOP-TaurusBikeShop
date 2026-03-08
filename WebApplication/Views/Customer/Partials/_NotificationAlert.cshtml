@@ -1,0 +1,21 @@
+@model dynamic
+
+<div class="notification-alert" id="notificationAlert">
+    <span class="close-alert" id="closeAlert">&times;</span>
+    <p id="alertMessage">@Model.Message</p>
+</div>
+
+@section Scripts {
+    <script>
+        const alertBox = document.getElementById('notificationAlert');
+        const closeBtn = document.getElementById('closeAlert');
+
+        function showAlert(message, duration = 4000) {
+            document.getElementById('alertMessage').textContent = message;
+            alertBox.style.display = 'flex';
+            setTimeout(() => { alertBox.style.display = 'none'; }, duration);
+        }
+
+        closeBtn.addEventListener('click', () => { alertBox.style.display = 'none'; });
+    </script>
+}

@@ -1,0 +1,27 @@
+@model dynamic
+
+<div class="order-summary">
+    <h2>📝 Order Summary</h2>
+    <ul class="summary-items">
+        @foreach(var item in Model.Items)
+        {
+            <li>
+                <span class="item-name">@item.Name (x@item.Quantity)</span>
+                <span class="item-price">$@item.TotalPrice.ToString("F2")</span>
+            </li>
+        }
+    </ul>
+    <div class="summary-total">
+        <span>Total:</span>
+        <span class="total-price">$@Model.Total.ToString("F2")</span>
+    </div>
+    <button id="proceedCheckout" class="btn-proceed">Proceed to Checkout 🛒</button>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('proceedCheckout').addEventListener('click', () => {
+            window.location.href = '/Checkout';
+        });
+    </script>
+}

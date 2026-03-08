@@ -1,0 +1,101 @@
+/* File: wwwroot/css/profile.css */
+
+.profile-page {
+    font-family: 'Segoe UI', sans-serif;
+    padding: 30px 20px;
+    background: #fff5f5;
+    min-height: 90vh;
+    color: #1a1a1a;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.profile-header h1 {
+    color: #d32f2f;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.btn-home {
+    text-decoration: none;
+    color: #d32f2f;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-home:hover {
+    color: #a71d1d;
+}
+
+.profile-main {
+    display: flex;
+    justify-content: center;
+}
+
+.profile-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+.profile-avatar {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-avatar img {
+    width: 120px;
+    border-radius: 50%;
+    border: 4px solid #d32f2f;
+}
+
+.profile-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.profile-card label {
+    font-weight: bold;
+    color: #b71c1c;
+}
+
+.profile-card input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+.btn-update {
+    padding: 15px;
+    background: #d32f2f;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-update:hover {
+    background: #b71c1c;
+}
+
+@media (max-width: 768px){
+    .profile-card {
+        padding: 20px;
+    }
+    .profile-avatar img {
+        width: 100px;
+    }
+}

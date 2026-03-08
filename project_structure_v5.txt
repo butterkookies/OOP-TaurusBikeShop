@@ -1,0 +1,519 @@
+Folder PATH listing
+Volume serial number is BA29-06A1
+C:.
+|   .gitignore
+|   OOP-TaurusBikeShop.sln
+|   project_structure.txt
+|   project_structure_v4.txt
+|   project_structure_v5.txt
+|   README.md
+|   Tools.txt
+|   
++---.github
+|   \---workflows
++---.postman
+|       resources.yaml
+|       
++---.vs
+|   |   slnx.sqlite
+|   |   VSWorkspaceState.json
+|   |   
+|   +---OOP-TaurusBikeShop
+|   |   +---copilot-chat
+|   |   |   \---16054b38
+|   |   |       \---sessions
+|   |   +---CopilotIndices
+|   |   |   \---18.4.89.4080
+|   |   |           CodeChunks.db
+|   |   |           SemanticSymbols.db
+|   |   |           
+|   |   +---DesignTimeBuild
+|   |   |       .dtbcache.v2
+|   |   |       
+|   |   +---FileContentIndex
+|   |   |       b4b955e7-168b-45d2-a192-35def0dec471.vsidx
+|   |   |       
+|   |   \---v18
+|   |           .futdcache.v2
+|   |           DocumentLayout.json
+|   |           
+|   +---OOP-TaurusBikeShop.slnx
+|   |   +---copilot-chat
+|   |   |   \---16054b38
+|   |   |       \---sessions
+|   |   +---FileContentIndex
+|   |   |       b32e39a7-e757-4698-b732-44d0f142a9e6.vsidx
+|   |   |       
+|   |   \---v18
+|   |           DocumentLayout.json
+|   |           
+|   \---ProjectEvaluation
+|           oop-taurusbikeshop.metadata.v10.bin
+|           oop-taurusbikeshop.projects.v10.bin
+|           oop-taurusbikeshop.strings.v10.bin
+|           
++---Mermaid
+|   +---Claude
+|   |       10_LOGISTICS_MANAGEMENT.mmd
+|   |       11_WALKIN_POS.mmd
+|   |       12_INVENTORY_MANAGEMENT.mmd
+|   |       13_SUPPORT_SYSTEM.mmd
+|   |       14_BACKGROUND_JOBS.mmd
+|   |       1_CUSTOMER_REGISTRATION_LOGIN.mmd
+|   |       2_CUSTOMER_DASHBOARD_SHOPPING.mmd
+|   |       3_CART_CHECKOUT.mmd
+|   |       4_PAYMENT_PROCESSING.mmd
+|   |       5_ORDER_CONFIRMATION_TRACKING.mmd
+|   |       6_DELIVERY_REVIEW.mmd
+|   |       7_ADMIN_OVERVIEW.mmd
+|   |       8_ONLINE_ORDERS_MANAGEMENT.mmd
+|   |       9_PAYMENT_VERIFICATION.mmd
+|   |       COMPLETE_SOLUTION_SUMMARY.md
+|   |       MODULAR_FLOWCHART_GUIDE.md
+|   |       
+|   +---ProgramFlow
+|   |       flowchart_v1.md
+|   |       flowchart_v10.md
+|   |       flowchart_v2.md
+|   |       flowchart_v3.md
+|   |       flowchart_v4.md
+|   |       flowchart_v5.md
+|   |       flowchart_v6.md
+|   |       flowchart_v7.md
+|   |       flowchart_v8.md
+|   |       flowchart_v9.md
+|   |       
+|   \---TechnicalFlow
+|           admin_to_customer_v1.md
+|           tf_v1.md
+|           tf_v2.md
+|           
++---postman
+|   \---globals
+|           workspace.globals.yaml
+|           
+\---WebApplication
+    |   appsettings.Development.json
+    |   appsettings.json
+    |   Program.cs
+    |   WebApplication.csproj
+    |   WebApplication.csproj.user
+    |   WebApplication.slnx
+    |   
+    +---.vs
+    |   |   slnx.sqlite
+    |   |   VSWorkspaceState.json
+    |   |   
+    |   +---ProjectEvaluation
+    |   +---WebApplication
+    |   |   \---CopilotIndices
+    |   |       \---18.4.89.4080
+    |   |               CodeChunks.db
+    |   |               CodeChunks.db-shm
+    |   |               CodeChunks.db-wal
+    |   |               SemanticSymbols.db
+    |   |               SemanticSymbols.db-shm
+    |   |               SemanticSymbols.db-wal
+    |   |               
+    |   \---WebApplication.slnx
+    |       +---config
+    |       |       applicationhost.config
+    |       |       
+    |       +---copilot-chat
+    |       |   \---16054b38
+    |       |       \---sessions
+    |       +---DesignTimeBuild
+    |       |       .dtbcache.v2
+    |       |       
+    |       +---FileContentIndex
+    |       |       9c87f3e7-540e-4b29-b9f5-f8879eeaa962.vsidx
+    |       |       b906d861-a3eb-490c-9469-dfd29f3f2c36.vsidx
+    |       |       ed41b490-634e-4b76-8c9d-dfe268ddf7d2.vsidx
+    |       |       ee38aa2f-05f0-4e53-bb4c-a3dc2adfb8f0.vsidx
+    |       |       f22eda81-260d-4670-9028-7373b00d7692.vsidx
+    |       |       
+    |       \---v18
+    |               .futdcache.v2
+    |               DocumentLayout.backup.json
+    |               DocumentLayout.json
+    |               
+    +---bin
+    |   +---Debug
+    |   |   +---net10.0
+    |   |   \---net8.0
+    |   |           appsettings.Development.json
+    |   |           appsettings.json
+    |   |           WebApplication.deps.json
+    |   |           WebApplication.dll
+    |   |           WebApplication.exe
+    |   |           WebApplication.pdb
+    |   |           WebApplication.runtimeconfig.json
+    |   |           WebApplication.staticwebassets.endpoints.json
+    |   |           WebApplication.staticwebassets.runtime.json
+    |   |           
+    |   \---Release
+    |       \---net10.0
+    +---BusinessLogic
+    |   |   .gitkeep
+    |   |   
+    |   +---Interfaces
+    |   |       ICartService.cs
+    |   |       IOrderService.cs
+    |   |       IProductService.cs
+    |   |       IUserService.cs
+    |   |       
+    |   \---Services
+    |           CartService.cs
+    |           OrderService.cs
+    |           ProductService.cs
+    |           UserService.cs
+    |           
+    +---Controllers
+    |       CartController.cs
+    |       CheckoutController.cs
+    |       CustomerController.cs
+    |       HomeController.cs
+    |       OrderController.cs
+    |       ProductController.cs
+    |       
+    +---DataAccess
+    |   |   .gitkeep
+    |   |   
+    |   +---Context
+    |   |       AppDbContext.cs
+    |   |       
+    |   \---Repositories
+    |           CartRepository.cs
+    |           IRepository.cs
+    |           OrderRepository.cs
+    |           ProductRepository.cs
+    |           Repository.cs
+    |           UserRepository.cs
+    |           
+    +---Models
+    |   |   ErrorViewModel.cs
+    |   |   
+    |   +---Entities
+    |   |       CartItem.cs
+    |   |       Category.cs
+    |   |       Delivery.cs
+    |   |       Order.cs
+    |   |       OrderItem.cs
+    |   |       Payment.cs
+    |   |       Product.cs
+    |   |       Review.cs
+    |   |       User.cs
+    |   |       
+    |   \---ViewModels
+    |           CartViewModel.cs
+    |           CheckoutViewModel.cs
+    |           LoginViewModel.cs
+    |           OrderViewModel.cs
+    |           ProductViewModel.cs
+    |           RegisterViewModel.cs
+    |           
+    +---obj
+    |   |   project.assets.json
+    |   |   project.nuget.cache
+    |   |   WebApplication.csproj.nuget.dgspec.json
+    |   |   WebApplication.csproj.nuget.g.props
+    |   |   WebApplication.csproj.nuget.g.targets
+    |   |   
+    |   +---Debug
+    |   |   +---net10.0
+    |   |   |   |   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+    |   |   |   |   rpswa.dswa.cache.json
+    |   |   |   |   staticwebassets.removed.txt
+    |   |   |   |   WebApplication.AssemblyInfo.cs
+    |   |   |   |   WebApplication.AssemblyInfoInputs.cache
+    |   |   |   |   WebApplication.assets.cache
+    |   |   |   |   WebApplication.GeneratedMSBuildEditorConfig.editorconfig
+    |   |   |   |   WebApplication.GlobalUsings.g.cs
+    |   |   |   |   WebApplication.RazorAssemblyInfo.cache
+    |   |   |   |   WebApplication.RazorAssemblyInfo.cs
+    |   |   |   |   
+    |   |   |   +---ref
+    |   |   |   +---refint
+    |   |   |   \---staticwebassets
+    |   |   \---net8.0
+    |   |       |   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+    |   |       |   ApiEndpoints.json
+    |   |       |   apphost.exe
+    |   |       |   rjimswa.dswa.cache.json
+    |   |       |   rjsmcshtml.dswa.cache.json
+    |   |       |   rjsmrazor.dswa.cache.json
+    |   |       |   rpswa.dswa.cache.json
+    |   |       |   staticwebassets.build.endpoints.json
+    |   |       |   staticwebassets.build.json
+    |   |       |   staticwebassets.build.json.cache
+    |   |       |   staticwebassets.development.json
+    |   |       |   staticwebassets.references.upToDateCheck.txt
+    |   |       |   staticwebassets.removed.txt
+    |   |       |   staticwebassets.upToDateCheck.txt
+    |   |       |   swae.build.ex.cache
+    |   |       |   WebApplication.AssemblyInfo.cs
+    |   |       |   WebApplication.AssemblyInfoInputs.cache
+    |   |       |   WebApplication.assets.cache
+    |   |       |   WebApplication.csproj.BuildWithSkipAnalyzers
+    |   |       |   WebApplication.csproj.CoreCompileInputs.cache
+    |   |       |   WebApplication.csproj.FileListAbsolute.txt
+    |   |       |   WebApplication.dll
+    |   |       |   WebApplication.GeneratedMSBuildEditorConfig.editorconfig
+    |   |       |   WebApplication.genruntimeconfig.cache
+    |   |       |   WebApplication.GlobalUsings.g.cs
+    |   |       |   WebApplication.MvcApplicationPartsAssemblyInfo.cache
+    |   |       |   WebApplication.pdb
+    |   |       |   WebApplication.RazorAssemblyInfo.cache
+    |   |       |   WebApplication.RazorAssemblyInfo.cs
+    |   |       |   WebApplication.sourcelink.json
+    |   |       |   
+    |   |       +---ref
+    |   |       |       WebApplication.dll
+    |   |       |       
+    |   |       +---refint
+    |   |       |       WebApplication.dll
+    |   |       |       
+    |   |       +---scopedcss
+    |   |       |   +---bundle
+    |   |       |   |       WebApplication.styles.css
+    |   |       |   |       
+    |   |       |   +---projectbundle
+    |   |       |   |       WebApplication.bundle.scp.css
+    |   |       |   |       
+    |   |       |   \---Views
+    |   |       |       \---Shared
+    |   |       |               _Layout.cshtml.rz.scp.css
+    |   |       |               
+    |   |       \---staticwebassets
+    |   \---Release
+    |       \---net10.0
+    |           |   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+    |           |   WebApplication.AssemblyInfo.cs
+    |           |   WebApplication.AssemblyInfoInputs.cache
+    |           |   WebApplication.GeneratedMSBuildEditorConfig.editorconfig
+    |           |   WebApplication.GlobalUsings.g.cs
+    |           |   WebApplication.RazorAssemblyInfo.cache
+    |           |   WebApplication.RazorAssemblyInfo.cs
+    |           |   
+    |           +---ref
+    |           \---refint
+    +---ProjectStructure
+    |       frontend_pst.txt
+    |       project_structure.txt
+    |       project_structure_v2.txt
+    |       project_structure_v3.txt
+    |       
+    +---Prompts
+    |       cshtml-ui.txt
+    |       
+    +---Properties
+    |       launchSettings.json
+    |       
+    +---Utilities
+    |       FileUploadHelper.cs
+    |       PasswordHelper.cs
+    |       ValidationHelper.cs
+    |       
+    +---Views
+    |   |   _ViewImports.cshtml
+    |   |   _ViewStart.cshtml
+    |   |   
+    |   +---Customer
+    |   |   |   .gitkeep
+    |   |   |   Cart.cshtml
+    |   |   |   Checkout.cshtml
+    |   |   |   Confirmation.cshtml
+    |   |   |   Dashboard.cshtml
+    |   |   |   Login.cshtml
+    |   |   |   OrderHistory.cshtml
+    |   |   |   Payment.cshtml
+    |   |   |   ProductCatalog.cshtml
+    |   |   |   ProductDetails.cshtml
+    |   |   |   Profile.cshtml
+    |   |   |   Register.cshtml
+    |   |   |   
+    |   |   \---Partials
+    |   |           _CartItem.cshtml
+    |   |           _ConfirmationModal.cshtml
+    |   |           _DeliverySelection.cshtml
+    |   |           _NotificationAlert.cshtml
+    |   |           _OrderSummary.cshtml
+    |   |           _OTPModal.cshtml
+    |   |           _PaymentMethod.cshtml
+    |   |           _ProductCard.cshtml
+    |   |           
+    |   +---Home
+    |   |       Index.cshtml
+    |   |       Privacy.cshtml
+    |   |       
+    |   \---Shared
+    |           Error.cshtml
+    |           footer.css
+    |           _Footer.cshtml
+    |           _Layout.cshtml
+    |           _Layout.cshtml.css
+    |           _Navbar.cshtml
+    |           _ValidationScriptsPartial.cshtml
+    |           
+    \---wwwroot
+        |   favicon.ico
+        |   
+        +---css
+        |       auth.css
+        |       bootstrap-grid.css
+        |       bootstrap-grid.css.map
+        |       bootstrap-grid.min.css
+        |       bootstrap-grid.min.css.map
+        |       bootstrap-grid.rtl.css
+        |       bootstrap-grid.rtl.css.map
+        |       bootstrap-grid.rtl.min.css
+        |       bootstrap-grid.rtl.min.css.map
+        |       bootstrap-reboot.css
+        |       bootstrap-reboot.css.map
+        |       bootstrap-reboot.min.css
+        |       bootstrap-reboot.min.css.map
+        |       bootstrap-reboot.rtl.css
+        |       bootstrap-reboot.rtl.css.map
+        |       bootstrap-reboot.rtl.min.css
+        |       bootstrap-reboot.rtl.min.css.map
+        |       bootstrap-utilities.css
+        |       bootstrap-utilities.css.map
+        |       bootstrap-utilities.min.css
+        |       bootstrap-utilities.min.css.map
+        |       bootstrap-utilities.rtl.css
+        |       bootstrap-utilities.rtl.css.map
+        |       bootstrap-utilities.rtl.min.css
+        |       bootstrap-utilities.rtl.min.css.map
+        |       bootstrap.css
+        |       bootstrap.css.map
+        |       bootstrap.min.css
+        |       bootstrap.min.css.map
+        |       bootstrap.rtl.css
+        |       bootstrap.rtl.css.map
+        |       bootstrap.rtl.min.css
+        |       bootstrap.rtl.min.css.map
+        |       cart-item.css
+        |       cart.css
+        |       checkout.css
+        |       confirmation-modal.css
+        |       confirmation.css
+        |       customer.css
+        |       dashboard.css
+        |       delivery-selection.css
+        |       notification-alert.css
+        |       order-history.css
+        |       order-summary.css
+        |       otp-modal.css
+        |       payment-method.css
+        |       payment.css
+        |       product-card.css
+        |       product-catalog.css
+        |       product-details.css
+        |       profile.css
+        |       responsive.css
+        |       site.css
+        |       
+        +---images
+        +---js
+        |       bootstrap.bundle.js
+        |       bootstrap.bundle.js.map
+        |       bootstrap.bundle.min.js
+        |       bootstrap.bundle.min.js.map
+        |       bootstrap.esm.js
+        |       bootstrap.esm.js.map
+        |       bootstrap.esm.min.js
+        |       bootstrap.esm.min.js.map
+        |       bootstrap.js
+        |       bootstrap.js.map
+        |       bootstrap.min.js
+        |       bootstrap.min.js.map
+        |       cart.js
+        |       checkout.js
+        |       confirmation.js
+        |       customer.js
+        |       order-history.js
+        |       payment.js
+        |       product-catalog.js
+        |       site.js
+        |       utils.js
+        |       
+        \---lib
+            +---bootstrap
+            |   |   LICENSE
+            |   |   
+            |   \---dist
+            |       +---css
+            |       |       bootstrap-grid.css
+            |       |       bootstrap-grid.css.map
+            |       |       bootstrap-grid.min.css
+            |       |       bootstrap-grid.min.css.map
+            |       |       bootstrap-grid.rtl.css
+            |       |       bootstrap-grid.rtl.css.map
+            |       |       bootstrap-grid.rtl.min.css
+            |       |       bootstrap-grid.rtl.min.css.map
+            |       |       bootstrap-reboot.css
+            |       |       bootstrap-reboot.css.map
+            |       |       bootstrap-reboot.min.css
+            |       |       bootstrap-reboot.min.css.map
+            |       |       bootstrap-reboot.rtl.css
+            |       |       bootstrap-reboot.rtl.css.map
+            |       |       bootstrap-reboot.rtl.min.css
+            |       |       bootstrap-reboot.rtl.min.css.map
+            |       |       bootstrap-utilities.css
+            |       |       bootstrap-utilities.css.map
+            |       |       bootstrap-utilities.min.css
+            |       |       bootstrap-utilities.min.css.map
+            |       |       bootstrap-utilities.rtl.css
+            |       |       bootstrap-utilities.rtl.css.map
+            |       |       bootstrap-utilities.rtl.min.css
+            |       |       bootstrap-utilities.rtl.min.css.map
+            |       |       bootstrap.css
+            |       |       bootstrap.css.map
+            |       |       bootstrap.min.css
+            |       |       bootstrap.min.css.map
+            |       |       bootstrap.rtl.css
+            |       |       bootstrap.rtl.css.map
+            |       |       bootstrap.rtl.min.css
+            |       |       bootstrap.rtl.min.css.map
+            |       |       
+            |       \---js
+            |               bootstrap.bundle.js
+            |               bootstrap.bundle.js.map
+            |               bootstrap.bundle.min.js
+            |               bootstrap.bundle.min.js.map
+            |               bootstrap.esm.js
+            |               bootstrap.esm.js.map
+            |               bootstrap.esm.min.js
+            |               bootstrap.esm.min.js.map
+            |               bootstrap.js
+            |               bootstrap.js.map
+            |               bootstrap.min.js
+            |               bootstrap.min.js.map
+            |               
+            +---jquery
+            |   |   LICENSE.txt
+            |   |   
+            |   \---dist
+            |           jquery.js
+            |           jquery.min.js
+            |           jquery.min.map
+            |           jquery.slim.js
+            |           jquery.slim.min.js
+            |           jquery.slim.min.map
+            |           
+            +---jquery-validation
+            |   |   LICENSE.md
+            |   |   
+            |   \---dist
+            |           additional-methods.js
+            |           additional-methods.min.js
+            |           jquery.validate.js
+            |           jquery.validate.min.js
+            |           
+            \---jquery-validation-unobtrusive
+                |   LICENSE.txt
+                |   
+                \---dist
+                        jquery.validate.unobtrusive.js
+                        jquery.validate.unobtrusive.min.js
+                        

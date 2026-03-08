@@ -1,0 +1,41 @@
+@model dynamic
+
+<div class="otp-modal" id="otpModal">
+    <div class="modal-content">
+        <span class="close-btn" id="closeOtp">&times;</span>
+        <h2>🔒 Enter OTP</h2>
+        <p>An OTP has been sent to your registered phone/email.</p>
+        <form id="otpForm">
+            <input type="text" id="otpInput" placeholder="Enter OTP" maxlength="6" required />
+            <button type="submit" class="btn-verify">Verify</button>
+        </form>
+        <p class="resend-text">Didn't receive OTP? <span id="resendOtp" class="resend-btn">Resend</span></p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const otpModal = document.getElementById('otpModal');
+        const closeOtp = document.getElementById('closeOtp');
+        const otpForm = document.getElementById('otpForm');
+        const resendBtn = document.getElementById('resendOtp');
+
+        function showOtpModal() {
+            otpModal.style.display = 'flex';
+        }
+
+        closeOtp.addEventListener('click', () => { otpModal.style.display = 'none'; });
+
+        window.addEventListener('click', e => { if(e.target === otpModal) otpModal.style.display = 'none'; });
+
+        otpForm.addEventListener('submit', e => {
+            e.preventDefault();
+            alert('OTP Verified Successfully!');
+            otpModal.style.display = 'none';
+        });
+
+        resendBtn.addEventListener('click', () => {
+            alert('A new OTP has been sent!');
+        });
+    </script>
+}
