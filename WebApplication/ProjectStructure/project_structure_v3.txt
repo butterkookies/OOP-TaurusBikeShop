@@ -1,0 +1,157 @@
+WebApplication
+│
+│   appsettings.Development.json        // Development-specific configuration settings
+│   appsettings.json                    // General configuration settings for the application
+│   Program.cs                          // Entry point: sets up host, services, middleware
+│   WebApplication.csproj               // Project definition for build and dependencies
+│   WebApplication.csproj.user          // User-specific project settings
+│   WebApplication.slnx                 // Solution file linking multiple projects
+│
+├───BusinessLogic
+│   │   .gitkeep                        // Placeholder to keep folder in Git
+│   │
+│   ├───🟢 Interfaces
+│   │       🟢 IUserService.cs          // Interface defining user-related business operations
+│   │       🟢 IProductService.cs       // Interface defining product-related operations
+│   │       🟢 ICartService.cs          // Interface defining cart-related operations
+│   │       🟢 IOrderService.cs         // Interface defining order-related operations
+│   │
+│   └───🟢 Services
+│           🟢 UserService.cs           // Implements IUserService, contains user logic
+│           🟢 ProductService.cs        // Implements IProductService, contains product logic
+│           🟢 CartService.cs           // Implements ICartService, manages cart operations
+│           🟢 OrderService.cs          // Implements IOrderService, manages orders
+│
+├───Controllers
+│       CustomerController.cs           // Handles customer page requests
+│       HomeController.cs               // Handles homepage and static pages
+│       🟢 CartController.cs            // Handles cart endpoints
+│       🟢 ProductController.cs         // Handles product catalog/details endpoints
+│       🟢 CheckoutController.cs        // Handles checkout process and payment
+│       🟢 OrderController.cs           // Handles order history and tracking endpoints
+│
+├───DataAccess
+│       .gitkeep                        // Placeholder to keep folder in Git
+│
+│   ├───🟢 Context
+│   │       🟢 AppDbContext.cs          // EF Core DbContext, manages database connection
+│   │
+│   └───🟢 Repositories
+│           🟢 IRepository.cs           // Generic repository interface for CRUD
+│           🟢 Repository.cs            // Generic repository implementation
+│           🟢 UserRepository.cs        // Handles data access for Users
+│           🟢 ProductRepository.cs     // Handles data access for Products
+│           🟢 CartRepository.cs        // Handles data access for Cart items
+│           🟢 OrderRepository.cs       // Handles data access for Orders
+│
+├───Models
+│       ErrorViewModel.cs               // Error page model
+│
+│   ├───🟢 Entities
+│   │       🟢 User.cs                  // User entity model
+│   │       🟢 Product.cs               // Product entity model
+│   │       🟢 Category.cs              // Category entity model
+│   │       🟢 CartItem.cs              // Cart item entity
+│   │       🟢 Order.cs                 // Order entity
+│   │       🟢 OrderItem.cs             // Individual order item entity
+│   │       🟢 Payment.cs               // Payment entity
+│   │       🟢 Delivery.cs              // Delivery entity
+│   │       🟢 Review.cs                // Customer review entity
+│   │
+│   └───🟢 ViewModels
+│           🟢 RegisterViewModel.cs    // User registration form model
+│           🟢 LoginViewModel.cs       // User login form model
+│           🟢 CartViewModel.cs        // Cart page display model
+│           🟢 CheckoutViewModel.cs    // Checkout page model
+│           🟢 OrderViewModel.cs       // Order summary/history model
+│           🟢 ProductViewModel.cs     // Product listing/detail model
+│
+├───🟢 Utilities
+│       🟢 PasswordHelper.cs           // Password hashing/verification helper
+│       🟢 ValidationHelper.cs         // Input validation helper
+│       🟢 FileUploadHelper.cs         // File upload helper
+│
+├───ProjectStructure
+│       frontend_pst.txt                // Project frontend structure notes
+│       project_structure.txt           // Full project structure notes
+│
+├───Prompts
+│       cshtml-ui.txt                   // Notes/prompts for Razor UI generation
+│
+├───Properties
+│       launchSettings.json             // Launch/debug settings for Visual Studio
+│
+├───Views
+│   │   _ViewImports.cshtml             // Razor import statements (namespaces, tag helpers)
+│   │   _ViewStart.cshtml               // Defines default layout for views
+│   │
+│   ├───Customer
+│   │   │   .gitkeep                    // Placeholder
+│   │   │   Cart.cshtml                 // Displays user cart
+│   │   │   Checkout.cshtml             // Checkout page
+│   │   │   Confirmation.cshtml         // Order confirmation page
+│   │   │   Login.cshtml                // Login page
+│   │   │   OrderHistory.cshtml         // Past orders page
+│   │   │   Payment.cshtml              // Payment page
+│   │   │   ProductCatalog.cshtml       // Product listing page
+│   │   │   ProductDetails.cshtml       // Individual product details page
+│   │   │   Register.cshtml             // User registration page
+│   │   │
+│   │   │   🟢 Dashboard.cshtml         // User dashboard page
+│   │   │   🟢 Profile.cshtml           // User profile page
+│   │   │
+│   │   └───Partials
+│   │           _CartItem.cshtml        // Partial for cart item display
+│   │           _ConfirmationModal.cshtml // Partial for confirmation modal
+│   │           _DeliverySelection.cshtml // Partial for delivery options
+│   │           _OrderSummary.cshtml    // Partial for order summary
+│   │           _OTPModal.cshtml        // Partial for OTP verification modal
+│   │           _PaymentMethod.cshtml   // Partial for payment method selection
+│   │           🟢 _ProductCard.cshtml  // Partial for product card display
+│   │           🟢 _NotificationAlert.cshtml // Partial for notifications
+│
+│   ├───Home
+│   │       Index.cshtml                 // Homepage
+│   │       Privacy.cshtml               // Privacy policy page
+│
+│   └───Shared
+│           Error.cshtml                 // Generic error page
+│           _Layout.cshtml               // Main layout template
+│           _Layout.cshtml.css           // Layout-specific styles
+│           _ValidationScriptsPartial.cshtml // Client-side validation scripts
+│           🟢 _Navbar.cshtml            // Site navigation bar partial
+│           🟢 _Footer.cshtml            // Site footer partial
+│
+└───wwwroot
+    │   favicon.ico                      // Site favicon
+    │
+    ├── css
+    │       bootstrap files...           // Bootstrap core CSS files
+    │       cart.css                     // Cart page styles
+    │       checkout.css                 // Checkout page styles
+    │       confirmation.css             // Confirmation page styles
+    │       customer.css                 // Customer pages styles
+    │       order-history.css            // Order history page styles
+    │       product-catalog.css          // Product catalog page styles
+    │       site.css                     // General site-wide styles
+    │       🟢 auth.css                  // Authentication/login/register styles
+    │       🟢 profile.css               // Profile/dashboard styles
+    │       🟢 responsive.css            // Responsive design styles
+    │
+    ├── js
+    │       bootstrap files...           // Bootstrap JS files
+    │       cart.js                      // Cart page scripts
+    │       confirmation.js              // Confirmation page scripts
+    │       customer.js                  // Customer page scripts
+    │       order-history.js             // Order history page scripts
+    │       payment.js                   // Payment page scripts
+    │       product-catalog.js           // Product catalog page scripts
+    │       site.js                      // General site scripts
+    │       🟢 checkout.js               // Checkout page scripts
+    │       🟢 utils.js                  // Utility JS functions
+    │
+    └── lib
+        ├── bootstrap                     // Bootstrap library
+        ├── jquery                        // jQuery library
+        ├── jquery-validation             // jQuery validation plugin
+        └── jquery-validation-unobtrusive // jQuery unobtrusive validation plugin
