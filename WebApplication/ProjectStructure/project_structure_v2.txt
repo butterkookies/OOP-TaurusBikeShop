@@ -1,0 +1,354 @@
+I understand! You want a **strict, constraint-driven output** with NO explanations—just the folder tree using Windows `tree /f /a` format. Here it is:
+
+```
+WebApplication
+│
+├── appsettings.json                          // Database connection string, Hangfire config
+├── appsettings.Development.json              // Development environment overrides
+├── appsettings.Testing.json                  // Testing environment with in-memory DB
+├── Program.cs                                // Main entry point: DI, middleware, SignalR, Hangfire
+├── WebApplication.csproj                     // Project file: NuGet packages
+├── WebApplication.csproj.user                // User-specific project settings
+├── WebApplication.slnx                       // Lightweight solution file
+├── Dockerfile                                // Container deployment configuration
+├── .dockerignore                             // Docker build exclusions
+├── .env.example                              // Environment variables template
+│
+├── 🟢 global.json                            // .NET version specification (8.0)
+├── 🟢 nuget.config                           // NuGet package source configuration
+│
+├───Properties
+│   └── launchSettings.json                   // Launch profiles for Development/Production
+│
+├───Configuration                             // 🟢 NEW: Centralized configuration folder
+│   ├── 🟢 DependencyInjection.cs             // Service + Repository registration in IoC container
+│   ├── 🟢 JwtAuthenticationConfig.cs         // JWT token validation, secret key management (FC1)
+│   ├── 🟢 AutoMapperConfig.cs                // Entity-to-DTO mapping profiles
+│   ├── 🟢 ExceptionHandlingMiddleware.cs     // Global error handling, JSON error responses
+│   ├── 🟢 LoggingConfig.cs                   // Serilog structured logging setup
+│   ├── 🟢 CorsConfig.cs                      // Cross-origin resource sharing configuration
+│   ├── 🟢 SwaggerConfig.cs                   // OpenAPI documentation setup (optional)
+│   ├── 🟢 DatabaseMigrationRunner.cs         // EF Core migrations & data seeding on startup
+│   ├── 🟢 SignalRConfig.cs                   // Real-time WebSocket hub configuration (FC5, FC14)
+│   └── 🟢 HangfireConfig.cs                  // Background job scheduling setup (FC14)
+│
+├───Controllers                               // 🟢 EXPAND: HTTP request handlers
+│   ├── HomeController.cs                     // Landing page, home routes
+│   ├── 🟢 CustomerController.cs              // FC1-6: Customer auth, profile, shopping (EXPAND)
+│   ├── 🟢 CartController.cs                  // FC3: Add/remove cart items, view cart (NEW)
+│   ├── 🟢 CheckoutController.cs              // FC3: 4-step checkout process (NEW)
+│   ├── 🟢 PaymentController.cs               // FC4,9: GCash, Bank Transfer, COD processing (NEW)
+│   ├── 🟢 OrderController.cs                 // FC5,6: Order confirmation, tracking, reviews (NEW)
+│   ├── 🟢 DeliveryController.cs              // FC5,8,10: Delivery tracking webhook handler (NEW)
+│   ├── 🟢 InventoryController.cs             // FC2,11,12: Stock checking, admin inventory (NEW)
+│   ├── 🟢 WishlistController.cs              // FC2: Save items, restock notifications (NEW)
+│   ├── 🟢 SupportController.cs               // FC2,6,13: Support ticket creation, replies (NEW)
+│   ├── 🟢 AuthController.cs                  // FC1: Token refresh, password reset (NEW)
+│   ├── 🟢 ApiController.cs                   // Base API controller for JSON responses (NEW)
+│   └── 🟢 AdminController.cs                 // FC7-13: Admin dashboard (do NOT include in WebApplication)
+│
+├───Models                                    // 🟢 EXPAND: Data structures
+│   ├── ErrorViewModel.cs                     // Error page model
+│   │
+│   ├───Domain                                // 🟢 NEW: Database entities (ORM models)
+│   │   ├── 🟢 BaseEntity.cs                  // Base class: Id, CreatedAt, UpdatedAt
+│   │   ├── 🟢 User.cs                        // Customer account: Email, Password, Phone, Address (FC1)
+│   │   ├── 🟢 Address.cs                     // Delivery address: Street, City, Postal Code (FC3)
+│   │   ├── 🟢 Product.cs                     // Bike product: Name, Price, Description, Image (FC2)
+│   │   ├── 🟢 Category.cs                    // Product category lookup (FC2)
+│   │   ├── 🟢 Cart.cs                        // Shopping cart: UserId, SessionId (FC3)
+│   │   ├── 🟢 CartItem.cs                    // Cart line item: CartId, ProductId, Quantity (FC3)
+│   │   ├── 🟢 Order.cs                       // Customer order: OrderDate, Status, Total, DeliveryType (FC4,5,6)
+│   │   ├── 🟢 OrderItem.cs                   // Order line item: ProductId, Quantity, Price (FC5)
+│   │   ├── 🟢 OrderStatus.cs                 // Enum: Pending, Processing, ReadyForPickup, OutForDelivery, Delivered, Cancelled
+│   │   ├── 🟢 Payment.cs                     // Payment record: Amount, Method, Status, ProofImage (FC4,9)
+│   │   ├── 🟢 PaymentMethod.cs               // Enum: GCash, BankTransfer, CashOnDelivery
+│   │   ├── 🟢 PaymentVerification.cs         // Bank transfer verification: Status, RejectionReason (FC9)
+│   │   ├── 🟢 Inventory.cs                   // Stock tracking: AvailableQuantity, LockedQuantity, Reserved (FC2,11,12)
+│   │   ├── 🟢 InventoryStatus.cs             // Enum: AVAILABLE, RESERVED, LOCKED, PROCESSING, DELIVERED, SOLD
+│   │   ├── 🟢 InventoryHistory.cs            // Stock movement log: Action, Quantity, Reason, Timestamp (FC12)
+│   │   ├── 🟢 Delivery.cs                    // Delivery record: CourierType, TrackingId, Status, DeliveredAt (FC5,8,10)
+│   │   ├── 🟢 DeliveryStatus.cs              // Enum: Pending, PickedUp, OutForDelivery, Delivered, Failed, Cancelled
+│   │   ├── 🟢 DeliveryTracking.cs            // Real-time tracking: Location, ETA, LastUpdate (FC5,10,14)
+│   │   ├── 🟢 DeliveryMethod.cs              // Enum: StorePickup, Lalamove, LBC, CashOnDelivery
+│   │   ├── 🟢 Notification.cs                // Notification queue: Type (Email/SMS), Status, CreatedAt, SentAt (FC4,5,9,14)
+│   │   ├── 🟢 Wishlist.cs                    // Saved items: UserId, ProductId, NotifyOnRestock (FC2)
+│   │   ├── 🟢 Review.cs                      // Product review: Rating (1-5), Comment, CreatedAt (FC6)
+│   │   ├── 🟢 SupportTicket.cs               // Support case: Category, Subject, Status (Open/InProgress/Resolved) (FC2,6,13)
+│   │   ├── 🟢 SupportTicketReply.cs          // Ticket response: Message, IsAdminReply, CreatedAt (FC13)
+│   │   └── 🟢 RefreshToken.cs                // JWT refresh token: Token, ExpiresAt, RevokedAt (FC1)
+│   │
+│   ├───DTOs                                  // 🟢 NEW: Data Transfer Objects (API request/response)
+│   │   ├───Customer                          // User-related DTOs (FC1)
+│   │   │   ├── 🟢 RegisterDto.cs             // Registration form: Email, Password, FullName, Phone
+│   │   │   ├── 🟢 LoginDto.cs                // Login form: Email, Password, RememberMe
+│   │   │   ├── 🟢 UserProfileDto.cs          // User profile display: Email, Name, Phone, Address
+│   │   │   ├── 🟢 UpdateProfileDto.cs        // Profile update form
+│   │   │   ├── 🟢 ChangePasswordDto.cs       // Password change: CurrentPassword, NewPassword, Confirm
+│   │   │   ├── 🟢 ForgotPasswordDto.cs       // Password reset request: Email (FC1)
+│   │   │   ├── 🟢 ResetPasswordDto.cs        // Password reset: Token, NewPassword (FC1)
+│   │   │   └── 🟢 AddressDto.cs              // Delivery address (FC3)
+│   │   │
+│   │   ├───Product                           // Product-related DTOs (FC2)
+│   │   │   ├── 🟢 ProductListDto.cs          // Product grid display: Id, Name, Price, Image, Rating
+│   │   │   ├── 🟢 ProductDetailDto.cs        // Detailed view: Specs, Stock status, Reviews
+│   │   │   └── 🟢 ProductSearchDto.cs        // Search result
+│   │   │
+│   │   ├───Cart                              // Cart-related DTOs (FC3)
+│   │   │   ├── 🟢 CartItemDto.cs             // Cart item: ProductId, Quantity, Price
+│   │   │   ├── 🟢 AddToCartDto.cs            // Add to cart request
+│   │   │   ├── 🟢 CartSummaryDto.cs          // Cart totals: ItemCount, Subtotal, Tax, Total
+│   │   │   └── 🟢 UpdateCartDto.cs           // Update quantity request
+│   │   │
+│   │   ├───Order                             // Order-related DTOs (FC4,5,6)
+│   │   │   ├── 🟢 CreateOrderDto.cs          // Create order: Items, DeliveryType, Address
+│   │   │   ├── 🟢 OrderConfirmationDto.cs    // Confirmation display: OrderNumber, Items, Total, TrackingLink
+│   │   │   ├── 🟢 OrderTrackingDto.cs        // Tracking info: Status, Location, ETA, LastUpdate
+│   │   │   ├── 🟢 OrderHistoryDto.cs         // Order list: OrderNumber, Date, Status, Total
+│   │   │   ├── 🟢 OrderDetailDto.cs          // Full order details
+│   │   │   └── 🟢 OrderStatusUpdateDto.cs    // Admin status update (FC8)
+│   │   │
+│   │   ├───Payment                           // Payment-related DTOs (FC4,9)
+│   │   │   ├── 🟢 GCashPaymentDto.cs         // GCash: Reference number
+│   │   │   ├── 🟢 BankProofDto.cs            // Bank: Receipt image upload
+│   │   │   ├── 🟢 PaymentStatusDto.cs        // Payment status check response
+│   │   │   └── 🟢 PaymentVerificationDto.cs  // Admin verification: Approve/Reject/Hold (FC9)
+│   │   │
+│   │   ├───Delivery                          // Delivery-related DTOs (FC3,5)
+│   │   │   ├── 🟢 CourierSelectionDto.cs     // Delivery method selection: Courier, Address (FC3)
+│   │   │   ├── 🟢 DeliveryDetailDto.cs       // Delivery info: Courier, TrackingId, ETA
+│   │   │   └── 🟢 TrackingUpdateDto.cs       // Tracking update from courier webhook
+│   │   │
+│   │   ├───Inventory                         // Inventory-related DTOs (FC2,11,12)
+│   │   │   ├── 🟢 StockCheckDto.cs           // Stock availability check response
+│   │   │   ├── 🟢 InventoryLevelDto.cs       // Stock levels display: Available, Reserved, Locked
+│   │   │   └── 🟢 StockHistoryDto.cs         // Stock movement log entry
+│   │   │
+│   │   └───Support                           // Support-related DTOs (FC2,6,13)
+│   │       ├── 🟢 CreateTicketDto.cs         // Create ticket: Category, Subject, Description
+│   │       ├── 🟢 TicketReplyDto.cs          // Reply: Message, Attachment (FC13)
+│   │       ├── 🟢 TicketListDto.cs           // Ticket list display (FC13)
+│   │       └── 🟢 TicketDetailDto.cs         // Full ticket details with replies
+│   │
+│   └───ViewModels                            // 🟢 NEW: View-specific models
+│       ├── 🟢 CheckoutViewModel.cs           // Checkout page data: Cart, Addresses, DeliveryMethods (FC3,4)
+│       ├── 🟢 OrderTrackingViewModel.cs      // Tracking page data: Order, Delivery, Timeline (FC5)
+│       └── 🟢 DashboardViewModel.cs          // Customer dashboard data: Profile, RecentOrders (FC2)
+│
+├───BusinessLogic                             // 🟢 EXPAND: Service layer (business logic)
+│   │
+│   ├───Interfaces                            // 🟢 NEW: Service contracts
+│   │   ├── 🟢 ICustomerService.cs            // Interface: RegisterAsync, LoginAsync, GetProfileAsync (FC1)
+│   │   ├── 🟢 IProductService.cs             // Interface: GetAllAsync, SearchAsync, FilterAsync (FC2)
+│   │   ├── 🟢 ICartService.cs                // Interface: AddToCartAsync, RemoveAsync, GetCartAsync (FC3)
+│   │   ├── 🟢 IOrderService.cs               // Interface: CreateOrderAsync, UpdateStatusAsync (FC4,5,6)
+│   │   ├── 🟢 IPaymentService.cs             // Interface: ProcessGCashAsync, VerifyPaymentAsync (FC4,9)
+│   │   ├── 🟢 IInventoryService.cs           // Interface: CheckStockAsync, LockStockAsync, SyncAsync (FC2,11,12,14)
+│   │   ├── 🟢 IDeliveryService.cs            // Interface: BookCourierAsync, GetTrackingAsync (FC5,8,10)
+│   │   ├── 🟢 IWishlistService.cs            // Interface: AddAsync, RemoveAsync, NotifyAsync (FC2)
+│   │   ├── 🟢 IReviewService.cs              // Interface: SubmitReviewAsync, GetReviewsAsync (FC6)
+│   │   ├── 🟢 INotificationService.cs        // Interface: SendEmailAsync, SendSMSAsync (FC4,5,9,13,14)
+│   │   ├── 🟢 ISupportService.cs             // Interface: CreateTicketAsync, ReplyAsync, ResolveAsync (FC2,6,13)
+│   │   ├── 🟢 IAuthenticationService.cs      // Interface: GenerateJWTAsync, RefreshTokenAsync (FC1)
+│   │   ├── 🟢 IPOSService.cs                 // Interface: ProcessSaleAsync, SyncInventoryAsync (FC11)
+│   │   └── 🟢 IBackgroundJobService.cs       // Interface: SyncInventoryAsync, MonitorOrdersAsync (FC14)
+│   │
+│   ├───Services                              // 🟢 NEW: Service implementations
+│   │   ├── 🟢 CustomerService.cs             // Customer operations: registration, login, profile (FC1)
+│   │   ├── 🟢 ProductService.cs              // Product catalog: browse, search, filter (FC2)
+│   │   ├── 🟢 CartService.cs                 // Shopping cart: add, remove, update, totals (FC3)
+│   │   ├── 🟢 OrderService.cs                // Order management: create, status, history (FC4,5,6)
+│   │   ├── 🟢 PaymentService.cs              // Payment processing: GCash, Bank, COD (FC4,9)
+│   │   ├── 🟢 InventoryService.cs            // Stock management: check, lock, sync (FC2,11,12,14)
+│   │   ├── 🟢 DeliveryService.cs             // Delivery ops: book courier, tracking (FC5,8,10)
+│   │   ├── 🟢 WishlistService.cs             // Wishlist: save, remove, restock notifications (FC2)
+│   │   ├── 🟢 ReviewService.cs               // Reviews: submit, display, ratings (FC6)
+│   │   ├── 🟢 NotificationService.cs         // Email/SMS: send confirmations, alerts (FC4,5,9,13,14)
+│   │   ├── 🟢 SupportService.cs              // Support tickets: create, reply, resolve (FC2,6,13)
+│   │   ├── 🟢 AuthenticationService.cs       // JWT: token generation, validation, refresh (FC1)
+│   │   ├── 🟢 POSService.cs                  // POS operations: sale processing, sync (FC11)
+│   │   └── 🟢 BackgroundJobService.cs        // Background jobs: inventory sync, monitoring (FC14)
+│   │
+│   ├───ExternalGateways                      // 🟢 NEW: Third-party API integrations
+│   │   ├── 🟢 IGCashGateway.cs               // GCash payment interface (FC4)
+│   │   ├── 🟢 GCashGateway.cs                // GCash implementation: GenerateQRAsync, VerifyAsync
+│   │   ├── 🟢 IBankVerificationGateway.cs    // Bank transfer interface (FC9)
+│   │   ├── 🟢 BankVerificationGateway.cs     // Bank verification implementation: VerifyProofAsync
+│   │   ├── 🟢 ILalamoveGateway.cs            // Lalamove delivery interface (FC8,10)
+│   │   ├── 🟢 LalamoveGateway.cs             // Lalamove implementation: BookAsync, GetTrackingAsync
+│   │   ├── 🟢 ILBCGateway.cs                 // LBC delivery interface (FC8,10)
+│   │   ├── 🟢 LBCGateway.cs                  // LBC implementation: BookAsync, GetTrackingAsync
+│   │   ├── 🟢 IEmailGateway.cs               // Email service interface (SendGrid) (FC4,5,9,13)
+│   │   ├── 🟢 EmailGateway.cs                // SendGrid implementation: SendEmailAsync, SendBulkAsync
+│   │   ├── 🟢 ISMSGateway.cs                 // SMS service interface (Twilio) (FC4,5)
+│   │   ├── 🟢 SMSGateway.cs                  // Twilio implementation: SendSMSAsync
+│   │   ├── 🟢 ISignalRHub.cs                 // Real-time communication interface (FC5,14)
+│   │   └── 🟢 OrderTrackingHub.cs            // SignalR hub: NotifyTrackingUpdate, NotifyPaymentVerified
+│   │
+│   └───Utilities                             // 🟢 NEW: Helper classes
+│       ├── 🟢 JwtTokenGenerator.cs           // JWT: GenerateToken, ValidateToken, RefreshToken (FC1)
+│       ├── 🟢 EncryptionHelper.cs            // Password: HashPassword, VerifyPassword (BCrypt) (FC1)
+│       ├── 🟢 ValidationHelper.cs            // Input: ValidateEmail, ValidatePhone, ValidatePassword
+│       ├── 🟢 DateTimeHelper.cs              // Formatting: FormatDate, FormatTime, CalculateDaysAgo
+│       ├── 🟢 CurrencyHelper.cs              // Currency: FormatCurrency, RoundAmount
+│       ├── 🟢 PaginationHelper.cs            // Pagination: GetPagedData, CalculatePages
+│       └── 🟢 FileHelper.cs                  // File: SaveUpload, ValidateImage, DeleteFile
+│
+├───DataAccess                                // 🟢 EXPAND: Data layer (repositories)
+│   │
+│   ├───Repositories                          // 🟢 NEW: Data access implementations
+│   │   ├── 🟢 IRepository.cs                 // Generic interface: GetAsync, AddAsync, UpdateAsync, DeleteAsync, SaveAsync
+│   │   ├── 🟢 Repository.cs                  // Generic implementation: Base CRUD for all entities
+│   │   ├── 🟢 ICustomerRepository.cs         // User data interface (FC1)
+│   │   ├── 🟢 CustomerRepository.cs          // User data access: GetByEmailAsync, RegisterAsync
+│   │   ├── 🟢 IProductRepository.cs          // Product data interface (FC2)
+│   │   ├── 🟢 ProductRepository.cs           // Product queries: GetAllAsync, SearchAsync, FilterAsync
+│   │   ├── 🟢 ICartRepository.cs             // Cart data interface (FC3)
+│   │   ├── 🟢 CartRepository.cs              // Cart operations: GetCartAsync, AddItemAsync
+│   │   ├── 🟢 IOrderRepository.cs            // Order data interface (FC4,5,6)
+│   │   ├── 🟢 OrderRepository.cs             // Order operations: CreateAsync, UpdateStatusAsync, GetHistoryAsync
+│   │   ├── 🟢 IPaymentRepository.cs          // Payment data interface (FC4,9)
+│   │   ├── 🟢 PaymentRepository.cs           // Payment operations: SaveAsync, UpdateStatusAsync
+│   │   ├── 🟢 IInventoryRepository.cs        // Stock data interface (FC2,11,12,14)
+│   │   ├── 🟢 InventoryRepository.cs         // Inventory ops: CheckStockAsync, LockAsync, UpdateAsync, LogAsync
+│   │   ├── 🟢 IDeliveryRepository.cs         // Delivery tracking interface (FC5,8,10)
+│   │   ├── 🟢 DeliveryRepository.cs          // Delivery ops: CreateAsync, UpdateStatusAsync, GetTrackingAsync
+│   │   ├── 🟢 IWishlistRepository.cs         // Wishlist data interface (FC2)
+│   │   ├── 🟢 WishlistRepository.cs          // Wishlist ops: AddAsync, RemoveAsync, GetAsync
+│   │   ├── 🟢 INotificationRepository.cs     // Notification queue interface (FC4,5,9,13,14)
+│   │   ├── 🟢 NotificationRepository.cs      // Queue ops: CreateAsync, GetAsync, MarkAsReadAsync, MarkAsSentAsync
+│   │   ├── 🟢 IReviewRepository.cs           // Review data interface (FC6)
+│   │   ├── 🟢 ReviewRepository.cs            // Review ops: SaveAsync, GetByProductAsync, GetAverageRatingAsync
+│   │   ├── 🟢 ISupportRepository.cs          // Support ticket interface (FC2,6,13)
+│   │   └── 🟢 SupportRepository.cs           // Ticket ops: CreateTicketAsync, AddReplyAsync, GetTicketsAsync
+│   │
+│   ├───Context                               // 🟢 NEW: Entity Framework database context
+│   │   ├── 🟢 AppDbContext.cs                // DbContext: All DbSets, relationships, configurations
+│   │   └── 🟢 DbContextFactory.cs            // Context factory for DI
+│   │
+│   ├───Migrations                            // 🟢 NEW: EF Core migrations (auto-generated)
+│   │   ├── 🟢 20240101000000_InitialCreate.cs // Create all tables, relationships
+│   │   ├── 🟢 20240101000001_AddNotificationTable.cs // Add Notification table
+│   │   ├── 🟢 20240101000002_AddWishlistTable.cs // Add Wishlist table
+│   │   ├── 🟢 20240101000003_AddSupportTicketTable.cs // Add SupportTicket tables
+│   │   ├── 🟢 20240101000004_AddPaymentVerificationTable.cs // Add PaymentVerification table
+│   │   ├── 🟢 20240101000005_AddRefreshTokenTable.cs // Add RefreshToken table
+│   │   └── 🟢 [ContextName]ModelSnapshot.cs // EF Core model snapshot
+│   │
+│   └───Seeders                               // 🟢 NEW: Database seeding on startup
+│       ├── 🟢 DataSeeder.cs                  // Main seeder: orchestrates all seeders
+│       ├── 🟢 ProductSeeder.cs               // Seed sample bike products (FC2)
+│       ├── 🟢 CategorySeeder.cs              // Seed product categories (FC2)
+│       ├── 🟢 UserSeeder.cs                  // Seed test customer accounts (FC1)
+│       ├── 🟢 DeliveryMethodSeeder.cs        // Seed delivery options: Pickup, Lalamove, LBC (FC3)
+│       └── 🟢 PaymentMethodSeeder.cs         // Seed payment options: GCash, Bank, COD (FC4)
+│
+├───Views                                     // Razor view templates
+│   ├── _ViewImports.cshtml                   // Global usings: @using, @addTagHelper
+│   ├── _ViewStart.cshtml                     // Global layout setup for all views
+│   │
+│   ├───Home                                  // Home/landing pages
+│   │   ├── 🟢 Index.cshtml                   // Landing page: Hero, featured products, call-to-action
+│   │   └── 🟢 Privacy.cshtml                 // Privacy policy page
+│   │
+│   ├───Customer                              // 🟢 EXPAND: Customer pages (FC1-6)
+│   │   ├── 🟢 Register.cshtml                // Registration form: Email, Password, Phone, Name (FC1)
+│   │   ├── 🟢 Login.cshtml                   // Login form: Email, Password, RememberMe (FC1)
+│   │   ├── 🟢 Dashboard.cshtml               // Customer hub: Welcome, recent orders, quick actions (FC2)
+│   │   ├── 🟢 ProductCatalog.cshtml          // Product grid: Search, filter, sort, pagination (FC2)
+│   │   ├── 🟢 ProductDetails.cshtml          // Product page: Images, specs, stock, reviews, add to cart (FC2)
+│   │   ├── 🟢 Cart.cshtml                    // Shopping cart: Items table, edit quantities, totals (FC3)
+│   │   ├── 🟢 Checkout.cshtml                // 4-step checkout: Review→Address→Delivery→Payment (FC3,4)
+│   │   ├── 🟢 Payment.cshtml                 // Payment options: GCash QR, Bank Transfer, COD (FC4)
+│   │   ├── 🟢 Confirmation.cshtml            // Order confirmation: Number, items, total, tracking link (FC5)
+│   │   ├── 🟢 OrderTracking.cshtml           // Real-time tracking: Status timeline, location, ETA (FC5)
+│   │   ├── 🟢 OrderHistory.cshtml            // Past orders: List with status, filter, reorder button (FC2)
+│   │   ├── 🟢 Wishlist.cshtml                // Saved items: Grid/list, add to cart, remove (FC2)
+│   │   ├── 🟢 Profile.cshtml                 // Account settings: Email, name, phone, addresses, password (FC1)
+│   │   ├── 🟢 ForgotPassword.cshtml          // Password reset request: Email input (FC1)
+│   │   ├── 🟢 ResetPassword.cshtml           // Password reset: Token, new password (FC1)
+│   │   ├── 🟢 SupportTicket.cshtml           // Create support ticket: Category, subject, description (FC2,6)
+│   │   ├── 🟢 DeliveryConfirmation.cshtml    // Order received confirmation: Condition check options (FC6)
+│   │   ├── 🟢 ReviewRating.cshtml            // Product review form: Star rating, comment, photos (FC6)
+│   │   ├── 🟢 Error.cshtml                   // Customer-friendly error page
+│   │   │
+│   │   └───Partials                          // 🟢 EXPAND: Reusable partial views
+│   │       ├── 🟢 _CartItem.cshtml           // Single cart item: Product, price, quantity editor, remove btn (FC3)
+│   │       ├── 🟢 _ProductCard.cshtml        // Product card: Image, name, price, rating, add to cart btn (FC2)
+│   │       ├── 🟢 _OrderSummary.cshtml       // Order summary: Items table, subtotal, tax, total (FC3,4)
+│   │       ├── 🟢 _DeliverySelection.cshtml  // Delivery options: Pickup/Lalamove/LBC, address form (FC3)
+│   │       ├── 🟢 _PaymentMethod.cshtml      // Payment method selector: GCash/Bank/COD radio buttons (FC4)
+│   │       ├── 🟢 _OTPModal.cshtml           // OTP verification modal: Email input, OTP code input (FC1)
+│   │       ├── 🟢 _ConfirmationModal.cshtml  // Confirmation modal: Order number, next steps buttons (FC5)
+│   │       ├── 🟢 _NotificationAlert.cshtml  // Toast notifications: Success, error, warning, info (FC5,9,12,14)
+│   │       ├── 🟢 _ReviewForm.cshtml         // Review form partial: Rating, comment, photo upload (FC6)
+│   │       ├── 🟢 _TrackingCard.cshtml       // Tracking display: Timeline, status, location (FC5)
+│   │       ├── 🟢 _AddressForm.cshtml        // Address input: Street, city, postal code validation (FC3)
+│   │       ├── 🟢 _SupportForm.cshtml        // Support ticket form: Category, subject, attachment (FC2,6)
+│   │       ├── 🟢 _SearchBar.cshtml          // Product search bar: Autocomplete suggestions (FC2)
+│   │       ├── 🟢 _LoadingSpinner.cshtml     // Loading indicator: Spinner animation during AJAX (FC5)
+│   │       └── 🟢 _WishlistNotice.cshtml     // Stock notification badge on product (FC2)
+│   │
+│   └───Shared                                // 🟢 EXPAND: Shared layout & components
+│       ├── 🟢 _Layout.cshtml                 // Master layout: Navbar, footer, RenderBody
+│       ├── 🟢 _Layout.cshtml.css             // Scoped layout styles
+│       ├── 🟢 _Navbar.cshtml                 // Navigation bar: Logo, search, cart icon, user menu (FC2)
+│       ├── 🟢 _Footer.cshtml                 // Footer: Links, company info, social media (FC2)
+│       ├── 🟢 _Sidebar.cshtml                // Sidebar (if needed): Customer navigation options
+│       ├── 🟢 Error.cshtml                   // Error display: Status code, message (FC5)
+│       └── _ValidationScriptsPartial.cshtml  // jQuery validation scripts
+│
+├───wwwroot                                   // Static files
+│   ├── favicon.ico                           // Site favicon
+│   │
+│   ├───css                                   // 🟢 EXPAND: Stylesheets
+│   │   ├── 🟢 site.css                       // Global styles: Colors, fonts, spacing (existing, update)
+│   │   ├── 🟢 customer.css                   // Customer pages: Dashboard, product catalog (existing, update)
+│   │   ├── 🟢 auth.css                       // Auth pages: Login, register, password reset styling
+│   │   ├── 🟢 cart.css                       // Cart page: Layout, item styles (existing, update)
+│   │   ├── 🟢 checkout.css                   // Checkout steps: Form layout, step indicator
+│   │   ├── 🟢 payment.css                    // Payment options: GCash QR, bank form styling
+│   │   ├── 🟢 order-tracking.css             // Tracking page: Timeline, map styling
+│   │   ├── 🟢 product-catalog.css            // Product grid: Card layout, filters (existing, update)
+│   │   ├── 🟢 order-history.css              // Order history table: Status badges
+│   │   ├── 🟢 wishlist.css                   // Wishlist: Grid/list toggle
+│   │   ├── 🟢 profile.css                    // Account settings: Form layout
+│   │   ├── 🟢 responsive.css                 // Media queries: Mobile, tablet, desktop breakpoints
+│   │   ├── 🟢 animations.css                 // Reusable: Fade, slide, pulse, spinner animations
+│   │   ├── 🟢 modals.css                     // Modal dialogs: Backdrop, content styling
+│   │   └── bootstrap* (existing)             // Bootstrap framework files
+│   │
+│   ├───js                                    // 🟢 EXPAND: Client-side JavaScript
+│   │   ├── 🟢 site.js                        // Global: Common functions, initialization (existing, update)
+│   │   ├── 🟢 api-client.js                  // AJAX wrapper: MakeRequest, HandleError, JWT headers
+│   │   ├── 🟢 notifications.js                // Toast: ShowNotification (success/error/warning/info)
+│   │   ├── 🟢 validation.js                  // Form validation: Email, phone, password regex
+│   │   ├── 🟢 utils.js                       // Utilities: FormatCurrency, FormatDate, Debounce
+│   │   ├── 🟢 auth.js                        // Authentication: Login, register, OTP, token management (FC1)
+│   │   ├── 🟢 product-catalog.js             // Products: Filter, search, sort, pagination AJAX
+│   │   ├── 🟢 cart.js                        // Shopping cart: Add, remove, update quantity, totals (FC3, existing expand)
+│   │   ├── 🟢 checkout.js                    // Checkout: Step navigation, address validation, delivery selection
+│   │   ├── 🟢 payment.js                     // Payment: GCash QR display, bank proof upload, COD (FC4)
+│   │   ├── 🟢 order-tracking.js              // Real-time tracking: SignalR connection, location updates (FC5)
+│   │   ├── 🟢 signalr-hub.js                 // SignalR: Hub connection, listeners for order/payment updates (FC5,14)
+│   │   ├── 🟢 wishlist.js                    // Wishlist: Add/remove, toggle notification (FC2)
+│   │   ├── 🟢 support.js                     // Support tickets: Create, category selection (FC2,6)
+│   │   └── bootstrap* (existing)             // Bootstrap framework JS
+│   │
+│   └───lib                                   // Third-party libraries
+│       ├── bootstrap (existing)              // Bootstrap CSS/JS framework
+│       ├── jquery (existing)                 // jQuery DOM manipulation library
+│       ├── 🟢 @microsoft/signalr             // SignalR client library for real-time WebSocket (FC5,14)
+│       ├── 🟢 chart.js                       // Charts library (for potential analytics, future admin feature)
+│       └── jquery-validation (existing)      // jQuery form validation plugin
+│
+├───Logs                                      // 🟢 NEW: Log file storage folder (gitignored)
+│   └── .gitkeep                              // Placeholder: Serilog will write logs here
+│
+└───Middleware                                // 🟢 NEW: Custom HTTP middleware
+    ├── 🟢 AuthenticationMiddleware.cs        // JWT token validation on requests (FC1)
+    ├── 🟢 ExceptionHandlingMiddleware.cs     // Global exception catching, JSON error responses
+    ├── 🟢 LoggingMiddleware.cs               // Request/response logging to Serilog
+    ├── 🟢 CorsMiddleware.cs                  // CORS headers (if API used)
+    └── 🟢 RequestTimingMiddleware.cs         // Log request duration for performance monitoring
+```

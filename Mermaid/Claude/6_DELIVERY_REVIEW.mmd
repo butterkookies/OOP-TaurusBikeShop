@@ -1,0 +1,75 @@
+%% =====================================================
+%% BIKE SHOP - PART 6: DELIVERY & REVIEW
+%% =====================================================
+%% This diagram covers: Order received, condition check, review
+%% Connected from: Part 5 (Tracking)
+%% Loops back to: Part 2 (Dashboard)
+%% =====================================================
+
+flowchart TD
+
+%% =====================================================
+%% DATABASES & EXTERNAL SERVICES
+%% =====================================================
+
+DB3[("Order Database")]
+DB4[("Inventory Database")]
+DB6[("Notification Queue")]
+EXT4["Email/SMS Service"]
+
+%% =====================================================
+%% ENTRY POINT FROM PART 5
+%% =====================================================
+
+D_START(["FROM Part 5:<br/>Order Arrived"])
+
+%% =====================================================
+%% DELIVERY CONFIRMATION
+%% =====================================================
+
+D_START --> D26[/"Confirm Order Received"/]
+
+D26 --> D26A{"Bike Condition?"}
+
+%% DAMAGED/DEFECTIVE PATH
+D26A -->|Damaged or Defective| D26B[/"Report Issue<br/>Upload photos, describe"/]
+D26B --> DB6
+DB6 --> D26C["Support Ticket Created"]
+D26C --> D_CASE(["SUPPORT CASE CREATED<br/>From Part 7"])
+D_CASE --> BACK_DASH(["BACK TO<br/>Part 2: Dashboard"])
+
+%% GOOD CONDITION PATH
+D26A -->|Perfect Condition| D26D[/"Add Review & Rating<br/>Rate 1-5 stars"/]
+
+D26D --> DB3
+D26D --> D27["Send Review Confirmation"]
+D27 --> EXT4
+
+EXT4 --> D_COMPLETE([Transaction Complete])
+
+D_COMPLETE --> D28A["Finalize Inventory in DB4"]
+D28A --> DB4
+
+D28A --> D28B["Unlock Pending Stock"]
+D28B --> DB4
+
+D28B --> BACK_DASH
+
+%% =====================================================
+%% STYLING
+%% =====================================================
+
+classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef decision fill:#FFF59D,stroke:#F9A825,stroke-width:2px,color:#000
+classDef io fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef external fill:#80DEEA,stroke:#00838F,stroke-width:2px,color:#000
+classDef connector fill:#FFB6C1,stroke:#FF1493,stroke-width:3px,color:#000,font-weight:bold
+
+class D_START,D_COMPLETE,D_CASE,BACK_DASH startend
+class D27,D28A,D28B,D26C process
+class D26A decision
+class D26,D26B,D26D io
+class DB3,DB4,DB6 database
+class EXT4 external

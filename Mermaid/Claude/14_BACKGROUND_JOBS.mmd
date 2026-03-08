@@ -1,0 +1,81 @@
+%% =====================================================
+%% BIKE SHOP - PART 14: BACKGROUND JOBS & AUTOMATION
+%% =====================================================
+%% This diagram covers: 5 background automation jobs
+%% Runs 24/7 without manual intervention
+%% =====================================================
+
+flowchart TD
+
+%% =====================================================
+%% DATABASES & EXTERNAL SERVICES
+%% =====================================================
+
+DB3[("Order Database")]
+DB4[("Inventory Database")]
+DB6[("Notification Queue")]
+EXT2["Lalamove API"]
+EXT3["LBC Delivery API"]
+
+%% =====================================================
+%% BACKGROUND JOBS
+%% =====================================================
+
+%% JOB 1: REAL-TIME INVENTORY SYNC
+J1["JOB 1: Inventory Sync<br/>Every 10 seconds"]
+J1 --> J1A["Compare Online DB4<br/>vs POS DB4"]
+J1A --> DB4
+DB4 --> J1B["Unified inventory view"]
+
+%% JOB 2: PENDING ORDERS MONITOR
+J2["JOB 2: Pending Orders Monitor<br/>Every 5 minutes"]
+J2 --> J2A["Check Orders<br/>> 24hrs Unprocessed"]
+J2A --> DB3
+DB3 --> J2B["Alert Admin:<br/>Slow Processing"]
+
+%% JOB 3: PAYMENT TIMEOUT MONITOR
+J3["JOB 3: Payment Timeout Monitor<br/>Every 5 minutes"]
+J3 --> J3A["Check Bank Transfers<br/>> 4hrs Unverified"]
+J3A --> DB3
+DB3 --> J3B["Auto-Hold Order<br/>24-hour deadline"]
+
+%% JOB 4: STOCK LEVEL MONITOR
+J4["JOB 4: Stock Level Monitor<br/>Every 15 minutes"]
+J4 --> J4A["Check Low Stock Items<br/>Below reorder threshold"]
+J4A --> DB4
+DB4 --> J4B["Trigger Reorder Alert<br/>Notify admin & wishlist"]
+
+%% JOB 5: DELIVERY STATUS UPDATE
+J5["JOB 5: Delivery Status Update<br/>Every 5 minutes"]
+J5 --> J5A["Poll Courier APIs"]
+J5A --> EXT2
+J5A --> EXT3
+EXT2 --> J5B["Sync Tracking Info<br/>to DB3"]
+EXT3 --> J5B
+J5B --> DB3
+DB3 --> J5C["Auto-Send Status<br/>Update to Customer"]
+
+%% SUMMARY BOX
+SUMMARY["All 5 Background Jobs<br/>Running 24/7<br/>No Manual Intervention Needed<br/>Reduces Admin Work by 60%"]
+
+J1B --> SUMMARY
+J2B --> SUMMARY
+J3B --> SUMMARY
+J4B --> SUMMARY
+J5C --> SUMMARY
+
+%% =====================================================
+%% STYLING
+%% =====================================================
+
+classDef job fill:#FFD700,stroke:#FFA500,stroke-width:3px,color:#000,font-weight:bold
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef external fill:#80DEEA,stroke:#00838F,stroke-width:2px,color:#000
+classDef summary fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
+
+class J1,J2,J3,J4,J5 job
+class J1A,J1B,J2A,J2B,J3A,J3B,J4A,J4B,J5A,J5B,J5C process
+class DB3,DB4,DB6 database
+class EXT2,EXT3 external
+class SUMMARY summary

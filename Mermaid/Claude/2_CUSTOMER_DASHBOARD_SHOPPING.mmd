@@ -1,0 +1,121 @@
+%% =====================================================
+%% BIKE SHOP - PART 2: CUSTOMER DASHBOARD & SHOPPING
+%% =====================================================
+%% This diagram covers: Dashboard navigation and shopping
+%% Connected from: Part 1 (Registration/Login)
+%% Connected to: Part 3 (Cart & Checkout)
+%% =====================================================
+
+flowchart TD
+
+%% =====================================================
+%% DATABASES
+%% =====================================================
+
+DB2[("Product Database")]
+DB3[("Order Database")]
+DB4[("Inventory Database")]
+DB5[("Cart Database")]
+DB6[("Notification Queue")]
+
+%% =====================================================
+%% ENTRY POINT FROM PART 1
+%% =====================================================
+
+A_START(["FROM Part 1:<br/>Shop as Guest"])
+
+%% =====================================================
+%% CUSTOMER DASHBOARD
+%% =====================================================
+
+A_START --> CD1[/"Customer Dashboard"/]
+
+CD1 --> CD2{"What Would You Like To Do?"}
+
+%% DASHBOARD OPTIONS
+CD2 -->|Shop Products| B1[/"Browse Product Catalog"/]
+CD2 -->|View Cart| CART_LINK(["CONTINUE TO<br/>Part 3: Cart & Checkout"])
+CD2 -->|Order History| CH1[/"View Past Orders"/]
+CD2 -->|Track Orders| CH2[/"View Active Deliveries"/]
+CD2 -->|Wishlist| CH3[/"View Saved Items"/]
+CD2 -->|Support| SUP1[/"Contact Support Form"/]
+CD2 -->|Logout| L1([Logout - End])
+
+%% ORDER HISTORY PATH
+CH1 --> DB3
+DB3 --> CH1A[/"Display Order List"/]
+CH1A --> CD1
+
+%% TRACK ORDERS PATH
+CH2 --> DB3
+DB3 --> CH2A[/"Show Real-Time Tracking"/]
+CH2A --> CD1
+
+%% WISHLIST PATH
+CH3 --> DB5
+DB5 --> CH3A[/"Display Wishlist"/]
+CH3A --> CH3B{"Action?"}
+CH3B -->|Add to Cart| SHOP_FLOW["Go to Shopping"]
+CH3B -->|Remove| DB5
+DB5 --> CD1
+
+%% SUPPORT PATH
+SUP1 --> DB6
+DB6 --> SUP1A["Ticket Created"]
+SUP1A --> CD1
+
+%% =====================================================
+%% SHOPPING FLOW
+%% =====================================================
+
+B1 --> SHOP_FLOW
+SHOP_FLOW --> DB2
+DB2 --> B2[/"Select Product"/]
+
+B2 --> B2A[/"View Product Details"/]
+
+B2A --> BINV{"Item In Stock?"}
+BINV --> DB4
+
+%% OUT OF STOCK PATH
+BINV -->|Out of Stock| B2B[/"Out of Stock"/]
+
+B2B --> B2C{"What Would You Like?"}
+
+B2C -->|Add to Wishlist| B2D["Save to Wishlist"]
+B2D --> DB5
+DB5 --> B2E["Will notify when back"]
+B2E --> B1
+
+B2C -->|Notify Me When Back| B2E
+
+B2C -->|View Similar Bikes| B1
+
+%% IN STOCK PATH
+BINV -->|Yes| B3{"Action?"}
+
+B3 -->|Add to Cart| B4["Add Item to Cart"]
+B4 --> DB5
+
+B4 --> B5{"Continue Shopping?"}
+B5 -->|Yes| B1
+B5 -->|No| CART_LINK
+
+B3 -->|Buy Now| CART_LINK
+
+%% =====================================================
+%% STYLING
+%% =====================================================
+
+classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef decision fill:#FFF59D,stroke:#F9A825,stroke-width:2px,color:#000
+classDef io fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef connector fill:#FFB6C1,stroke:#FF1493,stroke-width:3px,color:#000,font-weight:bold
+
+class A_START,CART_LINK,L1 startend
+class B4 process
+class CD2,B3,BINV,B2C,B5,CH3B decision
+class CD1,B1,B2,B2A,CH1,CH2,CH3A,SUP1 io
+class DB2,DB3,DB4,DB5,DB6 database
