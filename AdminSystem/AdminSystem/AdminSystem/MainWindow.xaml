@@ -1,12 +1,2768 @@
-﻿<Window x:Class="AdminSystem.MainWindow"
+﻿<!--
+    ╔══════════════════════════════════════════════════════════════════╗
+    ║  AdminDashboardWindow.xaml                                       ║
+    ║  Taurus Bike Shop — Admin POS System                            ║
+    ║                                                                  ║
+    ║  MERGED:                                                         ║
+    ║  • Taurus shell (sidebar, topbar, activity panel)               ║
+    ║  • All 9 module pages embedded as named ScrollViewer/Grid pages  ║
+    ║  • PendingOrdersPage fully implemented (all 10 sections)         ║
+    ║  • Shared styles from original AdminDashboardWindow              ║
+    ╚══════════════════════════════════════════════════════════════════╝
+-->
+<Window x:Class="TaurusBikeShop.AdminDashboardWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AdminSystem"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Taurus Bike Shop — Admin POS System"
+        Height="900" Width="1400"
+        MinHeight="720" MinWidth="1100"
+        WindowStartupLocation="CenterScreen"
+        Background="#1A1A1A">
+
+    <!-- ══════════════════════════════════════════════
+         RESOURCE DICTIONARY — all shared styles
+         ══════════════════════════════════════════════ -->
+    <Window.Resources>
+
+        <!-- ── Colour palette ── -->
+        <SolidColorBrush x:Key="BackgroundPrimary"   Color="#1A1A1A"/>
+        <SolidColorBrush x:Key="BackgroundSecondary" Color="#242424"/>
+        <SolidColorBrush x:Key="BackgroundPanel"     Color="#2C2C2C"/>
+        <SolidColorBrush x:Key="BackgroundCard"      Color="#333333"/>
+        <SolidColorBrush x:Key="AccentRed"           Color="#CC0000"/>
+        <SolidColorBrush x:Key="AccentRedHover"      Color="#E50000"/>
+        <SolidColorBrush x:Key="AccentRedDark"       Color="#990000"/>
+        <SolidColorBrush x:Key="TextPrimary"         Color="#F0F0F0"/>
+        <SolidColorBrush x:Key="TextSecondary"       Color="#A0A0A0"/>
+        <SolidColorBrush x:Key="TextMuted"           Color="#666666"/>
+        <SolidColorBrush x:Key="BorderSubtle"        Color="#3A3A3A"/>
+        <SolidColorBrush x:Key="StatusGreen"         Color="#4CAF50"/>
+        <SolidColorBrush x:Key="StatusYellow"        Color="#FFC107"/>
+        <SolidColorBrush x:Key="StatusBlue"          Color="#2196F3"/>
+        <SolidColorBrush x:Key="StatusPurple"        Color="#9C27B0"/>
+
+        <!-- ── Converter ── -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <!-- ── NAV BUTTON ── -->
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Background"             Value="Transparent"/>
+            <Setter Property="Foreground"             Value="{StaticResource TextSecondary}"/>
+            <Setter Property="BorderThickness"        Value="0"/>
+            <Setter Property="Height"                 Value="52"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding"                Value="20,0,12,0"/>
+            <Setter Property="FontSize"               Value="13"/>
+            <Setter Property="FontFamily"             Value="Segoe UI"/>
+            <Setter Property="Cursor"                 Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="NavBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderThickness="3,0,0,0"
+                                BorderBrush="Transparent"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="NavBorder" Property="Background"  Value="#2C2C2C"/>
+                                <Setter TargetName="NavBorder" Property="BorderBrush" Value="{StaticResource AccentRed}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── NAV BUTTON ACTIVE ── -->
+        <Style x:Key="NavButtonActiveStyle" TargetType="Button" BasedOn="{StaticResource NavButtonStyle}">
+            <Setter Property="Background" Value="#2C2C2C"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="#2C2C2C"
+                                BorderThickness="3,0,0,0"
+                                BorderBrush="{StaticResource AccentRed}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── PRIMARY BUTTON (Red) ── -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Background"      Value="{StaticResource AccentRed}"/>
+            <Setter Property="Foreground"      Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height"          Value="36"/>
+            <Setter Property="Padding"         Value="18,0"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="FontWeight"      Value="SemiBold"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="BtnBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BtnBorder" Property="Background"
+                                        Value="{StaticResource AccentRedHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BtnBorder" Property="Background"
+                                        Value="{StaticResource AccentRedDark}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="BtnBorder" Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── GHOST BUTTON (outlined) ── -->
+        <Style x:Key="GhostButtonStyle" TargetType="Button">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="{StaticResource TextSecondary}"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height"          Value="36"/>
+            <Setter Property="Padding"         Value="16,0"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="GhostBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="GhostBorder"
+                                        Property="BorderBrush" Value="{StaticResource AccentRed}"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── GREEN (approve) small button ── -->
+        <Style x:Key="ApproveButtonStyle" TargetType="Button">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="{StaticResource StatusGreen}"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource StatusGreen}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height"          Value="26"/>
+            <Setter Property="Padding"         Value="8,0"/>
+            <Setter Property="FontSize"        Value="11"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Margin"          Value="2,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1A3020"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── DANGER small button ── -->
+        <Style x:Key="DangerButtonStyle" TargetType="Button">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="{StaticResource AccentRed}"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource AccentRed}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height"          Value="26"/>
+            <Setter Property="Padding"         Value="8,0"/>
+            <Setter Property="FontSize"        Value="11"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Margin"          Value="2,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#2C1A1A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── TABLE ACTION (neutral ghost small) ── -->
+        <Style x:Key="TableActionStyle" TargetType="Button">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="{StaticResource TextSecondary}"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height"          Value="26"/>
+            <Setter Property="Padding"         Value="8,0"/>
+            <Setter Property="FontSize"        Value="11"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Margin"          Value="2,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#333333"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── SEARCH / TEXT BOX ── -->
+        <Style x:Key="SearchTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background"      Value="#2C2C2C"/>
+            <Setter Property="Foreground"      Value="{StaticResource TextPrimary}"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height"          Value="36"/>
+            <Setter Property="Padding"         Value="10,0"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="CaretBrush"      Value="{StaticResource AccentRed}"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource AccentRed}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ── COMBO BOX ── -->
+        <Style x:Key="ComboStyle" TargetType="ComboBox">
+            <Setter Property="Background"  Value="#2C2C2C"/>
+            <Setter Property="Foreground"  Value="{StaticResource TextPrimary}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="Height"      Value="36"/>
+            <Setter Property="Padding"     Value="8,0"/>
+            <Setter Property="FontFamily"  Value="Segoe UI"/>
+            <Setter Property="FontSize"    Value="13"/>
+        </Style>
+
+        <!-- ── DATA GRID (dark) ── -->
+        <Style x:Key="AdminDataGridStyle" TargetType="DataGrid">
+            <Setter Property="Background"               Value="#242424"/>
+            <Setter Property="Foreground"               Value="{StaticResource TextPrimary}"/>
+            <Setter Property="BorderThickness"          Value="0"/>
+            <Setter Property="GridLinesVisibility"      Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#2E2E2E"/>
+            <Setter Property="RowBackground"            Value="#242424"/>
+            <Setter Property="AlternatingRowBackground" Value="#272727"/>
+            <Setter Property="ColumnHeaderHeight"       Value="40"/>
+            <Setter Property="RowHeight"                Value="40"/>
+            <Setter Property="SelectionMode"            Value="Extended"/>
+            <Setter Property="SelectionUnit"            Value="FullRow"/>
+            <Setter Property="AutoGenerateColumns"      Value="False"/>
+            <Setter Property="CanUserAddRows"           Value="False"/>
+            <Setter Property="IsReadOnly"               Value="True"/>
+            <Setter Property="FontFamily"               Value="Segoe UI"/>
+            <Setter Property="FontSize"                 Value="13"/>
+        </Style>
+
+        <!-- ── STAT CARD ── -->
+        <Style x:Key="StatCardStyle" TargetType="Border">
+            <Setter Property="Background"      Value="{StaticResource BackgroundCard}"/>
+            <Setter Property="CornerRadius"    Value="6"/>
+            <Setter Property="Padding"         Value="20,16"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderSubtle}"/>
+        </Style>
+
+        <!-- ── PAGE CARD (module section card) ── -->
+        <Style x:Key="PageCard" TargetType="Border">
+            <Setter Property="Background"      Value="{StaticResource BackgroundSecondary}"/>
+            <Setter Property="CornerRadius"    Value="6"/>
+            <Setter Property="Padding"         Value="20"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="Margin"          Value="0,0,0,16"/>
+        </Style>
+
+        <!-- ── SECTION HEADER TEXT ── -->
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="FontSize"   Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Margin"     Value="0,0,0,12"/>
+        </Style>
+
+        <!-- ── SIDEBAR SEPARATOR ── -->
+        <Style x:Key="SidebarSeparatorStyle" TargetType="Separator">
+            <Setter Property="Background" Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="Height"     Value="1"/>
+            <Setter Property="Margin"     Value="16,8"/>
+        </Style>
+
+        <!-- ── TOGGLE SWITCH ── -->
+        <Style x:Key="ToggleSwitchStyle" TargetType="CheckBox">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border x:Name="Track" Width="40" Height="22"
+                                    CornerRadius="11" Background="#444444">
+                                <Border x:Name="Thumb" Width="16" Height="16"
+                                        CornerRadius="8" Background="#888888"
+                                        HorizontalAlignment="Left"
+                                        Margin="3,0,0,0"/>
+                            </Border>
+                            <ContentPresenter Margin="8,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Track"
+                                        Property="Background" Value="{StaticResource AccentRed}"/>
+                                <Setter TargetName="Thumb"
+                                        Property="Background" Value="White"/>
+                                <Setter TargetName="Thumb"
+                                        Property="HorizontalAlignment" Value="Right"/>
+                                <Setter TargetName="Thumb"
+                                        Property="Margin" Value="0,0,3,0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── PAGINATION BUTTON ── -->
+        <Style x:Key="PageNumBtn" TargetType="Button">
+            <Setter Property="Width"           Value="32"/>
+            <Setter Property="Height"          Value="32"/>
+            <Setter Property="Background"      Value="#333333"/>
+            <Setter Property="Foreground"      Value="{StaticResource TextSecondary}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Margin"          Value="2,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#444444"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PageNumBtnActive" TargetType="Button"
+               BasedOn="{StaticResource PageNumBtn}">
+            <Setter Property="Background" Value="{StaticResource AccentRed}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <!-- ── ACTIVITY FEED CARD ── -->
+        <Style x:Key="ActivityItemCard" TargetType="Border">
+            <Setter Property="Background"      Value="{StaticResource BackgroundCard}"/>
+            <Setter Property="CornerRadius"    Value="5"/>
+            <Setter Property="Padding"         Value="12,10"/>
+            <Setter Property="Margin"          Value="0,0,0,8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+    </Window.Resources>
+
+    <!-- ══════════════════════════════════════════════
+         ROOT 3-COLUMN GRID
+         Col 0: Sidebar (220px)
+         Col 1: Main content (*)
+         Col 2: Activity panel (300px)
+         ══════════════════════════════════════════════ -->
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             COLUMN 0 — LEFT SIDEBAR
+             ═══════════════════════════════════════════════════════════ -->
+        <Border Grid.Column="0"
+                Background="{StaticResource BackgroundSecondary}"
+                BorderThickness="0,0,1,0"
+                BorderBrush="{StaticResource BorderSubtle}">
+            <DockPanel LastChildFill="True">
+
+                <!-- ── Brand Header ── -->
+                <Border DockPanel.Dock="Top"
+                        Background="{StaticResource AccentRed}"
+                        Height="64">
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                        <Border Width="32" Height="32" Background="#AA0000"
+                                CornerRadius="4" Margin="0,0,10,0">
+                            <TextBlock Text="🐂" FontSize="18"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="TAURUS"
+                                       Foreground="White" FontSize="16"
+                                       FontWeight="Bold" FontFamily="Segoe UI"/>
+                            <TextBlock Text="BIKE SHOP"
+                                       Foreground="#FFD0D0" FontSize="9"
+                                       FontFamily="Segoe UI"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── Admin profile mini card ── -->
+                <Border DockPanel.Dock="Top" Background="#1E1E1E" Padding="16,12">
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="36" Height="36" CornerRadius="18"
+                                Background="{StaticResource AccentRed}">
+                            <TextBlock x:Name="AdminAvatarTextBlock"
+                                       Text="A" Foreground="White"
+                                       FontSize="15" FontWeight="Bold"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="AdminNameTextBlock"
+                                       Text="Admin User"
+                                       Foreground="{StaticResource TextPrimary}"
+                                       FontSize="12" FontWeight="SemiBold"
+                                       FontFamily="Segoe UI"/>
+                            <TextBlock x:Name="AdminRoleTextBlock"
+                                       Text="System Administrator"
+                                       Foreground="{StaticResource TextMuted}"
+                                       FontSize="10" FontFamily="Segoe UI"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Separator Style="{StaticResource SidebarSeparatorStyle}"
+                           DockPanel.Dock="Top"/>
+
+                <!-- ── Logout (pinned to bottom) ── -->
+                <Border DockPanel.Dock="Bottom"
+                        BorderThickness="0,1,0,0"
+                        BorderBrush="{StaticResource BorderSubtle}">
+                    <Button x:Name="LogoutButton"
+                            Style="{StaticResource NavButtonStyle}"
+                            Height="52">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⏻" FontSize="14" Margin="0,0,10,0"
+                                       Foreground="{StaticResource AccentRed}"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="Logout"
+                                       FontFamily="Segoe UI" FontSize="13"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+                <Separator Style="{StaticResource SidebarSeparatorStyle}"
+                           DockPanel.Dock="Bottom"/>
+
+                <!-- ── Navigation items ── -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <!-- Section label: MODULES -->
+                        <TextBlock Text="MODULES"
+                                   Foreground="{StaticResource TextMuted}"
+                                   FontSize="10" FontFamily="Segoe UI"
+                                   FontWeight="SemiBold" Margin="20,12,0,6"/>
+
+                        <Button x:Name="DashboardNavButton"
+                                Style="{StaticResource NavButtonActiveStyle}"
+                                Tag="Dashboard">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="⊞" FontSize="15" Margin="0,0,10,0"
+                                           Foreground="{StaticResource AccentRed}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Dashboard"
+                                           FontFamily="Segoe UI" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="PendingOrdersNavButton"
+                                Style="{StaticResource NavButtonStyle}"
+                                Tag="PendingOrders">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📦" FontSize="13" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Pending Orders"
+                                           FontFamily="Segoe UI" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                                <!-- Live badge -->
+                                <Border Background="{StaticResource AccentRed}"
+                                        CornerRadius="8" Padding="5,1"
+                                        Margin="8,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock x:Name="PendingOrdersBadgeTextBlock"
+                                               Text="7" Foreground="White"
+                                               FontSize="10" FontWeight="Bold"/>
+                                </Border>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="PaymentVerificationNavButton"
+                                Style="{StaticResource NavButtonStyle}"
+                                Tag="PaymentVerification">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="💳" FontSize="13" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Payment Verification"
+                                           FontFamily="Segoe UI" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                                <Border Background="{StaticResource StatusYellow}"
+                                        CornerRadius="8" Padding="5,1"
+                                        Margin="6,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock x:Name="PaymentVerificationBadgeTextBlock"
+                                               Text="3" Foreground="#1A1A1A"
+                                               FontSize="10" FontWeight="Bold"/>
+                                </Border>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="LogisticsNavButton"
+                                Style="{StaticResource NavButtonStyle}"
+                                Tag="Logistics">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🚚" FontSize="13" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Logistics"
+                                           FontFamily="Segoe UI" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="WalkInPosNavButton"
+                                Style="{StaticResource NavButtonStyle}"
+                                Tag="WalkInPOS">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🛒" FontSize="13" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Walk-In POS"
+                                           FontFamily="Segoe UI" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="InventoryNavButton"
+                                Style="{StaticResource NavButtonStyle}"
+                                Tag="Inventory">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📋" FontSize="13" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Inventory"
+                                           FontFamily="Segoe UI" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Section label: REPORTS -->
+                        <Separator Style="{StaticResource SidebarSeparatorStyle}"/>
+                        <TextBlock Text="REPORTS"
+                                   Foreground="{StaticResource TextMuted}"
+                                   FontSize="10" FontFamily="Segoe UI"
+                                   FontWeight="SemiBold" Margin="20,4,0,6"/>
+
+                        <Button x:Name="OrderHistoryNavButton"
+                                Style="{StaticResource NavButtonStyle}"
+                                Tag="OrderHistory">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🕘" FontSize="13" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Order History"
+                                           FontFamily="Segoe UI" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="AnalyticsNavButton"
+                                Style="{StaticResource NavButtonStyle}"
+                                Tag="Analytics">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📊" FontSize="13" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Analytics"
+                                           FontFamily="Segoe UI" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Section label: SUPPORT -->
+                        <Separator Style="{StaticResource SidebarSeparatorStyle}"/>
+                        <TextBlock Text="SUPPORT"
+                                   Foreground="{StaticResource TextMuted}"
+                                   FontSize="10" FontFamily="Segoe UI"
+                                   FontWeight="SemiBold" Margin="20,4,0,6"/>
+
+                        <Button x:Name="SupportTicketsNavButton"
+                                Style="{StaticResource NavButtonStyle}"
+                                Tag="Support">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🎫" FontSize="13" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Support Tickets"
+                                           FontFamily="Segoe UI" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                                <Border Background="{StaticResource StatusBlue}"
+                                        CornerRadius="8" Padding="5,1"
+                                        Margin="6,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock x:Name="SupportTicketsBadgeTextBlock"
+                                               Text="2" Foreground="White"
+                                               FontSize="10" FontWeight="Bold"/>
+                                </Border>
+                            </StackPanel>
+                        </Button>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             COLUMN 1 — MAIN CONTENT
+             ═══════════════════════════════════════════════════════════ -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <!-- Top bar -->
+                <RowDefinition Height="64"/>
+                <!-- Page host -->
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- ── Top Bar ── -->
+            <Border Grid.Row="0"
+                    Background="{StaticResource BackgroundSecondary}"
+                    BorderThickness="0,0,0,1"
+                    BorderBrush="{StaticResource BorderSubtle}">
+                <Grid Margin="20,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Page title + breadcrumb -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock x:Name="PageTitleTextBlock"
+                                   Text="Admin Dashboard"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   FontSize="18" FontWeight="SemiBold"
+                                   FontFamily="Segoe UI"/>
+                        <TextBlock x:Name="PageBreadcrumbTextBlock"
+                                   Text="Admin → Dashboard"
+                                   Foreground="{StaticResource TextMuted}"
+                                   FontSize="11" FontFamily="Segoe UI"/>
+                    </StackPanel>
+
+                    <!-- Top-right controls -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <TextBox x:Name="GlobalSearchTextBox"
+                                 Style="{StaticResource SearchTextBoxStyle}"
+                                 Width="220" Margin="0,0,10,0"/>
+                        <Button x:Name="NotificationsButton"
+                                Style="{StaticResource GhostButtonStyle}"
+                                Width="36" Padding="0" Margin="0,0,8,0">
+                            <Grid>
+                                <TextBlock Text="🔔" FontSize="14"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                                <Border Width="8" Height="8"
+                                        Background="{StaticResource AccentRed}"
+                                        CornerRadius="4"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="0,0,2,0"/>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="RefreshTopBarButton"
+                                Style="{StaticResource GhostButtonStyle}"
+                                Content="↻ Refresh" Margin="0,0,8,0"/>
+                        <Border Background="{StaticResource BackgroundCard}"
+                                CornerRadius="4" Padding="10,6"
+                                BorderThickness="1"
+                                BorderBrush="{StaticResource BorderSubtle}">
+                            <TextBlock x:Name="CurrentDateTimeTextBlock"
+                                       Text="--:--:--"
+                                       Foreground="{StaticResource TextSecondary}"
+                                       FontSize="12" FontFamily="Segoe UI"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ════════════════════════════════════════════════════════
+                 PAGE HOST — all pages stacked; controller toggles Visibility
+                 ════════════════════════════════════════════════════════ -->
+            <Grid Grid.Row="1">
+
+                <!-- ══════════ PAGE: DASHBOARD ══════════ -->
+                <ScrollViewer x:Name="PageDashboard"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              Padding="24,20,24,20">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeaderStyle}"
+                                   Text="Today's Overview"/>
+
+                        <!-- KPI cards -->
+                        <UniformGrid Rows="1" Columns="4" Margin="0,0,0,20">
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                        <TextBlock Text="💰" FontSize="18" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="TODAY'S SALES"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="10" FontWeight="SemiBold"
+                                                   FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="TodaySalesValueTextBlock"
+                                               Text="₱ 42,850"
+                                               Foreground="{StaticResource TextPrimary}"
+                                               FontSize="24" FontWeight="Bold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock Text="▲ +12.4% vs yesterday"
+                                               Foreground="{StaticResource StatusGreen}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                        <TextBlock Text="📦" FontSize="18" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="PENDING ORDERS"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="10" FontWeight="SemiBold"
+                                                   FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="PendingOrdersCountTextBlock"
+                                               Text="7"
+                                               Foreground="{StaticResource StatusYellow}"
+                                               FontSize="24" FontWeight="Bold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock Text="Awaiting processing"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                        <TextBlock Text="🎫" FontSize="18" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="OPEN TICKETS"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="10" FontWeight="SemiBold"
+                                                   FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="OpenTicketsCountTextBlock"
+                                               Text="2"
+                                               Foreground="{StaticResource StatusBlue}"
+                                               FontSize="24" FontWeight="Bold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock Text="Requires attention"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource StatCardStyle}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                        <TextBlock Text="⚠" FontSize="18"
+                                                   Foreground="{StaticResource AccentRed}"
+                                                   VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Text="LOW STOCK"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="10" FontWeight="SemiBold"
+                                                   FontFamily="Segoe UI" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="LowStockCountTextBlock"
+                                               Text="5"
+                                               Foreground="{StaticResource AccentRed}"
+                                               FontSize="24" FontWeight="Bold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock Text="Items below threshold"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- Module quick-access tiles -->
+                        <TextBlock Style="{StaticResource SectionHeaderStyle}"
+                                   Text="Quick Access — Modules" Margin="0,8,0,12"/>
+                        <UniformGrid Rows="2" Columns="4" Margin="0,0,0,20">
+                            <Border Margin="0,0,12,12" CornerRadius="6"
+                                    Background="{StaticResource BackgroundCard}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    Cursor="Hand">
+                                <Button x:Name="OnlineOrdersModuleButton"
+                                        Background="Transparent" BorderThickness="0"
+                                        Padding="16,14" HorizontalContentAlignment="Stretch"
+                                        Tag="PendingOrders">
+                                    <StackPanel>
+                                        <TextBlock Text="📦" FontSize="26" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Online Orders"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   FontSize="13" FontWeight="SemiBold"
+                                                   FontFamily="Segoe UI"/>
+                                        <TextBlock Text="Management"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                            </Border>
+                            <Border Margin="0,0,12,12" CornerRadius="6"
+                                    Background="{StaticResource BackgroundCard}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    Cursor="Hand">
+                                <Button x:Name="PaymentVerificationModuleButton"
+                                        Background="Transparent" BorderThickness="0"
+                                        Padding="16,14" HorizontalContentAlignment="Stretch"
+                                        Tag="PaymentVerification">
+                                    <StackPanel>
+                                        <TextBlock Text="💳" FontSize="26" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Payment Verification"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   FontSize="13" FontWeight="SemiBold"
+                                                   FontFamily="Segoe UI"/>
+                                        <TextBlock Text="Verification"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                            </Border>
+                            <Border Margin="0,0,12,12" CornerRadius="6"
+                                    Background="{StaticResource BackgroundCard}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    Cursor="Hand">
+                                <Button x:Name="LogisticsModuleButton"
+                                        Background="Transparent" BorderThickness="0"
+                                        Padding="16,14" HorizontalContentAlignment="Stretch"
+                                        Tag="Logistics">
+                                    <StackPanel>
+                                        <TextBlock Text="🚚" FontSize="26" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Logistics"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   FontSize="13" FontWeight="SemiBold"
+                                                   FontFamily="Segoe UI"/>
+                                        <TextBlock Text="Shipment Management"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                            </Border>
+                            <Border Margin="0,0,0,12" CornerRadius="6"
+                                    Background="{StaticResource AccentRedDark}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource AccentRed}"
+                                    Cursor="Hand">
+                                <Button x:Name="WalkInPosModuleButton"
+                                        Background="Transparent" BorderThickness="0"
+                                        Padding="16,14" HorizontalContentAlignment="Stretch"
+                                        Tag="WalkInPOS">
+                                    <StackPanel>
+                                        <TextBlock Text="🛒" FontSize="26" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Walk-In POS"
+                                                   Foreground="White"
+                                                   FontSize="13" FontWeight="Bold"
+                                                   FontFamily="Segoe UI"/>
+                                        <TextBlock Text="Point of Sale"
+                                                   Foreground="#FFD0D0"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                            </Border>
+                            <Border Margin="0,0,12,0" CornerRadius="6"
+                                    Background="{StaticResource BackgroundCard}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    Cursor="Hand">
+                                <Button x:Name="InventoryModuleButton"
+                                        Background="Transparent" BorderThickness="0"
+                                        Padding="16,14" HorizontalContentAlignment="Stretch"
+                                        Tag="Inventory">
+                                    <StackPanel>
+                                        <TextBlock Text="📋" FontSize="26" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Inventory"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   FontSize="13" FontWeight="SemiBold"
+                                                   FontFamily="Segoe UI"/>
+                                        <TextBlock Text="Stock Control"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                            </Border>
+                            <Border Margin="0,0,12,0" CornerRadius="6"
+                                    Background="{StaticResource BackgroundCard}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    Cursor="Hand">
+                                <Button x:Name="OrderHistoryModuleButton"
+                                        Background="Transparent" BorderThickness="0"
+                                        Padding="16,14" HorizontalContentAlignment="Stretch"
+                                        Tag="OrderHistory">
+                                    <StackPanel>
+                                        <TextBlock Text="🕘" FontSize="26" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Order History"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   FontSize="13" FontWeight="SemiBold"
+                                                   FontFamily="Segoe UI"/>
+                                        <TextBlock Text="Search &amp; Filter Records"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                            </Border>
+                            <Border Margin="0,0,12,0" CornerRadius="6"
+                                    Background="{StaticResource BackgroundCard}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    Cursor="Hand">
+                                <Button x:Name="AnalyticsModuleButton"
+                                        Background="Transparent" BorderThickness="0"
+                                        Padding="16,14" HorizontalContentAlignment="Stretch"
+                                        Tag="Analytics">
+                                    <StackPanel>
+                                        <TextBlock Text="📊" FontSize="26" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Analytics"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   FontSize="13" FontWeight="SemiBold"
+                                                   FontFamily="Segoe UI"/>
+                                        <TextBlock Text="Sales, Products, Stock"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                            </Border>
+                            <Border Margin="0" CornerRadius="6"
+                                    Background="{StaticResource BackgroundCard}"
+                                    BorderThickness="1"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    Cursor="Hand">
+                                <Button x:Name="SupportTicketsModuleButton"
+                                        Background="Transparent" BorderThickness="0"
+                                        Padding="16,14" HorizontalContentAlignment="Stretch"
+                                        Tag="Support">
+                                    <StackPanel>
+                                        <TextBlock Text="🎫" FontSize="26" Margin="0,0,0,8"/>
+                                        <TextBlock Text="Support Tickets"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   FontSize="13" FontWeight="SemiBold"
+                                                   FontFamily="Segoe UI"/>
+                                        <TextBlock Text="Customer Support"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,3,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- Recent Orders section -->
+                        <Grid Margin="0,8,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Style="{StaticResource SectionHeaderStyle}"
+                                       Text="Recent Orders" Margin="0"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <TextBox x:Name="OrderSearchTextBox"
+                                         Style="{StaticResource SearchTextBoxStyle}"
+                                         Width="200" Margin="0,0,8,0"/>
+                                <ComboBox x:Name="OrderStatusFilterComboBox"
+                                          Style="{StaticResource ComboStyle}"
+                                          Width="140" Margin="0,0,8,0">
+                                    <ComboBoxItem Content="All Statuses" IsSelected="True"/>
+                                    <ComboBoxItem Content="Pending"/>
+                                    <ComboBoxItem Content="Processing"/>
+                                    <ComboBoxItem Content="Shipped"/>
+                                    <ComboBoxItem Content="Completed"/>
+                                    <ComboBoxItem Content="Cancelled"/>
+                                </ComboBox>
+                                <Button x:Name="ExportOrdersButton"
+                                        Style="{StaticResource GhostButtonStyle}"
+                                        Content="⤓ Export" Margin="0,0,8,0"/>
+                                <Button x:Name="ViewAllOrdersButton"
+                                        Style="{StaticResource PrimaryButtonStyle}"
+                                        Content="View All Orders" Tag="PendingOrders"/>
+                            </StackPanel>
+                        </Grid>
+                        <Border BorderThickness="1"
+                                BorderBrush="{StaticResource BorderSubtle}"
+                                CornerRadius="6"
+                                Background="{StaticResource BackgroundSecondary}">
+                            <DataGrid x:Name="RecentOrdersDataGrid"
+                                      Style="{StaticResource AdminDataGridStyle}"
+                                      Height="220">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Order ID"  Binding="{Binding OrderId}"      Width="110"/>
+                                    <DataGridTextColumn Header="Customer"  Binding="{Binding CustomerName}" Width="160"/>
+                                    <DataGridTextColumn Header="Items"     Binding="{Binding ItemCount}"    Width="70"/>
+                                    <DataGridTextColumn Header="Total"     Binding="{Binding TotalAmount}"  Width="110"/>
+                                    <DataGridTextColumn Header="Type"      Binding="{Binding OrderType}"    Width="90"/>
+                                    <DataGridTextColumn Header="Status"    Binding="{Binding Status}"       Width="110"/>
+                                    <DataGridTextColumn Header="Date"      Binding="{Binding OrderDate}"    Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ══════════ PAGE: PENDING ORDERS ══════════ -->
+                <ScrollViewer x:Name="PagePendingOrders"
+                              Visibility="Collapsed"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              Padding="24,20">
+                    <StackPanel>
+                        <!-- Page subtitle -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="Admin" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI"/>
+                            <TextBlock Text=" › " Foreground="{StaticResource TextMuted}" FontSize="12"/>
+                            <TextBlock Text="Pending Orders" Foreground="{StaticResource AccentRed}" FontSize="12" FontWeight="SemiBold" FontFamily="Segoe UI"/>
+                        </StackPanel>
+                        <TextBlock Text="Pending Orders" Foreground="{StaticResource TextPrimary}" FontSize="22" FontWeight="Bold" FontFamily="Segoe UI"/>
+                        <TextBlock Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,4,0,20">
+                            <Run Text="Orders awaiting processing — Last synced:"/>
+                            <Run Text=" Today, 10:42 AM" Foreground="{StaticResource TextSecondary}"/>
+                        </TextBlock>
+
+                        <!-- ── Row 1: Header actions ── -->
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button x:Name="PO_RefreshButton"
+                                        Style="{StaticResource GhostButtonStyle}"
+                                        Content="↺ Refresh" Margin="0,0,8,0"/>
+                                <Button x:Name="PO_ExportButton"
+                                        Style="{StaticResource GhostButtonStyle}"
+                                        Content="⤓ Export" Margin="0,0,8,0"/>
+                                <ComboBox Style="{StaticResource ComboStyle}" Width="160">
+                                    <ComboBoxItem IsSelected="True">Bulk Actions</ComboBoxItem>
+                                    <ComboBoxItem>Approve Selected</ComboBoxItem>
+                                    <ComboBoxItem>Reject Selected</ComboBoxItem>
+                                    <ComboBoxItem>Assign Logistics</ComboBoxItem>
+                                    <ComboBoxItem>Export Selected</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- ── Row 2: Summary cards (4) ── -->
+                        <UniformGrid Rows="1" Columns="4" Margin="0,0,0,16">
+                            <!-- Card 1 -->
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Pending Orders" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI"/>
+                                        <Border Grid.Column="1" Width="30" Height="30" CornerRadius="6" Background="#2C1A1A">
+                                            <TextBlock Text="📋" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                    <TextBlock Text="142" Foreground="{StaticResource TextPrimary}"
+                                               FontSize="30" FontWeight="Bold"
+                                               FontFamily="Segoe UI" Margin="0,8,0,0"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                        <TextBlock Text="▲ 12%" Foreground="{StaticResource AccentRed}" FontSize="11" FontWeight="SemiBold"/>
+                                        <TextBlock Text=" vs yesterday" Foreground="{StaticResource TextMuted}" FontSize="11"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            <!-- Card 2 -->
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Awaiting Payment" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI"/>
+                                        <Border Grid.Column="1" Width="30" Height="30" CornerRadius="6" Background="#2C2000">
+                                            <TextBlock Text="💳" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                    <TextBlock Text="58" Foreground="{StaticResource StatusYellow}"
+                                               FontSize="30" FontWeight="Bold"
+                                               FontFamily="Segoe UI" Margin="0,8,0,0"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                        <TextBlock Text="▲ 4%" Foreground="{StaticResource StatusYellow}" FontSize="11" FontWeight="SemiBold"/>
+                                        <TextBlock Text=" requires attention" Foreground="{StaticResource TextMuted}" FontSize="11"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            <!-- Card 3 -->
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="High Value Orders" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI"/>
+                                        <Border Grid.Column="1" Width="30" Height="30" CornerRadius="6" Background="#1A3020">
+                                            <TextBlock Text="⭐" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                    <TextBlock Text="23" Foreground="{StaticResource StatusGreen}"
+                                               FontSize="30" FontWeight="Bold"
+                                               FontFamily="Segoe UI" Margin="0,8,0,0"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                        <TextBlock Text="▲ 7%" Foreground="{StaticResource StatusGreen}" FontSize="11" FontWeight="SemiBold"/>
+                                        <TextBlock Text=" ≥ ₱ 10,000 each" Foreground="{StaticResource TextMuted}" FontSize="11"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                            <!-- Card 4 -->
+                            <Border Style="{StaticResource StatCardStyle}">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Total Pending Revenue" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI"/>
+                                        <Border Grid.Column="1" Width="30" Height="30" CornerRadius="6" Background="#1A2030">
+                                            <TextBlock Text="₱" Foreground="{StaticResource StatusBlue}"
+                                                       FontWeight="Bold" FontSize="13"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                    <TextBlock Text="₱ 284,610" Foreground="{StaticResource TextPrimary}"
+                                               FontSize="24" FontWeight="Bold"
+                                               FontFamily="Segoe UI" Margin="0,8,0,0"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                        <TextBlock Text="▲ 18%" Foreground="{StaticResource StatusGreen}" FontSize="11" FontWeight="SemiBold"/>
+                                        <TextBlock Text=" from last week" Foreground="{StaticResource TextMuted}" FontSize="11"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- ── Row 3: Search & Filter panel ── -->
+                        <Border Style="{StaticResource PageCard}">
+                            <StackPanel>
+                                <TextBlock Text="SEARCH &amp; FILTERS"
+                                           Foreground="{StaticResource TextMuted}"
+                                           FontSize="10" FontWeight="Bold"
+                                           FontFamily="Segoe UI" Margin="0,0,0,12"/>
+
+                                <!-- Search row -->
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="16"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Background="#2C2C2C"
+                                            BorderBrush="{StaticResource BorderSubtle}"
+                                            BorderThickness="1" CornerRadius="4" Height="36">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="🔍" Foreground="{StaticResource TextMuted}"
+                                                       FontSize="13" Margin="10,0,0,0"
+                                                       VerticalAlignment="Center"/>
+                                            <TextBox Grid.Column="1"
+                                                     x:Name="PO_SearchBox"
+                                                     Style="{StaticResource SearchTextBoxStyle}"
+                                                     BorderThickness="0" Background="Transparent"
+                                                     Height="34"/>
+                                        </Grid>
+                                    </Border>
+                                    <Button Grid.Column="2"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Content="✕ Reset Filters"
+                                            x:Name="PO_ResetFilters"/>
+                                </Grid>
+
+                                <!-- Filter dropdowns row -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="12"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="12"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="12"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="12"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Payment Status -->
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Payment Status"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,0,0,6"/>
+                                        <ComboBox Style="{StaticResource ComboStyle}"
+                                                  x:Name="PO_PaymentFilter">
+                                            <ComboBoxItem IsSelected="True">All Statuses</ComboBoxItem>
+                                            <ComboBoxItem>Pending</ComboBoxItem>
+                                            <ComboBoxItem>Paid</ComboBoxItem>
+                                            <ComboBoxItem>Failed</ComboBoxItem>
+                                            <ComboBoxItem>Refunded</ComboBoxItem>
+                                        </ComboBox>
+                                    </StackPanel>
+
+                                    <!-- Order Status -->
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Order Status"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,0,0,6"/>
+                                        <ComboBox Style="{StaticResource ComboStyle}"
+                                                  x:Name="PO_OrderStatusFilter">
+                                            <ComboBoxItem IsSelected="True">All Statuses</ComboBoxItem>
+                                            <ComboBoxItem>Pending</ComboBoxItem>
+                                            <ComboBoxItem>Processing</ComboBoxItem>
+                                            <ComboBoxItem>Shipped</ComboBoxItem>
+                                            <ComboBoxItem>Completed</ComboBoxItem>
+                                            <ComboBoxItem>Cancelled</ComboBoxItem>
+                                        </ComboBox>
+                                    </StackPanel>
+
+                                    <!-- Date From -->
+                                    <StackPanel Grid.Column="4">
+                                        <TextBlock Text="Date From"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,0,0,6"/>
+                                        <DatePicker x:Name="PO_DateFrom"
+                                                    Background="#2C2C2C"
+                                                    Foreground="{StaticResource TextPrimary}"
+                                                    Height="36"/>
+                                    </StackPanel>
+
+                                    <!-- Date To -->
+                                    <StackPanel Grid.Column="6">
+                                        <TextBlock Text="Date To"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,0,0,6"/>
+                                        <DatePicker x:Name="PO_DateTo"
+                                                    Background="#2C2C2C"
+                                                    Foreground="{StaticResource TextPrimary}"
+                                                    Height="36"/>
+                                    </StackPanel>
+
+                                    <!-- High Value toggle -->
+                                    <StackPanel Grid.Column="8"
+                                                VerticalAlignment="Bottom"
+                                                Margin="0,0,0,8">
+                                        <TextBlock Text="High Value Only"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" FontFamily="Segoe UI"
+                                                   Margin="0,0,0,10"/>
+                                        <CheckBox Style="{StaticResource ToggleSwitchStyle}"
+                                                  x:Name="PO_HighValueToggle">
+                                            <TextBlock Text="≥ ₱10K"
+                                                       Foreground="{StaticResource TextSecondary}"
+                                                       FontSize="12" FontFamily="Segoe UI"/>
+                                        </CheckBox>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ── Row 4: Bulk Action Bar (hidden until rows selected) ── -->
+                        <Border x:Name="PO_BulkBar"
+                                Background="#2C1A1A"
+                                BorderBrush="{StaticResource AccentRed}"
+                                BorderThickness="1" CornerRadius="6"
+                                Padding="16,10" Margin="0,0,0,12"
+                                Visibility="Collapsed">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock x:Name="PO_SelectedCountLabel"
+                                               Text="0 orders selected"
+                                               Foreground="{StaticResource AccentRed}"
+                                               FontWeight="SemiBold" FontSize="13"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock Text=" — choose a bulk action:"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="13" FontFamily="Segoe UI"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                    <Button x:Name="PO_BulkApprove"
+                                            Style="{StaticResource ApproveButtonStyle}"
+                                            Content="✔ Approve" Height="32"
+                                            Padding="12,0" Margin="0,0,6,0"/>
+                                    <Button x:Name="PO_BulkReject"
+                                            Style="{StaticResource DangerButtonStyle}"
+                                            Content="✖ Reject" Height="32"
+                                            Padding="12,0" Margin="0,0,6,0"/>
+                                    <Button x:Name="PO_BulkLogistics"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Content="🚚 Assign Logistics" Height="32"
+                                            Padding="12,0" Margin="0,0,6,0"/>
+                                    <Button x:Name="PO_BulkExport"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Content="⤓ Export" Height="32"
+                                            Padding="12,0" Margin="0,0,6,0"/>
+                                    <Button x:Name="PO_ClearSelection"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Content="✕" Height="32" Width="32" Padding="0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- ── Row 5: Orders DataGrid ── -->
+                        <Border Style="{StaticResource PageCard}" Padding="0">
+                            <DataGrid x:Name="DgOrders"
+                                      Style="{StaticResource AdminDataGridStyle}"
+                                      Height="320"
+                                      SelectionChanged="DgOrders_SelectionChanged">
+                                <DataGrid.Columns>
+                                    <!-- Checkbox -->
+                                    <DataGridCheckBoxColumn Width="38" CanUserResize="False"/>
+
+                                    <!-- Order ID -->
+                                    <DataGridTemplateColumn Header="ORDER ID" Width="115" CanUserResize="False">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding OrderId}"
+                                                           Foreground="{StaticResource AccentRed}"
+                                                           FontWeight="SemiBold" FontSize="12"
+                                                           FontFamily="Segoe UI"
+                                                           VerticalAlignment="Center"
+                                                           Margin="12,0"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <!-- Customer -->
+                                    <DataGridTemplateColumn Header="CUSTOMER" Width="155">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel VerticalAlignment="Center" Margin="4,0">
+                                                    <TextBlock Text="{Binding CustomerName}"
+                                                               Foreground="{StaticResource TextPrimary}"
+                                                               FontSize="12" FontWeight="SemiBold"
+                                                               FontFamily="Segoe UI"/>
+                                                    <TextBlock Text="{Binding CustomerEmail}"
+                                                               Foreground="{StaticResource TextMuted}"
+                                                               FontSize="10" FontFamily="Segoe UI"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <!-- Order Date -->
+                                    <DataGridTemplateColumn Header="ORDER DATE" Width="120" CanUserResize="False">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel VerticalAlignment="Center" Margin="4,0">
+                                                    <TextBlock Text="{Binding OrderDate, StringFormat='MMM dd, yyyy'}"
+                                                               Foreground="{StaticResource TextSecondary}"
+                                                               FontSize="12" FontFamily="Segoe UI"/>
+                                                    <TextBlock Text="{Binding OrderDate, StringFormat='hh:mm tt'}"
+                                                               Foreground="{StaticResource TextMuted}"
+                                                               FontSize="10" FontFamily="Segoe UI"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <!-- Items -->
+                                    <DataGridTextColumn Header="ITEMS"
+                                                        Binding="{Binding ItemCount}"
+                                                        Width="60" CanUserResize="False"/>
+
+                                    <!-- Total -->
+                                    <DataGridTemplateColumn Header="TOTAL" Width="115" CanUserResize="False">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding TotalAmount, StringFormat='₱ {0:N2}'}"
+                                                           Foreground="{StaticResource TextPrimary}"
+                                                           FontWeight="SemiBold" FontSize="13"
+                                                           FontFamily="Segoe UI"
+                                                           VerticalAlignment="Center"
+                                                           Margin="4,0"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <!-- Payment Status badge -->
+                                    <DataGridTemplateColumn Header="PAYMENT" Width="110" CanUserResize="False">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border CornerRadius="10" Padding="10,3"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Center"
+                                                        Margin="4,0">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#2C2000"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding PaymentStatus}" Value="Paid">
+                                                                    <Setter Property="Background" Value="#1A3020"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding PaymentStatus}" Value="Failed">
+                                                                    <Setter Property="Background" Value="#2C1A1A"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding PaymentStatus}" Value="Refunded">
+                                                                    <Setter Property="Background" Value="#0D2137"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{Binding PaymentStatus}"
+                                                               FontSize="11" FontWeight="SemiBold"
+                                                               FontFamily="Segoe UI">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Foreground" Value="{StaticResource StatusYellow}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding PaymentStatus}" Value="Paid">
+                                                                        <Setter Property="Foreground" Value="{StaticResource StatusGreen}"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding PaymentStatus}" Value="Failed">
+                                                                        <Setter Property="Foreground" Value="{StaticResource AccentRed}"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding PaymentStatus}" Value="Refunded">
+                                                                        <Setter Property="Foreground" Value="{StaticResource StatusBlue}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <!-- Order Status badge -->
+                                    <DataGridTemplateColumn Header="STATUS" Width="115" CanUserResize="False">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border CornerRadius="10" Padding="10,3"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Center"
+                                                        Margin="4,0">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#333333"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding OrderStatus}" Value="Processing">
+                                                                    <Setter Property="Background" Value="#0D2137"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding OrderStatus}" Value="Shipped">
+                                                                    <Setter Property="Background" Value="#22103A"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding OrderStatus}" Value="Completed">
+                                                                    <Setter Property="Background" Value="#1A3020"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding OrderStatus}" Value="Cancelled">
+                                                                    <Setter Property="Background" Value="#2C1A1A"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{Binding OrderStatus}"
+                                                               FontSize="11" FontWeight="SemiBold"
+                                                               FontFamily="Segoe UI">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Foreground" Value="{StaticResource TextMuted}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding OrderStatus}" Value="Processing">
+                                                                        <Setter Property="Foreground" Value="{StaticResource StatusBlue}"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding OrderStatus}" Value="Shipped">
+                                                                        <Setter Property="Foreground" Value="{StaticResource StatusPurple}"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding OrderStatus}" Value="Completed">
+                                                                        <Setter Property="Foreground" Value="{StaticResource StatusGreen}"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding OrderStatus}" Value="Cancelled">
+                                                                        <Setter Property="Foreground" Value="{StaticResource AccentRed}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <!-- Actions -->
+                                    <DataGridTemplateColumn Header="ACTIONS" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center"
+                                                            Margin="6,0">
+                                                    <Button Style="{StaticResource TableActionStyle}"
+                                                            Content="View"
+                                                            Tag="{Binding OrderId}"/>
+                                                    <Button Style="{StaticResource ApproveButtonStyle}"
+                                                            Content="Approve"
+                                                            Tag="{Binding OrderId}"/>
+                                                    <Button Style="{StaticResource DangerButtonStyle}"
+                                                            Content="Reject"
+                                                            Tag="{Binding OrderId}"/>
+                                                    <Button Style="{StaticResource TableActionStyle}"
+                                                            Content="Logistics"
+                                                            Tag="{Binding OrderId}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+
+                        <!-- ── Row 6: Pagination ── -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <!-- Results summary -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <TextBlock Text="Showing " Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI"/>
+                                <TextBlock Text="1–25 " Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="SemiBold" FontFamily="Segoe UI"/>
+                                <TextBlock Text="of " Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI"/>
+                                <TextBlock Text="142 " Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="SemiBold" FontFamily="Segoe UI"/>
+                                <TextBlock Text="orders" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI"/>
+                            </StackPanel>
+                            <!-- Pagination controls -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <TextBlock Text="Rows per page:"
+                                           Foreground="{StaticResource TextMuted}"
+                                           FontSize="12" FontFamily="Segoe UI"
+                                           VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <ComboBox Style="{StaticResource ComboStyle}"
+                                          Width="68" Height="30" Margin="0,0,12,0">
+                                    <ComboBoxItem>10</ComboBoxItem>
+                                    <ComboBoxItem IsSelected="True">25</ComboBoxItem>
+                                    <ComboBoxItem>50</ComboBoxItem>
+                                    <ComboBoxItem>100</ComboBoxItem>
+                                </ComboBox>
+                                <Button Style="{StaticResource PageNumBtn}" Content="‹"
+                                        x:Name="PO_PrevPage"/>
+                                <Button Style="{StaticResource PageNumBtnActive}" Content="1"/>
+                                <Button Style="{StaticResource PageNumBtn}" Content="2"/>
+                                <Button Style="{StaticResource PageNumBtn}" Content="3"/>
+                                <TextBlock Text="…" Foreground="{StaticResource TextMuted}"
+                                           VerticalAlignment="Center" Margin="4,0"
+                                           FontFamily="Segoe UI"/>
+                                <Button Style="{StaticResource PageNumBtn}" Content="6"/>
+                                <Button Style="{StaticResource PageNumBtn}" Content="›"
+                                        x:Name="PO_NextPage"/>
+                            </StackPanel>
+                        </Grid>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ══════════ PAGE: PAYMENT VERIFICATION ══════════ -->
+                <ScrollViewer x:Name="PagePaymentVerification"
+                              Visibility="Collapsed"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="24,20">
+                    <StackPanel>
+                        <TextBlock Foreground="{StaticResource TextMuted}" FontSize="12"
+                                   FontFamily="Segoe UI" Margin="0,0,0,16"
+                                   Text="Payment Verification — Review incoming payment confirmations"/>
+                        <UniformGrid Rows="1" Columns="3" Margin="0,0,0,16">
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0" Background="#1A3020">
+                                <StackPanel>
+                                    <TextBlock Text="Verified Today" Foreground="{StaticResource StatusGreen}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="₱ 48,200" Foreground="{StaticResource StatusGreen}" FontSize="22" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                    <TextBlock Text="18 transactions" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0" Background="#2C2000">
+                                <StackPanel>
+                                    <TextBlock Text="Awaiting Review" Foreground="{StaticResource StatusYellow}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="3 payments" Foreground="{StaticResource StatusYellow}" FontSize="22" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                    <TextBlock Text="Needs attention" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}" Background="#2C1A1A">
+                                <StackPanel>
+                                    <TextBlock Text="Flagged / Failed" Foreground="{StaticResource AccentRed}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="1 payment" Foreground="{StaticResource AccentRed}" FontSize="22" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                    <TextBlock Text="Requires investigation" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                        <Border Style="{StaticResource PageCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Unverified Payments"/>
+                                <DataGrid x:Name="DgPayments" Style="{StaticResource AdminDataGridStyle}" Height="240">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Ref #"     Binding="{Binding RefNo}"    Width="110"/>
+                                        <DataGridTextColumn Header="Customer"  Binding="{Binding Customer}" Width="*"/>
+                                        <DataGridTextColumn Header="Order #"   Binding="{Binding OrderId}"  Width="90"/>
+                                        <DataGridTextColumn Header="Amount"    Binding="{Binding Amount}"   Width="100"/>
+                                        <DataGridTextColumn Header="Method"    Binding="{Binding Method}"   Width="100"/>
+                                        <DataGridTextColumn Header="Submitted" Binding="{Binding Date}"     Width="110"/>
+                                        <DataGridTextColumn Header="Status"    Binding="{Binding Status}"   Width="90"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource PageCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="260"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Proof of Payment"/>
+                                    <Border Background="#1A1A1A" CornerRadius="6" Height="130"
+                                            BorderThickness="1" BorderBrush="{StaticResource BorderSubtle}">
+                                        <TextBlock Text="Select a payment to view attached proof"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontFamily="Segoe UI"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Actions"/>
+                                    <TextBlock Text="Notes:" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                    <TextBox Style="{StaticResource SearchTextBoxStyle}" Height="60" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="✔ Confirm Verified" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                                    <Button Style="{StaticResource GhostButtonStyle}"   Content="✖ Reject Payment"  HorizontalAlignment="Left"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ══════════ PAGE: LOGISTICS ══════════ -->
+                <ScrollViewer x:Name="PageLogistics"
+                              Visibility="Collapsed"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="24,20">
+                    <StackPanel>
+                        <TextBlock Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,16" Text="Logistics Management — Shipment tracking and courier assignment"/>
+                        <UniformGrid Rows="1" Columns="4" Margin="0,0,0,16">
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Text="To Ship" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="8" Foreground="{StaticResource StatusYellow}" FontSize="28" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Text="In Transit" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="15" Foreground="{StaticResource StatusBlue}" FontSize="28" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Text="Delivered Today" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="22" Foreground="{StaticResource StatusGreen}" FontSize="28" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Failed / Returned" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="2" Foreground="{StaticResource AccentRed}" FontSize="28" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                        <Border Style="{StaticResource PageCard}">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,12">
+                                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Shipment Tracking" Margin="0"/>
+                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="+ Assign Courier" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <DataGrid x:Name="DgLogistics" Style="{StaticResource AdminDataGridStyle}" Height="260">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Tracking #" Binding="{Binding TrackingNo}" Width="130"/>
+                                        <DataGridTextColumn Header="Order #"    Binding="{Binding OrderId}"    Width="90"/>
+                                        <DataGridTextColumn Header="Customer"   Binding="{Binding Customer}"   Width="*"/>
+                                        <DataGridTextColumn Header="Courier"    Binding="{Binding Courier}"    Width="100"/>
+                                        <DataGridTextColumn Header="Status"     Binding="{Binding Status}"     Width="110"/>
+                                        <DataGridTextColumn Header="ETA"        Binding="{Binding ETA}"        Width="90"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource PageCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Update Shipment"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                        <TextBlock Text="Tracking Number" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                        <TextBox Style="{StaticResource SearchTextBoxStyle}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                        <TextBlock Text="Courier" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                        <ComboBox Style="{StaticResource ComboStyle}">
+                                            <ComboBoxItem Content="J&amp;T Express"/>
+                                            <ComboBoxItem Content="LBC"/>
+                                            <ComboBoxItem Content="Lalamove"/>
+                                            <ComboBoxItem Content="Grab Express"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                                        <TextBlock Text="Delivery Status" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                        <ComboBox Style="{StaticResource ComboStyle}">
+                                            <ComboBoxItem Content="Preparing"/>
+                                            <ComboBoxItem Content="Picked Up"/>
+                                            <ComboBoxItem Content="In Transit"/>
+                                            <ComboBoxItem Content="Out for Delivery"/>
+                                            <ComboBoxItem Content="Delivered"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <Button Grid.Column="3" Style="{StaticResource PrimaryButtonStyle}" Content="Save Update" VerticalAlignment="Bottom"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ══════════ PAGE: WALK-IN POS ══════════ -->
+                <Grid x:Name="PageWalkInPOS" Visibility="Collapsed">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="300"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- Product catalogue -->
+                    <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Padding="24,20">
+                        <StackPanel>
+                            <TextBlock Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,16" Text="Walk-In Point of Sale — Process in-store transactions"/>
+                            <Border Background="#2C2C2C" BorderBrush="{StaticResource BorderSubtle}"
+                                    BorderThickness="1" CornerRadius="4" Height="36" Margin="0,0,0,16">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="🔍" Foreground="{StaticResource TextMuted}" FontSize="13" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="1" Style="{StaticResource SearchTextBoxStyle}"
+                                             BorderThickness="0" Background="Transparent" Height="34"/>
+                                </Grid>
+                            </Border>
+                            <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Products"/>
+                            <UniformGrid Columns="3">
+                                <Border Background="{StaticResource BackgroundCard}" CornerRadius="8" Padding="14" Margin="0,0,10,10" Cursor="Hand" BorderThickness="1" BorderBrush="{StaticResource BorderSubtle}">
+                                    <StackPanel>
+                                        <Border Background="{StaticResource BackgroundPanel}" CornerRadius="6" Height="54" Margin="0,0,0,10">
+                                            <TextBlock Text="🚲" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="Road Bike Frame" Foreground="{StaticResource TextPrimary}" FontSize="12" FontWeight="SemiBold" FontFamily="Segoe UI"/>
+                                        <TextBlock Text="₱ 4,500" Foreground="{StaticResource StatusGreen}" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                        <Button x:Name="BtnAddBike" Style="{StaticResource PrimaryButtonStyle}" Content="+ Add to Cart" Margin="0,10,0,0" Height="30" FontSize="12"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource BackgroundCard}" CornerRadius="8" Padding="14" Margin="0,0,10,10" Cursor="Hand" BorderThickness="1" BorderBrush="{StaticResource BorderSubtle}">
+                                    <StackPanel>
+                                        <Border Background="{StaticResource BackgroundPanel}" CornerRadius="6" Height="54" Margin="0,0,0,10">
+                                            <TextBlock Text="⚙" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="Gear Set 21-Speed" Foreground="{StaticResource TextPrimary}" FontSize="12" FontWeight="SemiBold" FontFamily="Segoe UI"/>
+                                        <TextBlock Text="₱ 1,200" Foreground="{StaticResource StatusGreen}" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                        <Button x:Name="BtnAddGear" Style="{StaticResource PrimaryButtonStyle}" Content="+ Add to Cart" Margin="0,10,0,0" Height="30" FontSize="12"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource BackgroundCard}" CornerRadius="8" Padding="14" Margin="0,0,0,10" Cursor="Hand" BorderThickness="1" BorderBrush="{StaticResource BorderSubtle}">
+                                    <StackPanel>
+                                        <Border Background="{StaticResource BackgroundPanel}" CornerRadius="6" Height="54" Margin="0,0,0,10">
+                                            <TextBlock Text="🔧" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="Brake Kit" Foreground="{StaticResource TextPrimary}" FontSize="12" FontWeight="SemiBold" FontFamily="Segoe UI"/>
+                                        <TextBlock Text="₱ 850" Foreground="{StaticResource StatusGreen}" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                        <Button x:Name="BtnAddBrake" Style="{StaticResource PrimaryButtonStyle}" Content="+ Add to Cart" Margin="0,10,0,0" Height="30" FontSize="12"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource BackgroundCard}" CornerRadius="8" Padding="14" Margin="0,0,10,0" Cursor="Hand" BorderThickness="1" BorderBrush="{StaticResource BorderSubtle}">
+                                    <StackPanel>
+                                        <Border Background="{StaticResource BackgroundPanel}" CornerRadius="6" Height="54" Margin="0,0,0,10">
+                                            <TextBlock Text="🪖" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="Helmet Pro" Foreground="{StaticResource TextPrimary}" FontSize="12" FontWeight="SemiBold" FontFamily="Segoe UI"/>
+                                        <TextBlock Text="₱ 1,800" Foreground="{StaticResource StatusGreen}" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                        <Button x:Name="BtnAddHelmet" Style="{StaticResource PrimaryButtonStyle}" Content="+ Add to Cart" Margin="0,10,0,0" Height="30" FontSize="12"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource BackgroundCard}" CornerRadius="8" Padding="14" Margin="0,0,10,0" Cursor="Hand" BorderThickness="1" BorderBrush="{StaticResource BorderSubtle}">
+                                    <StackPanel>
+                                        <Border Background="{StaticResource BackgroundPanel}" CornerRadius="6" Height="54" Margin="0,0,0,10">
+                                            <TextBlock Text="🧰" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="Repair Kit" Foreground="{StaticResource TextPrimary}" FontSize="12" FontWeight="SemiBold" FontFamily="Segoe UI"/>
+                                        <TextBlock Text="₱ 450" Foreground="{StaticResource StatusGreen}" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                        <Button x:Name="BtnAddRepair" Style="{StaticResource PrimaryButtonStyle}" Content="+ Add to Cart" Margin="0,10,0,0" Height="30" FontSize="12"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource BackgroundCard}" CornerRadius="8" Padding="14" Margin="0" Cursor="Hand" BorderThickness="1" BorderBrush="{StaticResource BorderSubtle}">
+                                    <StackPanel>
+                                        <Border Background="{StaticResource BackgroundPanel}" CornerRadius="6" Height="54" Margin="0,0,0,10">
+                                            <TextBlock Text="💡" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="Bike Light Set" Foreground="{StaticResource TextPrimary}" FontSize="12" FontWeight="SemiBold" FontFamily="Segoe UI"/>
+                                        <TextBlock Text="₱ 680" Foreground="{StaticResource StatusGreen}" FontSize="13" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                        <Button x:Name="BtnAddLight" Style="{StaticResource PrimaryButtonStyle}" Content="+ Add to Cart" Margin="0,10,0,0" Height="30" FontSize="12"/>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+                        </StackPanel>
+                    </ScrollViewer>
+                    <!-- Cart panel -->
+                    <Border Grid.Column="1" Background="{StaticResource BackgroundSecondary}"
+                            BorderThickness="1,0,0,0" BorderBrush="{StaticResource BorderSubtle}">
+                        <DockPanel Margin="16">
+                            <TextBlock DockPanel.Dock="Top" Text="Current Sale"
+                                       Foreground="{StaticResource TextPrimary}"
+                                       FontSize="15" FontWeight="SemiBold"
+                                       FontFamily="Segoe UI" Margin="0,0,0,14"/>
+                            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                                <TextBlock Text="Customer Name" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                <TextBox Style="{StaticResource SearchTextBoxStyle}"/>
+                            </StackPanel>
+                            <StackPanel DockPanel.Dock="Bottom">
+                                <Separator Background="{StaticResource BorderSubtle}" Height="1" Margin="0,0,0,12"/>
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="Subtotal:" Foreground="{StaticResource TextSecondary}" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="₱ 0.00" Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Right" FontFamily="Segoe UI"/>
+                                </Grid>
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="Discount:" Foreground="{StaticResource TextSecondary}" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="₱ 0.00" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Right" FontFamily="Segoe UI"/>
+                                </Grid>
+                                <Grid Margin="0,0,0,14">
+                                    <TextBlock Text="TOTAL:" Foreground="{StaticResource TextPrimary}" FontSize="16" FontWeight="Bold" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="₱ 0.00" Foreground="{StaticResource StatusGreen}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" FontFamily="Segoe UI"/>
+                                </Grid>
+                                <TextBlock Text="Payment Method" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                <ComboBox Style="{StaticResource ComboStyle}" Margin="0,0,0,12">
+                                    <ComboBoxItem Content="Cash" IsSelected="True"/>
+                                    <ComboBoxItem Content="GCash"/>
+                                    <ComboBoxItem Content="Maya"/>
+                                    <ComboBoxItem Content="Card"/>
+                                </ComboBox>
+                                <Button x:Name="BtnProcessPayment" Style="{StaticResource PrimaryButtonStyle}" Content="Process Payment" HorizontalAlignment="Stretch" Height="42" Margin="0,0,0,8"/>
+                                <Button x:Name="BtnClearCart" Style="{StaticResource GhostButtonStyle}" Content="Clear Cart" HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <TextBlock Text="Cart is empty"
+                                           Foreground="{StaticResource TextMuted}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,30,0,0" FontFamily="Segoe UI"/>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+
+                <!-- ══════════ PAGE: INVENTORY ══════════ -->
+                <ScrollViewer x:Name="PageInventory"
+                              Visibility="Collapsed"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="24,20">
+                    <StackPanel>
+                        <TextBlock Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,16" Text="Inventory Management — Stock levels, SKUs, product catalogue"/>
+                        <UniformGrid Rows="1" Columns="4" Margin="0,0,0,16">
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Text="Total SKUs" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="142" Foreground="{StaticResource TextPrimary}" FontSize="28" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Text="In Stock" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="137" Foreground="{StaticResource StatusGreen}" FontSize="28" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Text="Low Stock" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="5" Foreground="{StaticResource StatusYellow}" FontSize="28" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Out of Stock" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="0" Foreground="{StaticResource AccentRed}" FontSize="28" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                        <Border Style="{StaticResource PageCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Style="{StaticResource SearchTextBoxStyle}" Margin="0,0,8,0"/>
+                                <ComboBox Grid.Column="1" Style="{StaticResource ComboStyle}" Margin="0,0,8,0">
+                                    <ComboBoxItem Content="All Categories" IsSelected="True"/>
+                                    <ComboBoxItem Content="Bikes"/>
+                                    <ComboBoxItem Content="Parts"/>
+                                    <ComboBoxItem Content="Accessories"/>
+                                </ComboBox>
+                                <Button Grid.Column="2" Style="{StaticResource GhostButtonStyle}" Content="⤓ Export" Margin="0,0,8,0"/>
+                                <Button Grid.Column="3" Style="{StaticResource PrimaryButtonStyle}" Content="+ Add Product"/>
+                            </Grid>
+                        </Border>
+                        <Border Style="{StaticResource PageCard}">
+                            <DataGrid x:Name="DgInventory" Style="{StaticResource AdminDataGridStyle}" Height="280">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="SKU"        Binding="{Binding SKU}"       Width="80"/>
+                                    <DataGridTextColumn Header="Product"    Binding="{Binding Product}"   Width="*"/>
+                                    <DataGridTextColumn Header="Category"   Binding="{Binding Category}"  Width="100"/>
+                                    <DataGridTextColumn Header="In Stock"   Binding="{Binding Stock}"     Width="75"/>
+                                    <DataGridTextColumn Header="Reorder At" Binding="{Binding ReorderAt}" Width="85"/>
+                                    <DataGridTextColumn Header="Price"      Binding="{Binding Price}"     Width="90"/>
+                                    <DataGridTextColumn Header="Supplier"   Binding="{Binding Supplier}"  Width="*"/>
+                                    <DataGridTextColumn Header="Status"     Binding="{Binding Status}"    Width="80"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                        <Border Style="{StaticResource PageCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Add / Edit Product"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="120"/>
+                                        <ColumnDefinition Width="120"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                        <TextBlock Text="Product Name" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                        <TextBox Style="{StaticResource SearchTextBoxStyle}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                        <TextBlock Text="Category" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                        <ComboBox Style="{StaticResource ComboStyle}">
+                                            <ComboBoxItem Content="Bikes"/>
+                                            <ComboBoxItem Content="Parts"/>
+                                            <ComboBoxItem Content="Accessories"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                                        <TextBlock Text="Qty" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                        <TextBox Style="{StaticResource SearchTextBoxStyle}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="3">
+                                        <TextBlock Text="Unit Price" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                        <TextBox Style="{StaticResource SearchTextBoxStyle}"/>
+                                    </StackPanel>
+                                </Grid>
+                                <Button Style="{StaticResource PrimaryButtonStyle}" Content="Save Product" HorizontalAlignment="Left" Margin="0,14,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ══════════ PAGE: ORDER HISTORY ══════════ -->
+                <ScrollViewer x:Name="PageOrderHistory"
+                              Visibility="Collapsed"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="24,20">
+                    <StackPanel>
+                        <TextBlock Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,16" Text="Order History — Search &amp; filter all past orders"/>
+                        <Border Style="{StaticResource PageCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Style="{StaticResource SearchTextBoxStyle}" Margin="0,0,8,0"/>
+                                <DatePicker Grid.Column="1" Background="#2C2C2C" Foreground="{StaticResource TextPrimary}" Margin="0,0,8,0" Height="36"/>
+                                <DatePicker Grid.Column="2" Background="#2C2C2C" Foreground="{StaticResource TextPrimary}" Margin="0,0,8,0" Height="36"/>
+                                <ComboBox Grid.Column="3" Style="{StaticResource ComboStyle}" Margin="0,0,8,0">
+                                    <ComboBoxItem Content="All Statuses" IsSelected="True"/>
+                                    <ComboBoxItem Content="Completed"/>
+                                    <ComboBoxItem Content="Cancelled"/>
+                                    <ComboBoxItem Content="Refunded"/>
+                                </ComboBox>
+                                <Button Grid.Column="4" Style="{StaticResource PrimaryButtonStyle}" Content="Search"/>
+                            </Grid>
+                        </Border>
+                        <Border Style="{StaticResource PageCard}">
+                            <DataGrid x:Name="DgHistory" Style="{StaticResource AdminDataGridStyle}" Height="440">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Order #"  Binding="{Binding OrderId}"  Width="100"/>
+                                    <DataGridTextColumn Header="Customer" Binding="{Binding Customer}" Width="*"/>
+                                    <DataGridTextColumn Header="Items"    Binding="{Binding Items}"    Width="*"/>
+                                    <DataGridTextColumn Header="Total"    Binding="{Binding Total}"    Width="100"/>
+                                    <DataGridTextColumn Header="Payment"  Binding="{Binding Payment}"  Width="100"/>
+                                    <DataGridTextColumn Header="Date"     Binding="{Binding Date}"     Width="120"/>
+                                    <DataGridTextColumn Header="Status"   Binding="{Binding Status}"   Width="100"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ══════════ PAGE: ANALYTICS ══════════ -->
+                <ScrollViewer x:Name="PageAnalytics"
+                              Visibility="Collapsed"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="24,20">
+                    <StackPanel>
+
+                        <!-- ── Page subtitle ── -->
+                        <TextBlock Foreground="{StaticResource TextMuted}" FontSize="12"
+                                   FontFamily="Segoe UI" Margin="0,0,0,16"
+                                   Text="Analytics Dashboard — Placeholder data until database is connected"/>
+
+                        <!-- ── Period selector bar ── -->
+                        <Border Style="{StaticResource PageCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Period buttons -->
+                                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                    <TextBlock Text="Period:"
+                                               Foreground="{StaticResource TextSecondary}"
+                                               FontSize="13" FontFamily="Segoe UI"
+                                               VerticalAlignment="Center" Margin="0,0,14,0"/>
+                                    <Button x:Name="Analytics_BtnToday"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Content="Today" Margin="0,0,6,0"
+                                            Tag="Today"
+                                            Click="AnalyticsPeriod_Click"/>
+                                    <Button x:Name="Analytics_BtnWeek"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Content="This Week" Margin="0,0,6,0"
+                                            Tag="Week"
+                                            Click="AnalyticsPeriod_Click"/>
+                                    <Button x:Name="Analytics_BtnMonth"
+                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            Content="This Month" Margin="0,0,6,0"
+                                            Tag="Month"
+                                            Click="AnalyticsPeriod_Click"/>
+                                    <Button x:Name="Analytics_BtnYear"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Content="This Year"
+                                            Tag="Year"
+                                            Click="AnalyticsPeriod_Click"/>
+                                </StackPanel>
+
+                                <!-- Active period label -->
+                                <StackPanel Grid.Column="2" Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Viewing: "
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="12" FontFamily="Segoe UI"/>
+                                    <TextBlock x:Name="Analytics_ActivePeriodLabel"
+                                               Text="This Month"
+                                               Foreground="{StaticResource AccentRed}"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock x:Name="Analytics_DateRangeLabel"
+                                               Text=" · Mar 1 – Mar 10, 2026"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="12" FontFamily="Segoe UI"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- ── KPI cards — values updated by code-behind ── -->
+                        <UniformGrid Rows="1" Columns="4" Margin="0,0,0,16">
+
+                            <!-- Total Revenue -->
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Text="TOTAL REVENUE"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="10" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock x:Name="Analytics_Revenue"
+                                               Text="₱ 142,800"
+                                               Foreground="{StaticResource StatusGreen}"
+                                               FontSize="22" FontWeight="Bold"
+                                               FontFamily="Segoe UI" Margin="0,6,0,0"/>
+                                    <TextBlock x:Name="Analytics_RevenueTrend"
+                                               Text="↑ 12% vs prev period"
+                                               Foreground="{StaticResource StatusGreen}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Orders Completed -->
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Text="ORDERS COMPLETED"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="10" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock x:Name="Analytics_Orders"
+                                               Text="87"
+                                               Foreground="{StaticResource StatusBlue}"
+                                               FontSize="22" FontWeight="Bold"
+                                               FontFamily="Segoe UI" Margin="0,6,0,0"/>
+                                    <TextBlock x:Name="Analytics_OrdersTrend"
+                                               Text="↑ 8 more than prev period"
+                                               Foreground="{StaticResource StatusBlue}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Avg Order Value -->
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Text="AVG. ORDER VALUE"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="10" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock x:Name="Analytics_AvgOrder"
+                                               Text="₱ 1,641"
+                                               Foreground="{StaticResource StatusYellow}"
+                                               FontSize="22" FontWeight="Bold"
+                                               FontFamily="Segoe UI" Margin="0,6,0,0"/>
+                                    <TextBlock x:Name="Analytics_AvgOrderTrend"
+                                               Text="↓ 2% vs prev period"
+                                               Foreground="{StaticResource AccentRed}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- New Customers -->
+                            <Border Style="{StaticResource StatCardStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="NEW CUSTOMERS"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="10" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock x:Name="Analytics_Customers"
+                                               Text="34"
+                                               Foreground="#CE93D8"
+                                               FontSize="22" FontWeight="Bold"
+                                               FontFamily="Segoe UI" Margin="0,6,0,0"/>
+                                    <TextBlock x:Name="Analytics_CustomersTrend"
+                                               Text="↑ 6 more than prev period"
+                                               Foreground="#CE93D8"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- ── Secondary KPI row ── -->
+                        <UniformGrid Rows="1" Columns="4" Margin="0,0,0,16">
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Text="WALK-IN SALES"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="10" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock x:Name="Analytics_WalkIn"
+                                               Text="₱ 38,400"
+                                               Foreground="{StaticResource TextPrimary}"
+                                               FontSize="18" FontWeight="Bold"
+                                               FontFamily="Segoe UI" Margin="0,6,0,0"/>
+                                    <TextBlock x:Name="Analytics_WalkInSub"
+                                               Text="24 transactions"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Text="ONLINE SALES"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="10" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock x:Name="Analytics_Online"
+                                               Text="₱ 104,400"
+                                               Foreground="{StaticResource TextPrimary}"
+                                               FontSize="18" FontWeight="Bold"
+                                               FontFamily="Segoe UI" Margin="0,6,0,0"/>
+                                    <TextBlock x:Name="Analytics_OnlineSub"
+                                               Text="63 transactions"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Text="REFUNDS ISSUED"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="10" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock x:Name="Analytics_Refunds"
+                                               Text="₱ 4,200"
+                                               Foreground="{StaticResource AccentRed}"
+                                               FontSize="18" FontWeight="Bold"
+                                               FontFamily="Segoe UI" Margin="0,6,0,0"/>
+                                    <TextBlock x:Name="Analytics_RefundsSub"
+                                               Text="3 refunds"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="CANCELLED ORDERS"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="10" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock x:Name="Analytics_Cancelled"
+                                               Text="7"
+                                               Foreground="{StaticResource StatusYellow}"
+                                               FontSize="18" FontWeight="Bold"
+                                               FontFamily="Segoe UI" Margin="0,6,0,0"/>
+                                    <TextBlock x:Name="Analytics_CancelledSub"
+                                               Text="↓ 2 vs prev period"
+                                               Foreground="{StaticResource StatusGreen}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- ── Chart placeholders ── -->
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Sales Over Time chart placeholder -->
+                            <Border Grid.Column="0" Style="{StaticResource PageCard}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Style="{StaticResource SectionHeaderStyle}"
+                                                   Text="Sales Over Time" Margin="0"/>
+                                        <TextBlock Grid.Column="1"
+                                                   x:Name="Analytics_ChartPeriodLabel"
+                                                   Text="This Month"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="12" FontFamily="Segoe UI"
+                                                   VerticalAlignment="Center"/>
+                                    </Grid>
+                                    <!-- Chart area — swap for LiveCharts2 CartesianChart -->
+                                    <Border Background="{StaticResource BackgroundPrimary}"
+                                            CornerRadius="6" Height="200"
+                                            BorderThickness="1"
+                                            BorderBrush="{StaticResource BorderSubtle}">
+                                        <StackPanel HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock Text="📈" FontSize="32"
+                                                       HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="Analytics_ChartHint"
+                                                       Text="Bind LiveCharts2 CartesianChart here"
+                                                       Foreground="{StaticResource TextMuted}"
+                                                       FontSize="12" FontFamily="Segoe UI"
+                                                       HorizontalAlignment="Center"
+                                                       Margin="0,8,0,0"/>
+                                            <TextBlock x:Name="Analytics_ChartSubHint"
+                                                       Text="Data source: This Month"
+                                                       Foreground="{StaticResource AccentRed}"
+                                                       FontSize="11" FontFamily="Segoe UI"
+                                                       HorizontalAlignment="Center"
+                                                       Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Top Products chart placeholder -->
+                            <Border Grid.Column="1" Style="{StaticResource PageCard}" Margin="0">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SectionHeaderStyle}"
+                                               Text="Top Products"/>
+                                    <Border Background="{StaticResource BackgroundPrimary}"
+                                            CornerRadius="6" Height="200"
+                                            BorderThickness="1"
+                                            BorderBrush="{StaticResource BorderSubtle}">
+                                        <StackPanel HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock Text="🥧" FontSize="32"
+                                                       HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Bind PieChart / BarChart here"
+                                                       Foreground="{StaticResource TextMuted}"
+                                                       FontSize="12" FontFamily="Segoe UI"
+                                                       HorizontalAlignment="Center"
+                                                       Margin="0,8,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- ── Product Performance table ── -->
+                        <Border Style="{StaticResource PageCard}">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource SectionHeaderStyle}"
+                                               Text="Product Performance" Margin="0"/>
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Content="⤓ Export" Height="30"
+                                            FontSize="12" Padding="12,0"/>
+                                </Grid>
+                                <DataGrid x:Name="DgAnalytics"
+                                          Style="{StaticResource AdminDataGridStyle}"
+                                          Height="200">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Product"    Binding="{Binding Product}" Width="*"/>
+                                        <DataGridTextColumn Header="Units Sold" Binding="{Binding Sold}"    Width="90"/>
+                                        <DataGridTextColumn Header="Revenue"    Binding="{Binding Revenue}" Width="120"/>
+                                        <DataGridTextColumn Header="Walk-In"    Binding="{Binding WalkIn}"  Width="90"/>
+                                        <DataGridTextColumn Header="Online"     Binding="{Binding Online}"  Width="90"/>
+                                        <DataGridTextColumn Header="Stock Left" Binding="{Binding Stock}"   Width="85"/>
+                                        <DataGridTextColumn Header="Trend"      Binding="{Binding Trend}"   Width="75"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ══════════ PAGE: SUPPORT TICKETS ══════════ -->
+                <ScrollViewer x:Name="PageSupport"
+                              Visibility="Collapsed"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="24,20">
+                    <StackPanel>
+                        <TextBlock Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,16" Text="Support Tickets — Manage customer support requests and escalations"/>
+                        <UniformGrid Rows="1" Columns="3" Margin="0,0,0,16">
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0" Background="#2C1A1A">
+                                <StackPanel>
+                                    <TextBlock Text="Urgent / Open" Foreground="{StaticResource AccentRed}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="2" Foreground="{StaticResource AccentRed}" FontSize="28" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                    <TextBlock Text="Needs immediate attention" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}" Margin="0,0,12,0" Background="#2C2000">
+                                <StackPanel>
+                                    <TextBlock Text="In Progress" Foreground="{StaticResource StatusYellow}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="4" Foreground="{StaticResource StatusYellow}" FontSize="28" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                    <TextBlock Text="Being handled" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StatCardStyle}" Background="#1A3020">
+                                <StackPanel>
+                                    <TextBlock Text="Resolved Today" Foreground="{StaticResource StatusGreen}" FontSize="11" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="3" Foreground="{StaticResource StatusGreen}" FontSize="28" FontWeight="Bold" FontFamily="Segoe UI" Margin="0,4,0,0"/>
+                                    <TextBlock Text="Closed tickets" Foreground="{StaticResource TextMuted}" FontSize="11" FontFamily="Segoe UI"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="300"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Style="{StaticResource PageCard}" Margin="0,0,12,0">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="All Tickets"/>
+                                    <DataGrid x:Name="DgSupport" Style="{StaticResource AdminDataGridStyle}" Height="340">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Ticket #" Binding="{Binding TicketId}" Width="80"/>
+                                            <DataGridTextColumn Header="Customer" Binding="{Binding Customer}" Width="*"/>
+                                            <DataGridTextColumn Header="Subject"  Binding="{Binding Subject}"  Width="*"/>
+                                            <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="75"/>
+                                            <DataGridTextColumn Header="Status"   Binding="{Binding Status}"   Width="85"/>
+                                            <DataGridTextColumn Header="Created"  Binding="{Binding Created}"  Width="100"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="1" Style="{StaticResource PageCard}" Margin="0">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Reply to Ticket"/>
+                                    <TextBlock Text="Select a ticket to respond."
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontFamily="Segoe UI" FontSize="13" Margin="0,0,0,12"/>
+                                    <TextBlock Text="Message:" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                    <TextBox Style="{StaticResource SearchTextBoxStyle}" Height="110" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,12"/>
+                                    <TextBlock Text="Update Status:" Foreground="{StaticResource TextMuted}" FontSize="12" FontFamily="Segoe UI" Margin="0,0,0,4"/>
+                                    <ComboBox Style="{StaticResource ComboStyle}" Margin="0,0,0,14">
+                                        <ComboBoxItem Content="Open" IsSelected="True"/>
+                                        <ComboBoxItem Content="In Progress"/>
+                                        <ComboBoxItem Content="Resolved"/>
+                                        <ComboBoxItem Content="Closed"/>
+                                    </ComboBox>
+                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Send Reply" HorizontalAlignment="Stretch" Height="40"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+
+            </Grid>
+            <!-- END PAGE HOST -->
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             COLUMN 2 — RIGHT ACTIVITY FEED PANEL
+             ═══════════════════════════════════════════════════════════ -->
+        <Border Grid.Column="2"
+                Background="{StaticResource BackgroundSecondary}"
+                BorderThickness="1,0,0,0"
+                BorderBrush="{StaticResource BorderSubtle}">
+            <DockPanel LastChildFill="True">
+
+                <!-- Panel header -->
+                <Border DockPanel.Dock="Top" Padding="16,14"
+                        BorderThickness="0,0,0,1"
+                        BorderBrush="{StaticResource BorderSubtle}">
+                    <TextBlock Text="Activity Feed"
+                               Foreground="{StaticResource TextPrimary}"
+                               FontSize="14" FontWeight="SemiBold"
+                               FontFamily="Segoe UI"/>
+                </Border>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="16,12,16,12">
+
+                        <!-- ── Pending Payments ── -->
+                        <TextBlock Text="PENDING PAYMENTS"
+                                   Foreground="{StaticResource TextMuted}"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   FontFamily="Segoe UI" Margin="0,0,0,8"/>
+
+                        <Border Style="{StaticResource ActivityItemCard}"
+                                BorderBrush="{StaticResource StatusYellow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="ORD-20260310-001"
+                                               Foreground="{StaticResource TextPrimary}"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock Text="Juan dela Cruz"
+                                               Foreground="{StaticResource TextSecondary}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,2,0,0"/>
+                                    <TextBlock Text="GCash · 08:45 AM"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="10" FontFamily="Segoe UI"
+                                               Margin="0,3,0,0"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                    <TextBlock Text="₱ 5,200"
+                                               Foreground="{StaticResource StatusYellow}"
+                                               FontSize="13" FontWeight="Bold"
+                                               FontFamily="Segoe UI"
+                                               HorizontalAlignment="Right"/>
+                                    <Button x:Name="VerifyPaymentItem1Button"
+                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            Content="Verify" Height="26" FontSize="11"
+                                            Margin="0,6,0,0" Tag="PaymentVerification"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource ActivityItemCard}"
+                                BorderBrush="{StaticResource StatusYellow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="ORD-20260310-002"
+                                               Foreground="{StaticResource TextPrimary}"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock Text="Maria Santos"
+                                               Foreground="{StaticResource TextSecondary}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,2,0,0"/>
+                                    <TextBlock Text="BDO Transfer · 09:12 AM"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="10" FontFamily="Segoe UI"
+                                               Margin="0,3,0,0"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                    <TextBlock Text="₱ 12,700"
+                                               Foreground="{StaticResource StatusYellow}"
+                                               FontSize="13" FontWeight="Bold"
+                                               FontFamily="Segoe UI"
+                                               HorizontalAlignment="Right"/>
+                                    <Button x:Name="VerifyPaymentItem2Button"
+                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            Content="Verify" Height="26" FontSize="11"
+                                            Margin="0,6,0,0" Tag="PaymentVerification"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource ActivityItemCard}"
+                                BorderBrush="{StaticResource StatusYellow}"
+                                Margin="0,0,0,16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="ORD-20260309-047"
+                                               Foreground="{StaticResource TextPrimary}"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock Text="Roberto Reyes"
+                                               Foreground="{StaticResource TextSecondary}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               Margin="0,2,0,0"/>
+                                    <TextBlock Text="PayMaya · 09:30 AM"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="10" FontFamily="Segoe UI"
+                                               Margin="0,3,0,0"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                    <TextBlock Text="₱ 3,450"
+                                               Foreground="{StaticResource StatusYellow}"
+                                               FontSize="13" FontWeight="Bold"
+                                               FontFamily="Segoe UI"
+                                               HorizontalAlignment="Right"/>
+                                    <Button x:Name="VerifyPaymentItem3Button"
+                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            Content="Verify" Height="26" FontSize="11"
+                                            Margin="0,6,0,0" Tag="PaymentVerification"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- ── System Alerts ── -->
+                        <TextBlock Text="SYSTEM ALERTS"
+                                   Foreground="{StaticResource TextMuted}"
+                                   FontSize="10" FontWeight="SemiBold"
+                                   FontFamily="Segoe UI" Margin="0,0,0,8"/>
+
+                        <Border Background="#2C1A1A" CornerRadius="5" Padding="12,10"
+                                Margin="0,0,0,8" BorderThickness="1"
+                                BorderBrush="{StaticResource AccentRed}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="⚠" FontSize="14"
+                                           Foreground="{StaticResource AccentRed}"
+                                           VerticalAlignment="Top" Margin="0,0,8,0"/>
+                                <StackPanel>
+                                    <TextBlock Text="Low Stock Warning"
+                                               Foreground="{StaticResource AccentRed}"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock Text="5 items below minimum threshold."
+                                               Foreground="{StaticResource TextSecondary}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                    <Button x:Name="ReviewInventoryButton"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Content="Review Now" Height="26" FontSize="11"
+                                            Margin="0,8,0,0" HorizontalAlignment="Left"
+                                            Tag="Inventory"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="#1A1E2C" CornerRadius="5" Padding="12,10"
+                                Margin="0,0,0,8" BorderThickness="1"
+                                BorderBrush="{StaticResource StatusBlue}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🎫" FontSize="14"
+                                           VerticalAlignment="Top" Margin="0,0,8,0"/>
+                                <StackPanel>
+                                    <TextBlock Text="New Support Ticket"
+                                               Foreground="{StaticResource StatusBlue}"
+                                               FontSize="12" FontWeight="SemiBold"
+                                               FontFamily="Segoe UI"/>
+                                    <TextBlock Text="#TKT-0082 — Delivery issue reported."
+                                               Foreground="{StaticResource TextSecondary}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                    <Button x:Name="ViewTicketButton"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Content="View Ticket" Height="26" FontSize="11"
+                                            Margin="0,8,0,0" HorizontalAlignment="Left"
+                                            Tag="Support"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ── System Status ── -->
+                        <Border Background="{StaticResource BackgroundCard}"
+                                CornerRadius="5" Padding="12,10"
+                                Margin="0,8,0,0" BorderThickness="1"
+                                BorderBrush="{StaticResource BorderSubtle}">
+                            <StackPanel>
+                                <TextBlock Text="SYSTEM STATUS"
+                                           Foreground="{StaticResource TextMuted}"
+                                           FontSize="10" FontWeight="SemiBold"
+                                           FontFamily="Segoe UI" Margin="0,0,0,10"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <Ellipse Width="8" Height="8"
+                                             Fill="{StaticResource StatusGreen}"
+                                             VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="User Database · Online"
+                                               Foreground="{StaticResource TextSecondary}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <Ellipse Width="8" Height="8"
+                                             Fill="{StaticResource StatusGreen}"
+                                             VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="POS Terminal · Active"
+                                               Foreground="{StaticResource TextSecondary}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8"
+                                             Fill="{StaticResource StatusGreen}"
+                                             VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Payment Gateway · Online"
+                                               Foreground="{StaticResource TextSecondary}"
+                                               FontSize="11" FontFamily="Segoe UI"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
     </Grid>
 </Window>
