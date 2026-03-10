@@ -1,0 +1,6 @@
+//All types. -- so that users can see lots of products from different types.
+//Mountain.
+//Road.
+//Fixie.
+//Kids.
+//Others.

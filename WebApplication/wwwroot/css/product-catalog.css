@@ -1,84 +1,338 @@
-/* ===========================
-   PRODUCT CATALOG GRID
-   =========================== */
-.catalog-container {
-    padding: 40px 20px;
-    background: #f5f5f5;
+/* ═══════════════════════════════════════════════════════════════
+   TAURUS BIKE SHOP — PRODUCT CATALOG STYLESHEET
+   File:    wwwroot/css/product-catalog.css
+   Used by: Views/Customer/ProductCatalog.cshtml
+   
+   NOTE: This file uses !important on html/body rules to override
+   Bootstrap's white background from _Layout.cshtml.
+   All component styles are scoped under .catalog-page.
+═══════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════
+   TAURUS — PRODUCT CATALOG PAGE STYLES
+   NOTE: Uses !important on layout-level rules
+   to override Bootstrap from _Layout.cshtml.
+   Scoped overrides live under .catalog-page.
+══════════════════════════════════════════════ */
+:root {
+    --bg-base:        #0B0B0B;
+    --bg-surface:     #111111;
+    --bg-card:        #141414;
+    --bg-input:       #1A1A1A;
+    --red:            #E10600;
+    --red-hover:      #FF1A17;
+    --red-dim:        #E1060016;
+    --white:          #FFFFFF;
+    --text-primary:   #F0F0F0;
+    --text-secondary: #888888;
+    --text-muted:     #3A3A3A;
+    --border:         #222222;
+    --font-display:   'Bebas Neue', sans-serif;
+    --font-cond:      'Barlow Condensed', sans-serif;
+    --font-body:      'Barlow', sans-serif;
+    --ease-out:       cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Part-type badge colors */
+    --c-unit:    #E10600; --c-frame:  #F97316; --c-fork:   #A855F7;
+    --c-hubs:    #3B82F6; --c-upkit:  #22C55E; --c-stem:   #14B8A6;
+    --c-bar:     #EAB308; --c-saddle: #EC4899; --c-grip:   #6366F1;
+    --c-pedals:  #06B6D4; --c-rims:   #F59E0B; --c-tires:  #84CC16;
+    --c-chain:   #94A3B8;
 }
 
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ── BOOTSTRAP OVERRIDE ──────────────────────────────────────────
+   _Layout.cshtml loads Bootstrap which sets body/html to white
+   and overrides our dark theme. These rules forcefully correct it.
+   The html/body rules need !important to beat Bootstrap specificity.
+   Everything else is scoped under .catalog-page for safety.
+─────────────────────────────────────────────────────────────────── */
+html, body {
+    background-color: #0B0B0B !important;
+    color: #F0F0F0 !important;
+}
+
+/* Bootstrap's .container adds horizontal padding but no background —
+   we need to make sure it doesn't show a white bg from a parent */
+body > .container,
+body > main > .container,
+body > div > .container {
+    background: transparent !important;
+}
+
+/* If your _Layout wraps @RenderBody() in a <main> or <div class="container">,
+   override it here too */
+main, #main-content, .main-content, [role="main"] {
+    background-color: #0B0B0B !important;
+    color: #F0F0F0 !important;
+}
+
+/* Bootstrap buttons reset — prevent btn styles leaking into filter tabs */
+.catalog-filter-tabs button,
+.catalog-toolbar button,
+.product-card button {
+    font-family: inherit;
+}
+
+/* Bootstrap form-control override — our inputs look different */
+.catalog-page input,
+.catalog-page select {
+    box-shadow: none !important;
+    color: #F0F0F0 !important;
+}
+
+/* Bootstrap h1-h6 color override */
+.catalog-page h1,
+.catalog-page h2,
+.catalog-page h3,
+.catalog-page h4,
+.catalog-page h5,
+.catalog-page h6 {
+    color: #F0F0F0;
+}
+
+/* Bootstrap p color override */
+.catalog-page p { color: #888888; }
+
+body {
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+}
+
+.catalog-page { position: relative; min-height: 100vh; padding-bottom: 80px; }
+
+.catalog-page::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(#ffffff03 1px, transparent 1px),
+                      linear-gradient(90deg, #ffffff03 1px, transparent 1px);
+    background-size: 48px 48px; pointer-events: none; z-index: 0;
+}
+
+/* ── HERO ── */
+.catalog-hero {
+    position: relative; z-index: 1; padding: 56px 0 44px;
+    text-align: center; border-bottom: 1px solid #E1060025; margin-bottom: 40px; overflow: hidden;
+}
+.catalog-hero__glow {
+    position: absolute; top: 50%; left: 50%; width: 800px; height: 320px;
+    background: radial-gradient(ellipse, #E1060010 0%, transparent 65%);
+    transform: translate(-50%, -50%); pointer-events: none;
+}
+.catalog-hero__eyebrow {
+    font-family: var(--font-cond); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.4em; text-transform: uppercase; color: var(--red); margin-bottom: 10px;
+}
+.catalog-hero__title {
+    font-family: var(--font-display); font-size: clamp(48px, 8vw, 88px);
+    color: var(--white); letter-spacing: 0.05em; line-height: 1; margin-bottom: 10px;
+}
+.catalog-hero__title span { color: var(--red); }
+.catalog-hero__sub { font-size: 15px; font-weight: 300; color: var(--text-secondary); }
+
+/* ── TOOLBAR ── */
+.catalog-toolbar {
+    position: relative; z-index: 1; display: flex;
+    align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
+}
+
+.toolbar-search { position: relative; flex: 1; min-width: 180px; }
+.toolbar-search__icon {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    width: 15px; height: 15px; color: var(--text-secondary); pointer-events: none;
+}
+.toolbar-search__input {
+    width: 100%; height: 44px; padding: 0 12px 0 40px;
+    background: var(--bg-surface); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-primary); font-family: var(--font-body); font-size: 14px; outline: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+.toolbar-search__input::placeholder { color: #444; }
+.toolbar-search__input:focus { border-color: var(--red); background: #160808; }
+
+.toolbar-part-select, .toolbar-sort {
+    height: 44px; padding: 0 30px 0 12px;
+    background: var(--bg-surface); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-secondary); font-family: var(--font-cond);
+    font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
+    outline: none; cursor: pointer; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; background-size: 11px;
+    transition: border-color 0.2s;
+}
+.toolbar-part-select { min-width: 160px; }
+.toolbar-part-select:focus, .toolbar-sort:focus { border-color: var(--red); color: var(--white); }
+.toolbar-part-select option, .toolbar-sort option { background: #161616; color: var(--text-primary); }
+
+.toolbar-count {
+    font-family: var(--font-cond); font-size: 13px; font-weight: 600;
+    letter-spacing: 0.1em; color: var(--text-secondary);
+    text-transform: uppercase; white-space: nowrap; margin-left: auto;
+}
+.toolbar-count span { color: var(--red); }
+
+/* ── CATEGORY TABS ── */
+.catalog-filter-tabs {
+    position: relative; z-index: 1; display: flex;
+    align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
+}
+.filter-tab {
+    height: 40px; padding: 0 20px;
+    background: transparent; border: 1px solid var(--border); border-radius: 3px;
+    font-family: var(--font-cond); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-secondary);
+    cursor: pointer; white-space: nowrap;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.filter-tab:hover { border-color: #444; color: var(--white); }
+.filter-tab.active { background: var(--red); border-color: var(--red); color: var(--white); }
+.filter-tab__count {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 16px; background: #ffffff18; border-radius: 2px;
+    font-size: 10px; margin-left: 6px;
+}
+.filter-tab.active .filter-tab__count { background: #ffffff30; }
+
+/* ── PRODUCT GRID ── */
 .catalog-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
 }
 
-/* ===========================
-   PRODUCT CARD
-   =========================== */
-.catalog-card {
-    background: white;
-    border-radius: 14px;
-    padding: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    text-align: center;
+/* ── PRODUCT CARD ── */
+.product-card {
+    position: relative; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 5px;
+    overflow: hidden; display: flex; flex-direction: column;
+    transition: border-color 0.3s, transform 0.3s var(--ease-out), box-shadow 0.3s;
+}
+.product-card:hover {
+    border-color: #E1060035; transform: translateY(-4px);
+    box-shadow: 0 14px 40px #00000055, 0 2px 8px #E1060012;
 }
 
-.catalog-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+.card-badge {
+    position: absolute; top: 10px; left: 10px; z-index: 3;
+    padding: 3px 8px; border-radius: 3px;
+    font-family: var(--font-cond); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--white);
 }
 
-/* ===========================
-   PRODUCT IMAGE
-   =========================== */
-.catalog-card img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    margin-bottom: 15px;
+.card-wish {
+    position: absolute; top: 10px; right: 10px; z-index: 3;
+    width: 30px; height: 30px; background: #00000070; backdrop-filter: blur(6px);
+    border: 1px solid #ffffff15; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    opacity: 0; transform: scale(0.8);
+    transition: opacity 0.2s, transform 0.2s var(--ease-spring), border-color 0.2s;
+}
+.product-card:hover .card-wish { opacity: 1; transform: scale(1); }
+.card-wish:hover { border-color: var(--red); }
+.card-wish svg { width: 13px; height: 13px; color: var(--white); }
+.card-wish.active svg { fill: var(--red); color: var(--red); }
+
+.card-img-wrap { position: relative; padding-top: 65%; background: #111111; overflow: hidden; }
+
+.card-img-placeholder {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; opacity: 0.15; transition: opacity 0.3s;
+}
+.product-card:hover .card-img-placeholder { opacity: 0.25; }
+.card-img-placeholder svg { width: 44px; height: 44px; color: var(--white); }
+.card-img-placeholder span {
+    font-family: var(--font-cond); font-size: 10px;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--white);
 }
 
-/* ===========================
-   PRODUCT TITLE & DESC
-   =========================== */
-.catalog-card h5 {
-    color: #8B0000;
-    font-weight: 600;
-    margin-bottom: 10px;
+.card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, #0b0b0bcc 0%, transparent 55%);
+    opacity: 0; display: flex; align-items: flex-end;
+    justify-content: center; padding-bottom: 12px; z-index: 2; transition: opacity 0.25s;
+}
+.product-card:hover .card-overlay { opacity: 1; }
+
+.btn-quick {
+    padding: 6px 16px; background: #ffffff18; backdrop-filter: blur(8px);
+    border: 1px solid #ffffff30; border-radius: 3px;
+    font-family: var(--font-cond); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--white); cursor: pointer;
+    transform: translateY(6px); transition: transform 0.25s var(--ease-spring), background 0.2s;
+}
+.product-card:hover .btn-quick { transform: translateY(0); }
+.btn-quick:hover { background: #ffffff28; }
+
+.card-body { padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.card-part-type {
+    font-family: var(--font-cond); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.25em; text-transform: uppercase;
+}
+.card-brand {
+    font-family: var(--font-cond); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary);
+}
+.card-name {
+    font-family: var(--font-cond); font-size: 15px; font-weight: 700;
+    color: var(--text-primary); line-height: 1.3; transition: color 0.2s;
+}
+.product-card:hover .card-name { color: var(--white); }
+.card-desc {
+    font-size: 12px; font-weight: 300; color: var(--text-secondary);
+    line-height: 1.5; flex: 1; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-price {
+    font-family: var(--font-display); font-size: 22px;
+    color: var(--white); letter-spacing: 0.03em; margin-top: 2px;
 }
 
-.catalog-card p {
-    font-size: 0.95rem;
-    color: #333;
-    margin-bottom: 15px;
+.card-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 10px; }
+
+.btn-cart {
+    display: flex; align-items: center; justify-content: center; gap: 7px; height: 40px;
+    background: var(--red); border: none; border-radius: 4px;
+    font-family: var(--font-cond); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--white);
+    cursor: pointer; position: relative; overflow: hidden;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
 }
+.btn-cart:hover { background: var(--red-hover); box-shadow: 0 4px 18px #E1060045; transform: translateY(-1px); }
+.btn-cart:active { transform: translateY(0); }
+.btn-cart svg { width: 13px; height: 13px; }
 
-/* ===========================
-   BUTTON
-   =========================== */
-.catalog-card .btn-taurus {
-    width: 100%;
-    padding: 10px 0;
-    font-weight: 600;
+.btn-details {
+    height: 40px; width: 40px; background: var(--bg-surface);
+    border: 1px solid var(--border); border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text-secondary);
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
+.btn-details:hover { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+.btn-details svg { width: 15px; height: 15px; }
 
-/* ===========================
-   RESPONSIVE
-   =========================== */
-@media (max-width: 768px) {
-    .catalog-container {
-        padding: 20px 10px;
-    }
+/* ── EMPTY STATE ── */
+.catalog-empty { grid-column: 1 / -1; text-align: center; padding: 80px 20px; display: none; }
+.catalog-empty.visible { display: block; }
+.catalog-empty svg { width: 56px; height: 56px; color: var(--text-muted); margin: 0 auto 16px; display: block; }
+.catalog-empty__title { font-family: var(--font-display); font-size: 28px; color: var(--text-muted); letter-spacing: 0.05em; }
+.catalog-empty__sub { font-size: 13px; color: var(--text-muted); margin-top: 6px; font-weight: 300; }
 
-    .catalog-card h5 {
-        font-size: 1rem;
-    }
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.product-card { animation: fadeUp 0.45s var(--ease-out) both; }
 
-    .catalog-card p {
-        font-size: 0.9rem;
-    }
+/* ── RESPONSIVE ── */
+@media (max-width: 1280px) { .catalog-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px)  { .catalog-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px)  {
+    .catalog-grid { grid-template-columns: 1fr; gap: 12px; }
+    .catalog-hero__title { font-size: 48px; }
+    .toolbar-count { display: none; }
 }
