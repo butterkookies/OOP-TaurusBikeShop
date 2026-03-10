@@ -1,0 +1,24 @@
+{
+  "name": "oop-taurusbikeshop",
+  "version": "1.0.0",
+  "description": "A repository for our finals project in DB-1 and OOP. An e-commerce website and an admin side software.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/butterkookies/OOP-TaurusBikeShop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/butterkookies/OOP-TaurusBikeShop/issues"
+  },
+  "homepage": "https://github.com/butterkookies/OOP-TaurusBikeShop#readme",
+  "dependencies": {
+    "@mermaid-js/mermaid-cli": "^11.12.0"
+  }
+}

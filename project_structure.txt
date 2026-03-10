@@ -4,6 +4,7 @@ C:.
 |   .gitignore
 |   OOP-TaurusBikeShop.sln
 |   project_structure.txt
+|   project_structure_v4.txt
 |   README.md
 |   Tools.txt
 |   
@@ -89,18 +90,60 @@ C:.
     |               WebApplication.staticwebassets.runtime.json
     |               
     +---BusinessLogic
-    |       .gitkeep
-    |       
+    |   +---Interfaces
+    |   |       ICartService.cs
+    |   |       IOrderService.cs
+    |   |       IProductService.cs
+    |   |       IUserService.cs
+    |   |       
+    |   \---Services
+    |           CartService.cs
+    |           OrderService.cs
+    |           ProductService.cs
+    |           UserService.cs
+    |           
     +---Controllers
+    |       CartController.cs
+    |       CheckoutController.cs
     |       CustomerController.cs
     |       HomeController.cs
+    |       OrderController.cs
+    |       ProductController.cs
     |       
     +---DataAccess
-    |       .gitkeep
-    |       
+    |   +---Context
+    |   |       AppDbContext.cs
+    |   |       
+    |   \---Repositories
+    |           CartRepository.cs
+    |           IRepository.cs
+    |           OrderRepository.cs
+    |           ProductRepository.cs
+    |           Repository.cs
+    |           UserRepository.cs
+    |           
     +---Models
-    |       ErrorViewModel.cs
-    |       
+    |   |   ErrorViewModel.cs
+    |   |   
+    |   +---Entities
+    |   |       CartItem.cs
+    |   |       Category.cs
+    |   |       Delivery.cs
+    |   |       Order.cs
+    |   |       OrderItem.cs
+    |   |       Payment.cs
+    |   |       Product.cs
+    |   |       Review.cs
+    |   |       User.cs
+    |   |       
+    |   \---ViewModels
+    |           CartViewModel.cs
+    |           CheckoutViewModel.cs
+    |           LoginViewModel.cs
+    |           OrderViewModel.cs
+    |           ProductViewModel.cs
+    |           RegisterViewModel.cs
+    |           
     +---obj
     |   |   project.assets.json
     |   |   project.nuget.cache
@@ -226,6 +269,8 @@ C:.
     +---ProjectStructure
     |       frontend_pst.txt
     |       project_structure.txt
+    |       project_structure_v2.txt
+    |       project_structure_v3.txt
     |       
     +---Prompts
     |       cshtml-ui.txt
@@ -233,29 +278,37 @@ C:.
     +---Properties
     |       launchSettings.json
     |       
+    +---Utilities
+    |       FileUploadHelper.cs
+    |       PasswordHelper.cs
+    |       ValidationHelper.cs
+    |       
     +---Views
     |   |   _ViewImports.cshtml
     |   |   _ViewStart.cshtml
     |   |   
     |   +---Customer
-    |   |   |   .gitkeep
     |   |   |   Cart.cshtml
     |   |   |   Checkout.cshtml
     |   |   |   Confirmation.cshtml
+    |   |   |   Dashboard.cshtml
     |   |   |   Login.cshtml
     |   |   |   OrderHistory.cshtml
     |   |   |   Payment.cshtml
     |   |   |   ProductCatalog.cshtml
     |   |   |   ProductDetails.cshtml
+    |   |   |   Profile.cshtml
     |   |   |   Register.cshtml
     |   |   |   
     |   |   \---Partials
     |   |           _CartItem.cshtml
     |   |           _ConfirmationModal.cshtml
     |   |           _DeliverySelection.cshtml
+    |   |           _NotificationAlert.cshtml
     |   |           _OrderSummary.cshtml
     |   |           _OTPModal.cshtml
     |   |           _PaymentMethod.cshtml
+    |   |           _ProductCard.cshtml
     |   |           
     |   +---Home
     |   |       Index.cshtml
@@ -263,14 +316,18 @@ C:.
     |   |       
     |   \---Shared
     |           Error.cshtml
+    |           footer.css
+    |           _Footer.cshtml
     |           _Layout.cshtml
     |           _Layout.cshtml.css
+    |           _Navbar.cshtml
     |           _ValidationScriptsPartial.cshtml
     |           
     \---wwwroot
         |   favicon.ico
         |   
         +---css
+        |       auth.css
         |       bootstrap-grid.css
         |       bootstrap-grid.css.map
         |       bootstrap-grid.min.css
@@ -303,12 +360,25 @@ C:.
         |       bootstrap.rtl.css.map
         |       bootstrap.rtl.min.css
         |       bootstrap.rtl.min.css.map
+        |       cart-item.css
         |       cart.css
         |       checkout.css
+        |       confirmation-modal.css
         |       confirmation.css
         |       customer.css
+        |       dashboard.css
+        |       delivery-selection.css
+        |       notification-alert.css
         |       order-history.css
+        |       order-summary.css
+        |       otp-modal.css
+        |       payment-method.css
+        |       payment.css
+        |       product-card.css
         |       product-catalog.css
+        |       product-details.css
+        |       profile.css
+        |       responsive.css
         |       site.css
         |       
         +---js
@@ -325,12 +395,14 @@ C:.
         |       bootstrap.min.js
         |       bootstrap.min.js.map
         |       cart.js
+        |       checkout.js
         |       confirmation.js
         |       customer.js
         |       order-history.js
         |       payment.js
         |       product-catalog.js
         |       site.js
+        |       utils.js
         |       
         \---lib
             +---bootstrap
