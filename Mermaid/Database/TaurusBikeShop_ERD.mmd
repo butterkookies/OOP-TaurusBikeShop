@@ -1,0 +1,327 @@
+erDiagram
+    %% =============================================
+    %% Taurus Bike Shop Database ERD
+    %% 24 Tables - Complete Schema with Variants, POS, and Inventory Management
+    %% =============================================
+
+    %% ============ USER & AUTHENTICATION ============
+    
+    User ||--o{ UserRole : "has roles"
+    User ||--o{ Cart : "owns"
+    User ||--o{ Order : "places"
+    User ||--o{ Wishlist : "maintains"
+    User ||--o{ Review : "writes"
+    User ||--o{ POS_Session : "operates"
+    User ||--o{ SystemLog : "triggers"
+    User ||--o{ UserVoucher : "receives"
+    User ||--o{ VoucherUsage : "redeems"
+    User ||--o{ InventoryLog : "modifies"
+    User ||--o{ PurchaseOrder : "creates"
+    
+    User {
+        int UserId PK
+        string Email UK "nullable for walk-ins"
+        string PasswordHash "nullable for walk-ins"
+        string FirstName
+        string LastName
+        string PhoneNumber
+        string Address
+        string City
+        string PostalCode
+        bit IsActive
+        bit IsWalkIn "POS customer flag"
+        datetime CreatedAt
+        datetime LastLoginAt
+    }
+
+    Role ||--o{ UserRole : "assigned to"
+    
+    Role {
+        int RoleId PK
+        string RoleName UK "Admin, Manager, Cashier, Staff, Customer"
+        string Description
+        datetime CreatedAt
+    }
+
+    UserRole {
+        int UserRoleId PK
+        int UserId FK
+        int RoleId FK
+        datetime AssignedAt
+    }
+
+    %% ============ PRODUCT CATALOG ============
+    
+    Category ||--o{ Product : "contains"
+    Category ||--o{ Category : "parent of"
+    
+    Category {
+        int CategoryId PK
+        string Name
+        string Description
+        int ParentCategoryId FK "self-reference"
+        bit IsActive
+        int DisplayOrder
+    }
+
+    Product ||--o{ ProductVariant : "has variants"
+    Product ||--o{ ProductImage : "has images"
+    Product ||--o{ CartItem : "added to"
+    Product ||--o{ OrderItem : "ordered as"
+    Product ||--o{ Wishlist : "saved in"
+    Product ||--o{ Review : "reviewed"
+    Product ||--o{ PurchaseOrderItem : "purchased"
+    Product ||--o{ InventoryLog : "tracked"
+    
+    Product {
+        int ProductId PK
+        int CategoryId FK
+        string Name
+        string Description
+        decimal Price "base price"
+        int StockQuantity "base or total stock"
+        bit IsActive
+        bit IsFeatured
+        datetime CreatedAt
+        datetime UpdatedAt
+    }
+
+    ProductVariant ||--o{ CartItem : "selected in"
+    ProductVariant ||--o{ OrderItem : "ordered as"
+    ProductVariant ||--o{ PurchaseOrderItem : "purchased"
+    ProductVariant ||--o{ InventoryLog : "tracked"
+    
+    ProductVariant {
+        int ProductVariantId PK
+        int ProductId FK
+        string VariantName "e.g. Red/Large"
+        string SKU
+        decimal AdditionalPrice "added to base price"
+        int StockQuantity "variant stock"
+        bit IsActive
+        datetime CreatedAt
+        datetime UpdatedAt
+    }
+
+    ProductImage {
+        int ProductImageId PK
+        int ProductId FK
+        string ImageUrl "Azure Blob Storage URL"
+        string ImageType "Full, Medium, Thumbnail"
+        bit IsPrimary "only one per product"
+        int DisplayOrder
+        string AltText
+        datetime CreatedAt
+    }
+
+    %% ============ SUPPLY CHAIN ============
+    
+    Supplier ||--o{ PurchaseOrder : "supplies"
+    
+    Supplier {
+        int SupplierId PK
+        string Name
+        string ContactPerson
+        string PhoneNumber
+        string Email UK
+        string Address
+        bit IsActive
+        datetime CreatedAt
+    }
+
+    PurchaseOrder ||--o{ PurchaseOrderItem : "contains"
+    PurchaseOrder ||--o{ InventoryLog : "logs"
+    
+    PurchaseOrder {
+        int PurchaseOrderId PK
+        int SupplierId FK
+        int CreatedByUserId FK
+        datetime OrderDate
+        datetime ExpectedDeliveryDate
+        string Status "Pending, Received, Cancelled"
+        decimal TotalAmount
+        datetime CreatedAt
+    }
+
+    PurchaseOrderItem {
+        int PurchaseOrderItemId PK
+        int PurchaseOrderId FK
+        int ProductId FK
+        int ProductVariantId FK "optional"
+        int Quantity
+        decimal UnitPrice
+        decimal Subtotal
+    }
+
+    %% ============ SHOPPING CART ============
+    
+    Cart ||--o{ CartItem : "contains"
+    
+    Cart {
+        int CartId PK
+        int UserId FK
+        datetime CreatedAt
+        datetime LastUpdatedAt
+        bit IsCheckedOut
+    }
+
+    CartItem {
+        int CartItemId PK
+        int CartId FK
+        int ProductId FK
+        int ProductVariantId FK "optional variant"
+        int Quantity
+        decimal PriceAtAdd "base + variant price"
+        datetime AddedAt
+    }
+
+    Wishlist {
+        int WishlistId PK
+        int UserId FK
+        int ProductId FK
+        datetime AddedAt
+    }
+
+    %% ============ VOUCHERS & DISCOUNTS ============
+    
+    Voucher ||--o{ UserVoucher : "assigned to users"
+    Voucher ||--o{ VoucherUsage : "redeemed"
+    
+    Voucher {
+        int VoucherId PK
+        string Code UK
+        string Description
+        string DiscountType "Percentage, Fixed"
+        decimal DiscountValue
+        decimal MinimumOrderAmount
+        int MaxUses
+        int MaxUsesPerUser
+        datetime StartDate
+        datetime EndDate
+        bit IsActive
+        datetime CreatedAt
+    }
+
+    UserVoucher {
+        int UserVoucherId PK
+        int UserId FK
+        int VoucherId FK
+        datetime AssignedAt
+        datetime ExpiresAt
+    }
+
+    %% ============ ORDERS & FULFILLMENT ============
+    
+    Order ||--o{ OrderItem : "contains"
+    Order ||--o{ VoucherUsage : "applies"
+    Order ||--o{ Payment : "paid by"
+    Order ||--o{ Delivery : "fulfilled by"
+    Order ||--o{ Review : "reviewed after"
+    Order ||--o{ InventoryLog : "logs"
+    
+    Order {
+        int OrderId PK
+        int UserId FK
+        string OrderNumber UK
+        datetime OrderDate
+        string OrderStatus "Pending, Processing, Shipped, Delivered, Cancelled"
+        decimal SubTotal
+        decimal DiscountAmount
+        decimal ShippingFee
+        decimal TotalAmount
+        string ShippingAddress
+        string ShippingCity
+        string ShippingPostalCode
+        string ContactPhone
+        string DeliveryInstructions
+        bit IsWalkIn "POS order flag"
+        datetime CreatedAt
+    }
+
+    OrderItem {
+        int OrderItemId PK
+        int OrderId FK
+        int ProductId FK
+        int ProductVariantId FK "optional variant"
+        int Quantity
+        decimal UnitPrice "base + variant price"
+        decimal Subtotal
+    }
+
+    VoucherUsage {
+        int VoucherUsageId PK
+        int VoucherId FK
+        int UserId FK
+        int OrderId FK
+        decimal DiscountAmount
+        datetime UsedAt
+    }
+
+    Payment {
+        int PaymentId PK
+        int OrderId FK
+        string PaymentMethod "GCash, Cash, Card"
+        string PaymentStatus "Pending, Completed, Failed, Refunded"
+        decimal Amount
+        string TransactionId
+        datetime PaymentDate
+        datetime CreatedAt
+    }
+
+    Delivery {
+        int DeliveryId PK
+        int OrderId FK
+        string LalamoveReference
+        string DeliveryStatus "Pending, PickedUp, InTransit, Delivered"
+        string DriverName
+        string DriverPhone
+        datetime EstimatedDeliveryTime
+        datetime ActualDeliveryTime
+        datetime CreatedAt
+    }
+
+    Review {
+        int ReviewId PK
+        int UserId FK
+        int ProductId FK
+        int OrderId FK
+        int Rating "1-5 stars"
+        string Comment
+        bit IsVerifiedPurchase
+        datetime CreatedAt
+    }
+
+    %% ============ INVENTORY TRACKING ============
+    
+    InventoryLog {
+        int InventoryLogId PK
+        int ProductId FK
+        int ProductVariantId FK "optional"
+        int OrderId FK "optional - customer order"
+        int PurchaseOrderId FK "optional - supplier order"
+        int ChangedByUserId FK "optional - staff"
+        int ChangeQuantity "positive=add, negative=reduce"
+        string ChangeType "Purchase, Sale, Return, Adjustment, Damage, Loss"
+        string Notes
+        datetime CreatedAt
+    }
+
+    %% ============ POS & AUDIT ============
+    
+    POS_Session {
+        int POSSessionId PK
+        int UserId FK "cashier"
+        string TerminalName
+        datetime ShiftStart
+        datetime ShiftEnd
+        decimal TotalSales
+        datetime CreatedAt
+    }
+
+    SystemLog {
+        int SystemLogId PK
+        int UserId FK "optional"
+        string EventType "Login, Logout, ProductUpdate, etc"
+        string EventDescription
+        datetime CreatedAt
+    }
