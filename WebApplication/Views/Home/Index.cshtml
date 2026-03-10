@@ -1,43 +1,349 @@
 ﻿@{
     ViewData["Title"] = "Taurus Bike Shop";
+    Layout = null;
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/index.css" />
+</head>
+<body>
 
-<div class="register-page">
-    <div class="container text-center">
-        <!-- Hero Section -->
-        <h1 class="brand-title mb-3">Welcome to Taurus Bike Shop</h1>
-        <p class="mb-4">Ride with strength, style, and performance. Explore our premium collection of bikes.</p>
-        <a href="/Customer/ProductCatalog" class="btn btn-taurus btn-lg">Shop Now</a>
+<div class="home-page">
 
-        <hr class="section-divider my-5">
+    <!-- ============================================================
+         ATMOSPHERIC BACKGROUND LAYERS
+         ============================================================ -->
+    <div class="bg-overlay"></div>
+    <div class="bg-grid"></div>
+    <div class="bg-red-glow"></div>
 
-        <!-- Feature Section -->
-        <div class="row justify-content-center">
-            <div class="col-md-4 mb-4">
-                <div class="register-card">
-                    <h4 class="section-title">Mountain Bikes</h4>
-                    <p>Conquer any terrain with our rugged mountain bikes.</p>
+    <!-- ============================================================
+         NAVBAR
+         ============================================================ -->
+    <nav class="site-nav">
+        <div class="site-nav__inner">
+            <!-- Brand Logo -->
+            <a href="/" class="nav-brand">
+                <span class="nav-brand__icon">&#9650;</span>
+                <span class="nav-brand__name">TAURUS</span>
+            </a>
+
+            <!-- Nav Links -->
+            <ul class="nav-links">
+                <li><a href="/Customer/ProductCatalog" class="nav-link">Catalog</a></li>
+                <li><a href="#categories" class="nav-link">Categories</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+            </ul>
+
+            <!-- Nav Actions -->
+            <div class="nav-actions">
+                <a href="/Customer/Login" class="btn-nav btn-nav--ghost">Sign In</a>
+                <a href="/Customer/Register" class="btn-nav btn-nav--solid">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+         HERO SECTION
+         ============================================================ -->
+    <section class="hero">
+        <div class="hero__inner">
+
+            <!-- Left: Hero Copy -->
+            <div class="hero__content">
+                <p class="hero__eyebrow">Est. 2014 &mdash; Premium Cycling</p>
+                <h1 class="hero__title">
+                    <span class="hero__title-line">BUILT FOR</span>
+                    <span class="hero__title-line hero__title-line--red">THE ROAD.</span>
+                    <span class="hero__title-line">FORGED FOR</span>
+                    <span class="hero__title-line">THE RIDER.</span>
+                </h1>
+                <p class="hero__desc">
+                    Ride with strength, style, and performance. Explore our premium
+                    collection of bikes engineered for every terrain and every rider.
+                </p>
+                <div class="hero__cta-row">
+                    <a href="/Customer/ProductCatalog" class="btn-primary">
+                        <span>Shop Now</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </a>
+                    <a href="#categories" class="btn-ghost">Explore Categories</a>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="hero__stats">
+                    <div class="hero-stat">
+                        <span class="hero-stat__number">500+</span>
+                        <span class="hero-stat__label">Models</span>
+                    </div>
+                    <div class="hero-stat__sep"></div>
+                    <div class="hero-stat">
+                        <span class="hero-stat__number">12K+</span>
+                        <span class="hero-stat__label">Riders</span>
+                    </div>
+                    <div class="hero-stat__sep"></div>
+                    <div class="hero-stat">
+                        <span class="hero-stat__number">10yr</span>
+                        <span class="hero-stat__label">Legacy</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-4 mb-4">
-                <div class="register-card">
-                    <h4 class="section-title">Road Bikes</h4>
-                    <p>Fast and light bikes perfect for daily commutes and racing.</p>
+            <!-- Right: Decorative Wheel Graphic -->
+            <div class="hero__graphic">
+                <div class="wheel-wrap">
+                    <svg class="wheel-svg" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="200" cy="200" r="190" stroke="#E10600" stroke-width="2" stroke-dasharray="8 6"/>
+                        <circle cx="200" cy="200" r="140" stroke="#ffffff08" stroke-width="1.5"/>
+                        <circle cx="200" cy="200" r="90"  stroke="#E1060030" stroke-width="1"/>
+                        <circle cx="200" cy="200" r="22"  fill="#E10600"/>
+                        <!-- Spokes -->
+                        <line x1="200" y1="10"  x2="200" y2="178" stroke="#ffffff18" stroke-width="2"/>
+                        <line x1="200" y1="222" x2="200" y2="390" stroke="#ffffff18" stroke-width="2"/>
+                        <line x1="10"  y1="200" x2="178" y2="200" stroke="#ffffff18" stroke-width="2"/>
+                        <line x1="222" y1="200" x2="390" y2="200" stroke="#ffffff18" stroke-width="2"/>
+                        <line x1="55"  y1="55"  x2="178" y2="178" stroke="#ffffff12" stroke-width="2"/>
+                        <line x1="222" y1="222" x2="345" y2="345" stroke="#ffffff12" stroke-width="2"/>
+                        <line x1="345" y1="55"  x2="222" y2="178" stroke="#ffffff12" stroke-width="2"/>
+                        <line x1="178" y1="222" x2="55"  y2="345" stroke="#ffffff12" stroke-width="2"/>
+                        <!-- Accent lines -->
+                        <line x1="200" y1="10"  x2="55"  y2="345" stroke="#E1060018" stroke-width="1.5"/>
+                        <line x1="200" y1="10"  x2="345" y2="345" stroke="#E1060018" stroke-width="1.5"/>
+                        <line x1="10"  y1="200" x2="345" y2="55"  stroke="#E1060010" stroke-width="1"/>
+                        <line x1="390" y1="200" x2="55"  y2="55"  stroke="#E1060010" stroke-width="1"/>
+                    </svg>
+                    <!-- Center Badge -->
+                    <div class="wheel-badge">
+                        <span class="wheel-badge__sym">&#9650;</span>
+                        <span class="wheel-badge__text">TAURUS</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-md-4 mb-4">
-                <div class="register-card">
-                    <h4 class="section-title">City Cruisers</h4>
-                    <p>Comfortable and stylish bikes for urban riding.</p>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="scroll-hint">
+            <span class="scroll-hint__line"></span>
+            <span class="scroll-hint__text">Scroll</span>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         CATEGORIES SECTION
+         ============================================================ -->
+    <section class="categories" id="categories">
+        <div class="section-inner">
+
+            <!-- Section Header -->
+            <div class="section-header">
+                <p class="section-header__eyebrow">What We Offer</p>
+                <h2 class="section-header__title">RIDE YOUR WAY</h2>
+                <div class="section-header__divider"></div>
+            </div>
+
+            <!-- Category Cards -->
+            <div class="category-grid">
+
+                <!-- Mountain Bikes -->
+                <div class="cat-card">
+                    <div class="cat-card__icon-wrap">
+                        <svg class="cat-card__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <polyline points="4,36 16,20 24,28 32,14 44,36"/>
+                            <circle cx="12" cy="36" r="5"/>
+                            <circle cx="36" cy="36" r="5"/>
+                        </svg>
+                    </div>
+                    <div class="cat-card__number">01</div>
+                    <h3 class="cat-card__title">Mountain Bikes</h3>
+                    <p class="cat-card__desc">Conquer any terrain with our rugged mountain bikes built for the toughest trails and off-road adventures.</p>
+                    <a href="/Customer/ProductCatalog" class="cat-card__link">
+                        Explore <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                    <div class="cat-card__accent"></div>
+                </div>
+
+                <!-- Road Bikes -->
+                <div class="cat-card cat-card--featured">
+                    <div class="cat-card__badge">Popular</div>
+                    <div class="cat-card__icon-wrap">
+                        <svg class="cat-card__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="34" r="7"/>
+                            <circle cx="36" cy="34" r="7"/>
+                            <path d="M12 34 L24 14 L36 34"/>
+                            <path d="M20 14 L28 14"/>
+                            <path d="M24 14 L24 22"/>
+                        </svg>
+                    </div>
+                    <div class="cat-card__number">02</div>
+                    <h3 class="cat-card__title">Road Bikes</h3>
+                    <p class="cat-card__desc">Fast and ultralight bikes engineered for speed — perfect for daily commutes, long-distance rides, and racing.</p>
+                    <a href="/Customer/ProductCatalog" class="cat-card__link">
+                        Explore <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                    <div class="cat-card__accent"></div>
+                </div>
+
+                <!-- City Cruisers -->
+                <div class="cat-card">
+                    <div class="cat-card__icon-wrap">
+                        <svg class="cat-card__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="34" r="7"/>
+                            <circle cx="36" cy="34" r="7"/>
+                            <path d="M12 34 L18 20 L36 20 L36 34"/>
+                            <path d="M18 20 L24 14"/>
+                            <rect x="22" y="11" width="6" height="6" rx="1"/>
+                        </svg>
+                    </div>
+                    <div class="cat-card__number">03</div>
+                    <h3 class="cat-card__title">City Cruisers</h3>
+                    <p class="cat-card__desc">Comfortable and stylish bikes designed for urban riding — smooth, reliable, and effortlessly cool on city streets.</p>
+                    <a href="/Customer/ProductCatalog" class="cat-card__link">
+                        Explore <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                    <div class="cat-card__accent"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         ABOUT / BRAND STRIP
+         ============================================================ -->
+    <section class="brand-strip" id="about">
+        <div class="brand-strip__inner">
+            <div class="brand-strip__copy">
+                <p class="brand-strip__eyebrow">Why Taurus</p>
+                <h2 class="brand-strip__title">A DECADE OF RIDING EXCELLENCE</h2>
+                <p class="brand-strip__text">
+                    Since 2014, Taurus Bike Shop has been the go-to destination for riders who demand quality,
+                    performance, and style. Every bike in our lineup is hand-selected to meet the highest standards
+                    of engineering and design.
+                </p>
+                <a href="/Customer/ProductCatalog" class="btn-primary">
+                    <span>Browse All Bikes</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="brand-strip__stats-col">
+                <div class="big-stat">
+                    <span class="big-stat__num">500+</span>
+                    <span class="big-stat__lbl">Bike Models</span>
+                </div>
+                <div class="big-stat">
+                    <span class="big-stat__num">12K+</span>
+                    <span class="big-stat__lbl">Happy Riders</span>
+                </div>
+                <div class="big-stat">
+                    <span class="big-stat__num">4.9★</span>
+                    <span class="big-stat__lbl">Customer Rating</span>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Call to Action -->
-        <div class="mt-5">
-            <p>Already have an account? <a href="/Customer/Login" class="login-link">Login here</a></p>
+    <!-- ============================================================
+         CALL TO ACTION SECTION
+         ============================================================ -->
+    <section class="cta-section">
+        <div class="cta-section__inner">
+            <!-- Decorative wheel (small) -->
+            <div class="cta-deco-wheel">
+                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="95" stroke="#E10600" stroke-width="1.5" stroke-dasharray="6 4"/>
+                    <circle cx="100" cy="100" r="12" fill="#E10600"/>
+                    <line x1="100" y1="5"   x2="100" y2="88"  stroke="#ffffff20" stroke-width="1.5"/>
+                    <line x1="100" y1="112" x2="100" y2="195" stroke="#ffffff20" stroke-width="1.5"/>
+                    <line x1="5"   y1="100" x2="88"  y2="100" stroke="#ffffff20" stroke-width="1.5"/>
+                    <line x1="112" y1="100" x2="195" y2="100" stroke="#ffffff20" stroke-width="1.5"/>
+                </svg>
+            </div>
+
+            <p class="cta-section__eyebrow">Get Started Today</p>
+            <h2 class="cta-section__title">JOIN THE TAURUS COMMUNITY</h2>
+            <p class="cta-section__sub">
+                Already have an account?
+                <a href="/Customer/Login" class="cta-login-link">Sign in here &rarr;</a>
+            </p>
+            <div class="cta-section__actions">
+                <a href="/Customer/Register" class="btn-primary">
+                    <span>Create an Account</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </a>
+                <a href="/Customer/ProductCatalog" class="btn-ghost">View Catalog</a>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+    <footer class="site-footer">
+        <div class="site-footer__inner">
+            <div class="site-footer__brand">
+                <span class="footer-logo__icon">&#9650;</span>
+                <span class="footer-logo__name">TAURUS</span>
+                <span class="footer-logo__tag">Bike Shop</span>
+            </div>
+            <p class="site-footer__copy">&copy; @DateTime.Now.Year Taurus Bike Shop. All rights reserved.</p>
+            <div class="site-footer__links">
+                <a href="/Customer/Login" class="footer-link">Login</a>
+                <a href="/Customer/Register" class="footer-link">Register</a>
+                <a href="/Customer/ProductCatalog" class="footer-link">Catalog</a>
+            </div>
+        </div>
+    </footer>
+
 </div>
+
+<script>
+(function () {
+    /* --- Staggered card entrance animation on scroll --- */
+    const cards = document.querySelectorAll('.cat-card');
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry, i) {
+                if (entry.isIntersecting) {
+                    setTimeout(function () {
+                        entry.target.classList.add('visible');
+                    }, i * 120);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        cards.forEach(function (card) { observer.observe(card); });
+    } else {
+        cards.forEach(function (card) { card.classList.add('visible'); });
+    }
+
+    /* --- Smooth scroll for anchor links --- */
+    document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+})();
+</script>
+</body>
+</html>
