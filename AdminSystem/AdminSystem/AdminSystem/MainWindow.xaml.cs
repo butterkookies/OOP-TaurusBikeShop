@@ -937,7 +937,6 @@ namespace TaurusBikeShop
                 FontFamily = new FontFamily("Segoe UI"),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Margin = new Thickness(0, 3, 0, 0),
-                LetterSpacing = 2,
             });
             headerBand.Child = headerStack;
             root.Children.Add(headerBand);
@@ -1270,9 +1269,15 @@ namespace TaurusBikeShop
 
         private bool ShowCustomItemDialog(out string itemName, out decimal unitPrice, out int qty)
         {
-            itemName = string.Empty;
+            // Local variables to work around C# restriction on capturing
+            // out/ref parameters inside lambdas.
+            string  localName  = string.Empty;
+            decimal localPrice = 0m;
+            int     localQty   = 0;
+
+            itemName  = string.Empty;
             unitPrice = 0m;
-            qty = 0;
+            qty       = 0;
 
             var dlg = new Window
             {
@@ -1447,9 +1452,9 @@ namespace TaurusBikeShop
                     return;
                 }
 
-                itemName = name;
-                unitPrice = price;
-                qty = q;
+                localName  = name;
+                localPrice = price;
+                localQty   = q;
                 confirmed = true;
                 dlg.Close();
             };
@@ -1458,7 +1463,10 @@ namespace TaurusBikeShop
             scroll.Content = panel;
             dlg.Content = scroll;
             dlg.ShowDialog();
-            return confirmed;
+                itemName  = localName;
+                unitPrice = localPrice;
+                qty       = localQty;
+                return confirmed;
         }
 
         // ════════════════════════════════════════════════════════════
