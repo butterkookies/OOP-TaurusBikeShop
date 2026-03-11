@@ -1,0 +1,77 @@
+Folder PATH listing
+Volume serial number is BA29-06A1
+C:.
+|   admin_structure.txt
+|   project_structure.txt
+|   
+\---AdminSystem
+    |   AdminSystem.slnx
+    |   AdminTest.txt
+    |   admin_structure.txt
+    |   
+    \---AdminSystem
+        |   AdminSystem.csproj
+        |   App.config
+        |   App.xaml
+        |   App.xaml.cs
+        |   
+        +---bin
+        |   \---Debug
+        |           AdminSystem.exe
+        |           AdminSystem.exe.config
+        |           AdminSystem.pdb
+        |           
+        +---Converters
+        |       .gitkeep
+        |       
+        +---Helpers
+        |       .gitkeep
+        |       
+        +---Models
+        |       .gitkeep
+        |       
+        +---obj
+        |   \---Debug
+        |       |   .NETFramework,Version=v4.8.AssemblyAttributes.cs
+        |       |   AdminSystem.csproj.AssemblyReference.cache
+        |       |   AdminSystem.csproj.CoreCompileInputs.cache
+        |       |   AdminSystem.csproj.FileListAbsolute.txt
+        |       |   AdminSystem.csproj.GenerateResource.cache
+        |       |   AdminSystem.exe
+        |       |   AdminSystem.g.resources
+        |       |   AdminSystem.pdb
+        |       |   AdminSystem.Properties.Resources.resources
+        |       |   AdminSystem_MarkupCompile.cache
+        |       |   App.g.cs
+        |       |   App.g.i.cs
+        |       |   DesignTimeResolveAssemblyReferencesInput.cache
+        |       |   Login.baml
+        |       |   Login.g.cs
+        |       |   Login.g.i.cs
+        |       |   MainWindow.baml
+        |       |   MainWindow.g.cs
+        |       |   MainWindow.g.i.cs
+        |       |   
+        |       \---TempPE
+        +---Properties
+        |       AssemblyInfo.cs
+        |       Resources.Designer.cs
+        |       Resources.resx
+        |       Settings.Designer.cs
+        |       Settings.settings
+        |       
+        +---Repositories
+        |       .gitkeep
+        |       
+        +---Services
+        |       .gitkeep
+        |       
+        +---ViewModels
+        |       .gitkeep
+        |       
+        \---Views
+                Login.xaml
+                Login.xaml.cs
+                MainWindow.xaml
+                MainWindow.xaml.cs
+                

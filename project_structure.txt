@@ -2,12 +2,11 @@ Folder PATH listing
 Volume serial number is BA29-06A1
 C:.
 |   .gitignore
+|   admin_structure.txt
 |   OOP-TaurusBikeShop.sln
 |   package-lock.json
 |   package.json
 |   project_structure.txt
-|   project_structure_v4.txt
-|   project_structure_v5.txt
 |   README.md
 |   Tools.txt
 |   
@@ -54,6 +53,138 @@ C:.
 |           oop-taurusbikeshop.projects.v10.bin
 |           oop-taurusbikeshop.strings.v10.bin
 |           
++---AdminSystem
+|   |   admin_structure.txt
+|   |   project_structure.txt
+|   |   
+|   \---AdminSystem
+|       |   AdminSystem.slnx
+|       |   AdminTest.txt
+|       |   admin_structure.txt
+|       |   
+|       \---AdminSystem
+|           |   AdminSystem.csproj
+|           |   App.config
+|           |   App.xaml
+|           |   App.xaml.cs
+|           |   
+|           +---bin
+|           |   \---Debug
+|           |           AdminSystem.exe
+|           |           AdminSystem.exe.config
+|           |           AdminSystem.pdb
+|           |           
+|           +---Converters
+|           |       .gitkeep
+|           |       BoolToVisibilityConverter.cs
+|           |       StatusToColorConverter.cs
+|           |       
+|           +---Helpers
+|           |       .gitkeep
+|           |       DatabaseHelper.cs
+|           |       PrintHelper.cs
+|           |       
+|           +---Models
+|           |       .gitkeep
+|           |       CartItem.cs
+|           |       Delivery.cs
+|           |       Inventory.cs
+|           |       Order.cs
+|           |       OrderItem.cs
+|           |       Payment.cs
+|           |       Product.cs
+|           |       SupportTicket.cs
+|           |       User.cs
+|           |       
+|           +---obj
+|           |   \---Debug
+|           |       |   .NETFramework,Version=v4.8.AssemblyAttributes.cs
+|           |       |   AdminSystem.csproj.AssemblyReference.cache
+|           |       |   AdminSystem.csproj.CoreCompileInputs.cache
+|           |       |   AdminSystem.csproj.FileListAbsolute.txt
+|           |       |   AdminSystem.csproj.GenerateResource.cache
+|           |       |   AdminSystem.exe
+|           |       |   AdminSystem.g.resources
+|           |       |   AdminSystem.pdb
+|           |       |   AdminSystem.Properties.Resources.resources
+|           |       |   AdminSystem_MarkupCompile.cache
+|           |       |   App.g.cs
+|           |       |   App.g.i.cs
+|           |       |   DesignTimeResolveAssemblyReferencesInput.cache
+|           |       |   Login.baml
+|           |       |   Login.g.cs
+|           |       |   Login.g.i.cs
+|           |       |   MainWindow.baml
+|           |       |   MainWindow.g.cs
+|           |       |   MainWindow.g.i.cs
+|           |       |   
+|           |       \---TempPE
+|           +---Properties
+|           |       AssemblyInfo.cs
+|           |       Resources.Designer.cs
+|           |       Resources.resx
+|           |       Settings.Designer.cs
+|           |       Settings.settings
+|           |       
+|           +---Repositories
+|           |       .gitkeep
+|           |       DeliveryRepository.cs
+|           |       InventoryRepository.cs
+|           |       OrderRepository.cs
+|           |       PaymentRepository.cs
+|           |       ProductRepository.cs
+|           |       SupportTicketRepository.cs
+|           |       UserRepository.cs
+|           |       
+|           +---Services
+|           |       .gitkeep
+|           |       AnalyticsService.cs
+|           |       AuthService.cs
+|           |       DeliveryService.cs
+|           |       InventoryService.cs
+|           |       NotificationService.cs
+|           |       OrderService.cs
+|           |       PaymentVerificationService.cs
+|           |       POSService.cs
+|           |       SupportTicketService.cs
+|           |       
+|           +---ViewModels
+|           |       .gitkeep
+|           |       AnalyticsViewModel.cs
+|           |       DashboardViewModel.cs
+|           |       InventoryViewModel.cs
+|           |       LoginViewModel.cs
+|           |       LogisticsViewModel.cs
+|           |       OnlineOrdersViewModel.cs
+|           |       OrderHistoryViewModel.cs
+|           |       PaymentVerificationViewModel.cs
+|           |       SupportTicketsViewModel.cs
+|           |       WalkInPOSViewModel.cs
+|           |       
+|           \---Views
+|                   Analytics.xaml
+|                   Analytics.xaml.cs
+|                   Dashboard.xaml
+|                   Dashboard.xaml.cs
+|                   InventoryManagement.xaml
+|                   InventoryManagement.xaml.cs
+|                   Login.xaml
+|                   Login.xaml.cs
+|                   LogisticsManagement.xaml
+|                   LogisticsManagement.xaml.cs
+|                   MainWindow.xaml
+|                   MainWindow.xaml.cs
+|                   OnlineOrders.xaml
+|                   OnlineOrders.xaml.cs
+|                   OrderHistory.xaml
+|                   OrderHistory.xaml.cs
+|                   PaymentVerification.xaml
+|                   PaymentVerification.xaml.cs
+|                   SupportTickets.xaml
+|                   SupportTickets.xaml.cs
+|                   WalkInPOS.xaml
+|                   WalkInPOS.xaml.cs
+|                   
 +---Mermaid
 |   +---Claude
 |   |       10_LOGISTICS_MANAGEMENT.mmd
@@ -77,6 +208,7 @@ C:.
 |   |       TaurusBikeShop_ERD.mmd
 |   |       TaurusBikeShop_ERD.png
 |   |       Taurus_schema.sql
+|   |       Taurus_seed.sql
 |   |       
 |   +---ProgramFlow
 |   |       flowchart_v1.md
@@ -123,11 +255,7 @@ C:.
     |   |   \---CopilotIndices
     |   |       \---18.4.89.4080
     |   |               CodeChunks.db
-    |   |               CodeChunks.db-shm
-    |   |               CodeChunks.db-wal
     |   |               SemanticSymbols.db
-    |   |               SemanticSymbols.db-shm
-    |   |               SemanticSymbols.db-wal
     |   |               
     |   \---WebApplication.slnx
     |       +---config
@@ -140,10 +268,10 @@ C:.
     |       |       .dtbcache.v2
     |       |       
     |       +---FileContentIndex
-    |       |       004a0c7b-7634-4485-8402-fcdc776485b7.vsidx
+    |       |       55ae3afa-6836-4f63-a98f-cd3313c5cf74.vsidx
+    |       |       67ec3408-322d-434b-b0c0-fdb617d30d68.vsidx
+    |       |       ad117f23-bf42-454f-af63-5384934c6da9.vsidx
     |       |       b906d861-a3eb-490c-9469-dfd29f3f2c36.vsidx
-    |       |       d3df84da-6c67-459b-a27e-1bcc0b3d4ea5.vsidx
-    |       |       e887f0ad-36ed-40f4-89b0-8686b4fa6e4d.vsidx
     |       |       ed41b490-634e-4b76-8c9d-dfe268ddf7d2.vsidx
     |       |       
     |       \---v18
@@ -151,6 +279,13 @@ C:.
     |               DocumentLayout.backup.json
     |               DocumentLayout.json
     |               
+    +---BackgroundJobs
+    |       DeliveryStatusUpdateJob.cs
+    |       InventorySyncJob.cs
+    |       PaymentTimeoutJob.cs
+    |       PendingOrderMonitorJob.cs
+    |       StockLevelMonitorJob.cs
+    |       
     +---bin
     |   +---Debug
     |   |   +---net10.0
@@ -170,23 +305,39 @@ C:.
     +---BusinessLogic
     |   +---Interfaces
     |   |       ICartService.cs
+    |   |       IDeliveryService.cs
+    |   |       INotificationService.cs
     |   |       IOrderService.cs
+    |   |       IPaymentService.cs
     |   |       IProductService.cs
+    |   |       IReviewService.cs
+    |   |       ISupportTicketService.cs
     |   |       IUserService.cs
+    |   |       IWishlistService.cs
     |   |       
     |   \---Services
     |           CartService.cs
+    |           DeliveryService.cs
+    |           NotificationService.cs
     |           OrderService.cs
+    |           PaymentService.cs
     |           ProductService.cs
+    |           ReviewService.cs
+    |           SupportTicketService.cs
     |           UserService.cs
+    |           WishlistService.cs
     |           
     +---Controllers
     |       CartController.cs
     |       CheckoutController.cs
     |       CustomerController.cs
+    |       DeliveryController.cs
     |       HomeController.cs
     |       OrderController.cs
     |       ProductController.cs
+    |       ReviewController.cs
+    |       SupportController.cs
+    |       WishlistController.cs
     |       
     +---DataAccess
     |   +---Context
@@ -194,16 +345,29 @@ C:.
     |   |       
     |   \---Repositories
     |           CartRepository.cs
+    |           DeliveryRepository.cs
     |           IRepository.cs
     |           OrderRepository.cs
+    |           PaymentRepository.cs
     |           ProductRepository.cs
     |           Repository.cs
+    |           ReviewRepository.cs
+    |           SupportTicketRepository.cs
     |           UserRepository.cs
+    |           WishlistRepository.cs
     |           
+    +---Integrations
+    |       BankVerificationService.cs
+    |       EmailSmsService.cs
+    |       GCashPaymentService.cs
+    |       LalamoveService.cs
+    |       LbcService.cs
+    |       
     +---Models
     |   |   ErrorViewModel.cs
     |   |   
     |   +---Entities
+    |   |       Cart.cs
     |   |       CartItem.cs
     |   |       Category.cs
     |   |       Delivery.cs
@@ -212,15 +376,23 @@ C:.
     |   |       Payment.cs
     |   |       Product.cs
     |   |       Review.cs
+    |   |       SupportTicket.cs
     |   |       User.cs
+    |   |       Voucher.cs
+    |   |       Wishlist.cs
     |   |       
     |   \---ViewModels
     |           CartViewModel.cs
     |           CheckoutViewModel.cs
     |           LoginViewModel.cs
     |           OrderViewModel.cs
+    |           PaymentViewModel.cs
     |           ProductViewModel.cs
     |           RegisterViewModel.cs
+    |           ReviewViewModel.cs
+    |           SupportTicketViewModel.cs
+    |           TrackingViewModel.cs
+    |           WishlistViewModel.cs
     |           
     +---obj
     |   |   project.assets.json
@@ -342,6 +514,10 @@ C:.
     |   |   |   ProductDetails.cshtml
     |   |   |   Profile.cshtml
     |   |   |   Register.cshtml
+    |   |   |   Review.cshtml
+    |   |   |   Support.cshtml
+    |   |   |   Tracking.cshtml
+    |   |   |   Wishlist.cshtml
     |   |   |   
     |   |   \---Partials
     |   |           _CartItem.cshtml
@@ -352,6 +528,7 @@ C:.
     |   |           _OTPModal.cshtml
     |   |           _PaymentMethod.cshtml
     |   |           _ProductCard.cshtml
+    |   |           _TrackingStatus.cshtml
     |   |           
     |   +---Home
     |   |       Index.cshtml
@@ -411,6 +588,7 @@ C:.
         |       customer.css
         |       dashboard.css
         |       delivery-selection.css
+        |       Index.css
         |       notification-alert.css
         |       order-history.css
         |       order-summary.css
@@ -421,6 +599,7 @@ C:.
         |       product-catalog.css
         |       product-details.css
         |       profile.css
+        |       register.css
         |       responsive.css
         |       site.css
         |       
