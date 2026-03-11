@@ -1,4 +1,4 @@
-﻿// Login.xaml.cs
+// Login.xaml.cs
 // C# 7.3 compatible
 using System.Windows;
 using System.Windows.Input;
