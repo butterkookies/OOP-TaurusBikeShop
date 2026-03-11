@@ -3,243 +3,247 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Taurus Bike Shop — Admin Login"
         Height="560" Width="420"
-        ResizeMode="NoResize"
+        MinHeight="480" MinWidth="360"
+        ResizeMode="CanResize"
+        WindowStyle="SingleBorderWindow"
         WindowStartupLocation="CenterScreen"
         Background="#1A1A1A">
 
-    <Window.Resources>
+	<Window.Resources>
 
-        <!-- INPUT STYLE -->
-        <Style x:Key="InputStyle" TargetType="TextBox">
-            <Setter Property="Background"               Value="#2E2E2E"/>
-            <Setter Property="Foreground"               Value="#F0F0F0"/>
-            <Setter Property="BorderBrush"              Value="#3A3A3A"/>
-            <Setter Property="BorderThickness"          Value="1"/>
-            <Setter Property="Height"                   Value="40"/>
-            <Setter Property="Padding"                  Value="12,0"/>
-            <Setter Property="FontSize"                 Value="13"/>
-            <Setter Property="FontFamily"               Value="Segoe UI"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="CaretBrush"               Value="#CC0000"/>
-            <Style.Triggers>
-                <Trigger Property="IsFocused" Value="True">
-                    <Setter Property="BorderBrush" Value="#CC0000"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+		<!-- INPUT STYLE -->
+		<Style x:Key="InputStyle" TargetType="TextBox">
+			<Setter Property="Background"               Value="#2E2E2E"/>
+			<Setter Property="Foreground"               Value="#F0F0F0"/>
+			<Setter Property="BorderBrush"              Value="#3A3A3A"/>
+			<Setter Property="BorderThickness"          Value="1"/>
+			<Setter Property="Height"                   Value="40"/>
+			<Setter Property="Padding"                  Value="12,0"/>
+			<Setter Property="FontSize"                 Value="13"/>
+			<Setter Property="FontFamily"               Value="Segoe UI"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+			<Setter Property="CaretBrush"               Value="#CC0000"/>
+			<Style.Triggers>
+				<Trigger Property="IsFocused" Value="True">
+					<Setter Property="BorderBrush" Value="#CC0000"/>
+				</Trigger>
+			</Style.Triggers>
+		</Style>
 
-        <!-- PASSWORD STYLE -->
-        <Style x:Key="PwdStyle" TargetType="PasswordBox">
-            <Setter Property="Background"               Value="#2E2E2E"/>
-            <Setter Property="Foreground"               Value="#F0F0F0"/>
-            <Setter Property="BorderBrush"              Value="#3A3A3A"/>
-            <Setter Property="BorderThickness"          Value="1"/>
-            <Setter Property="Height"                   Value="40"/>
-            <Setter Property="Padding"                  Value="12,0"/>
-            <Setter Property="FontSize"                 Value="13"/>
-            <Setter Property="FontFamily"               Value="Segoe UI"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-        </Style>
+		<!-- PASSWORD STYLE -->
+		<Style x:Key="PwdStyle" TargetType="PasswordBox">
+			<Setter Property="Background"               Value="#2E2E2E"/>
+			<Setter Property="Foreground"               Value="#F0F0F0"/>
+			<Setter Property="BorderBrush"              Value="#3A3A3A"/>
+			<Setter Property="BorderThickness"          Value="1"/>
+			<Setter Property="Height"                   Value="40"/>
+			<Setter Property="Padding"                  Value="12,0"/>
+			<Setter Property="FontSize"                 Value="13"/>
+			<Setter Property="FontFamily"               Value="Segoe UI"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
+		</Style>
 
-        <!-- SHOW PASSWORD TEXT BOX (same look as PasswordBox) -->
-        <Style x:Key="ShowPwdStyle" TargetType="TextBox"
+		<!-- SHOW PASSWORD TEXT BOX (same look as PasswordBox) -->
+		<Style x:Key="ShowPwdStyle" TargetType="TextBox"
                BasedOn="{StaticResource InputStyle}">
-            <Setter Property="Visibility" Value="Collapsed"/>
-        </Style>
+			<Setter Property="Visibility" Value="Collapsed"/>
+		</Style>
 
-        <!-- LOGIN BUTTON -->
-        <Style x:Key="BtnLoginStyle" TargetType="Button">
-            <Setter Property="Background"      Value="#CC0000"/>
-            <Setter Property="Foreground"      Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Height"          Value="44"/>
-            <Setter Property="FontSize"        Value="13"/>
-            <Setter Property="FontWeight"      Value="SemiBold"/>
-            <Setter Property="FontFamily"      Value="Segoe UI"/>
-            <Setter Property="Cursor"          Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+		<!-- LOGIN BUTTON -->
+		<Style x:Key="BtnLoginStyle" TargetType="Button">
+			<Setter Property="Background"      Value="#CC0000"/>
+			<Setter Property="Foreground"      Value="White"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="Height"          Value="44"/>
+			<Setter Property="FontSize"        Value="13"/>
+			<Setter Property="FontWeight"      Value="SemiBold"/>
+			<Setter Property="FontFamily"      Value="Segoe UI"/>
+			<Setter Property="Cursor"          Value="Hand"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border x:Name="Bd" Background="{TemplateBinding Background}"
                                 CornerRadius="6" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center"
+							<ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#E50000"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#990000"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bd" Property="Background" Value="#4A4A4A"/>
-                                <Setter Property="Foreground" Value="#808080"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="Bd" Property="Background" Value="#E50000"/>
+							</Trigger>
+							<Trigger Property="IsPressed" Value="True">
+								<Setter TargetName="Bd" Property="Background" Value="#990000"/>
+							</Trigger>
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter TargetName="Bd" Property="Background" Value="#4A4A4A"/>
+								<Setter Property="Foreground" Value="#808080"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
 
-        <!-- LINK BUTTON (Forgot Password / Show Password) -->
-        <Style x:Key="BtnLink" TargetType="Button">
-            <Setter Property="Background"      Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Foreground"      Value="#606060"/>
-            <Setter Property="FontSize"        Value="11"/>
-            <Setter Property="FontFamily"      Value="Segoe UI"/>
-            <Setter Property="Cursor"          Value="Hand"/>
-            <Setter Property="Padding"         Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <TextBlock x:Name="Tb"
+		<!-- LINK BUTTON -->
+		<Style x:Key="BtnLink" TargetType="Button">
+			<Setter Property="Background"      Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="Foreground"      Value="#606060"/>
+			<Setter Property="FontSize"        Value="11"/>
+			<Setter Property="FontFamily"      Value="Segoe UI"/>
+			<Setter Property="Cursor"          Value="Hand"/>
+			<Setter Property="Padding"         Value="0"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<TextBlock x:Name="Tb"
                                    Text="{TemplateBinding Content}"
                                    Foreground="{TemplateBinding Foreground}"
                                    FontSize="{TemplateBinding FontSize}"
                                    FontFamily="{TemplateBinding FontFamily}"/>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Tb" Property="Foreground" Value="#CC0000"/>
-                                <Setter TargetName="Tb" Property="TextDecorations" Value="Underline"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="Tb" Property="Foreground" Value="#CC0000"/>
+								<Setter TargetName="Tb" Property="TextDecorations" Value="Underline"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
 
-        <!-- TOGGLE BUTTON (eye icon) -->
-        <Style x:Key="BtnEye" TargetType="Button">
-            <Setter Property="Background"      Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Foreground"      Value="#606060"/>
-            <Setter Property="FontSize"        Value="14"/>
-            <Setter Property="Width"           Value="38"/>
-            <Setter Property="Cursor"          Value="Hand"/>
-            <Setter Property="Focusable"       Value="False"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="Transparent">
-                            <ContentPresenter HorizontalAlignment="Center"
+		<!-- EYE TOGGLE BUTTON -->
+		<Style x:Key="BtnEye" TargetType="Button">
+			<Setter Property="Background"      Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="Foreground"      Value="#606060"/>
+			<Setter Property="FontSize"        Value="14"/>
+			<Setter Property="Width"           Value="38"/>
+			<Setter Property="Cursor"          Value="Hand"/>
+			<Setter Property="Focusable"       Value="False"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border Background="Transparent">
+							<ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="#CC0000"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter Property="Foreground" Value="#CC0000"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
 
-    </Window.Resources>
+	</Window.Resources>
 
-    <!-- ROOT -->
-    <Grid>
+	<!-- ROOT — ScrollViewer keeps card reachable if window is very small -->
+	<ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Auto">
+		<Grid MinWidth="340" MinHeight="460">
 
-        <!-- Background accent blobs -->
-        <Border HorizontalAlignment="Left" VerticalAlignment="Top"
-                Width="340" Height="340" CornerRadius="170"
-                Background="#CC0000" Opacity="0.05"
-                Margin="-100,-100,0,0" IsHitTestVisible="False"/>
-        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                Width="260" Height="260" CornerRadius="130"
-                Background="#CC0000" Opacity="0.03"
-                Margin="0,0,-80,-80" IsHitTestVisible="False"/>
+			<!-- Background accent blobs -->
+			<Border HorizontalAlignment="Left" VerticalAlignment="Top"
+                    Width="340" Height="340" CornerRadius="170"
+                    Background="#CC0000" Opacity="0.05"
+                    Margin="-100,-100,0,0" IsHitTestVisible="False"/>
+			<Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Width="260" Height="260" CornerRadius="130"
+                    Background="#CC0000" Opacity="0.03"
+                    Margin="0,0,-80,-80" IsHitTestVisible="False"/>
 
-        <!-- LOGIN CARD -->
-        <Border HorizontalAlignment="Center" VerticalAlignment="Center"
-                Width="340" Background="#242424" CornerRadius="12"
-                Padding="36,32" BorderThickness="1" BorderBrush="#3A3A3A">
-            <Border.Effect>
-                <DropShadowEffect Color="#000000" BlurRadius="50"
-                                  Opacity="0.55" ShadowDepth="0"/>
-            </Border.Effect>
+			<!-- LOGIN CARD — always centred in whatever space is available -->
+			<Border HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Width="340" Background="#242424" CornerRadius="12"
+                    Padding="36,32" BorderThickness="1" BorderBrush="#3A3A3A">
+				<Border.Effect>
+					<DropShadowEffect Color="#000000" BlurRadius="50"
+                                      Opacity="0.55" ShadowDepth="0"/>
+				</Border.Effect>
 
-            <StackPanel>
+				<StackPanel>
 
-                <!-- LOGO -->
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center" Margin="0,0,0,28">
-                    <Border Width="42" Height="42" Background="#CC0000"
-                            CornerRadius="10" Margin="0,0,12,0">
-                        <TextBlock Text="&#x1F402;" FontSize="20"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"/>
-                    </Border>
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="TAURUS" Foreground="#F0F0F0"
-                                   FontSize="18" FontWeight="Bold"
-                                   FontFamily="Segoe UI"/>
-                        <TextBlock Text="BIKE SHOP ADMIN" Foreground="#606060"
-                                   FontSize="10" FontFamily="Segoe UI"
-                                   Margin="1,2,0,0"/>
-                    </StackPanel>
-                </StackPanel>
+					<!-- LOGO -->
+					<StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center" Margin="0,0,0,28">
+						<Border Width="42" Height="42" Background="#CC0000"
+                                CornerRadius="10" Margin="0,0,12,0">
+							<TextBlock Text="&#x1F402;" FontSize="20"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+						</Border>
+						<StackPanel VerticalAlignment="Center">
+							<TextBlock Text="TAURUS" Foreground="#F0F0F0"
+                                       FontSize="18" FontWeight="Bold"
+                                       FontFamily="Segoe UI"/>
+							<TextBlock Text="BIKE SHOP ADMIN" Foreground="#606060"
+                                       FontSize="10" FontFamily="Segoe UI"
+                                       Margin="1,2,0,0"/>
+						</StackPanel>
+					</StackPanel>
 
+					<!-- USERNAME -->	
+					<TextBlock Text="USERNAME" Foreground="#606060" FontSize="10"
+                               FontWeight="SemiBold" FontFamily="Segoe UI"
+                               Margin="0,0,0,6"/>
+					<TextBox x:Name="TbUsername"
+                             Style="{StaticResource InputStyle}"
+                             Margin="0,0,0,16"/>
 
-                <!-- USERNAME -->
-                <TextBlock Text="USERNAME" Foreground="#606060" FontSize="10"
-                           FontWeight="SemiBold" FontFamily="Segoe UI"
-                           Margin="0,0,0,6"/>
-                <TextBox x:Name="TbUsername"
-                         Style="{StaticResource InputStyle}"
-                         Margin="0,0,0,16"/>
+					<!-- PASSWORD LABEL -->
+					<TextBlock Text="PASSWORD" Foreground="#606060" FontSize="10"
+                               FontWeight="SemiBold" FontFamily="Segoe UI"
+                               Margin="0,0,0,6"/>
 
-                <!-- PASSWORD LABEL -->
-                <TextBlock Text="PASSWORD" Foreground="#606060" FontSize="10"
-                           FontWeight="SemiBold" FontFamily="Segoe UI"
-                           Margin="0,0,0,6"/>
+					<!-- PASSWORD INPUT -->
+					<Grid Margin="0,0,0,8">
+						<PasswordBox x:Name="PbPassword"
+                                     Style="{StaticResource PwdStyle}"/>
+						<TextBox x:Name="TbPasswordVisible"
+                                 Style="{StaticResource ShowPwdStyle}"/>
+						<Button x:Name="BtnTogglePassword"
+                                Style="{StaticResource BtnEye}"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Margin="0,0,2,0">
+							<TextBlock x:Name="TbEyeIcon" Text="&#x1F441;"
+                                       FontSize="13" Foreground="#606060"/>
+						</Button>
+					</Grid>
 
-                <!-- PASSWORD INPUT — PasswordBox + plain TextBox overlaid -->
-                <Grid Margin="0,0,0,8">
-                    <PasswordBox x:Name="PbPassword"
-                                 Style="{StaticResource PwdStyle}"/>
-                    <TextBox x:Name="TbPasswordVisible"
-                             Style="{StaticResource ShowPwdStyle}"/>
-                    <Button x:Name="BtnTogglePassword"
-                            Style="{StaticResource BtnEye}"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Margin="0,0,2,0">
-                        <TextBlock x:Name="TbEyeIcon" Text="&#x1F441;"
-                                   FontSize="13" Foreground="#606060"/>
-                    </Button>
-                </Grid>
+					<!-- FORGOT PASSWORD -->
+					<Grid Margin="0,4,0,22">
+						<Button x:Name="BtnForgotPassword"
+                                Style="{StaticResource BtnLink}"
+                                Content="Forgot password?"
+                                HorizontalAlignment="Right"/>
+					</Grid>
 
-                <!-- FORGOT PASSWORD (right only) -->
-                <Grid Margin="0,4,0,22">
-                    <Button x:Name="BtnForgotPassword"
-                            Style="{StaticResource BtnLink}"
-                            Content="Forgot password?"
-                            HorizontalAlignment="Right"/>
-                </Grid>
+					<!-- SIGN IN BUTTON -->
+					<Button x:Name="BtnLogin"
+                            Style="{StaticResource BtnLoginStyle}"
+                            Content="Sign In"
+                            HorizontalAlignment="Stretch"/>
 
-                <!-- SIGN IN BUTTON -->
-                <Button x:Name="BtnLogin"
-                        Style="{StaticResource BtnLoginStyle}"
-                        Content="Sign In"
-                        HorizontalAlignment="Stretch"/>
+					<!-- HINT -->
+					<TextBlock Text="admin  /  admin123"
+                               Foreground="#404040" FontSize="11"
+                               FontFamily="Segoe UI"
+                               HorizontalAlignment="Center"
+                               Margin="0,16,0,0"/>
 
-                <!-- HINT -->
-                <TextBlock Text="admin  /  admin123"
-                           Foreground="#404040" FontSize="11"
-                           FontFamily="Segoe UI"
-                           HorizontalAlignment="Center"
-                           Margin="0,16,0,0"/>
+				</StackPanel>
+			</Border>
 
-            </StackPanel>
-        </Border>
-
-        <!-- FOOTER -->
-        <TextBlock Text="Taurus Bike Shop  &#x2022;  Admin System"
-                   Foreground="#333333" FontSize="11" FontFamily="Segoe UI"
-                   HorizontalAlignment="Center" VerticalAlignment="Bottom"
-                   Margin="0,0,0,14"/>
-    </Grid>
+			<!-- FOOTER -->
+			<TextBlock Text="Taurus Bike Shop  &#x2022;  Admin System"
+                       Foreground="#333333" FontSize="11" FontFamily="Segoe UI"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,14"/>
+		</Grid>
+	</ScrollViewer>
 
 </Window>
