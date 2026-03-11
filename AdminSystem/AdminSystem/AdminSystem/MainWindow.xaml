@@ -1659,6 +1659,24 @@
 								</Button>
 
 							</UniformGrid>
+
+						<!-- + Custom Item button -->
+						<Button x:Name="BtnAddCustomItem"
+								Margin="0,8,0,0"
+								Height="40"
+								Background="{StaticResource BackgroundCard}"
+								Foreground="{StaticResource TextSecondary}"
+								BorderThickness="1"
+								BorderBrush="{StaticResource BorderSubtle}"
+								FontSize="12"
+								FontFamily="Segoe UI"
+								Cursor="Hand">
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="＋" FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center" Foreground="{StaticResource AccentRed}"/>
+								<TextBlock Text="Custom Item" VerticalAlignment="Center"/>
+							</StackPanel>
+						</Button>
+
 						</StackPanel>
 					</ScrollViewer>
 					<!-- Cart panel -->
