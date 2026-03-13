@@ -1,0 +1,942 @@
+/* ============================================================
+   TAURUS BIKE SHOP — REVIEW PAGE
+   Place this file at: /wwwroot/css/review.css
+   Dark / Red Premium Aesthetic — consistent with Login,
+   Register, and Index pages
+   ============================================================ */
+
+/* ---- CSS VARIABLES ---- */
+:root {
+    --bg-base:        #0B0B0B;
+    --bg-surface:     #111111;
+    --bg-card:        #161616;
+    --bg-input:       #1A1A1A;
+    --red:            #E10600;
+    --red-hover:      #FF1A17;
+    --red-dim:        #E1060022;
+    --red-faint:      #E1060010;
+    --star-off:       #2A2A2A;
+    --star-on:        #E10600;
+    --star-hover:     #FF4400;
+    --white:          #FFFFFF;
+    --text-primary:   #F0F0F0;
+    --text-secondary: #888888;
+    --text-muted:     #444444;
+    --border:         #2A2A2A;
+    --border-red:     #E1060040;
+    --success:        #22C55E;
+
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-cond:    'Barlow Condensed', sans-serif;
+    --font-body:    'Barlow', sans-serif;
+
+    --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---- RESET ---- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   PAGE SHELL
+   ============================================================ */
+.review-page {
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ============================================================
+   ATMOSPHERIC BACKGROUND LAYERS
+   ============================================================ */
+.bg-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 20% 50%, #1a0202 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(#ffffff04 1px, transparent 1px),
+        linear-gradient(90deg, #ffffff04 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bg-red-glow {
+    position: fixed;
+    top: 50%;
+    left: 30%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #E1060018 0%, transparent 65%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
+    animation: glowPulse 6s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1);    }
+    50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.08); }
+}
+
+/* ============================================================
+   SPLIT LAYOUT
+   Left panel is sticky; right panel scrolls
+   ============================================================ */
+.review-split {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    min-height: 100vh;
+    align-items: start;
+}
+
+/* ============================================================
+   BRAND PANEL (LEFT)
+   ============================================================ */
+.brand-panel {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 52px 40px;
+    border-right: 1px solid #E1060030;
+    overflow: hidden;
+}
+
+.brand-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #0f0000 0%, #0B0B0B 60%, #130000 100%);
+}
+
+.brand-panel__inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    width: 100%;
+}
+
+/* ── Brand mark ── */
+.brand-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border: 1.5px solid var(--red);
+    background: var(--red-dim);
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    text-decoration: none;
+    margin-bottom: 18px;
+    animation: fadeSlideUp 0.8s var(--ease-out) both;
+    transition: background 0.2s;
+}
+
+.brand-logo:hover { background: #E1060040; }
+
+.brand-logo__icon {
+    font-size: 16px;
+    color: var(--red);
+    margin-top: 10px;
+    line-height: 1;
+}
+
+.brand-name {
+    font-family: var(--font-display);
+    font-size: clamp(40px, 4.5vw, 64px);
+    color: var(--white);
+    letter-spacing: 0.06em;
+    line-height: 1;
+    animation: fadeSlideUp 0.8s 0.1s var(--ease-out) both;
+}
+
+.brand-tagline {
+    font-family: var(--font-cond);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.35em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-top: 4px;
+    animation: fadeSlideUp 0.8s 0.15s var(--ease-out) both;
+}
+
+.brand-divider {
+    width: 0;
+    height: 2px;
+    background: var(--red);
+    margin: 20px auto;
+    animation: expandWidth 1s 0.4s var(--ease-out) forwards;
+}
+
+@keyframes expandWidth {
+    from { width: 0;    opacity: 0; }
+    to   { width: 40px; opacity: 1; }
+}
+
+.brand-copy {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    animation: fadeSlideUp 0.8s 0.2s var(--ease-out) both;
+}
+
+/* ============================================================
+   PRODUCT CARD  (inside left panel)
+   ============================================================ */
+.product-card {
+    margin-top: 28px;
+    background: #1A0505;
+    border: 1px solid var(--border-red);
+    border-radius: 6px;
+    padding: 22px 20px 18px;
+    text-align: left;
+    animation: fadeSlideUp 0.8s 0.3s var(--ease-out) both;
+}
+
+/* Verified purchase badge */
+.product-card__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-cond);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--success);
+    margin-bottom: 12px;
+}
+
+.product-card__badge svg {
+    width: 12px;
+    height: 12px;
+    stroke: var(--success);
+}
+
+/* Category eyebrow */
+.product-card__category {
+    font-family: var(--font-cond);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 6px;
+}
+
+/* Product name */
+.product-card__name {
+    font-family: var(--font-cond);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--white);
+    line-height: 1.25;
+    margin-bottom: 8px;
+}
+
+/* Brand + SKU row */
+.product-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.product-card__brand {
+    font-family: var(--font-cond);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.product-card__sku {
+    font-family: var(--font-cond);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    padding-left: 10px;
+    border-left: 1px solid var(--border);
+}
+
+/* Product card star display (synced to rating via JS) */
+.product-card__stars {
+    display: flex;
+    gap: 4px;
+}
+
+.product-card__stars svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--star-off);
+    transition: fill 0.25s;
+}
+
+.product-card__stars svg.card-star--filled {
+    fill: var(--star-on);
+    filter: drop-shadow(0 0 4px #E1060060);
+}
+
+/* ============================================================
+   QUICK LINKS  (bottom of left panel)
+   ============================================================ */
+.panel-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 28px;
+    animation: fadeSlideUp 0.8s 0.4s var(--ease-out) both;
+}
+
+.panel-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-cond);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 6px 0;
+    transition: color 0.2s, gap 0.25s var(--ease-spring);
+}
+
+.panel-link svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    transition: transform 0.2s var(--ease-spring);
+}
+
+.panel-link:hover            { color: var(--text-secondary); gap: 12px; }
+.panel-link:hover svg        { transform: translateX(-3px); }
+
+/* Decorative spinning wheel */
+.deco-wheel {
+    position: absolute;
+    bottom: -80px;
+    right: -80px;
+    width: 280px;
+    height: 280px;
+    opacity: 0.3;
+    animation: spinSlow 60s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   FORM PANEL (RIGHT)
+   ============================================================ */
+.form-panel {
+    display: flex;
+    justify-content: center;
+    padding: 60px 48px 80px;
+    overflow-y: auto;
+}
+
+.form-panel__inner {
+    width: 100%;
+    max-width: 560px;
+    animation: fadeSlideUp 0.9s 0.2s var(--ease-out) both;
+}
+
+/* ── Form header ── */
+.form-header { margin-bottom: 36px; }
+
+.form-header__eyebrow {
+    font-family: var(--font-cond);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.35em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.form-header__title {
+    font-family: var(--font-display);
+    font-size: 52px;
+    color: var(--white);
+    letter-spacing: 0.04em;
+    line-height: 1;
+}
+
+.form-header__sub {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+/* ============================================================
+   FORM STRUCTURE
+   ============================================================ */
+.review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Section number + label */
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-label__num {
+    font-family: var(--font-display);
+    font-size: 36px;
+    color: var(--red);
+    opacity: 0.25;
+    line-height: 1;
+    letter-spacing: 0.04em;
+}
+
+.section-label__text {
+    font-family: var(--font-cond);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+/* Red gradient divider */
+.section-rule {
+    height: 1px;
+    background: linear-gradient(90deg, var(--red) 0%, transparent 100%);
+    opacity: 0.2;
+    margin: 4px 0;
+}
+
+/* ============================================================
+   STAR RATING SELECTOR
+   Classic RTL CSS trick: stars are laid out right-to-left,
+   sibling selectors light up stars on hover/check.
+   ============================================================ */
+.rating-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.star-selector {
+    display: flex;
+    flex-direction: row-reverse;   /* RTL so CSS :checked ~ label works */
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+/* Hide radio inputs visually but keep them accessible */
+.star-selector input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+/* Star label */
+.star-selector label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: transform 0.15s var(--ease-spring);
+}
+
+.star-selector label:hover { transform: scale(1.15); }
+
+.star-selector label svg {
+    width: 36px;
+    height: 36px;
+    fill: var(--star-off);
+    transition: fill 0.2s, filter 0.2s;
+}
+
+/* Hover: light up hovered star AND all stars after it (to the left = higher value) */
+.star-selector label:hover svg,
+.star-selector label:hover ~ label svg {
+    fill: var(--star-hover);
+    filter: drop-shadow(0 0 6px #FF440050);
+}
+
+/* Checked: light up selected star AND all stars after it */
+.star-selector input[type="radio"]:checked ~ label svg {
+    fill: var(--star-on);
+    filter: drop-shadow(0 0 8px #E1060070);
+}
+
+/* Focus-visible ring for keyboard navigation */
+.star-selector input[type="radio"]:focus-visible + label {
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Dynamic rating description label */
+.rating-label {
+    font-family: var(--font-cond);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    transition: color 0.3s;
+    min-height: 20px;
+}
+
+.rating-label[data-rating="1"] { color: #E10600; }
+.rating-label[data-rating="2"] { color: #F97316; }
+.rating-label[data-rating="3"] { color: #EAB308; }
+.rating-label[data-rating="4"] { color: #84CC16; }
+.rating-label[data-rating="5"] { color: var(--success); }
+.rating-label[data-rating="error"] { color: #E10600; }
+
+/* ============================================================
+   FIELD / TEXTAREA
+   ============================================================ */
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field-label {
+    font-family: var(--font-cond);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+
+.field-group:focus-within .field-label { color: var(--red); }
+
+.field-wrap { position: relative; }
+
+/* Icon aligned to top for textarea */
+.field-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    color: var(--text-muted);
+    pointer-events: none;
+    transition: color 0.2s;
+    z-index: 1;
+}
+
+.field-icon--top {
+    top: 16px;
+    transform: none;
+}
+
+.field-group:focus-within .field-icon { color: var(--red); }
+
+/* Shared input/textarea styles */
+.field-input {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 400;
+    outline: none;
+    transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+    letter-spacing: 0.01em;
+    padding: 0 14px 0 42px;
+    height: 50px;
+}
+
+/* Textarea overrides */
+.field-textarea {
+    height: auto;
+    padding: 14px 14px 14px 42px;
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.7;
+}
+
+.field-input::placeholder {
+    color: var(--text-muted);
+    font-weight: 300;
+}
+
+.field-input:focus {
+    border-color: var(--red);
+    background: #1E0A0A;
+    box-shadow: 0 0 0 3px #E1060015, inset 0 1px 0 #E1060010;
+}
+
+/* Animated red underline */
+.field-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--red);
+    border-radius: 0 0 4px 4px;
+    transition: width 0.3s var(--ease-out);
+}
+
+.field-group:focus-within .field-line { width: 100%; }
+
+/* Character counter */
+.char-counter {
+    font-family: var(--font-cond);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    text-align: right;
+    transition: color 0.3s;
+}
+
+.char-counter__num--warn { color: #F97316; }
+
+/* ============================================================
+   SUBMIT BUTTON
+   ============================================================ */
+.btn-submit {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    height: 58px;
+    margin-top: 8px;
+    background: var(--red);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    font-family: var(--font-cond);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--white);
+    transition: background 0.25s, transform 0.15s, box-shadow 0.25s;
+}
+
+.btn-submit::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #FF2A27 0%, #C00000 100%);
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+
+.btn-submit:hover {
+    background: var(--red-hover);
+    box-shadow: 0 8px 32px #E1060050, 0 2px 8px #E1060030;
+    transform: translateY(-1px);
+}
+
+.btn-submit:hover::before { opacity: 1; }
+
+.btn-submit:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 16px #E1060040;
+}
+
+.btn-submit__text  { position: relative; z-index: 1; }
+
+.btn-submit__arrow {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    transition: transform 0.25s var(--ease-spring);
+}
+
+.btn-submit__arrow svg { width: 18px; height: 18px; }
+
+.btn-submit:hover .btn-submit__arrow { transform: translateX(4px); }
+
+/* Loading state */
+.btn-submit__loader {
+    display: none;
+    position: absolute;
+    right: 20px;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ffffff40;
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+.btn-submit.loading .btn-submit__text,
+.btn-submit.loading .btn-submit__arrow { opacity: 0; }
+
+.btn-submit.loading .btn-submit__loader { display: block; }
+
+.btn-submit.loading {
+    pointer-events: none;
+    background: #9a0400;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   FORM FOOTER  (back link)
+   ============================================================ */
+.form-footer {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+    padding-top: 8px;
+}
+
+.form-footer__link {
+    color: var(--red);
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 6px;
+    transition: color 0.2s;
+}
+
+.form-footer__link:hover { color: var(--red-hover); }
+
+/* ============================================================
+   EXISTING REVIEWS FEED
+   ============================================================ */
+.reviews-feed {
+    margin-top: 56px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+}
+
+.reviews-feed__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.reviews-feed__count {
+    font-family: var(--font-cond);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* Review list */
+.review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Individual review card */
+.review-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 22px 24px;
+    transition: border-color 0.3s, transform 0.3s var(--ease-out);
+
+    /* Entrance animation — starts invisible */
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.review-card--visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out),
+                border-color 0.3s;
+}
+
+.review-card:hover {
+    border-color: var(--border-red);
+    transform: translateY(-2px);
+}
+
+/* Card header: avatar + name + date + stars */
+.review-card__header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+/* Avatar circle with initial */
+.review-card__avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--red-dim);
+    border: 1.5px solid var(--border-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--red);
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.review-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.review-card__name {
+    font-family: var(--font-cond);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.review-card__date {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+}
+
+/* Stars row in review card */
+.review-card__stars {
+    display: flex;
+    gap: 3px;
+    margin-left: auto;
+}
+
+.review-star {
+    width: 14px;
+    height: 14px;
+    fill: var(--star-off);
+}
+
+.review-star--filled {
+    fill: var(--star-on);
+    filter: drop-shadow(0 0 3px #E1060050);
+}
+
+/* Review comment text */
+.review-card__comment {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    padding-top: 2px;
+    border-top: 1px solid var(--border);
+}
+
+/* ============================================================
+   SHARED ANIMATIONS
+   ============================================================ */
+@keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+    .review-split {
+        grid-template-columns: 300px 1fr;
+    }
+}
+
+@media (max-width: 820px) {
+    .review-split {
+        grid-template-columns: 1fr;
+    }
+
+    .brand-panel {
+        display: none;
+    }
+
+    .form-panel {
+        padding: 48px 24px 72px;
+        min-height: 100vh;
+    }
+
+    .form-panel__inner {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 540px) {
+    .form-header__title { font-size: 42px; }
+    .form-panel         { padding: 40px 20px 64px; }
+
+    .star-selector label svg {
+        width: 30px;
+        height: 30px;
+    }
+
+    .review-card__stars  { margin-left: 0; width: 100%; margin-top: 4px; }
+    .review-card__header { align-items: flex-start; }
+}
