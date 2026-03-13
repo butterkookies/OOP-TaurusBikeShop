@@ -5,6 +5,7 @@ C:.
 |   OOP-TaurusBikeShop.sln
 |   package-lock.json
 |   package.json
+|   ProjectFilesLibrary_v3.docx
 |   project_structure.txt
 |   README.md
 |   Tools.txt
@@ -41,13 +42,10 @@ C:.
 |           |       
 |           +---Helpers
 |           |       .gitkeep
-|           |       BoolToVisibility.cs
-|           |       CurrencyConverter.cs
 |           |       DatabaseHelper.cs
 |           |       NavigationHelper.cs
 |           |       PasswordHelper.cs
 |           |       PrintHelper.cs
-|           |       StatusToColor.cs
 |           |       
 |           +---Models
 |           |       .gitkeep
@@ -598,8 +596,10 @@ C:.
         |       order-history.js
         |       payment.js
         |       product-catalog.js
+        |       review.js
         |       site.js
         |       utils.js
+        |       wishlist.js
         |       
         \---lib
             +---bootstrap
