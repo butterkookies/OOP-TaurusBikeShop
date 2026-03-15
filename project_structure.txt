@@ -35,13 +35,11 @@ C:.
 |           |           AdminSystem.pdb
 |           |           
 |           +---Converters
-|           |       .gitkeep
 |           |       BoolToVisibility.cs
 |           |       CurrencyConverter.cs
 |           |       StatusToColor.cs
 |           |       
 |           +---Helpers
-|           |       .gitkeep
 |           |       DatabaseHelper.cs
 |           |       NavigationHelper.cs
 |           |       PasswordHelper.cs
@@ -49,16 +47,22 @@ C:.
 |           |       
 |           +---Models
 |           |       .gitkeep
+|           |       BankTransferPayment.cs
 |           |       Brand.cs
 |           |       Category.cs
 |           |       Delivery.cs
+|           |       GCashPayment.cs
 |           |       InventoryLog.cs
+|           |       LalamoveDelivery.cs
+|           |       LBCDelivery.cs
 |           |       Order.cs
 |           |       OrderItem.cs
 |           |       Payment.cs
+|           |       PickupOrder.cs
 |           |       POS_Session.cs
 |           |       Product.cs
 |           |       Review.cs
+|           |       SupportTask.cs
 |           |       User.cs
 |           |       Voucher.cs
 |           |       
@@ -96,34 +100,35 @@ C:.
 |           |       Settings.settings
 |           |       
 |           +---Repositories
-|           |       .gitkeep
+|           |       InventoryRepository.cs
+|           |       IRepository.cs
+|           |       OrderRepository.cs
+|           |       PaymentRepository.cs
+|           |       ProductRepository.cs
+|           |       Repository.cs
+|           |       UserRepository.cs
 |           |       
 |           +---Services
-|           |       .gitkeep
 |           |       AuthService.cs
 |           |       DeliveryService.cs
 |           |       IAuthService.cs
 |           |       IDeliveryService.cs
 |           |       IInventoryService.cs
-|           |       InventoryRepository.cs
+|           |       INotificationService.cs
 |           |       InventoryService.cs
 |           |       IOrderService.cs
 |           |       IPaymentService.cs
 |           |       IProductService.cs
 |           |       IReportService.cs
-|           |       IRepository.cs
-|           |       OrderRepository.cs
+|           |       ISupportService.cs
+|           |       NotificationService.cs
 |           |       OrderService.cs
-|           |       PaymentRepository.cs
 |           |       PaymentService.cs
-|           |       ProductRepository.cs
 |           |       ProductService.cs
 |           |       ReportService.cs
-|           |       Repository.cs
-|           |       UserRepository.cs
+|           |       SupportService.cs
 |           |       
 |           +---ViewModels
-|           |       .gitkeep
 |           |       BaseViewModel.cs
 |           |       DashboardViewModel.cs
 |           |       DeliveryViewModel.cs
@@ -133,7 +138,8 @@ C:.
 |           |       POSViewModel.cs
 |           |       ProductViewModel.cs
 |           |       ReportViewModel.cs
-|           |       UserViewModel.cs
+|           |       SupportViewModel.cs
+|           |       UsersViewModel.cs
 |           |       VoucherViewModel.cs
 |           |       
 |           \---Views
@@ -155,30 +161,72 @@ C:.
 |                   Products.xaml.cs
 |                   Reports.xaml
 |                   Reports.xaml.cs
+|                   Support.xaml
+|                   Support.xaml.cs
 |                   Users.xaml
 |                   Users.xaml.cs
 |                   Vouchers.xaml
 |                   Vouchers.xaml.cs
 |                   
++---Documentation
+|   \---DataDictionary
+|           Taurus_DB_Dictionary_v1.0.pdf
+|           
 +---Mermaid
 |   +---Claude
-|   |       10_LOGISTICS_MANAGEMENT.mmd
-|   |       11_WALKIN_POS.mmd
-|   |       12_INVENTORY_MANAGEMENT.mmd
-|   |       13_SUPPORT_SYSTEM.mmd
-|   |       14_BACKGROUND_JOBS.mmd
-|   |       1_CUSTOMER_REGISTRATION_LOGIN.mmd
-|   |       2_CUSTOMER_DASHBOARD_SHOPPING.mmd
-|   |       3_CART_CHECKOUT.mmd
-|   |       4_PAYMENT_PROCESSING.mmd
-|   |       5_ORDER_CONFIRMATION_TRACKING.mmd
-|   |       6_DELIVERY_REVIEW.mmd
-|   |       7_ADMIN_OVERVIEW.mmd
-|   |       8_ONLINE_ORDERS_MANAGEMENT.mmd
-|   |       9_PAYMENT_VERIFICATION.mmd
-|   |       COMPLETE_SOLUTION_SUMMARY.md
-|   |       MODULAR_FLOWCHART_GUIDE.md
-|   |       
+|   |   +---v1.0
+|   |   |       10_LOGISTICS_MANAGEMENT.mmd
+|   |   |       11_WALKIN_POS.mmd
+|   |   |       12_INVENTORY_MANAGEMENT.mmd
+|   |   |       13_SUPPORT_SYSTEM.mmd
+|   |   |       14_BACKGROUND_JOBS.mmd
+|   |   |       1_CUSTOMER_REGISTRATION_LOGIN.mmd
+|   |   |       2_CUSTOMER_DASHBOARD_SHOPPING.mmd
+|   |   |       3_CART_CHECKOUT.mmd
+|   |   |       4_PAYMENT_PROCESSING.mmd
+|   |   |       5_ORDER_CONFIRMATION_TRACKING.mmd
+|   |   |       6_DELIVERY_REVIEW.mmd
+|   |   |       7_ADMIN_OVERVIEW.mmd
+|   |   |       8_ONLINE_ORDERS_MANAGEMENT.mmd
+|   |   |       9_PAYMENT_VERIFICATION.mmd
+|   |   |       COMPLETE_SOLUTION_SUMMARY.md
+|   |   |       MODULAR_FLOWCHART_GUIDE.md
+|   |   |       
+|   |   +---v2.0
+|   |   |       10_LOGISTICS_MANAGEMENT.mmd
+|   |   |       11_WALKIN_POS.mmd
+|   |   |       12_INVENTORY_MANAGEMENT.mmd
+|   |   |       13_SUPPORT_SYSTEM.mmd
+|   |   |       14_BACKGROUND_JOBS.mmd
+|   |   |       1_CUSTOMER_REGISTRATION_LOGIN.mmd
+|   |   |       2_CUSTOMER_DASHBOARD_SHOPPING.mmd
+|   |   |       3_CART_CHECKOUT.mmd
+|   |   |       4_PAYMENT_PROCESSING.mmd
+|   |   |       5_ORDER_CONFIRMATION_TRACKING.mmd
+|   |   |       6_DELIVERY_REVIEW.mmd
+|   |   |       7_ADMIN_OVERVIEW.mmd
+|   |   |       8_ONLINE_ORDERS_MANAGEMENT.mmd
+|   |   |       9_PAYMENT_VERIFICATION.mmd
+|   |   |       Taurus_flowcharts_v71.txt
+|   |   |       
+|   |   \---v3.0
+|   |           10_LOGISTICS_MANAGEMENT.mmd
+|   |           11_WALKIN_POS.mmd
+|   |           12_INVENTORY_MANAGEMENT.mmd
+|   |           13_SUPPORT_SYSTEM.mmd
+|   |           14_BACKGROUND_JOBS.mmd
+|   |           15_VOUCHER_CHECKOUT.mmd
+|   |           16_SUPPLIER_PURCHASE_ORDER.mmd
+|   |           1_CUSTOMER_REGISTRATION_LOGIN.mmd
+|   |           2_CUSTOMER_DASHBOARD_SHOPPING.mmd
+|   |           3_CART_CHECKOUT.mmd
+|   |           4_PAYMENT_PROCESSING.mmd
+|   |           5_ORDER_CONFIRMATION_TRACKING.mmd
+|   |           6_DELIVERY_REVIEW.mmd
+|   |           7_ADMIN_OVERVIEW.mmd
+|   |           8_ONLINE_ORDERS_MANAGEMENT.mmd
+|   |           9_PAYMENT_VERIFICATION.mmd
+|   |           
 |   +---Database
 |   |       TaurusBikeShop_ERD.mmd
 |   |       TaurusBikeShop_ERD.png
@@ -213,6 +261,14 @@ C:.
 |   |       workspace.globals.yaml
 |   |       
 |   \---specs
++---SQL
+|   +---Schema
+|   |       Taurus_schema_v7.1.sql
+|   |       Taurus_schema_v7.1_patch.sql
+|   |       
+|   \---Seed
+|           Taurus_seed_v7.1.sql
+|           
 \---WebApplication
     |   appsettings.Development.json
     |   appsettings.json
@@ -221,6 +277,13 @@ C:.
     |   WebApplication.csproj.user
     |   WebApplication.slnx
     |   
+    +---BackgroundJobs
+    |       DeliveryStatusPollJob.cs
+    |       InventorySyncJob.cs
+    |       PaymentTimeoutJob.cs
+    |       PendingOrderMonitorJob.cs
+    |       StockMonitorJob.cs
+    |       
     +---bin
     |   \---Debug
     |       \---net8.0
@@ -239,10 +302,12 @@ C:.
     |   +---Interfaces
     |   |       IBrandService.cs
     |   |       ICartService.cs
+    |   |       INotificationService.cs
     |   |       IOrderService.cs
     |   |       IPaymentService.cs
     |   |       IProductService.cs
     |   |       IReviewService.cs
+    |   |       ISupportService.cs
     |   |       IUserService.cs
     |   |       IVoucherService.cs
     |   |       IWishlistService.cs
@@ -250,10 +315,12 @@ C:.
     |   \---Services
     |           BrandService.cs
     |           CartService.cs
+    |           NotificationService.cs
     |           OrderService.cs
     |           PaymentService.cs
     |           ProductService.cs
     |           ReviewService.cs
+    |           SupportService.cs
     |           UserService.cs
     |           VoucherService.cs
     |           WishlistService.cs
@@ -267,6 +334,7 @@ C:.
     |       PaymentController.cs
     |       ProductController.cs
     |       ReviewController.cs
+    |       SupportController.cs
     |       VoucherController.cs
     |       WishlistController.cs
     |       
@@ -284,6 +352,7 @@ C:.
     |           Repository.cs
     |           ReviewRepository.cs
     |           SupplierRepository.cs
+    |           SupportRepository.cs
     |           UserRepository.cs
     |           VoucherRepository.cs
     |           WishlistRepository.cs
@@ -292,15 +361,24 @@ C:.
     |   |   ErrorViewModel.cs
     |   |   
     |   +---Entities
+    |   |       Address.cs
+    |   |       BankTransferPayment.cs
     |   |       Brand.cs
     |   |       Cart.cs
     |   |       CartItem.cs
     |   |       Category.cs
     |   |       Delivery.cs
+    |   |       GCashPayment.cs
+    |   |       GuestSession.cs
     |   |       InventoryLog.cs
+    |   |       LalamoveDelivery.cs
+    |   |       LBCDelivery.cs
+    |   |       Notification.cs
     |   |       Order.cs
     |   |       OrderItem.cs
+    |   |       OTPVerification.cs
     |   |       Payment.cs
+    |   |       PickupOrder.cs
     |   |       POS_Session.cs
     |   |       PriceHistory.cs
     |   |       Product.cs
@@ -311,6 +389,9 @@ C:.
     |   |       Review.cs
     |   |       Role.cs
     |   |       Supplier.cs
+    |   |       SupportTask.cs
+    |   |       SupportTicket.cs
+    |   |       SupportTicketReply.cs
     |   |       SystemLog.cs
     |   |       User.cs
     |   |       UserRole.cs
@@ -340,70 +421,6 @@ C:.
     |   |   WebApplication.csproj.nuget.g.targets
     |   |   
     |   \---Debug
-    |       +---net10.0
-    |       |   |   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
-    |       |   |   rpswa.dswa.cache.json
-    |       |   |   staticwebassets.removed.txt
-    |       |   |   WebApplication.AssemblyInfo.cs
-    |       |   |   WebApplication.AssemblyInfoInputs.cache
-    |       |   |   WebApplication.assets.cache
-    |       |   |   WebApplication.csproj.CoreCompileInputs.cache
-    |       |   |   WebApplication.csproj.FileListAbsolute.txt
-    |       |   |   WebApplication.GeneratedMSBuildEditorConfig.editorconfig
-    |       |   |   WebApplication.GlobalUsings.g.cs
-    |       |   |   WebApplication.MvcApplicationPartsAssemblyInfo.cache
-    |       |   |   WebApplication.RazorAssemblyInfo.cache
-    |       |   |   WebApplication.RazorAssemblyInfo.cs
-    |       |   |   WebApplication.sourcelink.json
-    |       |   |   
-    |       |   +---ref
-    |       |   +---refint
-    |       |   \---staticwebassets
-    |       +---net7.0
-    |       |   |   .NETCoreApp,Version=v7.0.AssemblyAttributes.cs
-    |       |   |   apphost.exe
-    |       |   |   staticwebassets.build.json
-    |       |   |   staticwebassets.development.json
-    |       |   |   staticwebassets.pack.json
-    |       |   |   staticwebassets.removed.txt
-    |       |   |   WebApplication.AssemblyInfo.cs
-    |       |   |   WebApplication.AssemblyInfoInputs.cache
-    |       |   |   WebApplication.assets.cache
-    |       |   |   WebApplication.csproj.BuildWithSkipAnalyzers
-    |       |   |   WebApplication.csproj.CoreCompileInputs.cache
-    |       |   |   WebApplication.csproj.FileListAbsolute.txt
-    |       |   |   WebApplication.dll
-    |       |   |   WebApplication.GeneratedMSBuildEditorConfig.editorconfig
-    |       |   |   WebApplication.genruntimeconfig.cache
-    |       |   |   WebApplication.GlobalUsings.g.cs
-    |       |   |   WebApplication.MvcApplicationPartsAssemblyInfo.cache
-    |       |   |   WebApplication.pdb
-    |       |   |   WebApplication.RazorAssemblyInfo.cache
-    |       |   |   WebApplication.RazorAssemblyInfo.cs
-    |       |   |   
-    |       |   +---ref
-    |       |   |       WebApplication.dll
-    |       |   |       
-    |       |   +---refint
-    |       |   |       WebApplication.dll
-    |       |   |       
-    |       |   +---scopedcss
-    |       |   |   +---bundle
-    |       |   |   |       WebApplication.styles.css
-    |       |   |   |       
-    |       |   |   +---projectbundle
-    |       |   |   |       WebApplication.bundle.scp.css
-    |       |   |   |       
-    |       |   |   \---Views
-    |       |   |       \---Shared
-    |       |   |               _Layout.cshtml.rz.scp.css
-    |       |   |               
-    |       |   \---staticwebassets
-    |       |           msbuild.build.WebApplication.props
-    |       |           msbuild.buildMultiTargeting.WebApplication.props
-    |       |           msbuild.buildTransitive.WebApplication.props
-    |       |           msbuild.WebApplication.Microsoft.AspNetCore.StaticWebAssets.props
-    |       |           
     |       \---net8.0
     |           |   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
     |           |   ApiEndpoints.json
@@ -519,38 +536,6 @@ C:.
         |   
         +---css
         |       auth.css
-        |       bootstrap-grid.css
-        |       bootstrap-grid.css.map
-        |       bootstrap-grid.min.css
-        |       bootstrap-grid.min.css.map
-        |       bootstrap-grid.rtl.css
-        |       bootstrap-grid.rtl.css.map
-        |       bootstrap-grid.rtl.min.css
-        |       bootstrap-grid.rtl.min.css.map
-        |       bootstrap-reboot.css
-        |       bootstrap-reboot.css.map
-        |       bootstrap-reboot.min.css
-        |       bootstrap-reboot.min.css.map
-        |       bootstrap-reboot.rtl.css
-        |       bootstrap-reboot.rtl.css.map
-        |       bootstrap-reboot.rtl.min.css
-        |       bootstrap-reboot.rtl.min.css.map
-        |       bootstrap-utilities.css
-        |       bootstrap-utilities.css.map
-        |       bootstrap-utilities.min.css
-        |       bootstrap-utilities.min.css.map
-        |       bootstrap-utilities.rtl.css
-        |       bootstrap-utilities.rtl.css.map
-        |       bootstrap-utilities.rtl.min.css
-        |       bootstrap-utilities.rtl.min.css.map
-        |       bootstrap.css
-        |       bootstrap.css.map
-        |       bootstrap.min.css
-        |       bootstrap.min.css.map
-        |       bootstrap.rtl.css
-        |       bootstrap.rtl.css.map
-        |       bootstrap.rtl.min.css
-        |       bootstrap.rtl.min.css.map
         |       cart-item.css
         |       cart.css
         |       checkout.css
@@ -575,20 +560,9 @@ C:.
         |       responsive.css
         |       review.css
         |       site.css
+        |       wishlist.css
         |       
         +---js
-        |       bootstrap.bundle.js
-        |       bootstrap.bundle.js.map
-        |       bootstrap.bundle.min.js
-        |       bootstrap.bundle.min.js.map
-        |       bootstrap.esm.js
-        |       bootstrap.esm.js.map
-        |       bootstrap.esm.min.js
-        |       bootstrap.esm.min.js.map
-        |       bootstrap.js
-        |       bootstrap.js.map
-        |       bootstrap.min.js
-        |       bootstrap.min.js.map
         |       cart.js
         |       checkout.js
         |       confirmation.js
