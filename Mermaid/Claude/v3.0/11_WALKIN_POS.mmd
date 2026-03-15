@@ -1,0 +1,74 @@
+%% =====================================================
+%% BIKE SHOP - PART 11: WALK-IN POS SYSTEM
+%% =====================================================
+%% Schema tables: POS_Session, Order, OrderItem, InventoryLog,
+%%   Payment, Cart, CartItem, ProductVariant
+%% Payment methods: Cash | GCash ONLY
+%% NOTE: Card payment is NOT supported.
+%% Connected from: Part 7
+%% =====================================================
+
+flowchart TD
+
+DB2[("Product Database")]
+DB3[("Order Database")]
+DB4[("Inventory Database")]
+DB5[("Cart Database")]
+EXT1["GCash Payment Gateway"]
+
+W_START(["FROM Part 7: Walk-In POS"])
+
+W_START --> W1[/"Open POS Terminal — Start POS Session"/]
+W1 --> W2[/"Scan Product Barcode"/]
+W2 --> DB2
+
+DB2 --> W3{"Stock Available?"}
+W3 -->|No| W3A[/"Show Out of Stock"/]
+W3A --> W2
+
+W3 -->|Yes| W4["Add Product to Cart"]
+W4 --> DB5
+W4 --> W5{"Add More Items?"}
+W5 -->|Yes| W2
+W5 -->|No| W6[/"Display Total & Items"/]
+
+W6 --> W7{"Payment Method?"}
+
+W7 -->|Cash| W8["Accept Cash Payment"]
+W8 --> W10
+
+W7 -->|GCash| W9["Process GCash Payment"]
+W9 --> EXT1
+EXT1 --> W9A{"Payment Success?"}
+W9A -->|Yes| W10
+W9A -->|No| W9B[/"Show Error — Retry"/]
+W9B --> W7
+
+W10 --> W10C[/"Create Walk-In Order Record"/]
+W10C --> DB3
+W10C --> W10A["Log Sale in InventoryLog"]
+W10A --> DB4
+W10A --> W10B["Sync Online Inventory — Real-time < 1 sec"]
+W10B --> DB4
+W10B --> W11[/"Print Receipt"/]
+W11 --> W12[/"Thank Customer"/]
+W12 --> W13([Transaction Complete])
+
+W13 --> W13A{"Another Customer?"}
+W13A -->|Yes| W1
+W13A -->|No| END1(["BACK TO Part 7: Admin Dashboard"])
+
+classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef decision fill:#FFF59D,stroke:#F9A825,stroke-width:2px,color:#000
+classDef io fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef external fill:#80DEEA,stroke:#00838F,stroke-width:2px,color:#000
+classDef connector fill:#FFB6C1,stroke:#FF1493,stroke-width:3px,color:#000,font-weight:bold
+
+class W_START,W13,END1 startend
+class W4,W8,W9,W10C,W10A,W10B process
+class W3,W5,W7,W9A,W13A decision
+class W1,W2,W6,W11,W12,W9B,W3A io
+class DB2,DB3,DB4,DB5 database
+class EXT1 external

@@ -1,0 +1,69 @@
+%% =====================================================
+%% BIKE SHOP - PART 3: CART & CHECKOUT
+%% =====================================================
+%% Schema tables: Cart, CartItem, Address, Order, PickupOrder,
+%%   Delivery, LalamoveDelivery, LBCDelivery
+%% NOTE: COD is NOT offered. Couriers: Lalamove and LBC only.
+%% Connected from: Part 2
+%% Connected to: Part 4 (Payment)
+%% =====================================================
+
+flowchart TD
+
+DB1[("User Database")]
+DB5[("Cart Database")]
+
+B_START(["FROM Part 2: Open Shopping Cart"])
+
+B_START --> B7[/"Display Cart Summary"/]
+B7 --> DB5
+DB5 --> B7A[/"Cart Summary: Items, Quantities, Subtotal"/]
+
+B7A --> B7B{"Cart Empty?"}
+B7B -->|Yes| B7C[/"Empty Cart Message"/]
+B7C --> BACK_SHOP(["BACK TO Part 2: Shopping"])
+
+B7B -->|No| B7D{"What Would You Like?"}
+B7D -->|Edit Items| B7E[/"Modify Quantities"/]
+B7E --> DB5
+DB5 --> B7A
+
+B7D -->|Save for Later| B7F["Move to Wishlist"]
+B7F --> DB5
+DB5 --> B7A
+
+B7D -->|Proceed to Checkout| B8[/"Review Order Summary"/]
+
+B8 --> STEP1[/"STEP 1: Review Order"/]
+STEP1 --> STEP1A["Verify Order Items & Subtotal"]
+
+STEP1A --> STEP2[/"STEP 2: Verify Address"/]
+STEP2 --> STEP2B{"Is Address Correct?"}
+STEP2B -->|No| STEP2C[/"Edit Address"/]
+STEP2C --> DB1
+DB1 --> STEP2
+STEP2B -->|Yes| STEP3[/"STEP 3: Select Delivery"/]
+
+STEP3 --> B20{"How to Receive Order?"}
+B20 -->|Store Pickup| B21["Pickup in Store"]
+B21 --> STEP4
+
+B20 -->|Home Delivery| B22{"Choose Courier:"}
+B22 -->|Lalamove| B23[/"Confirm Delivery Address"/]
+B22 -->|LBC| B23
+
+B23 --> STEP4[/"STEP 4: Select Payment Method"/]
+STEP4 --> PAYMENT_LINK(["CONTINUE TO Part 4: Payment"])
+
+classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef decision fill:#FFF59D,stroke:#F9A825,stroke-width:2px,color:#000
+classDef io fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef connector fill:#FFB6C1,stroke:#FF1493,stroke-width:3px,color:#000,font-weight:bold
+
+class B_START,BACK_SHOP,PAYMENT_LINK startend
+class STEP1A,B21,B7F process
+class B7B,B7D,STEP2B,B20,B22 decision
+class B7,B7A,B8,STEP1,STEP2,STEP3,STEP4,B23 io
+class DB1,DB5 database
