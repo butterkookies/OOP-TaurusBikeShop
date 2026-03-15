@@ -782,8 +782,7 @@ CREATE TABLE Payment (
         'VerificationPending',   -- bank transfer uploaded, awaiting admin review
         'VerificationRejected',  -- admin rejected the proof
         'Completed',
-        'Failed',
-        'Refunded'
+        'Failed'
     )),
     CONSTRAINT CK_Payment_Amount CHECK (Amount >= 0)
 );
@@ -993,7 +992,7 @@ CREATE TABLE SupportTicket (
     CONSTRAINT CK_Ticket_Source        CHECK (TicketSource IN ('Customer','Admin','System')),
     CONSTRAINT CK_Ticket_Category      CHECK (TicketCategory IN (
         'DamagedItem','WrongItem','DeliveryIssue',
-        'PaymentIssue','ReturnRefund','ProductInquiry','General'
+        'PaymentIssue','ProductInquiry','General'
     )),
     CONSTRAINT CK_Ticket_Status        CHECK (TicketStatus IN (
         'Open','InProgress','AwaitingResponse','Resolved','Closed'
@@ -1389,7 +1388,7 @@ GO
 -- (e.g., "Ship replacement", "Arrange return pickup").
 -- Distinct from SupportTicketReply — this is an actionable
 -- work item with its own assignee, due date, and lifecycle.
--- TaskType  : ShipReplacement | ArrangeReturn | IssueRefund | ContactSupplier | Other
+-- TaskType  : ShipReplacement | ArrangeReturn | ContactSupplier | Other
 -- TaskStatus: Pending → InProgress → Done | Cancelled
 -- =============================================================================
 CREATE TABLE SupportTask (
@@ -1408,7 +1407,6 @@ CREATE TABLE SupportTask (
     CONSTRAINT CK_SupportTask_Type       CHECK (TaskType IN (
         'ShipReplacement',
         'ArrangeReturn',
-        'IssueRefund',
         'ContactSupplier',
         'Other'
     )),
