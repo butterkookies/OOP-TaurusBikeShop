@@ -2,7 +2,7 @@
 %% BIKE SHOP - PART 7: ADMIN SYSTEM OVERVIEW
 %% =====================================================
 %% Schema tables: User, Role, UserRole, SystemLog
-%% Connects to: Parts 8–13 (admin modules)
+%% Connects to: Parts 8–13, 16 (admin modules)
 %% =====================================================
 
 flowchart TD
@@ -25,6 +25,7 @@ A4 -->|Walk-In POS| POS(["PART 11: Walk-In POS System"])
 A4 -->|Inventory Mgmt| INVENTORY(["PART 12: Inventory Management"])
 A4 -->|Order History| HISTORY[/"View Order History: Search & Filter"/]
 A4 -->|Support Tickets| SUPPORT(["PART 13: Support System"])
+A4 -->|Purchase Orders| PURCHASE_ORDERS(["PART 16: Supplier & Purchase Order"])
 A4 -->|Analytics| ANALYTICS[/"View Analytics: Sales, Products, Inventory"/]
 A4 -->|Logout| END([End Session])
 
@@ -39,7 +40,7 @@ classDef io fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
 classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
 classDef connector fill:#FFB6C1,stroke:#FF1493,stroke-width:3px,color:#000,font-weight:bold
 
-class A_START,ORDERS,PAYMENT_VER,LOGISTICS,POS,INVENTORY,SUPPORT,END startend
+class A_START,ORDERS,PAYMENT_VER,LOGISTICS,POS,INVENTORY,SUPPORT,PURCHASE_ORDERS,END startend
 class A3 process
 class A2,A4 decision
 class A1,HISTORY,ANALYTICS io
