@@ -31,13 +31,11 @@ DB3 --> L1F["Queue Delay Notification to Customer"]
 L1F --> EXT4
 EXT4 --> L1C
 
-L1C -->|Cancel Delivery| L1G[/"Confirm Cancellation — Refund Customer"/]
-L1G --> EXT2
-EXT2 --> L1H["Process Refund via Payment Gateway"]
-L1H --> EXT1
-EXT1 --> DB3
-DB3 --> END1(["BACK TO Part 7: Admin Dashboard"])
-
+L1C -->|Cancel Delivery| L1G[/"Confirm Cancellation — Notify Customer"/]
+L1G --> DB3
+DB3 --> L1H["Queue Delivery Cancellation Notification to Customer"]
+L1H --> EXT4
+EXT4 --> END1(["BACK TO Part 7: Admin Dashboard"])
 classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
 classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
 classDef decision fill:#FFF59D,stroke:#F9A825,stroke-width:2px,color:#000

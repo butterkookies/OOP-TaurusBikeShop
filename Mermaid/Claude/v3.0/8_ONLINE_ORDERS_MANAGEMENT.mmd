@@ -85,10 +85,8 @@ O11C --> O11D["Send Retry Options to Customer"]
 O11D --> EXT4
 EXT4 --> O11E{"Customer Action?"}
 O11E -->|Reschedule| O11
-O11E -->|Refund| O11F["Process Refund — Set Status: Refunded"]
-O11F --> EXT1
-EXT1 --> DB3
-DB3 --> END1
+O11E -->|Contact Support| SUP_REFER(["CONTACT SUPPORT Part 13"])
+SUP_REFER --> END1
 
 classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
 classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000

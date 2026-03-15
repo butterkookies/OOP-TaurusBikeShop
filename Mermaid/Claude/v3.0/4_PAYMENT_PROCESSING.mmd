@@ -59,8 +59,8 @@ P30B -->|Timeout 24hrs| P30C["Auto-Hold Order"]
 P30C --> EXT4
 EXT4 --> P30D{"Customer Action?"}
 P30D -->|Resubmit Proof| P29A
-P30D -->|Request Refund| P30E["Set Status: Refunded"]
-P30E --> DB3
+P30D -->|Contact Support| SUP_REFER(["CONTACT SUPPORT Part 7"])
+SUP_REFER --> BACK_DASH
 
 %% ORDER CREATION
 P14 --> P14A["Save Order Record to DB3"]

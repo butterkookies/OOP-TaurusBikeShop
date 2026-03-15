@@ -17,7 +17,7 @@ EXT3["LBC Delivery API"]
 
 %% JOB 1: REAL-TIME INVENTORY SYNC
 J1["JOB 1: Inventory Sync — Every 10 Seconds"]
-J1 --> J1A["Compare Online DB4 vs POS DB4"]
+J1 --> J1A[""Detect and Log Stock Discrepancies in InventoryLog""]
 J1A --> DB4
 DB4 --> J1B["Write Unified InventoryLog — Single View"]
 

@@ -62,9 +62,6 @@ DB6 --> TRACK_LOOP
 TRACK_WHAT -->|Delivery Failed| FAILED[/"Show Delivery Failed: Reschedule or Refund"/]
 FAILED --> FAILED_OPT{"What Would You Like?"}
 FAILED_OPT -->|Reschedule| TRACK_LOOP
-FAILED_OPT -->|Request Refund| REFUND["Queue Refund Notification"]
-REFUND --> DB6
-DB6 --> TRACK_LOOP
 FAILED_OPT -->|Get Support| ISSUE
 
 TRACK_WHAT -->|Received| DELIVERY_COMPLETE(["CONTINUE TO Part 6: Delivery & Review"])
