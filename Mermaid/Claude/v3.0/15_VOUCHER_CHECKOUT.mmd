@@ -1,0 +1,99 @@
+%% =====================================================
+%% BIKE SHOP - PART 15: VOUCHER & CHECKOUT APPLICATION
+%% =====================================================
+%% Schema tables: Voucher, UserVoucher, VoucherUsage,
+%%   Order, Cart, CartItem, Notification
+%% Columns used: Code, DiscountType, DiscountValue,
+%%   MinimumOrderAmount, MaxUses, MaxUsesPerUser,
+%%   StartDate, EndDate, IsActive, DiscountAmount
+%% Connected from: Part 3 (Cart & Checkout)
+%% Connected to: Part 4 (Payment Processing)
+%% =====================================================
+
+flowchart TD
+
+DB3[("Order Database")]
+DB5[("Cart Database")]
+DB6[("Notification Queue")]
+EXT4["Email/SMS Service"]
+
+V_START(["FROM Part 3: Proceed to Checkout"])
+
+V_START --> V1[/"Display Checkout: Order Summary & Voucher Field"/]
+V1 --> DB5
+DB5 --> V2[/"Show Cart Subtotal"/]
+
+V2 --> V3{"Apply Voucher Code?"}
+V3 -->|Skip| V_PAY(["CONTINUE TO Part 4: Payment"])
+
+V3 -->|Enter Code| V4[/"Enter Voucher Code"/]
+V4 --> V5["Validate Code Against Voucher Table"]
+V5 --> DB3
+
+%% VALIDATION CHECKS
+DB3 --> V6{"Voucher Exists & IsActive?"}
+V6 -->|No| V6A[/"Show Error: Invalid or Expired Code"/]
+V6A --> V3
+
+V6 -->|Yes| V7{"Within StartDate and EndDate?"}
+V7 -->|No| V7A[/"Show Error: Voucher Not Yet Active or Expired"/]
+V7A --> V3
+
+V7 -->|Yes| V8{"Subtotal >= MinimumOrderAmount?"}
+V8 -->|No| V8A[/"Show Error: Minimum Order Amount Not Met"/]
+V8A --> V2
+
+V8 -->|Yes| V9{"MaxUses Reached?"}
+V9 -->|Yes| V9A[/"Show Error: Voucher Fully Redeemed"/]
+V9A --> V3
+
+V9 -->|No| V10{"User Already Used MaxUsesPerUser?"}
+V10 -->|Yes| V10A[/"Show Error: Usage Limit Reached for Your Account"/]
+V10A --> V3
+
+V10 -->|No| V11{"DiscountType?"}
+
+%% PERCENTAGE DISCOUNT
+V11 -->|Percentage| V12["Calculate: DiscountAmount = Subtotal x DiscountValue divided by 100"]
+V12 --> V14
+
+%% FIXED DISCOUNT
+V11 -->|Fixed| V13["Apply: DiscountAmount = DiscountValue"]
+V13 --> V14
+
+V14[/"Display: Discount Applied — Updated Order Total"/]
+V14 --> V15["Save Applied Voucher to Session"]
+V15 --> V_CONFIRM{"Confirm and Proceed?"}
+
+V_CONFIRM -->|Change Code| V3
+V_CONFIRM -->|Remove Voucher| V16["Clear Voucher from Session"]
+V16 --> V2
+
+V_CONFIRM -->|Confirm| V17["Create Order Record — Write DiscountAmount to Order"]
+V17 --> DB3
+V17 --> V18["Write VoucherUsage Record: VoucherId, UserId, OrderId, DiscountAmount"]
+V18 --> DB3
+V18 --> V19{"UserVoucher Assignment Exists?"}
+
+V19 -->|Yes — Assigned Code| V20["Voucher Use Recorded"]
+V19 -->|No — Public Code| V20
+
+V20 --> V21["Queue Order Confirmation Notification"]
+V21 --> DB6
+V21 --> EXT4
+EXT4 --> V_PAY
+
+classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef decision fill:#FFF59D,stroke:#F9A825,stroke-width:2px,color:#000
+classDef io fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef external fill:#80DEEA,stroke:#00838F,stroke-width:2px,color:#000
+classDef connector fill:#FFB6C1,stroke:#FF1493,stroke-width:3px,color:#000,font-weight:bold
+
+class V_START,V_PAY startend
+class V5,V12,V13,V15,V16,V17,V18,V20,V21 process
+class V3,V6,V7,V8,V9,V10,V11,V_CONFIRM,V19 decision
+class V1,V2,V4,V6A,V7A,V8A,V9A,V10A,V14 io
+class DB3,DB5,DB6 database
+class EXT4 external

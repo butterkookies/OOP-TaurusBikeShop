@@ -1,0 +1,119 @@
+%% =====================================================
+%% BIKE SHOP - PART 16: SUPPLIER & PURCHASE ORDER
+%% =====================================================
+%% Schema tables: Supplier, PurchaseOrder, PurchaseOrderItem,
+%%   Product, ProductVariant, InventoryLog, Notification
+%% Columns used: Status (Pending/Received/Cancelled),
+%%   ExpectedDeliveryDate, UnitPrice (locked at PO time),
+%%   ChangeType = Purchase, StockQuantity, ReorderThreshold
+%% TotalAmount computed via vw_PurchaseOrderDetail (not stored)
+%% Connected from: Part 7 (Admin Dashboard)
+%% Connected to: Part 12 (Inventory Management)
+%% =====================================================
+
+flowchart TD
+
+DB2[("Product Database")]
+DB4[("Inventory Database")]
+DB6[("Notification Queue")]
+EXT4["Email/SMS Service"]
+EXT6["Supplier Contact"]
+
+PO_START(["FROM Part 7: Admin Dashboard — Purchase Orders"])
+
+PO_START --> PO1[/"View Purchase Orders"/]
+PO1 --> DB4
+DB4 --> PO2[/"Filter by Status: Pending / Received / Cancelled"/]
+PO2 --> PO3{{"Action?"}}
+
+%% CREATE NEW PO
+PO3 -->|Create New PO| PO4[/"Select Supplier"/]
+PO4 --> DB4
+DB4 --> PO5{"Supplier Exists?"}
+
+PO5 -->|No| PO5A[/"Add New Supplier: Name, Contact, Phone, Email, Address"/]
+PO5A --> DB4
+DB4 --> PO6
+
+PO5 -->|Yes| PO6[/"Set Expected Delivery Date"/]
+PO6 --> PO7["Create PurchaseOrder Record — Status: Pending"]
+PO7 --> DB4
+
+DB4 --> PO8[/"Add Items to Purchase Order"/]
+PO8 --> PO9[/"Search and Select Product"/]
+PO9 --> DB2
+DB2 --> PO10[/"Select ProductVariant or Default"/]
+PO10 --> PO11[/"Enter Quantity and Unit Price (Wholesale)"/]
+PO11 --> PO12["Save PurchaseOrderItem — UnitPrice Locked at PO Time"]
+PO12 --> DB4
+
+DB4 --> PO13{"Add More Items?"}
+PO13 -->|Yes| PO8
+PO13 -->|No| PO14[/"Review PO: Items, Quantities, Total via vw_PurchaseOrderDetail"/]
+
+PO14 --> PO15{"Confirm PO?"}
+PO15 -->|Cancel| PO16["Set PurchaseOrder Status: Cancelled"]
+PO16 --> DB4
+DB4 --> END1(["BACK TO Part 7: Admin Dashboard"])
+
+PO15 -->|Send to Supplier| PO17["Send PO Notification to Supplier"]
+PO17 --> EXT6
+EXT6 --> PO18[/"PO Sent — Awaiting Supplier Delivery"/]
+PO18 --> END1
+
+%% RECEIVE STOCK
+PO3 -->|Receive Stock| PO20[/"Select Pending PurchaseOrder"/]
+PO20 --> DB4
+DB4 --> PO21[/"Display PO Items: Product, Variant, Expected Qty, Unit Price"/]
+PO21 --> PO22[/"Enter Actual Received Quantities"/]
+
+PO22 --> PO23{"All Items Fully Received?"}
+
+PO23 -->|Partial Delivery| PO24[/"Mark Which Items Received — Note Shortfall"/]
+PO24 --> PO25
+
+PO23 -->|Full Delivery| PO25["Update PurchaseOrder Status: Received"]
+PO25 --> DB4
+
+DB4 --> PO26["Update ProductVariant.StockQuantity for Each Received Item"]
+PO26 --> DB2
+
+PO26 --> PO27["Write InventoryLog: ChangeType = Purchase per Item"]
+PO27 --> DB4
+
+DB4 --> PO28{"StockQuantity >= ReorderThreshold?"}
+PO28 -->|Yes — Stock Restored| PO29["Queue WishlistRestock Notification — Notify Customers"]
+PO29 --> DB6
+PO29 --> EXT4
+EXT4 --> PO30[/"Stock Updated — Wishlist Customers Notified"/]
+PO30 --> END1
+
+PO28 -->|Still Below Threshold| PO31["Queue LowStockAlert to Admin"]
+PO31 --> DB6
+DB6 --> END1
+
+%% VIEW OR CANCEL EXISTING PO
+PO3 -->|View PO Detail| PO40[/"Display Full PO: Supplier, Items, Subtotals, Total"/]
+PO40 --> DB4
+DB4 --> PO41{"Action on PO?"}
+
+PO41 -->|No Action| END1
+PO41 -->|Cancel PO| PO42["Set PurchaseOrder Status: Cancelled"]
+PO42 --> DB4
+DB4 --> PO43["Log Cancellation in SystemLog"]
+PO43 --> END1
+
+classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef decision fill:#FFF59D,stroke:#F9A825,stroke-width:2px,color:#000
+classDef io fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef external fill:#80DEEA,stroke:#00838F,stroke-width:2px,color:#000
+classDef connector fill:#FFB6C1,stroke:#FF1493,stroke-width:3px,color:#000,font-weight:bold
+
+class PO_START,END1 startend
+class PO7,PO12,PO16,PO17,PO25,PO26,PO27,PO29,PO31,PO42,PO43 process
+class PO3,PO5,PO13,PO15,PO22,PO23,PO28,PO41 decision
+class PO1,PO2,PO4,PO5A,PO6,PO8,PO9,PO10,PO11,PO14,PO18,PO20,PO21,PO24,PO30,PO40 io
+class DB2,DB4,DB6 database
+class EXT4,EXT6 external
