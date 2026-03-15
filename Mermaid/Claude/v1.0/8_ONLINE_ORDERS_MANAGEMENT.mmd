@@ -1,0 +1,151 @@
+%% =====================================================
+%% BIKE SHOP - PART 8: ONLINE ORDERS MANAGEMENT
+%% =====================================================
+%% This diagram covers: Admin order processing and courier assignment
+%% Connected from: Part 7 (Admin Dashboard)
+%% =====================================================
+
+flowchart TD
+
+%% =====================================================
+%% DATABASES & EXTERNAL SERVICES
+%% =====================================================
+
+DB3[("Order Database")]
+DB4[("Inventory Database")]
+DB6[("Notification Queue")]
+EXT2["Lalamove Delivery API"]
+EXT3["LBC Delivery API"]
+EXT4["Email/SMS Service"]
+EXT1["Payment Gateway"]
+
+%% =====================================================
+%% ENTRY POINT FROM PART 7
+%% =====================================================
+
+O_START(["FROM Part 7:<br/>Online Orders Module"])
+
+%% =====================================================
+%% ORDER MANAGEMENT
+%% =====================================================
+
+O_START --> O1[/"View Pending Orders"/]
+
+O1 --> DB3
+DB3 --> O2[/"Select Specific Order"/]
+
+O2 --> O2A[/"Display Order Details"/]
+
+O2A --> O5{"Delivery Type?"}
+
+%% =====================================================
+%% PICKUP ORDERS PATH
+%% =====================================================
+
+O5 -->|Pickup at Store| O3["Update Status: READY FOR PICKUP"]
+O3 --> O3A["Set Pickup Ready Date/Time"]
+O3A --> DB3
+
+O3A --> O3B["Send Ready Notification"]
+O3B --> EXT4
+EXT4 --> O3C[/"Customer Can Pickup"/]
+
+O3C --> O3D{"Pickup Confirmed?"}
+
+O3D -->|Yes| O3E["Update Status: PICKED UP"]
+O3E --> DB3
+DB3 --> END1(["BACK TO<br/>Part 7: Admin Dashboard"])
+
+O3D -->|No - 3 Days| O3F[/"Auto-Hold Order<br/>Expire in 7 days"/]
+O3F --> DB3
+DB3 --> O3G["Send Alert: Pickup or Cancel"]
+O3G --> EXT4
+EXT4 --> END1
+
+%% =====================================================
+%% DELIVERY ORDERS PATH
+%% =====================================================
+
+O5 -->|Delivery| O6{"Courier Status?"}
+
+O6 -->|Not Yet Booked| O6A[/"Assign Courier"/]
+
+O6A --> O6B{"Select Courier:"}
+
+O6B -->|Lalamove| O7["Book Lalamove"]
+O7 --> EXT2
+
+O6B -->|LBC| O8["Book LBC"]
+O8 --> EXT3
+
+O7 --> O9A{"Booking Success?"}
+O8 --> O9A
+
+O9A -->|Yes| O9["Generate Tracking Link"]
+O9 --> DB3
+
+O9 --> O10["Add to Notification Queue"]
+O10 --> DB6
+
+O10 --> O10A["Send Tracking Email & SMS"]
+O10A --> EXT4
+EXT4 --> O10B["Update Status: OUT FOR DELIVERY"]
+O10B --> DB3
+
+O10B --> O11["Monitor Delivery Progress"]
+
+O9A -->|No| O9B[/"Booking Failed<br/>Retry or change courier"/]
+O9B --> O6B
+
+O6 -->|Already Booked| O11
+
+%% DELIVERY COMPLETE
+O11 --> O11A{"Delivery Complete?"}
+
+O11A -->|Yes| O11B["Update Status: DELIVERED"]
+O11B --> DB3
+
+O11B --> O12["Send Delivery Confirmation"]
+O12 --> EXT4
+
+EXT4 --> O12A{"COD Payment?"}
+
+O12A -->|Yes| O12B["Mark as COD RECEIVED"]
+O12B --> DB3
+DB3 --> END1
+
+O12A -->|No| END1
+
+%% DELIVERY FAILED
+O11A -->|Failed| O11C[/"Delivery Failed Alert<br/>Add to queue"/]
+O11C --> DB6
+
+O11C --> O11D["Send Retry Options to Customer"]
+O11D --> EXT4
+EXT4 --> O11E{"Customer Action?"}
+
+O11E -->|Reschedule| O11
+
+O11E -->|Refund| O11F["Process Refund"]
+O11F --> EXT1
+EXT1 --> DB3
+DB3 --> END1
+
+%% =====================================================
+%% STYLING
+%% =====================================================
+
+classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef decision fill:#FFF59D,stroke:#F9A825,stroke-width:2px,color:#000
+classDef io fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef external fill:#80DEEA,stroke:#00838F,stroke-width:2px,color:#000
+classDef connector fill:#FFB6C1,stroke:#FF1493,stroke-width:3px,color:#000,font-weight:bold
+
+class O_START,END1 startend
+class O3,O3A,O3B,O7,O8,O9,O10,O10A,O10B,O11F process
+class O5,O6,O6B,O9A,O3D,O3C,O11A,O11E,O12A decision
+class O1,O2,O2A,O6A,O11,O11C,O12,O11D io
+class DB3,DB4,DB6 database
+class EXT2,EXT3,EXT4,EXT1 external

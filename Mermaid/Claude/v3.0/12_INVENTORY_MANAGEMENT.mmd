@@ -1,0 +1,55 @@
+%% =====================================================
+%% BIKE SHOP - PART 12: INVENTORY MANAGEMENT
+%% =====================================================
+%% Schema tables: ProductVariant (StockQuantity, ReorderThreshold),
+%%   InventoryLog, Wishlist, Notification
+%% ReorderThreshold column used for low-stock detection (v7.1)
+%% Connected from: Part 7
+%% =====================================================
+
+flowchart TD
+
+DB2[("Product Database")]
+DB4[("Inventory Database")]
+DB6[("Notification Queue")]
+EXT4["Email/SMS Service"]
+
+INV_START(["FROM Part 7: Inventory Management"])
+
+INV_START --> INV1[/"View All Products"/]
+INV1 --> DB2
+DB2 --> INV2[/"Select Product"/]
+INV2 --> INV3[/"Display Stock Levels: Available / Reserved / Locked"/]
+INV3 --> INV4{{"Action?"}}
+
+INV4 -->|Update Stock| INV5[/"Enter Quantity to Add or Remove"/]
+INV5 --> DB4
+INV5 --> INV6["Write InventoryLog — Sync Online & POS"]
+INV6 --> INV7{"StockQuantity < ReorderThreshold?"}
+
+INV7 -->|Yes| INV8["Trigger Low Stock Alert"]
+INV8 --> DB6
+INV8 --> INV9A["Notify Wishlist Customers: Item Back in Stock"]
+INV9A --> EXT4
+EXT4 --> END1(["BACK TO Part 7: Admin Dashboard"])
+
+INV7 -->|No| INV9["Stock Updated — No Alert Needed"]
+INV9 --> END1
+
+INV4 -->|View History| INV11[/"Show InventoryLog: All Stock Movements with Dates"/]
+INV11 --> END1
+
+classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef decision fill:#FFF59D,stroke:#F9A825,stroke-width:2px,color:#000
+classDef io fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef external fill:#80DEEA,stroke:#00838F,stroke-width:2px,color:#000
+classDef connector fill:#FFB6C1,stroke:#FF1493,stroke-width:3px,color:#000,font-weight:bold
+
+class INV_START,END1 startend
+class INV6,INV8,INV9A process
+class INV4,INV7 decision
+class INV1,INV2,INV3,INV5,INV9,INV11 io
+class DB2,DB4,DB6 database
+class EXT4 external

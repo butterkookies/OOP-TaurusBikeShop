@@ -1,0 +1,100 @@
+%% =====================================================
+%% BIKE SHOP - PART 11: WALK-IN POS SYSTEM
+%% =====================================================
+%% This diagram covers: In-store customer transactions
+%% Connected from: Part 7 (Admin Dashboard)
+%% =====================================================
+
+flowchart TD
+
+%% =====================================================
+%% DATABASES & EXTERNAL SERVICES
+%% =====================================================
+
+DB2[("Product Database")]
+DB3[("Order Database")]
+DB4[("Inventory Database")]
+DB5[("Cart Database")]
+EXT1["Payment Gateway"]
+
+%% =====================================================
+%% ENTRY POINT FROM PART 7
+%% =====================================================
+
+W_START(["FROM Part 7:<br/>Walk-In POS"])
+
+%% =====================================================
+%% POS OPERATIONS
+%% =====================================================
+
+W_START --> W1[/"Open POS Terminal"/]
+
+W1 --> W2[/"Scan Product Barcode"/]
+W2 --> DB2
+
+DB2 --> W3{"Stock Available?"}
+
+%% OUT OF STOCK
+W3 -->|No| W3A[/"Show Out of Stock"/]
+W3A --> W2
+
+%% IN STOCK - ADD TO CART
+W3 -->|Yes| W4["Add Product to Cart"]
+W4 --> DB5
+
+W4 --> W5{"Add More Items?"}
+W5 -->|Yes| W2
+W5 -->|No| W6[/"Display Total & Items"/]
+
+%% PAYMENT SELECTION
+W6 --> W7{"Payment Method?"}
+
+%% CASH PAYMENT
+W7 -->|Cash| W8["Accept Cash Payment"]
+W8 --> W10
+
+%% CARD/GCASH PAYMENT
+W7 -->|Card/GCash| W9["Process Payment via API"]
+W9 --> EXT1
+EXT1 --> W9A{"Payment Success?"}
+
+W9A -->|Yes| W10
+W9A -->|No| W9B[/"Show Error - Retry"/]
+W9B --> W7
+
+%% ORDER CREATION
+W10 --> W10C[/"Create Walk-In Order"/]
+W10C --> DB3
+
+W10C --> W10A["Deduct from Inventory"]
+W10A --> DB4
+
+W10A --> W10B["Sync Online Inventory<br/>Real-time update < 1 sec"]
+W10B --> DB4
+
+W10B --> W11[/"Print Receipt"/]
+W11 --> W12[/"Thank Customer"/]
+W12 --> W13([Transaction Complete])
+
+W13 --> W13A{"Another Customer?"}
+W13A -->|Yes| W1
+W13A -->|No| END1(["BACK TO<br/>Part 7: Admin Dashboard"])
+
+%% =====================================================
+%% STYLING
+%% =====================================================
+
+classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:3px,color:#000,font-weight:bold
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef decision fill:#FFF59D,stroke:#F9A825,stroke-width:2px,color:#000
+classDef io fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef external fill:#80DEEA,stroke:#00838F,stroke-width:2px,color:#000
+classDef connector fill:#FFB6C1,stroke:#FF1493,stroke-width:3px,color:#000,font-weight:bold
+
+class W_START,W13,END1 startend
+class W4,W8,W9,W10C,W10A,W10B process
+class W3,W5,W7,W9A,W13A decision
+class W1,W2,W6,W10,W11,W12,W9B io
+class DB2,DB3,DB4,DB5 database
+class EXT1 external
