@@ -5,6 +5,7 @@ obj/
 *.user
 *.suo
 *.sln.docstates
+appsettings.Development.json
 
 # ASP.NET Core runtime
 wwwroot/lib/

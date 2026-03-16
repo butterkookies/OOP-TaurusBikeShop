@@ -1,0 +1,257 @@
+Here is the final combined prompt, ready to paste:
+
+---
+
+## INSTRUCTIONS FOR NEW CLAUDE — READ BEFORE DOING ANYTHING
+
+Before generating any code, you must:
+1. Confirm you have read and understood all uploaded files the user will send
+2. Restate the key business rules in your own words to prove understanding
+3. Confirm you will follow the 29-step order strictly
+4. Flag any inconsistencies you find before starting
+5. Only begin coding when the user explicitly says "begin"
+
+The user will send you the following files as reference. Study ALL of them thoroughly before responding:
+- `Taurus_DB_Dictionary.docx`
+- `Taurus_schema_v7.1.sql`
+- `Taurus_schema_v7.2.sql`
+- `ProjectFilesLibrary_v4.docx`
+- `Taurus_Implementation_Checklist.docx`
+- All 16 flowchart `.mmd` files
+- `project_structure.txt`
+
+---
+
+## Taurus Bike Shop — Project Handoff Summary
+
+### What This Project Is
+Taurus Bike Shop is a full-stack bike shop management system with two applications sharing one database (`TaurusBikeShopDB` on Google Cloud SQL for SQL Server):
+
+- **WebApplication** — ASP.NET Core MVC (.NET 8), customer-facing: product browsing, cart, checkout, payment, order tracking, reviews, wishlist, support ticket creation
+- **AdminSystem** — WPF (.NET Framework 4.8), staff-facing: POS, inventory, order management, logistics, payment verification, reports, vouchers, support, supplier/purchase orders
+
+They share **one database only** — no shared code.
+
+### Technology Stack
+- **WebApplication:** ASP.NET Core MVC (.NET 8), EF Core, BCrypt.Net-Next, Google.Cloud.Storage.V1, Bootstrap (from ~/lib/bootstrap/), jQuery, jQuery Validation
+- **AdminSystem:** WPF (.NET Framework 4.8), Dapper, ADO.NET, BCrypt.Net-Next, direct SQL Server connection via App.config
+- **Database:** Google Cloud SQL for SQL Server (SQL Server 2019+ dialect)
+- **Image/file storage:** Google Cloud Storage — only URLs and bucket/path metadata stored in DB
+- No Entity Framework in AdminSystem — Dapper + raw SQL only
+- No Razor Pages — MVC only in WebApplication
+
+---
+
+### Database Status
+- Schema v7.1 ✅ run
+- Patch file ✅ run
+- Seed file (Taurus_seed_v7.1.sql) ✅ run
+- Live DB verified via SSMS Generate Scripts → `Taurus_schema_v7.2.sql`
+- Trigger `TR_Product_PriceAudit` ✅ confirmed present in live DB and added to v7.2 export
+
+---
+
+### All Inconsistencies — Fully Resolved
+
+| # | Issue | Resolution |
+|---|-------|------------|
+| 1 | Refund policy — `'Refunded'` in PaymentStatus, refund branches in Parts 4, 5, 8, 10 | Taurus does NOT offer refunds. `'Refunded'` removed from `CK_Payment_Status` via patch. All 4 flowchart refund branches replaced with Contact Support paths. |
+| 2 | Part 7 missing Purchase Orders branch | Added `A4 -->|Purchase Orders| PURCHASE_ORDERS(["PART 16: Supplier & Purchase Order"])` to `7_ADMIN_OVERVIEW.mmd` |
+| 3 | `DashboardViewModel.cs` missing from project_structure.txt | Added to structure. File to be created at Step 21. |
+| 4 | Job 1 misleading dual-source description in `14_BACKGROUND_JOBS.mmd` | Updated to "Detect and Log Stock Discrepancies in InventoryLog" — only one DB, one stock source |
+| 5 | `'IssueRefund'` in `CK_SupportTask_Type` | Removed via DROP/RECREATE patch. Final TaskType values: ShipReplacement, ArrangeReturn, ContactSupplier, Other |
+
+---
+
+### Key Business Rules — Never Violate These
+- **No COD** — PaymentMethod: GCash, BankTransfer, Cash (POS only). No card, no COD.
+- **No refunds** — Taurus does not offer refunds. No code path should ever set PaymentStatus = 'Refunded'.
+- **Couriers: Lalamove and LBC only** — no other courier values anywhere.
+- **Stock lives exclusively in `ProductVariant.StockQuantity`** — no StockQuantity on Product table.
+- **Every Product must have at least one ProductVariant row** — use VariantName = 'Default' for products with no real variants.
+- **Computed fields are never stored** — TotalAmount (Order), Subtotal (OrderItem), Subtotal (PurchaseOrderItem), TotalAmount (PurchaseOrder) are all computed in views.
+- **5 shared-PK 1:1 relationships** — GCashPayment, BankTransferPayment, LalamoveDelivery, LBCDelivery, PickupOrder all share PK with their parent table.
+- **Circular FK** — `User.DefaultAddressId → Address.AddressId` is a deferred FK added via ALTER TABLE.
+
+---
+
+### Implementation Order — 29 Steps (Section 2 of ProjectFilesLibrary_v4.docx)
+Code must be generated strictly in this order. Do not skip steps. Do not generate a step before its dependencies are confirmed complete.
+
+| Step | What | Status |
+|------|------|--------|
+| 1 | Database Schema | ✅ COMPLETE |
+| 2 | WebApplication Solution & Project Config | ← **START HERE** |
+| 3 | All 38 Entity Classes | |
+| 4 | AppDbContext | |
+| 5 | Utilities | |
+| 6 | Generic Repository | |
+| 7 | All Specific Repositories | |
+| 8 | Notification Service | |
+| 9 | Program.cs (initial pass) | |
+| 10 | Shared Layout + Global Views | |
+| 11 | Authentication | |
+| 12 | Product Catalog | |
+| 13 | Cart System | |
+| 14 | Wishlist | |
+| 15 | Voucher System | |
+| 16 | Checkout + Order Creation | |
+| 17 | Payment Processing | |
+| 18 | Order Confirmation + Tracking | |
+| 19 | Reviews | |
+| 20 | Support Tickets (Web) | |
+| 21 | DashboardViewModel + ViewModels Completion | |
+| 22 | Background Jobs | |
+| 23 | Supplier & Purchase Order (Web read-only) | |
+| 24 | AdminSystem Foundation | |
+| 25 | AdminSystem Services | |
+| 26 | AdminSystem ViewModels | |
+| 27 | AdminSystem Views | |
+| 28 | Remaining CSS and JavaScript | |
+| 29 | End-to-End Testing | |
+
+---
+
+### Current Progress
+- **Step 1 ✅ Complete** — DB schema, patch, and seed all run. Live DB fully verified.
+- **Step 2 is next** — WebApplication Solution & Project Config: `WebApplication.slnx`, `WebApplication.csproj`, `appsettings.json`, `appsettings.Development.json`
+- The user will share the current contents of `WebApplication.csproj` and `appsettings.json` before code is generated for Step 2.
+
+---
+
+## CODE GENERATION STANDARDS — APPLY TO EVERY FILE
+
+### Philosophy
+Every file generated must be production-ready. Not a scaffold, not a placeholder, not a demo. Write code as if a senior .NET engineer will review it tomorrow and a junior developer will maintain it next year. Every decision must be justifiable, every pattern must be consistent, and every line must earn its place.
+
+---
+
+### Naming Conventions
+- **Interfaces:** `IServiceName`, `IRepositoryName`
+- **Async methods:** always suffix with `Async` (e.g., `GetOrderByIdAsync`)
+- **Private fields:** `_camelCase`
+- **Constants:** `PascalCase` inside a dedicated static constants class, or `UPPER_SNAKE_CASE` for true compile-time constants
+- **ViewModels:** suffix with `ViewModel` (e.g., `CartViewModel`)
+- **DTOs and result objects:** suffix with `Result` or `Dto` (e.g., `VoucherValidationResult`)
+- **EF Entity classes:** match the DB table name exactly (e.g., `ProductVariant`, `SupportTicket`)
+- **Controllers:** suffix with `Controller` (e.g., `CartController`)
+- **Repositories:** suffix with `Repository` (e.g., `CartRepository`)
+- **Services:** suffix with `Service` (e.g., `CartService`)
+
+---
+
+### Architecture Rules
+- **Controllers are dumb.** They receive a request, call one service method, and return a result. No business logic, no direct DB access, no multi-step orchestration inside a controller action.
+- **Services own all business logic.** Validation, rules enforcement, status transitions, notification queuing — all of it lives in the service layer. Services call repositories, never DbContext directly.
+- **Repositories own all data access.** No raw SQL in services. No LINQ queries in controllers. Repositories return domain entities or lightweight DTOs — never expose `IQueryable` outside the repository boundary.
+- **Interfaces for everything injectable.** Every service and repository has a corresponding interface. Nothing is newed up directly where it can be injected.
+- **No static classes for business logic.** Helpers and utilities (PasswordHelper, ValidationHelper, FileUploadHelper) are the only acceptable static or non-injectable classes, and only because they are pure functions with no state.
+- **EF Core configuration in OnModelCreating only.** No data annotations for relationships on entity classes. Data annotations are permitted only for validation (Required, MaxLength, etc.). All FK relationships, 1:1 configs, indexes, and cascade behaviors are configured exclusively via Fluent API in `AppDbContext`.
+- **Shared-PK 1:1 subtype configuration.** The 5 shared-PK subtypes (GCashPayment, BankTransferPayment, LalamoveDelivery, LBCDelivery, PickupOrder) must be configured in `OnModelCreating` using HasOne/WithOne/HasForeignKey. The subtype's PK is also its FK. Never use IDENTITY on subtype PKs — the parent's PK value is used directly. Example:
+```csharp
+modelBuilder.Entity<GCashPayment>()
+    .HasOne(g => g.Payment)
+    .WithOne(p => p.GCashPayment)
+    .HasForeignKey<GCashPayment>(g => g.PaymentId);
+```
+- **Error handling in controllers.** Wrap service calls in try-catch at the controller level. On exception, log to SystemLog, set a TempData error message, and redirect gracefully. Never expose raw exception messages to the user.
+- **Consistent AJAX response shape.** All AJAX controller actions must return a consistent JSON envelope using a shared `ApiResponse` helper:
+```csharp
+public class ApiResponse
+{
+    public bool Success { get; set; }
+    public string? Message { get; set; }
+    public object? Data { get; set; }
+}
+```
+
+---
+
+### .NET / C# Standards
+- Use `async/await` throughout — every repository method, every service method, every controller action that touches I/O must be async.
+- Use `CancellationToken` where applicable, especially in background jobs and long-running repository calls.
+- Prefer `IReadOnlyList<T>` or `IEnumerable<T>` for return collections from repositories and services — never expose `List<T>` as a public contract.
+- Enable nullable reference types — every nullable property must be explicitly marked with `?`.
+- Never use `var` where the type is not immediately obvious from the right-hand side of the assignment.
+- Use `record` types for immutable DTOs and result objects (e.g., `VoucherValidationResult`).
+- Use `sealed` on classes that are not designed for inheritance.
+- Define string constants for status values used repeatedly across layers — never scatter magic strings.
+- Guard clauses at the top of methods — fail fast, return early, avoid deep nesting.
+- Never swallow exceptions silently. Either handle them meaningfully or let them propagate.
+- All public methods must have XML doc comments (`/// <summary>`).
+
+---
+
+### Security Standards
+- **Passwords:** BCrypt only. Work factor 12. Never log, serialize, or transmit password hashes.
+- **SQL injection:** Zero tolerance. EF Core parameterized queries in WebApplication. Dapper parameterized queries in AdminSystem. No string concatenation in SQL ever.
+- **Anti-forgery:** `[ValidateAntiForgeryToken]` on every POST action in WebApplication. `fetchWithCSRF` wrapper in all JavaScript fetch calls.
+- **Authorization:** Every controller action that requires authentication must have `[Authorize]`. Admin-only routes must be role-checked. Never rely on UI hiding to enforce access control.
+- **Sensitive data:** No connection strings, API keys, or secrets in source code. Connection strings in `appsettings.json` for WebApplication, `App.config` for AdminSystem — both excluded from version control for local dev overrides.
+- **Input validation:** Validate at the ViewModel level with data annotations AND at the service level with business rule checks. Never trust client-side validation alone.
+- **File uploads:** Validate MIME type and file size before any GCS upload. Only allow image/webp, image/jpeg, image/png for product images, and application/pdf or image/* for payment proofs. Maximum file size 5MB.
+
+---
+
+### Scalability and Maintainability Standards
+- **No hardcoded values.** Magic numbers and magic strings become constants or configuration values. Thresholds (retry counts, expiry windows, reorder levels) must be configurable, not baked in.
+- **Single Responsibility.** Each class does one thing. If a service method grows beyond 40–50 lines, it is doing too much — break it up.
+- **DRY without over-engineering.** Extract repeated logic, but do not create abstractions for their own sake. A helper method is better than a one-size-fits-all generic that nobody can follow.
+- **Dependency injection over service locator.** Never use `IServiceProvider` to manually resolve services inside business logic. Take all dependencies through the constructor.
+- **Repository pattern is a boundary.** Add domain-specific query methods to specific repositories — do not bloat the generic base with special cases.
+- **ViewModels are never entities.** Never pass EF Core entities directly to views. Always map to a ViewModel. This decouples the view from the schema and prevents accidental over-posting.
+- **Partial views for reuse.** Any UI pattern used in more than one place belongs in a partial — `_CartItem`, `_ProductCard`, `_OrderSummary`, etc.
+
+---
+
+### Transaction and Data Integrity Standards
+- Any operation that writes to more than one table must be wrapped in a single database transaction. No exceptions.
+- Critical multi-table transactions (CreateOrder, CreateWalkInOrder, ReceiveStock, VerifyPayment) must explicitly roll back on failure and log the error to SystemLog.
+- **InventoryLog rows are immutable** — never update or delete them. Only insert.
+- **Address snapshot rows (IsSnapshot = 1) are immutable** — never modify after creation.
+- **PriceHistory rows are immutable** — written only by the DB trigger, never by application code.
+
+---
+
+### Background Job Standards
+- All 5 jobs extend `BackgroundService` and implement `ExecuteAsync(CancellationToken stoppingToken)`.
+- Every job cycle must write `BackgroundJobStart` and `BackgroundJobComplete` (or `BackgroundJobError`) to SystemLog.
+- Jobs must handle external API failures gracefully — catch, log to SystemLog, and continue to the next cycle. Never crash the job on a single failure.
+- Jobs must avoid duplicate notifications — check the Notification table before queuing the same alert type for the same entity in the same cycle.
+- Use `IServiceScopeFactory` to resolve scoped services (repositories, DbContext) inside background jobs — never inject scoped services directly into a singleton-lifetime BackgroundService.
+
+---
+
+### CSS and JavaScript Standards
+- CSS follows a component-per-file pattern — one CSS file per view or partial, named identically to the view it styles.
+- No inline styles in views. No `style=` attributes except for dynamically computed values set by JavaScript.
+- JavaScript follows a module-per-page pattern — one JS file per page, using event delegation and AJAX via `fetchWithCSRF` from `utils.js`.
+- No jQuery `$.ajax` — use `fetch` wrapped in `fetchWithCSRF`.
+- Debounce all search inputs at 300ms minimum.
+- All AJAX responses must handle both success and error states visibly to the user — never silently fail.
+
+---
+
+### AdminSystem-Specific Standards
+- Dapper + raw SQL only — no EF Core anywhere in AdminSystem.
+- All SQL queries must use parameterized Dapper calls — `connection.QueryAsync<T>(sql, new { Param = value })`.
+- ViewModels implement `INotifyPropertyChanged` via `BaseViewModel.SetProperty<T>` — no direct `PropertyChanged` invocations outside of `SetProperty`.
+- Commands implement `ICommand` — no code-behind event handlers for business actions.
+- All WPF views bind exclusively to ViewModel properties — no code-behind business logic.
+- Use `ObservableCollection<T>` for all DataGrid-bound collections.
+
+---
+
+### What "Done" Means for Each File
+A file is not done until:
+- [ ] It compiles without warnings
+- [ ] All injected dependencies are registered in the DI container
+- [ ] All public methods have XML doc comments
+- [ ] All magic strings are replaced with constants or enums
+- [ ] All nullable scenarios are handled explicitly
+- [ ] The file follows the responsibility defined for it in `ProjectFilesLibrary_v4.docx` exactly
+- [ ] The file follows the behavior defined for it in the relevant flowchart(s)
+- [ ] No TODO, FIXME, or placeholder comments remain unless explicitly flagged for a future step
+- [ ] AJAX endpoints return the standard `ApiResponse` envelope
+- [ ] All POST actions have `[ValidateAntiForgeryToken]`
+- [ ] No refund logic, no card payment logic, no COD logic exists anywhere in the file

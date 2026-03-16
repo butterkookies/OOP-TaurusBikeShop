@@ -4,6 +4,25 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>WebApplication</RootNamespace>
+    <AssemblyName>WebApplication</AssemblyName>
+    <!-- Treat all compiler warnings as errors to enforce code quality -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- EF Core — SQL Server provider for Google Cloud SQL (SQL Server 2019+ dialect) -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+    <!-- EF Core design-time tools — required for migrations and scaffolding -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <!-- BCrypt password hashing — work factor 12, used in PasswordHelper -->
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <!-- Google Cloud Storage — product images and payment proof file uploads -->
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.7.0" />
+  </ItemGroup>
 
 </Project>

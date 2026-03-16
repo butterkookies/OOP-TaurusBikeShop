@@ -1,0 +1,567 @@
+# TAURUS BIKE SHOP — CONTINUATION PROMPT
+# New conversation handoff. Read everything before generating a single line of code.
+
+---
+
+## SECTION 1 — WHAT THIS PROJECT IS
+
+Taurus Bike Shop is a full-stack bike shop management system with two applications
+sharing one database (TaurusBikeShopDB on Google Cloud SQL for SQL Server):
+
+- **WebApplication** — ASP.NET Core MVC (.NET 8), customer-facing: product browsing,
+  cart, checkout, payment, order tracking, reviews, wishlist, support ticket creation.
+- **AdminSystem** — WPF (.NET Framework 4.8), staff-facing: POS, inventory, order
+  management, logistics, payment verification, reports, vouchers, support,
+  supplier/purchase orders.
+
+They share ONE database only — no shared code, no shared assemblies.
+
+---
+
+## SECTION 2 — TECHNOLOGY STACK
+
+- **WebApplication:** ASP.NET Core MVC (.NET 8), EF Core, BCrypt.Net-Next,
+  Google.Cloud.Storage.V1, Bootstrap (from ~/lib/bootstrap/), jQuery, jQuery Validation
+- **AdminSystem:** WPF (.NET Framework 4.8), Dapper, ADO.NET, BCrypt.Net-Next,
+  direct SQL Server connection via App.config
+- **Database:** Google Cloud SQL for SQL Server (SQL Server 2019+ dialect)
+- **Image/file storage:** Google Cloud Storage — only URLs and bucket/path metadata in DB
+- No Entity Framework in AdminSystem — Dapper + raw SQL only
+- No Razor Pages anywhere — MVC controllers and views only in WebApplication
+
+---
+
+## SECTION 3 — ABSOLUTE BUSINESS RULES — NEVER VIOLATE
+
+1. **No COD** — PaymentMethod values: GCash, BankTransfer, Cash (POS only). No card, no COD.
+2. **No refunds** — Taurus does not offer refunds. No code path ever sets PaymentStatus = 'Refunded'.
+3. **Couriers: Lalamove and LBC only** — no other courier values anywhere in code.
+4. **Stock lives exclusively in ProductVariant.StockQuantity** — no StockQuantity on Product table.
+5. **Every Product must have at least one ProductVariant row** — use VariantName = 'Default' for products with no real variants.
+6. **Computed fields are never stored** — TotalAmount (Order), Subtotal (OrderItem),
+   Subtotal (PurchaseOrderItem), TotalAmount (PurchaseOrder) are all computed in views.
+7. **5 shared-PK 1:1 relationships** — GCashPayment, BankTransferPayment, LalamoveDelivery,
+   LBCDelivery, PickupOrder all share PK with their parent table. PKs are ValueGeneratedNever().
+8. **Circular FK** — User.DefaultAddressId → Address.AddressId is deferred FK,
+   configured in AppDbContext with IsRequired(false) and OnDelete(DeleteBehavior.NoAction).
+9. **IssueRefund task type was removed** — SupportTask.TaskType valid values:
+   ShipReplacement, ArrangeReturn, ContactSupplier, Other. Never add IssueRefund back.
+10. **InventoryLog rows are immutable** — append-only, never update or delete.
+11. **Address snapshot rows (IsSnapshot=1) are immutable** — never modify after creation.
+12. **PriceHistory rows are immutable** — written only by DB trigger TR_Product_PriceAudit.
+13. **Order+OrderItem+InventoryLog** must always be written in a single DB transaction.
+
+---
+
+## SECTION 4 — ARCHITECTURE STANDARDS (APPLY TO EVERY FILE)
+
+### Naming
+- Interfaces: IServiceName, IRepositoryName
+- Async methods: always suffix with Async
+- Private fields: _camelCase
+- ViewModels: suffix ViewModel
+- DTOs/results: suffix Result or Dto
+- EF entities: match DB table name exactly
+- Controllers: suffix Controller
+- Repositories: suffix Repository
+- Services: suffix Service
+
+### Architecture Rules
+- Controllers are dumb — receive request, call one service method, return result.
+  No business logic, no direct DB access in controllers.
+- Services own all business logic — validation, rules, status transitions,
+  notification queuing. Services call repositories, never DbContext directly.
+- Repositories own all data access — no LINQ in controllers, no raw SQL in services.
+  Never expose IQueryable outside repository boundary.
+- Interfaces for everything injectable.
+- EF Core configuration in OnModelCreating ONLY — no relationship data annotations
+  on entity classes. Data annotations only for validation (Required, MaxLength).
+- All AJAX controller actions return ApiResponse envelope:
+  public class ApiResponse { public bool Success; public string? Message; public object? Data; }
+
+### .NET Standards
+- async/await throughout — every method touching I/O must be async
+- CancellationToken in background jobs and long-running repository calls
+- IReadOnlyList<T> or IEnumerable<T> for collection returns — never List<T> as public contract
+- Nullable reference types enabled — every nullable property marked with ?
+- Never use var where type is not immediately obvious
+- Use record types for immutable DTOs and result objects
+- Use sealed on classes not designed for inheritance
+- String constants for status values — never magic strings
+- Guard clauses at top of methods — fail fast, return early
+- All public methods have XML doc comments (/// <summary>)
+
+### Security
+- BCrypt work factor 12. Never log/serialize/transmit password hashes.
+- Zero tolerance SQL injection — EF Core parameterized queries in WebApplication
+- [ValidateAntiForgeryToken] on every POST action
+- [Authorize] on every action requiring authentication
+- File uploads: validate MIME type and size before GCS upload. Max 5MB.
+
+### Transaction Standards
+- Any operation writing to more than one table = single DB transaction. No exceptions.
+- Critical transactions: CreateOrder, CreateWalkInOrder, ReceiveStock, VerifyPayment
+  must explicitly rollback on failure and log to SystemLog.
+
+### Background Job Standards
+- All 5 jobs extend BackgroundService, implement ExecuteAsync(CancellationToken)
+- Every cycle writes BackgroundJobStart and BackgroundJobComplete/Error to SystemLog
+- Jobs handle external API failures gracefully — catch, log, continue next cycle
+- Jobs avoid duplicate notifications — check Notification table before queuing
+- Use IServiceScopeFactory to resolve scoped services inside singleton BackgroundService
+
+---
+
+## SECTION 5 — COMPLETED STEPS
+
+### Step 1 ✅ — Database Schema
+Schema v7.1 run, patch run, seed run. Live DB verified as Taurus_schema_v7.2.sql.
+Trigger TR_Product_PriceAudit confirmed present.
+
+### Step 2 ✅ — WebApplication Solution & Project Config
+Files completed and pasted into project:
+- WebApplication.slnx — references only WebApplication.csproj
+- WebApplication.csproj — TargetFramework net8.0, packages:
+  Microsoft.EntityFrameworkCore.SqlServer 8.0.0,
+  Microsoft.EntityFrameworkCore.Tools 8.0.0 (PrivateAssets=all),
+  BCrypt.Net-Next 4.0.3,
+  Google.Cloud.Storage.V1 4.7.0
+- appsettings.json — placeholder connection string, Session config (30min idle),
+  Auth cookie config, GoogleCloudStorage section with BucketName/folders,
+  Logging Warning level for production
+- appsettings.Development.json — real dev connection string
+  (Server=35.221.161.150,1433;Database=TaurusBikeShopDB;User Id=sqlserver;
+  Password=[RESET — new password set by developer];TrustServerCertificate=True;
+  MultipleActiveResultSets=True;),
+  SecurePolicy=None for local HTTP, EF Core SQL logging at Information level.
+  THIS FILE IS IN .gitignore.
+
+### Step 3 ✅ — All 38 Entity Classes
+All completed and pasted. Namespace: WebApplication.Models.Entities
+Location: WebApplication/Models/Entities/
+
+Key architectural decisions already embedded in entity files:
+- No relationship data annotations on any entity — Fluent API only in AppDbContext
+- All nav collections initialised to new List<T>()
+- Required nav properties use null! (null-forgiving)
+- Optional nav properties use ?
+- Constants classes co-located in same file as entity where applicable:
+  RoleNames (Role.cs), AddressLabels (Address.cs), CategoryCodes (Category.cs),
+  CurrencyCodes (Product.cs), DiscountTypes (Voucher.cs), OrderStatuses (Order.cs),
+  PaymentMethods / PaymentStages / PaymentStatuses (Payment.cs),
+  Couriers / DeliveryStatuses (Delivery.cs), TicketSources / TicketCategories /
+  TicketStatuses (SupportTicket.cs), SupportTaskTypes / SupportTaskStatuses (SupportTask.cs),
+  InventoryChangeTypes (InventoryLog.cs), NotifChannels / NotifStatuses / NotifTypes (Notification.cs),
+  SystemLogEvents (SystemLog.cs), ImageTypes (ProductImage.cs),
+  PurchaseOrderStatuses (PurchaseOrder.cs)
+
+All 38 entities by group:
+GROUP 1 — Auth & Users: User, Role, UserRole, Address, OTPVerification, GuestSession
+GROUP 2 — Catalog: Category, Brand, Product, ProductVariant, ProductImage, PriceHistory
+GROUP 3 — Supply Chain: Supplier, PurchaseOrder, PurchaseOrderItem
+GROUP 4 — Vouchers: Voucher, UserVoucher, VoucherUsage
+GROUP 5 — Cart & Wishlist: Cart, CartItem, Wishlist
+GROUP 6 — Orders: Order, OrderItem, PickupOrder
+GROUP 7 — Inventory: InventoryLog
+GROUP 8 — Payments: Payment, GCashPayment, BankTransferPayment
+GROUP 9 — Delivery: Delivery, LalamoveDelivery, LBCDelivery
+GROUP 10 — Reviews & POS: Review, POS_Session
+GROUP 11 — Support: SupportTicket, SupportTicketReply, SupportTask
+GROUP 12 — Comms & Audit: Notification, SystemLog
+
+### Step 4 ✅ — AppDbContext
+File completed and pasted.
+Location: WebApplication/DataAccess/Context/AppDbContext.cs
+Namespace: WebApplication.DataAccess.Context
+
+Key decisions:
+- All 38 DbSet<T> registered using expression-bodied property syntax:
+  public DbSet<User> Users => Set<User>();
+- OnModelCreating calls 38 private static Configure* methods, one per entity
+- All filtered unique indexes replicated with exact filter expressions from schema
+- 5 shared-PK 1:1 subtypes configured with ValueGeneratedNever() + HasOne/WithOne/HasForeignKey:
+  GCashPayment, BankTransferPayment, LalamoveDelivery, LBCDelivery, PickupOrder
+- Circular FK: User→Address configured with IsRequired(false) + OnDelete(DeleteBehavior.NoAction)
+- SupportTicket has two User FKs (UserId + AssignedToUserId) — both configured explicitly
+- Cascade only where schema defines it; everything else Restrict or NoAction
+
+### Step 5 ✅ — Utilities
+All 3 files completed and pasted.
+Location: WebApplication/Utilities/
+
+- PasswordHelper.cs — static class. Hash(string) uses BCrypt work factor 12.
+  Verify(string, string?) catches SaltParseException, returns false for null/malformed hash.
+- ValidationHelper.cs — static class. Compiled Regex with 100ms timeout (ReDoS protection).
+  Methods: IsValidPhilippinePhone (accepts +639 or 09 prefix),
+  IsValidPostalCode (4 numeric digits), IsValidEmail (RFC simplified),
+  IsValidVoucherCode (alphanumeric + hyphens, 3-50 chars), IsValidQuantity (1-999).
+- FileUploadHelper.cs — sealed class, injected (not static). Constructor takes
+  StorageClient + bucketName. Three public methods:
+  UploadProductImageAsync, UploadPaymentProofAsync, UploadSupportAttachmentAsync —
+  each with its own MIME whitelist, all delegating to private UploadAsync core.
+  Max 5MB. Returns UploadResult record (ImageUrl, StorageBucket, StoragePath).
+
+---
+
+## SECTION 6 — REMAINING STEPS (START HERE)
+
+| Step | What | Status |
+|------|------|--------|
+| 6  | Generic Repository — IRepository.cs, Repository.cs | ← START HERE |
+| 7  | All Specific Repositories | |
+| 8  | Notification Service | |
+| 9  | Program.cs (initial pass) | |
+| 10 | Shared Layout + Global Views | |
+| 11 | Authentication | |
+| 12 | Product Catalog | |
+| 13 | Cart System | |
+| 14 | Wishlist | |
+| 15 | Voucher System | |
+| 16 | Checkout + Order Creation | |
+| 17 | Payment Processing | |
+| 18 | Order Confirmation + Tracking | |
+| 19 | Reviews | |
+| 20 | Support Tickets (Web) | |
+| 21 | DashboardViewModel + ViewModels Completion | |
+| 22 | Background Jobs | |
+| 23 | Supplier & Purchase Order (Web read-only) | |
+| 24 | AdminSystem Foundation | |
+| 25 | AdminSystem Services | |
+| 26 | AdminSystem ViewModels | |
+| 27 | AdminSystem Views | |
+| 28 | Remaining CSS and JavaScript | |
+| 29 | End-to-End Testing | |
+
+---
+
+## SECTION 7 — STEP 6 SPECIFICATION
+
+### IRepository.cs
+Location: WebApplication/DataAccess/Repositories/IRepository.cs
+Namespace: WebApplication.DataAccess.Repositories
+
+Define generic interface IRepository<T> where T : class
+Methods (all async):
+- Task<IReadOnlyList<T>> GetAllAsync(CancellationToken cancellationToken = default)
+- Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+- Task AddAsync(T entity, CancellationToken cancellationToken = default)
+- Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
+- Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+- Task<IReadOnlyList<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+
+### Repository.cs
+Location: WebApplication/DataAccess/Repositories/Repository.cs
+Namespace: WebApplication.DataAccess.Repositories
+
+Implement IRepository<T> using AppDbContext.
+- Constructor takes AppDbContext via DI
+- GetAll: DbSet<T>.AsNoTracking().ToListAsync()
+- GetById: DbSet<T>.FindAsync(id)
+- Add: DbSet<T>.AddAsync + SaveChangesAsync
+- Update: DbSet<T>.Update + SaveChangesAsync
+- Delete: find by id, remove, SaveChangesAsync — throw if not found
+- Find: DbSet<T>.AsNoTracking().Where(predicate).ToListAsync()
+- Protected property DbSet<T> DbSet for subclasses to use
+- Protected AppDbContext Context for subclasses that need transaction access
+
+---
+
+## SECTION 8 — STEP 7 SPECIFICATION (AFTER STEP 6)
+
+All specific repositories extend Repository<T> and add domain-specific methods.
+Location: WebApplication/DataAccess/Repositories/
+
+### UserRepository.cs — extends Repository<User>
+Extra methods:
+- FindByEmailAsync(string email) — used for login
+- CreateOTPAsync(string email, string code, DateTime expiresAt) — inserts OTPVerification
+- VerifyOTPAsync(string email, string code) — checks IsUsed=false AND ExpiresAt > now, sets IsUsed=true
+- UpdateLastLoginAsync(int userId) — sets LastLoginAt = UtcNow
+
+### BrandRepository.cs — extends Repository<Brand>
+Extra methods:
+- GetAllActiveBrandsAsync() — filter IsActive=true, ordered by BrandName
+
+### CartRepository.cs — extends Repository<Cart>
+Extra methods:
+- GetActiveCartAsync(int? userId, int? guestSessionId) — filter IsCheckedOut=false, include Items→Product+Variant
+- GetCartItemCountAsync(int cartId) — SUM of Quantity for active cart
+
+### OrderRepository.cs — extends Repository<Order>
+Extra methods:
+- GetOrdersByUserAsync(int userId, int pageNum, int pageSize) — paginated, ordered by OrderDate DESC
+- GetOrderWithDetailsAsync(int orderId) — includes Items→Product+Variant, Payments→GCash+BankTransfer, Deliveries→Lalamove+LBC, PickupOrder, ShippingAddress
+- UpdateStatusAsync(int orderId, string status) — updates OrderStatus
+- GetPendingUnprocessedAsync(int cutoffHours) — orders with Status=Pending AND CreatedAt < now-cutoffHours
+
+### PaymentRepository.cs — extends Repository<Payment>
+Extra methods:
+- GetWithSubtypeAsync(int paymentId) — includes GCashPayment and BankTransferPayment
+- CreateWithSubtypeAsync(Payment payment, object subtype) — inserts Payment then subtype in same transaction
+- GetPendingBankTransfersAsync() — Status=VerificationPending ordered by CreatedAt
+
+### ProductRepository.cs — extends Repository<Product>
+Extra methods:
+- GetFilteredAsync(int? categoryId, int? brandId, decimal? minPrice, decimal? maxPrice, string? searchText, int page, int pageSize) — dynamic EF query, IsActive=true always applied
+- GetWithFullDetailsAsync(int productId) — includes Variants(IsActive), Images(ordered by IsPrimary DESC then DisplayOrder), Brand, Category
+- GetBySKUAsync(string sku)
+- GetFeaturedAsync(int count) — IsFeatured=true, IsActive=true
+
+### ReviewRepository.cs — extends Repository<Review>
+Extra methods:
+- GetByProductAsync(int productId, int page, int pageSize) — ordered by CreatedAt DESC
+- HasVerifiedPurchaseAsync(int userId, int productId) — checks if user has Delivered order containing productId
+- GetAverageRatingAsync(int productId) — returns decimal average
+
+### SupplierRepository.cs — extends Repository<Supplier>
+Extra methods:
+- GetActiveSuppliersAsync()
+- GetPurchaseOrdersAsync(int supplierId)
+- CreatePurchaseOrderAsync(PurchaseOrder po, IEnumerable<PurchaseOrderItem> items) — transaction
+- ReceiveStockAsync(int purchaseOrderId, IEnumerable<(int variantId, int receivedQty)> receivedItems)
+  — updates ProductVariant.StockQuantity + inserts InventoryLog Purchase entries per item
+  + sets PurchaseOrder.Status=Received. ALL in single transaction.
+
+### SupportRepository.cs — extends Repository<SupportTicket>
+Extra methods:
+- GetByUserAsync(int userId) — ordered by CreatedAt DESC
+- GetWithRepliesAsync(int ticketId) — includes Replies ordered by CreatedAt, includes Tasks
+- CreateTicketAsync(SupportTicket ticket) — insert and return with ID
+
+### VoucherRepository.cs — extends Repository<Voucher>
+Extra methods:
+- GetByCodeAsync(string code) — return Voucher? or null
+- GetGlobalUsageCountAsync(int voucherId) — COUNT(*) from VoucherUsage
+- GetUserUsageCountAsync(int voucherId, int userId) — per-user COUNT
+- WriteUsageAsync(int voucherId, int userId, int orderId, decimal discountAmount) — INSERT VoucherUsage
+
+### WishlistRepository.cs — extends Repository<Wishlist>
+Extra methods:
+- GetByUserWithProductAsync(int userId) — join to Product, include primary image
+- AddIdempotentAsync(int userId, int productId) — catch UniqueConstraint violation silently
+- GetProductIdsForUserAsync(int userId) — for stock monitor job
+- GetUserIdsForProductAsync(int productId) — for WishlistRestock notification
+
+---
+
+## SECTION 9 — STEP 8 SPECIFICATION (AFTER STEP 7)
+
+### INotificationService.cs
+Location: WebApplication/BusinessLogic/Interfaces/INotificationService.cs
+Namespace: WebApplication.BusinessLogic.Interfaces
+
+Method:
+Task QueueAsync(
+    string channel,           // NotifChannels.Email or NotifChannels.SMS
+    string notifType,         // one of 17 NotifTypes constants
+    string recipient,         // email address or phone number
+    string? subject,          // email subject; null for SMS
+    string? body,             // message body
+    int userId,               // recipient user FK
+    int? orderId = null,      // optional order context
+    int? ticketId = null,     // optional ticket context
+    CancellationToken cancellationToken = default)
+
+### NotificationService.cs
+Location: WebApplication/BusinessLogic/Services/NotificationService.cs
+Namespace: WebApplication.BusinessLogic.Services
+
+Implements INotificationService.
+QueueAsync: creates Notification entity with Status=Pending, RetryCount=0,
+inserts via AppDbContext.SaveChangesAsync().
+Does NOT dispatch — dispatch is handled by background jobs polling vw_PendingNotifications.
+
+---
+
+## SECTION 10 — STEP 9 SPECIFICATION (AFTER STEP 8)
+
+### Program.cs (initial pass)
+Location: WebApplication/Program.cs
+
+Register:
+- AddDbContext<AppDbContext> with SQL Server connection string from config
+- AddDistributedMemoryCache
+- AddSession with config from appsettings
+- AddAuthentication with cookie config from appsettings
+- AddScoped for all repositories and services built so far:
+  IRepository<T>/Repository<T>,
+  UserRepository, BrandRepository, CartRepository, OrderRepository,
+  PaymentRepository, ProductRepository, ReviewRepository,
+  SupplierRepository, SupportRepository, VoucherRepository, WishlistRepository,
+  INotificationService/NotificationService
+- FileUploadHelper registration (singleton or scoped with StorageClient)
+- Middleware pipeline: UseStaticFiles, UseRouting, UseAuthentication,
+  UseAuthorization, UseSession
+- Map controller routes with default {controller=Home}/{action=Index}/{id?}
+NOTE: Background job AddHostedService registrations are added at Step 22.
+
+---
+
+## SECTION 11 — PROJECT FOLDER STRUCTURE (EXACT PATHS)
+
+WebApplication/
+├── appsettings.json                          ✅ done
+├── appsettings.Development.json              ✅ done
+├── Program.cs                                (Step 9)
+├── WebApplication.csproj                     ✅ done
+├── WebApplication.slnx                       ✅ done
+├── BackgroundJobs/
+│   ├── DeliveryStatusPollJob.cs              (Step 22)
+│   ├── InventorySyncJob.cs                   (Step 22)
+│   ├── PaymentTimeoutJob.cs                  (Step 22)
+│   ├── PendingOrderMonitorJob.cs             (Step 22)
+│   └── StockMonitorJob.cs                    (Step 22)
+├── BusinessLogic/
+│   ├── Interfaces/
+│   │   ├── IBrandService.cs                  (Step 12)
+│   │   ├── ICartService.cs                   (Step 13)
+│   │   ├── INotificationService.cs           (Step 8)  ✅ next
+│   │   ├── IOrderService.cs                  (Step 16)
+│   │   ├── IPaymentService.cs                (Step 17)
+│   │   ├── IProductService.cs                (Step 12)
+│   │   ├── IReviewService.cs                 (Step 19)
+│   │   ├── ISupportService.cs                (Step 20)
+│   │   ├── IUserService.cs                   (Step 11)
+│   │   ├── IVoucherService.cs                (Step 15)
+│   │   └── IWishlistService.cs               (Step 14)
+│   └── Services/
+│       ├── BrandService.cs                   (Step 12)
+│       ├── CartService.cs                    (Step 13)
+│       ├── NotificationService.cs            (Step 8)  ✅ next
+│       ├── OrderService.cs                   (Step 16)
+│       ├── PaymentService.cs                 (Step 17)
+│       ├── ProductService.cs                 (Step 12)
+│       ├── ReviewService.cs                  (Step 19)
+│       ├── SupportService.cs                 (Step 20)
+│       ├── UserService.cs                    (Step 11)
+│       ├── VoucherService.cs                 (Step 15)
+│       └── WishlistService.cs                (Step 14)
+├── Controllers/
+│   ├── CartController.cs                     (Step 13)
+│   ├── CheckoutController.cs                 (Step 16)
+│   ├── CustomerController.cs                 (Step 11)
+│   ├── HomeController.cs                     (Step 10)
+│   ├── OrderController.cs                    (Step 18)
+│   ├── PaymentController.cs                  (Step 17)
+│   ├── ProductController.cs                  (Step 12)
+│   ├── ReviewController.cs                   (Step 19)
+│   ├── SupportController.cs                  (Step 20)
+│   ├── VoucherController.cs                  (Step 15)
+│   └── WishlistController.cs                 (Step 14)
+├── DataAccess/
+│   ├── Context/
+│   │   └── AppDbContext.cs                   ✅ done
+│   └── Repositories/
+│       ├── BrandRepository.cs                (Step 7)
+│       ├── CartRepository.cs                 (Step 7)
+│       ├── IRepository.cs                    (Step 6)  ← START HERE
+│       ├── OrderRepository.cs                (Step 7)
+│       ├── PaymentRepository.cs              (Step 7)
+│       ├── ProductRepository.cs              (Step 7)
+│       ├── Repository.cs                     (Step 6)  ← START HERE
+│       ├── ReviewRepository.cs               (Step 7)
+│       ├── SupplierRepository.cs             (Step 7)
+│       ├── SupportRepository.cs              (Step 7)
+│       ├── UserRepository.cs                 (Step 7)
+│       ├── VoucherRepository.cs              (Step 7)
+│       └── WishlistRepository.cs             (Step 7)
+├── Models/
+│   ├── ErrorViewModel.cs                     (Step 21)
+│   ├── Entities/                             ✅ all 38 done
+│   └── ViewModels/
+│       ├── CartViewModel.cs                  (Step 13)
+│       ├── CheckoutViewModel.cs              (Step 16)
+│       ├── DashboardViewModel.cs             (Step 21)
+│       ├── LoginViewModel.cs                 (Step 11)
+│       ├── OrderViewModel.cs                 (Step 18)
+│       ├── ProductDetailViewModel.cs         (Step 12)
+│       ├── ProductViewModel.cs               (Step 12)
+│       ├── ProfileViewModel.cs               (Step 11)
+│       ├── RegisterViewModel.cs              (Step 11)
+│       ├── ReviewViewModel.cs                (Step 19)
+│       └── WishlistViewModel.cs              (Step 14)
+├── Utilities/
+│   ├── FileUploadHelper.cs                   ✅ done
+│   ├── PasswordHelper.cs                     ✅ done
+│   └── ValidationHelper.cs                   ✅ done
+└── Views/
+    (Steps 10-21)
+
+AdminSystem/
+(Steps 24-27)
+
+---
+
+## SECTION 12 — CONSTANTS ALREADY DEFINED (DO NOT REDEFINE)
+
+These constants classes already exist inside entity files.
+Import them — do not create duplicate constants anywhere:
+
+| Constant Class      | Defined In          | Values |
+|---------------------|---------------------|--------|
+| RoleNames           | Role.cs             | Admin, Manager, Cashier, Staff, Customer |
+| AddressLabels       | Address.cs          | Home, Work, Other |
+| CategoryCodes       | Category.cs         | UNIT, FRAME, FORK, HUB, UPGKIT, STEM, HBAR, SADDLE, GRIP, PEDAL, RIM, TIRE, CHAIN |
+| CurrencyCodes       | Product.cs          | PHP, USD, EUR |
+| DiscountTypes       | Voucher.cs          | Percentage, Fixed |
+| OrderStatuses       | Order.cs            | Pending, PendingVerification, OnHold, Processing, ReadyForPickup, PickedUp, Shipped, Delivered, Cancelled |
+| PaymentMethods      | Payment.cs          | GCash, BankTransfer, Cash |
+| PaymentStages       | Payment.cs          | Upfront, Confirmation |
+| PaymentStatuses     | Payment.cs          | Pending, VerificationPending, VerificationRejected, Completed, Failed |
+| Couriers            | Delivery.cs         | Lalamove, LBC |
+| DeliveryStatuses    | Delivery.cs         | Pending, PickedUp, InTransit, Delivered, Failed |
+| TicketSources       | SupportTicket.cs    | Customer, Admin, System |
+| TicketCategories    | SupportTicket.cs    | DamagedItem, WrongItem, DeliveryIssue, PaymentIssue, ProductInquiry, ReturnRefund, General |
+| TicketStatuses      | SupportTicket.cs    | Open, InProgress, AwaitingResponse, Resolved, Closed |
+| SupportTaskTypes    | SupportTask.cs      | ShipReplacement, ArrangeReturn, ContactSupplier, Other |
+| SupportTaskStatuses | SupportTask.cs      | Pending, InProgress, Done, Cancelled |
+| InventoryChangeTypes| InventoryLog.cs     | Purchase, Sale, Return, Adjustment, Damage, Loss, Lock, Unlock |
+| NotifChannels       | Notification.cs     | Email, SMS |
+| NotifStatuses       | Notification.cs     | Pending, Sent, Failed |
+| NotifTypes          | Notification.cs     | OTPCode, WelcomeEmail, OrderConfirmation, PaymentReceived, PaymentRejected, PaymentHeld, TrackingUpdate, ReadyForPickup, PickupExpiry, DeliveryDelay, DeliveryConfirmation, WishlistRestock, SupportTicketCreated, SupportTicketReply, SupportTicketResolved, LowStockAlert, PendingOrderAlert |
+| SystemLogEvents     | SystemLog.cs        | Login, Logout, AccessDenied, UserCreated, ProductUpdate, VoucherCreated, OrderStatusChange, PaymentProcessed, PaymentVerified, PaymentRejected, PaymentTimeout, InventoryAdjustment, InventorySync, LowStockTriggered, DeliveryStatusPoll, DeliveryDelayed, DeliveryFailed, BackgroundJobStart, BackgroundJobComplete, BackgroundJobError, SupportTicketCreated, SupportTicketResolved |
+| ImageTypes          | ProductImage.cs     | Full, Medium, Thumbnail |
+| PurchaseOrderStatuses| PurchaseOrder.cs   | Pending, Received, Cancelled |
+
+---
+
+## SECTION 13 — APICLIENT RESPONSE ENVELOPE
+
+This class has NOT been created yet. Create it when building Step 9 (Program.cs)
+or the first controller that needs it:
+
+```csharp
+// WebApplication/Models/ApiResponse.cs
+namespace WebApplication.Models;
+
+public sealed class ApiResponse
+{
+    public bool Success { get; set; }
+    public string? Message { get; set; }
+    public object? Data { get; set; }
+
+    public static ApiResponse Ok(object? data = null, string? message = null)
+        => new() { Success = true, Data = data, Message = message };
+
+    public static ApiResponse Fail(string message)
+        => new() { Success = false, Message = message };
+}
+```
+
+---
+
+## SECTION 14 — INSTRUCTIONS FOR THIS CONVERSATION
+
+1. Do not regenerate any file from Steps 1-5. They are done and pasted.
+2. Start immediately with Step 6: IRepository.cs and Repository.cs.
+3. Then proceed in order: Step 7 (all specific repositories), Step 8, Step 9, etc.
+4. Within each step, generate all files for that step before moving to the next.
+5. Every file must be production-ready — no scaffolds, no placeholders, no TODOs.
+6. Every file must follow all architecture standards in Section 4.
+7. When a file references a constants class from Section 12, use it — never
+   hardcode the string value.
+8. Never generate refund logic, COD logic, or card payment logic anywhere.
+9. Ask for confirmation after every step before proceeding to the next.
+10. Red lines / unresolved references in Visual Studio are expected until
+    all files for a step are pasted — do not treat them as errors to fix by
+    changing architecture.

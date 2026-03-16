@@ -170,7 +170,9 @@ C:.
 |                   
 +---Documentation
 |   \---DataDictionary
+|           ProjectFilesLibrary_v4.pdf
 |           Taurus_DB_Dictionary_v1.0.pdf
+|           Taurus_Implementation_Checklist.pdf
 |           
 +---Mermaid
 |   +---Claude
@@ -261,10 +263,15 @@ C:.
 |   |       workspace.globals.yaml
 |   |       
 |   \---specs
++---prompt
+|   \---ScriptGeneration
+|           ScriptGeneration.txt
+|           
 +---SQL
 |   +---Schema
 |   |       Taurus_schema_v7.1.sql
 |   |       Taurus_schema_v7.1_patch.sql
+|   |       Taurus_schema_v7.2.sql
 |   |       
 |   \---Seed
 |           Taurus_seed_v7.1.sql
@@ -403,6 +410,7 @@ C:.
     |   \---ViewModels
     |           CartViewModel.cs
     |           CheckoutViewModel.cs
+    |           DashboardViewModel.cs
     |           LoginViewModel.cs
     |           OrderViewModel.cs
     |           ProductDetailViewModel.cs
