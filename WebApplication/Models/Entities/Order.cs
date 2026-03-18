@@ -118,6 +118,15 @@ public sealed class Order
     public string? DeliveryInstructions { get; set; }
 
     /// <summary>
+    /// The fulfilment method chosen at checkout: Lalamove, LBC, or Pickup.
+    /// NULL for walk-in POS orders (<see cref="IsWalkIn"/> = true).
+    /// Stored at order creation time and never modified thereafter.
+    /// Use the <c>Couriers</c> constants or "Pickup" string for comparisons.
+    /// </summary>
+    [MaxLength(50)]
+    public string? DeliveryMethod { get; set; }
+
+    /// <summary>
     /// <c>true</c> for orders created via the AdminSystem walk-in POS terminal.
     /// Walk-in orders have no shipping address, are immediately Delivered,
     /// and accept Cash or GCash payment only.

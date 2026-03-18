@@ -50,7 +50,7 @@ public sealed class CartController : Controller
             (int? userId, int? guestId) = GetCartOwner();
             CartViewModel vm = await _cartService.GetCartAsync(userId, guestId, cancellationToken);
             ViewData["Title"] = "Shopping Cart";
-            return View("Cart", vm);
+            return View("~/Views/Customer/Cart.cshtml", vm);
         }
         catch (Exception ex)
         {

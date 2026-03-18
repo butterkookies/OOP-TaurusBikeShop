@@ -84,7 +84,7 @@ public sealed class CheckoutController : Controller
         };
 
         ViewData["Title"] = "Checkout";
-        return View(vm);
+        return View("~/Views/Customer/Checkout.cshtml", vm);
     }
 
     // =========================================================================
@@ -126,7 +126,7 @@ public sealed class CheckoutController : Controller
                 .AsReadOnly() ?? [];
 
             ViewData["Title"] = "Checkout";
-            return View("Index", vm);
+            return View("~/Views/Customer/Checkout.cshtml", vm);
         }
 
         try

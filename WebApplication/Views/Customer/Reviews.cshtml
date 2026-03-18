@@ -1,0 +1,142 @@
+@* WebApplication/Views/Customer/Reviews.cshtml *@
+@model WebApplication.Models.ViewModels.ProductReviewsViewModel
+@{
+    ViewData["Title"] = $"Reviews — {Model.ProductName}";
+}
+
+<div class="container py-5">
+
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Customer/ProductCatalog">Catalog</a></li>
+            <li class="breadcrumb-item">
+                <a href="/Customer/Product/Details/@Model.ProductId">@Model.ProductName</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Reviews</li>
+        </ol>
+    </nav>
+
+    <!-- ── Page header ── -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="h3 mb-1">@Model.ProductName</h1>
+            <p class="text-muted mb-0">@Model.TotalCount review@(Model.TotalCount == 1 ? "" : "s")</p>
+        </div>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a href="/Customer/Review?productId=@Model.ProductId&orderId=0"
+               class="btn btn-danger">
+                Write a Review
+            </a>
+        }
+    </div>
+
+    <!-- ── Average rating summary ── -->
+    @if (Model.TotalCount > 0)
+    {
+        <div class="card border-0 shadow-sm mb-4 p-4">
+            <div class="d-flex align-items-center gap-4 flex-wrap">
+                <div class="text-center">
+                    <div class="display-4 fw-bold text-danger">@Model.AverageRating.ToString("F1")</div>
+                    <div class="text-muted small">out of 5</div>
+                </div>
+                <div class="d-flex gap-1 fs-4" aria-label="Average rating @Model.AverageRating.ToString("F1") out of 5">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        double fill = Math.Max(0, Math.Min(1, Model.AverageRating - (i - 1)));
+                        <span class="@(fill >= 1 ? "text-warning" : fill > 0 ? "text-warning" : "text-secondary")"
+                              aria-hidden="true">&#9733;</span>
+                    }
+                </div>
+                <div class="text-muted">
+                    Based on <strong>@Model.TotalCount</strong> verified purchase@(Model.TotalCount == 1 ? "" : "s")
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ── Reviews list ── -->
+    @if (!Model.Reviews.Any())
+    {
+        <div class="text-center py-5 text-muted">
+            <p class="fs-5 mb-1">No reviews yet.</p>
+            <p>Be the first to review this product after your order is delivered.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 g-3 mb-4">
+            @foreach (var review in Model.Reviews)
+            {
+                <div class="col">
+                    <article class="card border-0 shadow-sm p-4">
+                        <div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-2">
+                            <div class="d-flex align-items-center gap-3">
+                                <!-- Avatar -->
+                                <div class="rounded-circle bg-danger text-white d-flex align-items-center
+                                            justify-content-center fw-bold"
+                                     style="width:40px;height:40px;font-size:1rem;"
+                                     aria-hidden="true">
+                                    @(string.IsNullOrEmpty(review.UserName)
+                                        ? "?"
+                                        : review.UserName.Substring(0, 1).ToUpper())
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">@(review.UserName ?? "Anonymous Rider")</div>
+                                    <time class="text-muted small"
+                                          datetime="@review.CreatedAt.ToString("yyyy-MM-dd")">
+                                        @review.CreatedAt.ToString("MMMM dd, yyyy")
+                                    </time>
+                                </div>
+                            </div>
+                            <!-- Star rating -->
+                            <div class="d-flex gap-1 text-warning fs-5"
+                                 aria-label="@review.Rating out of 5 stars">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span aria-hidden="true">@(i <= review.Rating ? "★" : "☆")</span>
+                                }
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(review.Comment))
+                        {
+                            <p class="mb-0 mt-2">@review.Comment</p>
+                        }
+                    </article>
+                </div>
+            }
+        </div>
+
+        <!-- ── Pagination ── -->
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Review pages">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.CurrentPage <= 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           href="/Customer/Reviews/@Model.ProductId?page=@(Model.CurrentPage - 1)"
+                           aria-label="Previous page">
+                            &laquo;
+                        </a>
+                    </li>
+                    @for (int p = 1; p <= Model.TotalPages; p++)
+                    {
+                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")"
+                            aria-current="@(p == Model.CurrentPage ? "page" : null)">
+                            <a class="page-link"
+                               href="/Customer/Reviews/@Model.ProductId?page=@p">@p</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link"
+                           href="/Customer/Reviews/@Model.ProductId?page=@(Model.CurrentPage + 1)"
+                           aria-label="Next page">
+                            &raquo;
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+
+</div>

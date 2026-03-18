@@ -20,10 +20,12 @@ namespace WebApplication.Models.Entities;
 /// <para>
 /// <b>Payment status flow:</b>
 /// <list type="bullet">
-///   <item>GCash: Pending → Completed | Failed</item>
+///   <item>GCash: Pending → VerificationPending → Completed | VerificationRejected | Failed</item>
 ///   <item>BankTransfer: Pending → VerificationPending → Completed | VerificationRejected | Failed</item>
 ///   <item>Cash (POS): directly → Completed</item>
 /// </list>
+/// Both GCash and BankTransfer require admin screenshot/proof verification before
+/// the payment can be marked Completed, so both pass through VerificationPending.
 /// Use <see cref="PaymentStatuses"/> constants instead of magic strings.
 /// </para>
 /// <para>

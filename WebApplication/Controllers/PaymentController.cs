@@ -54,7 +54,7 @@ public sealed class PaymentController : Controller
         }
 
         ViewData["Title"] = $"Payment — {detail.OrderNumber}";
-        return View("Payment", detail);
+        return View("~/Views/Customer/Payment.cshtml", detail);
     }
 
     // =========================================================================

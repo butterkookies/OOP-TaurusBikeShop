@@ -47,7 +47,7 @@ public sealed class WishlistController : Controller
                 await _wishlistService.GetWishlistAsync(GetCurrentUserId(), cancellationToken);
 
             ViewData["Title"] = "My Wishlist";
-            return View("Wishlist", vm);
+            return View("~/Views/Customer/Wishlist.cshtml", vm);
         }
         catch (Exception ex)
         {
