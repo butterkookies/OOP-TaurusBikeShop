@@ -183,7 +183,7 @@
                                    asp-route-brandId="@brandId"
                                    asp-route-search="@search"
                                    aria-label="Page @p"
-                                   @(p == currentPage ? "aria-current=page" : "")>
+                                   aria-current="@(p == currentPage ? "page" : null)">
                                     @p
                                 </a>
                             }

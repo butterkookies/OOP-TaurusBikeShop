@@ -64,6 +64,25 @@ public sealed class ReviewViewModel
 }
 
 /// <summary>
+/// View model for a single review entry as displayed on the product detail page.
+/// Built by <c>ProductService.MapReviewToViewModel</c>.
+/// </summary>
+public sealed class ProductReviewViewModel
+{
+    public int ReviewId { get; set; }
+    public int ProductId { get; set; }
+    public string ProductName { get; set; } = string.Empty;
+    public int OrderId { get; set; }
+    public int Rating { get; set; }
+    public string? Comment { get; set; }
+    public bool IsVerifiedPurchase { get; set; }
+    /// <summary>Formatted reviewer name, e.g. "Juan D."</summary>
+    public string ReviewerName { get; set; } = string.Empty;
+    /// <summary>Pre-formatted date string, e.g. "January 1, 2025".</summary>
+    public string CreatedAt { get; set; } = string.Empty;
+}
+
+/// <summary>
 /// View model for the paginated product reviews list page (Reviews.cshtml).
 /// </summary>
 public sealed class ProductReviewsViewModel
