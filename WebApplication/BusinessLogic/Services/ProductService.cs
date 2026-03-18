@@ -211,7 +211,7 @@ public sealed class ProductService : IProductService
         };
     }
 
-    private static ReviewViewModel MapReviewToViewModel(Review review) => new()
+    private static ProductReviewViewModel MapReviewToViewModel(Review review) => new()
     {
         ReviewId           = review.ReviewId,
         ProductId          = review.ProductId,

@@ -149,7 +149,6 @@ public sealed class OrderService : IOrderService
                 OrderStatus       = OrderStatuses.Pending,
                 OrderDate         = DateTime.UtcNow,
                 ShippingAddressId = snapshotAddressId,
-                DeliveryMethod    = vm.DeliveryMethod,
                 ShippingFee       = shippingFee,
                 DiscountAmount    = vm.DiscountAmount,
                 IsWalkIn          = false,
@@ -204,10 +203,9 @@ public sealed class OrderService : IOrderService
             {
                 PickupOrder pickup = new()
                 {
-                    PickupOrderId  = order.OrderId,
-                    OrderId        = order.OrderId,
-                    PickupExpiresAt= DateTime.UtcNow.AddDays(3),
-                    CreatedAt      = DateTime.UtcNow
+                    PickupOrderId   = order.OrderId,
+                    OrderId         = order.OrderId,
+                    PickupExpiresAt = DateTime.UtcNow.AddDays(3)
                 };
                 await _context.PickupOrders.AddAsync(pickup, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -231,7 +229,7 @@ public sealed class OrderService : IOrderService
             {
                 UserId    = userId,
                 EventType = SystemLogEvents.OrderStatusChange,
-                Details   = $"Order #{orderNumber} created with status Pending.",
+                EventDescription =$"Order #{orderNumber} created with status Pending.",
                 CreatedAt = DateTime.UtcNow
             };
             await _context.SystemLogs.AddAsync(sysLog, cancellationToken);
@@ -271,7 +269,7 @@ public sealed class OrderService : IOrderService
                 {
                     UserId    = userId,
                     EventType = SystemLogEvents.BackgroundJobError,
-                    Details   = $"Order creation rolled back: {ex.Message}",
+                    EventDescription =$"Order creation rolled back: {ex.Message}",
                     CreatedAt = DateTime.UtcNow
                 };
                 await _context.SystemLogs.AddAsync(errLog, CancellationToken.None);
@@ -378,7 +376,7 @@ public sealed class OrderService : IOrderService
             {
                 UserId    = userId,
                 EventType = SystemLogEvents.OrderStatusChange,
-                Details   = $"Order #{order.OrderNumber} cancelled by customer.",
+                EventDescription =$"Order #{order.OrderNumber} cancelled by customer.",
                 CreatedAt = DateTime.UtcNow
             };
             await _context.SystemLogs.AddAsync(sysLog, cancellationToken);
@@ -419,7 +417,7 @@ public sealed class OrderService : IOrderService
         OrderStatus   = order.OrderStatus,
         OrderDate     = order.OrderDate,
         ItemCount     = order.Items.Count,
-        DeliveryMethod= order.DeliveryMethod ?? string.Empty,
+        DeliveryMethod= order.PickupOrder != null ? "Pickup" : "Delivery",
         ShippingFee   = order.ShippingFee,
         DiscountAmount= order.DiscountAmount
     };
@@ -452,7 +450,7 @@ public sealed class OrderService : IOrderService
             SubTotal        = subTotal,
             ShippingFee     = order.ShippingFee,
             DiscountAmount  = order.DiscountAmount,
-            DeliveryMethod  = order.DeliveryMethod ?? string.Empty,
+            DeliveryMethod  = order.PickupOrder != null ? "Pickup" : "Delivery",
             ShippingAddress = order.ShippingAddress,
             PickupOrder     = order.PickupOrder,
             Payments        = order.Payments.ToList().AsReadOnly(),

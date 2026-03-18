@@ -82,6 +82,9 @@ public sealed class BankTransferPayment
     /// </summary>
     public DateTime? VerifiedAt { get; set; }
 
+    /// <summary>UTC timestamp when the customer uploaded the payment proof.</summary>
+    public DateTime? SubmittedAt { get; set; }
+
     /// <summary>
     /// UTC timestamp by which an admin must verify this payment.
     /// Set to <c>CreatedAt + 24 hours</c> by <c>PaymentService</c> when

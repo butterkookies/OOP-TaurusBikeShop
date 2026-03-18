@@ -40,7 +40,7 @@ public sealed class VoucherService : IVoucherService
 
         // ── Step 3: Date window ────────────────────────────────────────────
         DateTime now = DateTime.UtcNow;
-        if (voucher.StartDate.HasValue && now < voucher.StartDate.Value)
+        if (now < voucher.StartDate)
             return Fail("This voucher is not yet active.");
         if (voucher.EndDate.HasValue && now > voucher.EndDate.Value)
             return Fail("This voucher has expired.");
@@ -64,9 +64,9 @@ public sealed class VoucherService : IVoucherService
         }
 
         // ── Minimum order value check ──────────────────────────────────────
-        if (voucher.MinimumOrderValue.HasValue && orderSubTotal < voucher.MinimumOrderValue.Value)
+        if (voucher.MinimumOrderAmount.HasValue && orderSubTotal < voucher.MinimumOrderAmount.Value)
             return Fail(
-                $"This voucher requires a minimum order of ₱{voucher.MinimumOrderValue.Value:N2}.");
+                $"This voucher requires a minimum order of ₱{voucher.MinimumOrderAmount.Value:N2}.");
 
         // ── Calculate discount ─────────────────────────────────────────────
         decimal discountAmount = voucher.DiscountType == DiscountTypes.Percentage

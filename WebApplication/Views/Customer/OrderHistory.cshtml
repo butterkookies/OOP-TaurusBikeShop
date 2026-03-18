@@ -97,7 +97,7 @@
                            asp-action="History" asp-controller="Order"
                            asp-route-page="@p"
                            aria-label="Page @p"
-                           @(p == currentPage ? "aria-current=page" : "")>@p</a>
+                           aria-current="@(p == currentPage ? "page" : null)">@p</a>
                     }
                     @if (currentPage < totalPages)
                     {

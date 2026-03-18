@@ -1,21 +1,18 @@
-@model dynamic
+@* WebApplication/Views/Customer/Partials/_NotificationAlert.cshtml *@
+@* No model — this is a pure client-side alert container driven by showAlert() in utils.js *@
 
 <div class="notification-alert" id="notificationAlert">
     <span class="close-alert" id="closeAlert">&times;</span>
-    <p id="alertMessage">@Model.Message</p>
+    <p id="alertMessage"></p>
 </div>
 
-@section Scripts {
-    <script>
+<script>
+    (function () {
         const alertBox = document.getElementById('notificationAlert');
         const closeBtn = document.getElementById('closeAlert');
 
-        function showAlert(message, duration = 4000) {
-            document.getElementById('alertMessage').textContent = message;
-            alertBox.style.display = 'flex';
-            setTimeout(() => { alertBox.style.display = 'none'; }, duration);
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => { alertBox.style.display = 'none'; });
         }
-
-        closeBtn.addEventListener('click', () => { alertBox.style.display = 'none'; });
-    </script>
-}
+    })();
+</script>

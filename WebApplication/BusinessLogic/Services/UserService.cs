@@ -1,6 +1,7 @@
 // WebApplication/BusinessLogic/Services/UserService.cs
 
 using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
 using WebApplication.BusinessLogic.Interfaces;
 using WebApplication.DataAccess.Repositories;
 using WebApplication.Models.Entities;
@@ -309,11 +310,9 @@ public sealed class UserService : IUserService
             return ServiceResult.Fail("Address not found.");
 
         // Clear existing default
-        List<Address> existingDefaults = await System.Linq.AsyncEnumerable
-            .ToListAsync(
-                _userRepo.Context.Addresses
-                    .Where(a => a.UserId == userId && a.IsDefault && !a.IsSnapshot),
-                cancellationToken);
+        List<Address> existingDefaults = await _userRepo.Context.Addresses
+            .Where(a => a.UserId == userId && a.IsDefault && !a.IsSnapshot)
+            .ToListAsync(cancellationToken);
 
         foreach (Address addr in existingDefaults)
             addr.IsDefault = false;

@@ -44,6 +44,21 @@ public sealed class GCashPayment
     [MaxLength(255)]
     public string? GcashTransactionId { get; set; }
 
+    /// <summary>GCS public URL of the uploaded GCash screenshot proof.</summary>
+    [MaxLength(1000)]
+    public string? ScreenshotUrl { get; set; }
+
+    /// <summary>GCS bucket where the screenshot is stored.</summary>
+    [MaxLength(200)]
+    public string? StorageBucket { get; set; }
+
+    /// <summary>GCS object path for the screenshot within the bucket.</summary>
+    [MaxLength(1000)]
+    public string? StoragePath { get; set; }
+
+    /// <summary>UTC timestamp when the customer submitted the GCash payment proof.</summary>
+    public DateTime? SubmittedAt { get; set; }
+
     // -------------------------------------------------------------------------
     // Navigation properties
     // -------------------------------------------------------------------------

@@ -177,9 +177,9 @@ public sealed class PaymentService : IPaymentService
             BankTransferPayment bankTransfer = new()
             {
                 BpiReferenceNumber   = bpiReferenceNumber.Trim(),
-                ProofImageUrl        = upload.ImageUrl,
-                StorageBucket        = upload.StorageBucket,
-                StoragePath          = upload.StoragePath,
+                ProofUrl             = upload.ImageUrl,
+                ProofStorageBucket   = upload.StorageBucket,
+                ProofStoragePath     = upload.StoragePath,
                 VerificationDeadline = deadline,
                 SubmittedAt          = DateTime.UtcNow
             };
@@ -239,7 +239,7 @@ public sealed class PaymentService : IPaymentService
             proofUrl = existingPayment.GCashPayment.ScreenshotUrl;
         else if (existingPayment?.BankTransferPayment != null)
         {
-            proofUrl    = existingPayment.BankTransferPayment.ProofImageUrl;
+            proofUrl    = existingPayment.BankTransferPayment.ProofUrl;
             verDeadline = existingPayment.BankTransferPayment.VerificationDeadline;
         }
 
@@ -308,7 +308,7 @@ public sealed class PaymentService : IPaymentService
         {
             UserId    = userId,
             EventType = eventType,
-            Details   = details,
+            EventDescription = details,
             CreatedAt = DateTime.UtcNow
         };
         await _context.SystemLogs.AddAsync(log, ct);

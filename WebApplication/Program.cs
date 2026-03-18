@@ -1,6 +1,7 @@
 // WebApplication/Program.cs
 
 using Google.Cloud.Storage.V1;
+using AppWebApplication = Microsoft.AspNetCore.Builder.WebApplication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WebApplication.BusinessLogic.Interfaces;
@@ -9,7 +10,11 @@ using WebApplication.DataAccess.Context;
 using WebApplication.DataAccess.Repositories;
 using WebApplication.Utilities;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = AppWebApplication.CreateBuilder(args);
+
+builder.Services.Configure<HostOptions>(options =>
+    options.BackgroundServiceExceptionBehavior =
+        BackgroundServiceExceptionBehavior.Ignore);
 
 // =============================================================================
 // DATABASE
@@ -179,7 +184,7 @@ builder.Services.AddControllersWithViews(options =>
 // BUILD
 // =============================================================================
 
-WebApplication app = builder.Build();
+AppWebApplication app = builder.Build();
 
 // =============================================================================
 // MIDDLEWARE PIPELINE

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebApplication.BusinessLogic.Interfaces;
 using WebApplication.DataAccess.Repositories;
 using WebApplication.Models;
+using WebApplication.Models.Entities;
 using WebApplication.Models.ViewModels;
 
 namespace WebApplication.Controllers;
@@ -70,12 +71,12 @@ public sealed class CheckoutController : Controller
 
         CheckoutViewModel vm = new()
         {
-            SavedAddresses  = user?.Addresses
+            SavedAddresses  = (user?.Addresses ?? new List<Address>())
                 .Where(a => !a.IsSnapshot)
                 .OrderByDescending(a => a.IsDefault)
                 .ThenBy(a => a.CreatedAt)
                 .ToList()
-                .AsReadOnly() ?? [],
+                .AsReadOnly(),
             CartItems       = cart.Items,
             SubTotal        = cart.SubTotal,
             VoucherCode     = voucherCode,
@@ -118,12 +119,12 @@ public sealed class CheckoutController : Controller
 
             vm.CartItems      = cart.Items;
             vm.SubTotal       = cart.SubTotal;
-            vm.SavedAddresses = user?.Addresses
+            vm.SavedAddresses = (user?.Addresses ?? new List<Address>())
                 .Where(a => !a.IsSnapshot)
                 .OrderByDescending(a => a.IsDefault)
                 .ThenBy(a => a.CreatedAt)
                 .ToList()
-                .AsReadOnly() ?? [];
+                .AsReadOnly();
 
             ViewData["Title"] = "Checkout";
             return View("Index", vm);

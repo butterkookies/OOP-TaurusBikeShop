@@ -356,6 +356,8 @@ public sealed class AppDbContext : DbContext
             e.ToTable("Product");
             e.HasKey(p => p.ProductId);
 
+            e.Property(p => p.Price).HasPrecision(18, 2);
+
             // Filtered unique SKU — unique when non-NULL
             e.HasIndex(p => p.SKU)
                 .IsUnique()
@@ -399,6 +401,8 @@ public sealed class AppDbContext : DbContext
         {
             e.ToTable("ProductVariant");
             e.HasKey(pv => pv.ProductVariantId);
+
+            e.Property(pv => pv.AdditionalPrice).HasPrecision(18, 2);
 
             e.HasIndex(pv => pv.ProductId)
                 .HasDatabaseName("IX_ProductVariant_ProductId");
@@ -463,6 +467,9 @@ public sealed class AppDbContext : DbContext
         {
             e.ToTable("PriceHistory");
             e.HasKey(ph => ph.PriceHistoryId);
+
+            e.Property(ph => ph.OldPrice).HasPrecision(18, 2);
+            e.Property(ph => ph.NewPrice).HasPrecision(18, 2);
 
             e.HasIndex(ph => new { ph.ProductId, ph.ChangedAt })
                 .HasDatabaseName("IX_PriceHistory_ProductId");
@@ -540,6 +547,8 @@ public sealed class AppDbContext : DbContext
             e.ToTable("PurchaseOrderItem");
             e.HasKey(poi => poi.PurchaseOrderItemId);
 
+            e.Property(poi => poi.UnitPrice).HasPrecision(18, 2);
+
             e.HasIndex(poi => poi.PurchaseOrderId)
                 .HasDatabaseName("IX_POItem_PurchaseOrderId");
 
@@ -573,6 +582,9 @@ public sealed class AppDbContext : DbContext
         {
             e.ToTable("Voucher");
             e.HasKey(v => v.VoucherId);
+
+            e.Property(v => v.DiscountValue).HasPrecision(18, 2);
+            e.Property(v => v.MinimumOrderAmount).HasPrecision(18, 2);
 
             e.HasIndex(v => v.Code)
                 .IsUnique()
@@ -625,6 +637,8 @@ public sealed class AppDbContext : DbContext
         {
             e.ToTable("VoucherUsage");
             e.HasKey(vu => vu.VoucherUsageId);
+
+            e.Property(vu => vu.DiscountAmount).HasPrecision(18, 2);
 
             e.HasIndex(vu => vu.VoucherId)
                 .HasDatabaseName("IX_VoucherUsage_VoucherId");
@@ -701,6 +715,8 @@ public sealed class AppDbContext : DbContext
             e.ToTable("CartItem");
             e.HasKey(ci => ci.CartItemId);
 
+            e.Property(ci => ci.PriceAtAdd).HasPrecision(18, 2);
+
             e.HasIndex(ci => ci.CartId)
                 .HasDatabaseName("IX_CartItem_CartId");
 
@@ -765,6 +781,10 @@ public sealed class AppDbContext : DbContext
             e.ToTable("Order");
             e.HasKey(o => o.OrderId);
 
+            e.Property(o => o.DiscountAmount).HasPrecision(18, 2);
+            e.Property(o => o.ShippingFee).HasPrecision(18, 2);
+            e.Property(o => o.SubTotal).HasPrecision(18, 2);
+
             e.HasIndex(o => o.OrderNumber)
                 .IsUnique()
                 .HasDatabaseName("IX_Order_OrderNumber");
@@ -804,6 +824,8 @@ public sealed class AppDbContext : DbContext
         {
             e.ToTable("OrderItem");
             e.HasKey(oi => oi.OrderItemId);
+
+            e.Property(oi => oi.UnitPrice).HasPrecision(18, 2);
 
             e.HasIndex(oi => oi.OrderId)
                 .HasDatabaseName("IX_OrderItem_OrderId");
@@ -925,6 +947,8 @@ public sealed class AppDbContext : DbContext
         {
             e.ToTable("Payment");
             e.HasKey(p => p.PaymentId);
+
+            e.Property(p => p.Amount).HasPrecision(18, 2);
 
             e.HasIndex(p => p.OrderId)
                 .HasDatabaseName("IX_Payment_OrderId");
@@ -1113,6 +1137,8 @@ public sealed class AppDbContext : DbContext
         {
             e.ToTable("POS_Session");
             e.HasKey(p => p.POSSessionId);
+
+            e.Property(p => p.TotalSales).HasPrecision(18, 2);
 
             e.HasIndex(p => p.UserId)
                 .HasDatabaseName("IX_POS_Session_UserId");
