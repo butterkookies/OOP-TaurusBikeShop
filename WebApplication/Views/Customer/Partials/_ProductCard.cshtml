@@ -1,28 +1,79 @@
-@model dynamic
+@* WebApplication/Views/Customer/Partials/_ProductCard.cshtml *@
+@model WebApplication.Models.ViewModels.ProductViewModel
 
-<div class="product-card" data-id="@Model.Id">
-    <div class="card-image">
-        <img src="@Model.ImageUrl" alt="@Model.Name" />
-    </div>
-    <div class="card-content">
-        <h3>@Model.Name</h3>
-        <p class="price">$@Model.Price.ToString("F2")</p>
-        <p class="description">@Model.Description</p>
-        <div class="card-actions">
-            <button class="btn-add-cart">Add to Cart 🛒</button>
-            <a href="/ProductDetails/@Model.Id" class="btn-details">View Details 🔍</a>
+<div class="tbs-product-card" data-product-id="@Model.ProductId">
+
+    @* Image *@
+    <a asp-controller="Product" asp-action="Detail"
+       asp-route-id="@Model.ProductId"
+       class="tbs-product-card__img-link"
+       tabindex="-1" aria-hidden="true">
+        @if (Model.PrimaryImageUrl != null)
+        {
+            <img src="@Model.PrimaryImageUrl"
+                 alt="@Model.Name"
+                 class="tbs-product-card__img"
+                 loading="lazy" />
+        }
+        else
+        {
+            <div class="tbs-product-card__img-placeholder" aria-hidden="true">
+                <span>&#9651;</span>
+            </div>
+        }
+    </a>
+
+    @* Stock badge *@
+    @if (Model.IsOutOfStock)
+    {
+        <span class="tbs-product-card__stock-badge tbs-product-card__stock-badge--oos">
+            Out of Stock
+        </span>
+    }
+    else if (Model.IsLowStock)
+    {
+        <span class="tbs-product-card__stock-badge tbs-product-card__stock-badge--low">
+            Low Stock
+        </span>
+    }
+
+    @* Wishlist toggle *@
+    <button type="button"
+            class="tbs-product-card__wishlist @(Model.IsInWishlist ? "tbs-product-card__wishlist--active" : "")"
+            data-product-id="@Model.ProductId"
+            aria-label="@(Model.IsInWishlist ? "Remove from wishlist" : "Add to wishlist")"
+            aria-pressed="@(Model.IsInWishlist ? "true" : "false")">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+             fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+        </svg>
+    </button>
+
+    @* Info *@
+    <div class="tbs-product-card__body">
+        @if (Model.Brand != null)
+        {
+            <p class="tbs-product-card__brand">@Model.Brand</p>
+        }
+        <h3 class="tbs-product-card__name">
+            <a asp-controller="Product" asp-action="Detail"
+               asp-route-id="@Model.ProductId">@Model.Name</a>
+        </h3>
+        <div class="tbs-product-card__footer">
+            <span class="tbs-product-card__price">@Model.FormattedPrice</span>
+            @if (!Model.IsOutOfStock)
+            {
+                <button type="button"
+                        class="tbs-product-card__cart-btn"
+                        data-product-id="@Model.ProductId"
+                        aria-label="Add @Model.Name to cart">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+                         fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                    </svg>
+                </button>
+            }
         </div>
     </div>
-</div>
 
-@section Scripts {
-    <script>
-        document.querySelectorAll('.btn-add-cart').forEach(btn => {
-            btn.addEventListener('click', e => {
-                const card = e.target.closest('.product-card');
-                const productId = card.dataset.id;
-                alert(`Product ${productId} added to cart!`);
-            });
-        });
-    </script>
-}
+</div>

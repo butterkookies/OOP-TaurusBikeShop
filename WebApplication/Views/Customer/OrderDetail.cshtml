@@ -1,0 +1,282 @@
+@* WebApplication/Views/Customer/OrderDetail.cshtml *@
+@model WebApplication.Models.ViewModels.OrderViewModel
+@using WebApplication.Models.Entities
+@{
+    ViewData["Title"] = $"Order {Model.OrderNumber}";
+    bool hasDelivery = Model.Deliveries.Any();
+    bool hasPayment  = Model.Payments.Any();
+    bool isPickup    = Model.DeliveryMethod == "Pickup";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/order.css" asp-append-version="true" />
+}
+
+@Html.AntiForgeryToken()
+
+<div class="tbs-order-detail-page">
+    <div class="container">
+
+        @* Breadcrumb *@
+        <ol class="tbs-breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><a asp-controller="Order" asp-action="History">My Orders</a></li>
+            <li>@Model.OrderNumber</li>
+        </ol>
+
+        <div class="tbs-page-header">
+            <div>
+                <h1 class="tbs-page-header__title">@Model.OrderNumber</h1>
+                <p class="tbs-page-header__subtitle">Placed @Model.FormattedOrderDate</p>
+            </div>
+            <div class="tbs-order-detail__header-right">
+                @await Html.PartialAsync(
+                    "~/Views/Customer/Partials/_OrderStatusBadge.cshtml",
+                    Model.OrderStatus)
+
+                @if (Model.IsCancellable)
+                {
+                    <form asp-action="Cancel" asp-controller="Order"
+                          method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="orderId" value="@Model.OrderId" />
+                        <button type="submit"
+                                class="tbs-order-detail__cancel-btn"
+                                onclick="return confirm('Are you sure you want to cancel this order?')">
+                            Cancel Order
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+
+        <div class="tbs-order-detail__layout">
+
+            @* =================== LEFT: MAIN CONTENT =================== *@
+            <div class="tbs-order-detail__main">
+
+                @* Items *@
+                <div class="tbs-card">
+                    <h2 class="tbs-card__title">Order Items</h2>
+                    <div class="tbs-order-card__items">
+                        @foreach (var item in Model.Items)
+                        {
+                            <div class="tbs-order-item">
+                                @if (item.ImageUrl != null)
+                                {
+                                    <img src="@item.ImageUrl"
+                                         alt="@item.ProductName"
+                                         class="tbs-order-item__img"
+                                         loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div class="tbs-order-item__img-placeholder"
+                                         aria-hidden="true">&#9651;</div>
+                                }
+                                <div class="tbs-order-item__info">
+                                    <a asp-controller="Product"
+                                       asp-action="Detail"
+                                       asp-route-id="@item.ProductId"
+                                       class="tbs-order-item__name">
+                                        @item.ProductName
+                                    </a>
+                                    @if (!string.IsNullOrWhiteSpace(item.VariantName))
+                                    {
+                                        <span class="tbs-order-item__variant">
+                                            @item.VariantName
+                                        </span>
+                                    }
+                                    <span class="tbs-order-item__qty">
+                                        @item.FormattedUnitPrice &times; @item.Quantity
+                                    </span>
+                                </div>
+                                <span class="tbs-order-item__total">
+                                    @item.FormattedLineTotal
+                                </span>
+                            </div>
+                        }
+                    </div>
+                    <div class="tbs-order-card__totals">
+                        <div class="tbs-order-total-row">
+                            <span>Subtotal</span><span>@Model.FormattedSubTotal</span>
+                        </div>
+                        @if (Model.DiscountAmount > 0)
+                        {
+                            <div class="tbs-order-total-row tbs-order-total-row--discount">
+                                <span>Discount</span>
+                                <span>−₱@Model.DiscountAmount.ToString("N2")</span>
+                            </div>
+                        }
+                        <div class="tbs-order-total-row">
+                            <span>Shipping</span><span>@Model.FormattedShippingFee</span>
+                        </div>
+                        <div class="tbs-order-total-row tbs-order-total-row--grand">
+                            <span>Total</span><span>@Model.FormattedGrandTotal</span>
+                        </div>
+                    </div>
+                </div>
+
+                @* Payment *@
+                <div class="tbs-card mt-3">
+                    <h2 class="tbs-card__title">Payment</h2>
+                    @if (!hasPayment)
+                    {
+                        <div class="tbs-order-detail__no-payment">
+                            <p>No payment submitted yet.</p>
+                            @if (Model.OrderStatus == OrderStatuses.Pending)
+                            {
+                                <a asp-controller="Payment"
+                                   asp-action="Submit"
+                                   asp-route-orderId="@Model.OrderId"
+                                   class="btn tbs-btn-accent">
+                                    Submit Payment
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (Payment payment in Model.Payments)
+                        {
+                            <div class="tbs-payment-summary">
+                                <div class="tbs-payment-summary__row">
+                                    <span>Method</span>
+                                    <strong>@payment.PaymentMethod</strong>
+                                </div>
+                                <div class="tbs-payment-summary__row">
+                                    <span>Stage</span>
+                                    <strong>@payment.PaymentStage</strong>
+                                </div>
+                                <div class="tbs-payment-summary__row">
+                                    <span>Status</span>
+                                    @await Html.PartialAsync(
+                                        "~/Views/Customer/Partials/_PaymentStatusBadge.cshtml",
+                                        payment.PaymentStatus)
+                                </div>
+                                <div class="tbs-payment-summary__row">
+                                    <span>Amount</span>
+                                    <strong>₱@payment.Amount.ToString("N2")</strong>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+                @* Delivery *@
+                <div class="tbs-card mt-3">
+                    <h2 class="tbs-card__title">
+                        @(isPickup ? "Pickup Status" : "Delivery Status")
+                    </h2>
+                    @if (isPickup && Model.PickupOrder != null)
+                    {
+                        <div class="tbs-pickup-info">
+                            <p>
+                                Your order is ready for pickup.
+                                Please bring a valid ID and your order number.
+                            </p>
+                            @if (Model.PickupOrder.PickupExpiresAt.HasValue)
+                            {
+                                <p class="tbs-pickup-info__expiry">
+                                    Pickup deadline:
+                                    <strong>
+                                        @Model.PickupOrder.PickupExpiresAt.Value
+                                              .ToString("MMMM d, yyyy")
+                                    </strong>
+                                </p>
+                            }
+                        </div>
+                    }
+                    else if (hasDelivery)
+                    {
+                        @foreach (Delivery delivery in Model.Deliveries)
+                        {
+                            <div class="tbs-delivery-info">
+                                <div class="tbs-delivery-info__row">
+                                    <span>Courier</span>
+                                    <strong>@delivery.Courier</strong>
+                                </div>
+                                <div class="tbs-delivery-info__row">
+                                    <span>Status</span>
+                                    <strong>@delivery.DeliveryStatus</strong>
+                                </div>
+                                @if (delivery.LalamoveDelivery?.BookingRef != null)
+                                {
+                                    <div class="tbs-delivery-info__row">
+                                        <span>Booking Ref</span>
+                                        <strong>@delivery.LalamoveDelivery.BookingRef</strong>
+                                    </div>
+                                }
+                                @if (delivery.LBCDelivery?.TrackingNumber != null)
+                                {
+                                    <div class="tbs-delivery-info__row">
+                                        <span>Tracking Number</span>
+                                        <strong>@delivery.LBCDelivery.TrackingNumber</strong>
+                                    </div>
+                                }
+                                @if (delivery.IsDelayed)
+                                {
+                                    <p class="tbs-delivery-info__delayed">
+                                        ⚠ This delivery has been flagged as delayed.
+                                        Our team has been notified.
+                                    </p>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="tbs-order-detail__pending-text">
+                            Delivery details will appear here once your payment
+                            is verified and your order is processed.
+                        </p>
+                    }
+                </div>
+
+            </div>
+
+            @* =================== RIGHT: SIDEBAR =================== *@
+            <aside class="tbs-order-detail__aside">
+
+                <div class="tbs-card">
+                    <h2 class="tbs-card__title">
+                        @(isPickup ? "Pickup Method" : "Shipping Address")
+                    </h2>
+                    @if (isPickup)
+                    {
+                        <p class="tbs-order-detail__pickup-note">
+                            In-store pickup at Taurus Bike Shop.
+                        </p>
+                    }
+                    else if (Model.ShippingAddress != null)
+                    {
+                        <address class="tbs-order-detail__address">
+                            @Model.ShippingAddress.Street<br />
+                            @Model.ShippingAddress.City
+                            @if (!string.IsNullOrWhiteSpace(Model.ShippingAddress.Province))
+                            {
+                                <text>, @Model.ShippingAddress.Province</text>
+                            }<br />
+                            @Model.ShippingAddress.PostalCode — @Model.ShippingAddress.Country
+                        </address>
+                    }
+                </div>
+
+                <div class="tbs-card mt-3">
+                    <h2 class="tbs-card__title">Need Help?</h2>
+                    <a asp-controller="Support"
+                       asp-action="Create"
+                       asp-route-orderId="@Model.OrderId"
+                       class="tbs-order-detail__support-link">
+                        Contact Support for this Order →
+                    </a>
+                </div>
+
+            </aside>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/order.js" asp-append-version="true"></script>
+}

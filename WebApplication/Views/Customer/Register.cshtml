@@ -1,532 +1,168 @@
+@* WebApplication/Views/Customer/Register.cshtml *@
+@model WebApplication.Models.ViewModels.RegisterViewModel
 @{
     ViewData["Title"] = "Create Account";
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool showOTPModal = ViewBag.ShowOTPModal == true;
+    string otpEmail   = ViewBag.OTPEmail ?? Model.Email ?? string.Empty;
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] — Taurus Bike Shop</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Place register.css at: /wwwroot/css/register.css -->
-    <link rel="stylesheet" href="~/css/register.css" />
-</head>
-<body>
 
-<div class="register-page">
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/register.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/otp-modal.css" asp-append-version="true" />
+}
 
-    <!-- ============================================================
-         ATMOSPHERIC BACKGROUND LAYERS
-         (matches Login & Index page atmospheric style)
-         ============================================================ -->
-    <div class="bg-overlay"></div>
-    <div class="bg-grid"></div>
-    <div class="bg-red-glow"></div>
+<div class="tbs-auth-page tbs-auth-page--register">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8 col-xl-7">
 
-    <!-- ============================================================
-         SPLIT LAYOUT
-         Left = Brand / Step Guide  |  Right = Form
-         ============================================================ -->
-    <div class="register-split">
+                <div class="tbs-auth-card tbs-auth-card--wide">
 
-        <!-- ── LEFT PANEL: Brand Identity + Step Guide ── -->
-        <div class="brand-panel">
-            <div class="brand-panel__inner">
-
-                <!-- Logo mark -->
-                <div class="brand-logo">
-                    <span class="brand-logo__bull">&#9650;</span>
-                </div>
-
-                <h1 class="brand-name">TAURUS</h1>
-                <p class="brand-tagline">Bike Shop</p>
-                <div class="brand-divider"></div>
-                <p class="brand-copy">Your journey starts here.<br>Join the Taurus community.</p>
-
-                <!-- Step guide — JS highlights active step on scroll -->
-                <div class="steps-guide" id="stepsGuide" aria-label="Registration steps">
-
-                    <div class="step-item active" data-step="1">
-                        <div class="step-circle" aria-hidden="true">1</div>
-                        <div class="step-info">
-                            <span class="step-title">Account Info</span>
-                            <span class="step-desc">Email &amp; password</span>
-                        </div>
+                    <div class="tbs-auth-card__header">
+                        <div class="tbs-auth-card__logo" aria-hidden="true">&#9651;</div>
+                        <h1 class="tbs-auth-card__title">Create Account</h1>
+                        <p class="tbs-auth-card__subtitle">Join Taurus Bike Shop</p>
                     </div>
 
-                    <div class="step-connector" aria-hidden="true"></div>
-
-                    <div class="step-item" data-step="2">
-                        <div class="step-circle" aria-hidden="true">2</div>
-                        <div class="step-info">
-                            <span class="step-title">Verification</span>
-                            <span class="step-desc">OTP via mobile</span>
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="tbs-auth-card__error" role="alert">
+                            <asp-validation-summary asp-validation-group="" />
                         </div>
-                    </div>
+                    }
 
-                    <div class="step-connector" aria-hidden="true"></div>
+                    <form asp-action="Register" asp-controller="Customer" method="post"
+                          class="tbs-auth-form tbs-register-form" novalidate>
+                        @Html.AntiForgeryToken()
 
-                    <div class="step-item" data-step="3">
-                        <div class="step-circle" aria-hidden="true">3</div>
-                        <div class="step-info">
-                            <span class="step-title">Delivery Address</span>
-                            <span class="step-desc">Where to ship</span>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- Decorative spinning wheel (purely visual) -->
-            <div class="deco-wheel" aria-hidden="true">
-                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="100" r="95" stroke="#E10600" stroke-width="1.5" stroke-dasharray="6 4"/>
-                    <circle cx="100" cy="100" r="70" stroke="#ffffff10" stroke-width="1"/>
-                    <circle cx="100" cy="100" r="12" fill="#E10600"/>
-                    <line x1="100" y1="5"   x2="100" y2="88"  stroke="#ffffff20" stroke-width="1.5"/>
-                    <line x1="100" y1="112" x2="100" y2="195" stroke="#ffffff20" stroke-width="1.5"/>
-                    <line x1="5"   y1="100" x2="88"  y2="100" stroke="#ffffff20" stroke-width="1.5"/>
-                    <line x1="112" y1="100" x2="195" y2="100" stroke="#ffffff20" stroke-width="1.5"/>
-                    <line x1="32"  y1="32"  x2="91"  y2="91"  stroke="#ffffff15" stroke-width="1.5"/>
-                    <line x1="109" y1="109" x2="168" y2="168" stroke="#ffffff15" stroke-width="1.5"/>
-                    <line x1="168" y1="32"  x2="109" y2="91"  stroke="#ffffff15" stroke-width="1.5"/>
-                    <line x1="91"  y1="109" x2="32"  y2="168" stroke="#ffffff15" stroke-width="1.5"/>
-                </svg>
-            </div>
-        </div>
-
-        <!-- ── RIGHT PANEL: Registration Form ── -->
-        <div class="form-panel">
-            <div class="form-panel__inner">
-
-                <!-- Form header -->
-                <div class="form-header">
-                    <div class="form-header__eyebrow">New Rider</div>
-                    <h2 class="form-header__title">Create Account</h2>
-                    <p class="form-header__sub">Join thousands of Taurus riders today</p>
-                </div>
-
-                <form id="registerForm"
-                      method="post"
-                      action="/Customer/Register"
-                      class="register-form"
-                      novalidate>
-
-                    <!-- ============================================================
-                         SECTION 1 — ACCOUNT INFORMATION
-                         ============================================================ -->
-                    <div class="form-section" id="section-account">
-                        <div class="section-label">
-                            <span class="section-label__num" aria-hidden="true">01</span>
-                            <span class="section-label__text">Account Information</span>
-                        </div>
-
-                        <div class="fields-grid">
-
-                            <!-- Email -->
-                            <div class="field-group field-full">
-                                <label for="email" class="field-label">Email Address</label>
-                                <div class="field-wrap">
-                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                        <polyline points="22,6 12,13 2,6"/>
-                                    </svg>
-                                    <input type="email"
-                                           class="field-input"
-                                           id="email"
-                                           name="email"
-                                           placeholder="you@example.com"
-                                           required
-                                           autocomplete="email">
-                                    <div class="field-line" aria-hidden="true"></div>
-                                </div>
-                            </div>
-
-                            <!-- Password -->
-                            <div class="field-group field-full">
-                                <label for="password" class="field-label">Password</label>
-                                <div class="field-wrap">
-                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                    </svg>
-                                    <input type="password"
-                                           class="field-input"
-                                           id="password"
-                                           name="password"
-                                           placeholder="Create a strong password"
-                                           required
-                                           autocomplete="new-password">
-                                    <button type="button"
-                                            class="toggle-password"
-                                            id="togglePassword"
-                                            aria-label="Toggle password visibility">
-                                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                            <circle cx="12" cy="12" r="3"/>
-                                        </svg>
-                                    </button>
-                                    <div class="field-line" aria-hidden="true"></div>
-                                </div>
-                                <!-- Password strength indicator -->
-                                <div class="password-strength" id="passwordStrength" aria-live="polite">
-                                    <div class="strength-bar">
-                                        <span class="strength-fill" id="strengthFill"></span>
+                        @* Personal Info *@
+                        <fieldset class="tbs-register-form__section">
+                            <legend class="tbs-register-form__legend">Personal Information</legend>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="tbs-form-group">
+                                        <label asp-for="FirstName" class="tbs-label">First Name</label>
+                                        <input asp-for="FirstName" class="tbs-input" autocomplete="given-name" placeholder="Juan" />
+                                        <span asp-validation-for="FirstName" class="tbs-field-error"></span>
                                     </div>
-                                    <span class="strength-label" id="strengthLabel"></span>
+                                </div>
+                                <div class="col-6">
+                                    <div class="tbs-form-group">
+                                        <label asp-for="LastName" class="tbs-label">Last Name</label>
+                                        <input asp-for="LastName" class="tbs-input" autocomplete="family-name" placeholder="Dela Cruz" />
+                                        <span asp-validation-for="LastName" class="tbs-field-error"></span>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="row g-3">
+                                <div class="col-12 col-sm-6">
+                                    <div class="tbs-form-group">
+                                        <label asp-for="Email" class="tbs-label">Email Address</label>
+                                        <input asp-for="Email" class="tbs-input" type="email" autocomplete="email" placeholder="you@example.com" />
+                                        <span asp-validation-for="Email" class="tbs-field-error"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="tbs-form-group">
+                                        <label asp-for="PhoneNumber" class="tbs-label">Phone Number</label>
+                                        <input asp-for="PhoneNumber" class="tbs-input" type="tel" autocomplete="tel" placeholder="09XXXXXXXXX" />
+                                        <span asp-validation-for="PhoneNumber" class="tbs-field-error"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
 
-                        </div>
+                        @* Address *@
+                        <fieldset class="tbs-register-form__section">
+                            <legend class="tbs-register-form__legend">Default Shipping Address</legend>
+                            <div class="tbs-form-group">
+                                <label asp-for="Street" class="tbs-label">Street Address</label>
+                                <input asp-for="Street" class="tbs-input" autocomplete="street-address" placeholder="House no., Street, Barangay" />
+                                <span asp-validation-for="Street" class="tbs-field-error"></span>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-12 col-sm-5">
+                                    <div class="tbs-form-group">
+                                        <label asp-for="City" class="tbs-label">City / Municipality</label>
+                                        <input asp-for="City" class="tbs-input" autocomplete="address-level2" placeholder="Manila" />
+                                        <span asp-validation-for="City" class="tbs-field-error"></span>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <div class="tbs-form-group">
+                                        <label asp-for="PostalCode" class="tbs-label">Postal Code</label>
+                                        <input asp-for="PostalCode" class="tbs-input" autocomplete="postal-code" placeholder="1000" maxlength="4" />
+                                        <span asp-validation-for="PostalCode" class="tbs-field-error"></span>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-4">
+                                    <div class="tbs-form-group">
+                                        <label asp-for="Province" class="tbs-label">Province <span class="tbs-label__optional">(optional)</span></label>
+                                        <input asp-for="Province" class="tbs-input" autocomplete="address-level1" placeholder="Metro Manila" />
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        @* Password *@
+                        <fieldset class="tbs-register-form__section">
+                            <legend class="tbs-register-form__legend">Password</legend>
+                            <div class="row g-3">
+                                <div class="col-12 col-sm-6">
+                                    <div class="tbs-form-group">
+                                        <label asp-for="Password" class="tbs-label">Password</label>
+                                        <input asp-for="Password" class="tbs-input" type="password" autocomplete="new-password" placeholder="Minimum 8 characters" />
+                                        <span asp-validation-for="Password" class="tbs-field-error"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="tbs-form-group">
+                                        <label asp-for="ConfirmPassword" class="tbs-label">Confirm Password</label>
+                                        <input asp-for="ConfirmPassword" class="tbs-input" type="password" autocomplete="new-password" placeholder="Repeat your password" />
+                                        <span asp-validation-for="ConfirmPassword" class="tbs-field-error"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <button type="submit" class="btn tbs-btn-accent tbs-btn-full">
+                            Create Account &amp; Verify Email
+                        </button>
+
+                    </form>
+
+                    <div class="tbs-auth-card__footer">
+                        Already have an account?
+                        <a asp-action="Login" asp-controller="Customer">Sign in</a>
                     </div>
 
-                    <!-- ============================================================
-                         SECTION 2 — MOBILE VERIFICATION / OTP
-                         ============================================================ -->
-                    <div class="form-section" id="section-verify">
-                        <div class="section-label">
-                            <span class="section-label__num" aria-hidden="true">02</span>
-                            <span class="section-label__text">Mobile Verification</span>
-                        </div>
-
-                        <div class="fields-grid">
-
-                            <!-- Contact number + Send OTP button -->
-                            <div class="field-group field-full">
-                                <label for="contactNumber" class="field-label">Contact Number</label>
-                                <div class="field-wrap otp-input-wrap">
-                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-                                    </svg>
-                                    <input type="tel"
-                                           class="field-input"
-                                           id="contactNumber"
-                                           name="contactNumber"
-                                           placeholder="09XXXXXXXXX"
-                                           required
-                                           autocomplete="tel">
-                                    <button type="button"
-                                            class="btn-send-otp"
-                                            id="sendOtpBtn">Send OTP</button>
-                                    <div class="field-line" aria-hidden="true"></div>
-                                </div>
-                            </div>
-
-                            <!-- OTP boxes — hidden until OTP is sent (toggled via JS) -->
-                            <div class="field-group field-full otp-field-group" id="otpFieldGroup">
-                                <label class="field-label">OTP Verification Code</label>
-                                <div class="otp-boxes" id="otpBoxes" role="group" aria-label="Enter 6-digit OTP">
-                                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="OTP digit 1">
-                                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="OTP digit 2">
-                                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="OTP digit 3">
-                                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="OTP digit 4">
-                                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="OTP digit 5">
-                                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" aria-label="OTP digit 6">
-                                </div>
-                                <!-- Hidden field assembles full OTP for form submission -->
-                                <input type="hidden" id="otpCode" name="otpCode">
-                                <div class="otp-hint">
-                                    <span id="otpTimer" class="otp-timer" aria-live="polite"></span>
-                                    <button type="button"
-                                            class="otp-resend"
-                                            id="resendOtp"
-                                            style="display:none">Resend code</button>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- Section divider -->
-                    <div class="section-rule" aria-hidden="true"></div>
-
-                    <!-- ============================================================
-                         SECTION 3 — DELIVERY ADDRESS
-                         ============================================================ -->
-                    <div class="form-section" id="section-address">
-                        <div class="section-label">
-                            <span class="section-label__num" aria-hidden="true">03</span>
-                            <span class="section-label__text">Delivery Address</span>
-                        </div>
-
-                        <div class="fields-grid">
-
-                            <!-- Street address (full width) -->
-                            <div class="field-group field-full">
-                                <label for="streetAddress" class="field-label">Street Address</label>
-                                <div class="field-wrap">
-                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                        <polyline points="9 22 9 12 15 12 15 22"/>
-                                    </svg>
-                                    <input type="text"
-                                           class="field-input"
-                                           id="streetAddress"
-                                           name="streetAddress"
-                                           placeholder="House No. / Street / Barangay"
-                                           required>
-                                    <div class="field-line" aria-hidden="true"></div>
-                                </div>
-                            </div>
-
-                            <!-- City (half width) -->
-                            <div class="field-group field-half">
-                                <label for="city" class="field-label">City</label>
-                                <div class="field-wrap">
-                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                        <circle cx="12" cy="10" r="3"/>
-                                        <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 13 8 13s8-7.75 8-13a8 8 0 0 0-8-8z"/>
-                                    </svg>
-                                    <input type="text"
-                                           class="field-input"
-                                           id="city"
-                                           name="city"
-                                           placeholder="City / Municipality"
-                                           required>
-                                    <div class="field-line" aria-hidden="true"></div>
-                                </div>
-                            </div>
-
-                            <!-- Province (half width) -->
-                            <div class="field-group field-half">
-                                <label for="province" class="field-label">Province</label>
-                                <div class="field-wrap">
-                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                        <polygon points="3 11 22 2 13 21 11 13 3 11"/>
-                                    </svg>
-                                    <input type="text"
-                                           class="field-input"
-                                           id="province"
-                                           name="province"
-                                           placeholder="Province / Region"
-                                           required>
-                                    <div class="field-line" aria-hidden="true"></div>
-                                </div>
-                            </div>
-
-                            <!-- Postal code (half width) -->
-                            <div class="field-group field-half">
-                                <label for="postalCode" class="field-label">Postal Code</label>
-                                <div class="field-wrap">
-                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                        <path d="M4 4h16v16H4z"/>
-                                        <path d="M9 9h6M9 12h6M9 15h4"/>
-                                    </svg>
-                                    <input type="text"
-                                           class="field-input"
-                                           id="postalCode"
-                                           name="postalCode"
-                                           placeholder="0000"
-                                           required>
-                                    <div class="field-line" aria-hidden="true"></div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- ── SUBMIT BUTTON ── -->
-                    <button type="submit" class="btn-register" id="registerBtn">
-                        <span class="btn-register__text">Create My Account</span>
-                        <span class="btn-register__arrow" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                <line x1="5" y1="12" x2="19" y2="12"/>
-                                <polyline points="12 5 19 12 12 19"/>
-                            </svg>
-                        </span>
-                        <span class="btn-register__loader" aria-hidden="true"></span>
-                    </button>
-
-                    <!-- Already have an account? -->
-                    <div class="form-footer">
-                        <span class="form-footer__text">Already have an account?</span>
-                        <a href="/Customer/Login" class="form-footer__link">Sign in &rarr;</a>
-                    </div>
-
-                </form>
+                </div>
             </div>
         </div>
+    </div>
+</div>
 
-    </div><!-- /.register-split -->
-</div><!-- /.register-page -->
+@* OTP Modal — shown after successful POST *@
+@if (showOTPModal)
+{
+    @await Html.PartialAsync("_OTPModal", otpEmail)
+}
 
-<script>
-(function () {
-
-    /* ── Password visibility toggle ── */
-    const toggleBtn     = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('password');
-    const eyeIcon       = toggleBtn ? toggleBtn.querySelector('.eye-icon') : null;
-
-    if (toggleBtn && passwordInput && eyeIcon) {
-        toggleBtn.addEventListener('click', function () {
-            const show = passwordInput.type === 'password';
-            passwordInput.type = show ? 'text' : 'password';
-            eyeIcon.innerHTML = show
-                ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
-                : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-        });
-    }
-
-    /* ── Password strength meter ── */
-    const strengthFill  = document.getElementById('strengthFill');
-    const strengthLabel = document.getElementById('strengthLabel');
-
-    function calcStrength(pw) {
-        let score = 0;
-        if (pw.length >= 8)           score++;
-        if (pw.length >= 12)          score++;
-        if (/[A-Z]/.test(pw))         score++;
-        if (/[0-9]/.test(pw))         score++;
-        if (/[^A-Za-z0-9]/.test(pw))  score++;
-        return score;
-    }
-
-    const strengthLevels = [
-        { width: '0%',   color: 'transparent', label: '' },
-        { width: '25%',  color: '#E10600',      label: 'Weak' },
-        { width: '50%',  color: '#F97316',      label: 'Fair' },
-        { width: '75%',  color: '#EAB308',      label: 'Good' },
-        { width: '100%', color: '#22C55E',      label: 'Strong' },
-    ];
-
-    if (passwordInput && strengthFill && strengthLabel) {
-        passwordInput.addEventListener('input', function () {
-            const lvl = strengthLevels[Math.min(calcStrength(this.value), 4)];
-            strengthFill.style.width      = lvl.width;
-            strengthFill.style.background = lvl.color;
-            strengthLabel.textContent     = lvl.label;
-            strengthLabel.style.color     = lvl.color;
-        });
-    }
-
-    /* ── OTP: Send button + countdown + resend ── */
-    const sendOtpBtn  = document.getElementById('sendOtpBtn');
-    const otpTimer    = document.getElementById('otpTimer');
-    const resendOtp   = document.getElementById('resendOtp');
-    const otpGroup    = document.getElementById('otpFieldGroup');
-    let   countdown;
-
-    function startCountdown(seconds) {
-        clearInterval(countdown);
-        sendOtpBtn.disabled = true;
-        resendOtp.style.display = 'none';
-
-        /* Reveal the OTP boxes the first time an OTP is sent */
-        if (otpGroup) otpGroup.classList.add('otp-field-group--visible');
-
-        let remaining = seconds;
-        otpTimer.textContent = 'Resend in ' + remaining + 's';
-
-        countdown = setInterval(function () {
-            remaining--;
-            if (remaining <= 0) {
-                clearInterval(countdown);
-                otpTimer.textContent    = '';
-                resendOtp.style.display = 'inline';
-                sendOtpBtn.disabled     = false;
-            } else {
-                otpTimer.textContent = 'Resend in ' + remaining + 's';
-            }
-        }, 1000);
-    }
-
-    if (sendOtpBtn) {
-        sendOtpBtn.addEventListener('click', function () {
-            const phone = document.getElementById('contactNumber');
-            if (!phone || !phone.value.trim()) {
-                phone && phone.focus();
-                return;
-            }
-            startCountdown(60);
-        });
-    }
-
-    if (resendOtp) {
-        resendOtp.addEventListener('click', function () { startCountdown(60); });
-    }
-
-    /* ── OTP box: auto-advance, backspace, paste ── */
-    const otpBoxes  = document.querySelectorAll('.otp-box');
-    const otpHidden = document.getElementById('otpCode');
-
-    function syncOtpHidden() {
-        if (otpHidden) {
-            otpHidden.value = Array.from(otpBoxes).map(function (b) { return b.value; }).join('');
-        }
-    }
-
-    otpBoxes.forEach(function (box, i) {
-        box.addEventListener('input', function () {
-            /* Keep only last numeric character */
-            this.value = this.value.replace(/[^0-9]/g, '').slice(-1);
-            this.classList.toggle('filled', this.value !== '');
-            syncOtpHidden();
-            if (this.value && i < otpBoxes.length - 1) {
-                otpBoxes[i + 1].focus();
-            }
-        });
-
-        box.addEventListener('keydown', function (e) {
-            if (e.key === 'Backspace' && !this.value && i > 0) {
-                otpBoxes[i - 1].focus();
-            }
-        });
-
-        box.addEventListener('paste', function (e) {
-            e.preventDefault();
-            var pasted = (e.clipboardData || window.clipboardData)
-                .getData('text')
-                .replace(/\D/g, '')
-                .slice(0, 6);
-            pasted.split('').forEach(function (ch, idx) {
-                if (otpBoxes[idx]) {
-                    otpBoxes[idx].value = ch;
-                    otpBoxes[idx].classList.add('filled');
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    @if (showOTPModal)
+    {
+        <script>
+            // Auto-open the OTP modal when the page loads after a successful registration POST
+            document.addEventListener('DOMContentLoaded', () => {
+                const otpModal = document.getElementById('otpModal');
+                if (otpModal) {
+                    const modal = new bootstrap.Modal(otpModal, { backdrop: 'static', keyboard: false });
+                    modal.show();
                 }
             });
-            syncOtpHidden();
-            var next = otpBoxes[Math.min(pasted.length, otpBoxes.length - 1)];
-            if (next) next.focus();
-        });
-    });
-
-    /* ── Side-panel step highlighter (scroll-driven) ── */
-    var sectionIds = ['section-account', 'section-verify', 'section-address'];
-    var stepItems  = document.querySelectorAll('.step-item');
-
-    function updateSteps() {
-        var threshold = window.scrollY + window.innerHeight / 3;
-        var active    = 0;
-        sectionIds.forEach(function (id, idx) {
-            var el = document.getElementById(id);
-            if (el && el.getBoundingClientRect().top + window.scrollY <= threshold) {
-                active = idx;
-            }
-        });
-        stepItems.forEach(function (item, idx) {
-            item.classList.toggle('active', idx === active);
-            item.classList.toggle('done',   idx <  active);
-        });
+        </script>
     }
-
-    window.addEventListener('scroll', updateSteps, { passive: true });
-
-    /* ── Submit: loading state ── */
-    var registerForm = document.getElementById('registerForm');
-    var registerBtn  = document.getElementById('registerBtn');
-
-    if (registerForm && registerBtn) {
-        registerForm.addEventListener('submit', function () {
-            registerBtn.classList.add('loading');
-        });
-    }
-
-})();
-</script>
-
-</body>
-</html>
+}

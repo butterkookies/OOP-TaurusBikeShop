@@ -1,5 +1,5 @@
 Folder PATH listing
-Volume serial number is 3853-0BCF
+Volume serial number is BA29-06A1
 C:.
 |   .gitignore
 |   OOP-TaurusBikeShop.sln
@@ -15,6 +15,44 @@ C:.
 +---.postman
 |       resources.yaml
 |       
++---.vs
+|   |   slnx.sqlite
+|   |   VSWorkspaceState.json
+|   |   
+|   +---OOP-TaurusBikeShop
+|   |   +---copilot-chat
+|   |   |   \---16054b38
+|   |   |       \---sessions
+|   |   +---CopilotIndices
+|   |   |   \---18.4.89.4080
+|   |   |           CodeChunks.db
+|   |   |           SemanticSymbols.db
+|   |   |           
+|   |   +---DesignTimeBuild
+|   |   |       .dtbcache.v2
+|   |   |       
+|   |   +---FileContentIndex
+|   |   |       b4b955e7-168b-45d2-a192-35def0dec471.vsidx
+|   |   |       
+|   |   \---v18
+|   |           .futdcache.v2
+|   |           DocumentLayout.json
+|   |           
+|   +---OOP-TaurusBikeShop.slnx
+|   |   +---copilot-chat
+|   |   |   \---16054b38
+|   |   |       \---sessions
+|   |   +---FileContentIndex
+|   |   |       b32e39a7-e757-4698-b732-44d0f142a9e6.vsidx
+|   |   |       
+|   |   \---v18
+|   |           DocumentLayout.json
+|   |           
+|   \---ProjectEvaluation
+|           oop-taurusbikeshop.metadata.v10.bin
+|           oop-taurusbikeshop.projects.v10.bin
+|           oop-taurusbikeshop.strings.v10.bin
+|           
 +---AdminSystem
 |   \---AdminSystem
 |       |   AdminSystem.slnx
@@ -27,8 +65,6 @@ C:.
 |           |   AppStyles.xaml
 |           |   
 |           +---bin
-|           |   |   .gitignore
-|           |   |   
 |           |   \---Debug
 |           |           AdminSystem.exe
 |           |           AdminSystem.exe.config
@@ -67,8 +103,6 @@ C:.
 |           |       Voucher.cs
 |           |       
 |           +---obj
-|           |   |   .gitignore
-|           |   |   
 |           |   \---Debug
 |           |       |   .NETFramework,Version=v4.8.AssemblyAttributes.cs
 |           |       |   AdminSystem.csproj.AssemblyReference.cache
@@ -256,15 +290,13 @@ C:.
 |           tf_v2.md
 |           
 +---postman
-|   +---collections
-|   +---environments
-|   +---flows
-|   +---globals
-|   |       workspace.globals.yaml
-|   |       
-|   \---specs
+|   \---globals
+|           workspace.globals.yaml
+|           
 +---prompt
 |   \---ScriptGeneration
+|           Continuation-generate-code.txt
+|           Generate-strict-code.txt
 |           ScriptGeneration.txt
 |           
 +---SQL
@@ -284,6 +316,43 @@ C:.
     |   WebApplication.csproj.user
     |   WebApplication.slnx
     |   
+    +---.vs
+    |   |   slnx.sqlite
+    |   |   VSWorkspaceState.json
+    |   |   
+    |   +---ProjectEvaluation
+    |   |       webapplication.metadata.v10.bin
+    |   |       webapplication.projects.v10.bin
+    |   |       webapplication.strings.v10.bin
+    |   |       
+    |   +---WebApplication
+    |   |   \---CopilotIndices
+    |   |       \---18.4.89.4080
+    |   |               CodeChunks.db
+    |   |               SemanticSymbols.db
+    |   |               
+    |   \---WebApplication.slnx
+    |       +---config
+    |       |       applicationhost.config
+    |       |       
+    |       +---copilot-chat
+    |       |   \---16054b38
+    |       |       \---sessions
+    |       +---DesignTimeBuild
+    |       |       .dtbcache.v2
+    |       |       
+    |       +---FileContentIndex
+    |       |       0a89dc15-e2ef-41d8-8f0c-61d10b1cda6e.vsidx
+    |       |       bc38251c-10b1-40a9-a5af-db65d9fc5290.vsidx
+    |       |       be1c3748-fba1-465f-bcc1-16fc4fd80be5.vsidx
+    |       |       d060993a-a0de-42eb-b475-c69e07600144.vsidx
+    |       |       ea85d584-1d1a-4ccb-9790-e8ccf080fbe8.vsidx
+    |       |       
+    |       \---v18
+    |               .futdcache.v2
+    |               DocumentLayout.backup.json
+    |               DocumentLayout.json
+    |               
     +---BackgroundJobs
     |       DeliveryStatusPollJob.cs
     |       InventorySyncJob.cs
@@ -292,19 +361,21 @@ C:.
     |       StockMonitorJob.cs
     |       
     +---bin
-    |   \---Debug
-    |       \---net8.0
-    |               .gitignore
-    |               appsettings.Development.json
-    |               appsettings.json
-    |               WebApplication.deps.json
-    |               WebApplication.dll
-    |               WebApplication.exe
-    |               WebApplication.pdb
-    |               WebApplication.runtimeconfig.json
-    |               WebApplication.staticwebassets.endpoints.json
-    |               WebApplication.staticwebassets.runtime.json
-    |               
+    |   +---Debug
+    |   |   +---net10.0
+    |   |   \---net8.0
+    |   |           appsettings.Development.json
+    |   |           appsettings.json
+    |   |           WebApplication.deps.json
+    |   |           WebApplication.dll
+    |   |           WebApplication.exe
+    |   |           WebApplication.pdb
+    |   |           WebApplication.runtimeconfig.json
+    |   |           WebApplication.staticwebassets.endpoints.json
+    |   |           WebApplication.staticwebassets.runtime.json
+    |   |           
+    |   \---Release
+    |       \---net10.0
     +---BusinessLogic
     |   +---Interfaces
     |   |       IBrandService.cs
@@ -365,6 +436,7 @@ C:.
     |           WishlistRepository.cs
     |           
     +---Models
+    |   |   ApiResponse.cs
     |   |   ErrorViewModel.cs
     |   |   
     |   +---Entities
@@ -418,67 +490,95 @@ C:.
     |           ProfileViewModel.cs
     |           RegisterViewModel.cs
     |           ReviewViewModel.cs
+    |           VoucherViewModels.cs
     |           WishlistViewModel.cs
     |           
     +---obj
-    |   |   .gitignore
     |   |   project.assets.json
     |   |   project.nuget.cache
     |   |   WebApplication.csproj.nuget.dgspec.json
     |   |   WebApplication.csproj.nuget.g.props
     |   |   WebApplication.csproj.nuget.g.targets
     |   |   
-    |   \---Debug
-    |       \---net8.0
-    |           |   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
-    |           |   ApiEndpoints.json
-    |           |   apphost.exe
-    |           |   rjimswa.dswa.cache.json
-    |           |   rjsmcshtml.dswa.cache.json
-    |           |   rjsmrazor.dswa.cache.json
-    |           |   rpswa.dswa.cache.json
-    |           |   staticwebassets.build.endpoints.json
-    |           |   staticwebassets.build.json
-    |           |   staticwebassets.build.json.cache
-    |           |   staticwebassets.development.json
-    |           |   staticwebassets.references.upToDateCheck.txt
-    |           |   staticwebassets.removed.txt
-    |           |   staticwebassets.upToDateCheck.txt
-    |           |   swae.build.ex.cache
+    |   +---Debug
+    |   |   +---net10.0
+    |   |   |   |   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+    |   |   |   |   rpswa.dswa.cache.json
+    |   |   |   |   staticwebassets.removed.txt
+    |   |   |   |   WebApplication.AssemblyInfo.cs
+    |   |   |   |   WebApplication.AssemblyInfoInputs.cache
+    |   |   |   |   WebApplication.assets.cache
+    |   |   |   |   WebApplication.GeneratedMSBuildEditorConfig.editorconfig
+    |   |   |   |   WebApplication.GlobalUsings.g.cs
+    |   |   |   |   WebApplication.RazorAssemblyInfo.cache
+    |   |   |   |   WebApplication.RazorAssemblyInfo.cs
+    |   |   |   |   
+    |   |   |   +---ref
+    |   |   |   +---refint
+    |   |   |   \---staticwebassets
+    |   |   \---net8.0
+    |   |       |   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+    |   |       |   ApiEndpoints.json
+    |   |       |   apphost.exe
+    |   |       |   rjimswa.dswa.cache.json
+    |   |       |   rjsmcshtml.dswa.cache.json
+    |   |       |   rjsmrazor.dswa.cache.json
+    |   |       |   rpswa.dswa.cache.json
+    |   |       |   staticwebassets.build.endpoints.json
+    |   |       |   staticwebassets.build.json
+    |   |       |   staticwebassets.build.json.cache
+    |   |       |   staticwebassets.development.json
+    |   |       |   staticwebassets.references.upToDateCheck.txt
+    |   |       |   staticwebassets.removed.txt
+    |   |       |   staticwebassets.upToDateCheck.txt
+    |   |       |   swae.build.ex.cache
+    |   |       |   WebApplication.AssemblyInfo.cs
+    |   |       |   WebApplication.AssemblyInfoInputs.cache
+    |   |       |   WebApplication.assets.cache
+    |   |       |   WebApplication.csproj.AssemblyReference.cache
+    |   |       |   WebApplication.csproj.BuildWithSkipAnalyzers
+    |   |       |   WebApplication.csproj.CoreCompileInputs.cache
+    |   |       |   WebApplication.csproj.FileListAbsolute.txt
+    |   |       |   WebApplication.dll
+    |   |       |   WebApplication.GeneratedMSBuildEditorConfig.editorconfig
+    |   |       |   WebApplication.genruntimeconfig.cache
+    |   |       |   WebApplication.GlobalUsings.g.cs
+    |   |       |   WebApplication.MvcApplicationPartsAssemblyInfo.cache
+    |   |       |   WebApplication.pdb
+    |   |       |   WebApplication.RazorAssemblyInfo.cache
+    |   |       |   WebApplication.RazorAssemblyInfo.cs
+    |   |       |   WebApplication.sourcelink.json
+    |   |       |   
+    |   |       +---ref
+    |   |       |       WebApplication.dll
+    |   |       |       
+    |   |       +---refint
+    |   |       |       WebApplication.dll
+    |   |       |       
+    |   |       +---scopedcss
+    |   |       |   +---bundle
+    |   |       |   |       WebApplication.styles.css
+    |   |       |   |       
+    |   |       |   +---projectbundle
+    |   |       |   |       WebApplication.bundle.scp.css
+    |   |       |   |       
+    |   |       |   \---Views
+    |   |       |       \---Shared
+    |   |       |               _Layout.cshtml.rz.scp.css
+    |   |       |               
+    |   |       \---staticwebassets
+    |   \---Release
+    |       \---net10.0
+    |           |   .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
     |           |   WebApplication.AssemblyInfo.cs
     |           |   WebApplication.AssemblyInfoInputs.cache
-    |           |   WebApplication.assets.cache
-    |           |   WebApplication.csproj.BuildWithSkipAnalyzers
-    |           |   WebApplication.csproj.CoreCompileInputs.cache
-    |           |   WebApplication.csproj.FileListAbsolute.txt
-    |           |   WebApplication.dll
     |           |   WebApplication.GeneratedMSBuildEditorConfig.editorconfig
-    |           |   WebApplication.genruntimeconfig.cache
     |           |   WebApplication.GlobalUsings.g.cs
-    |           |   WebApplication.MvcApplicationPartsAssemblyInfo.cache
-    |           |   WebApplication.pdb
     |           |   WebApplication.RazorAssemblyInfo.cache
     |           |   WebApplication.RazorAssemblyInfo.cs
-    |           |   WebApplication.sourcelink.json
     |           |   
     |           +---ref
-    |           |       WebApplication.dll
-    |           |       
-    |           +---refint
-    |           |       WebApplication.dll
-    |           |       
-    |           +---scopedcss
-    |           |   +---bundle
-    |           |   |       WebApplication.styles.css
-    |           |   |       
-    |           |   +---projectbundle
-    |           |   |       WebApplication.bundle.scp.css
-    |           |   |       
-    |           |   \---Views
-    |           |       \---Shared
-    |           |               _Layout.cshtml.rz.scp.css
-    |           |               
-    |           \---staticwebassets
+    |           \---refint
     +---ProjectStructure
     |       frontend_pst.txt
     |       project_structure.txt
@@ -508,12 +608,14 @@ C:.
     |   |   |   Confirmation.cshtml
     |   |   |   Dashboard.cshtml
     |   |   |   Login.cshtml
+    |   |   |   OrderDetail.cshtml
     |   |   |   OrderHistory.cshtml
     |   |   |   Payment.cshtml
     |   |   |   ProductCatalog.cshtml
     |   |   |   ProductDetails.cshtml
     |   |   |   Profile.cshtml
     |   |   |   Register.cshtml
+    |   |   |   Review.cshtml
     |   |   |   Reviews.cshtml
     |   |   |   Wishlist.cshtml
     |   |   |   
@@ -522,9 +624,11 @@ C:.
     |   |           _ConfirmationModal.cshtml
     |   |           _DeliverySelection.cshtml
     |   |           _NotificationAlert.cshtml
+    |   |           _OrderStatusBadge.cshtml
     |   |           _OrderSummary.cshtml
     |   |           _OTPModal.cshtml
     |   |           _PaymentMethod.cshtml
+    |   |           _PaymentStatusBadge.cshtml
     |   |           _ProductCard.cshtml
     |   |           
     |   +---Home
@@ -557,6 +661,7 @@ C:.
         |       notification-alert.css
         |       order-history.css
         |       order-summary.css
+        |       order.css
         |       otp-modal.css
         |       payment-method.css
         |       payment.css
@@ -570,17 +675,20 @@ C:.
         |       site.css
         |       wishlist.css
         |       
+        +---images
         +---js
         |       cart.js
         |       checkout.js
         |       confirmation.js
         |       customer.js
         |       order-history.js
+        |       order.js
         |       payment.js
         |       product-catalog.js
         |       review.js
         |       site.js
         |       utils.js
+        |       voucher.js
         |       wishlist.js
         |       
         \---lib

@@ -1,106 +1,98 @@
+@* WebApplication/Views/Customer/Dashboard.cshtml *@
 @{
-    ViewData["Title"] = "Dashboard - Taurus Bike Shop";
-    Layout = "_Layout";
+    ViewData["Title"] = "My Dashboard";
+    string customerName = ViewBag.CustomerName ?? "Customer";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/dashboard.css" />
+    <link rel="stylesheet" href="~/css/customer.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 }
 
-<div class="dashboard-page">
-    <aside class="sidebar">
-        <div class="brand">
-            <h2>Taurus 🐂</h2>
+<div class="tbs-customer-page">
+    <div class="container">
+
+        @* Page header *@
+        <div class="tbs-page-header">
+            <div>
+                <h1 class="tbs-page-header__title">Welcome back, @customerName.Split(' ')[0]</h1>
+                <p class="tbs-page-header__subtitle">Here's what's happening with your account</p>
+            </div>
         </div>
-        <nav class="sidebar-nav">
-            <a href="/Dashboard" class="active">Dashboard</a>
-            <a href="/Orders">Orders</a>
-            <a href="/Products">Products</a>
-            <a href="/Customers">Customers</a>
-            <a href="/Reports">Reports</a>
-            <a href="/Settings">Settings</a>
-        </nav>
-    </aside>
 
-    <main class="main-content">
-        <header class="dashboard-header">
-            <h1>Welcome, Admin</h1>
-            <div class="header-actions">
-                <button id="notifications-btn">🔔 Notifications</button>
-                <button id="profile-btn">👤 Profile</button>
+        @* Quick stat cards *@
+        <div class="row g-3 tbs-dashboard__stats">
+            <div class="col-6 col-md-3">
+                <a asp-controller="Order" asp-action="History" class="tbs-stat-card">
+                    <div class="tbs-stat-card__icon" aria-hidden="true">📦</div>
+                    <div class="tbs-stat-card__body">
+                        <div class="tbs-stat-card__label">My Orders</div>
+                        <div class="tbs-stat-card__hint">View history</div>
+                    </div>
+                    <div class="tbs-stat-card__arrow" aria-hidden="true">›</div>
+                </a>
             </div>
-        </header>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Wishlist" asp-action="ViewWishlist" class="tbs-stat-card">
+                    <div class="tbs-stat-card__icon" aria-hidden="true">❤️</div>
+                    <div class="tbs-stat-card__body">
+                        <div class="tbs-stat-card__label">Wishlist</div>
+                        <div class="tbs-stat-card__hint">Saved items</div>
+                    </div>
+                    <div class="tbs-stat-card__arrow" aria-hidden="true">›</div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Customer" asp-action="Profile" class="tbs-stat-card">
+                    <div class="tbs-stat-card__icon" aria-hidden="true">👤</div>
+                    <div class="tbs-stat-card__body">
+                        <div class="tbs-stat-card__label">Profile</div>
+                        <div class="tbs-stat-card__hint">Settings &amp; addresses</div>
+                    </div>
+                    <div class="tbs-stat-card__arrow" aria-hidden="true">›</div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Support" asp-action="Create" class="tbs-stat-card">
+                    <div class="tbs-stat-card__icon" aria-hidden="true">💬</div>
+                    <div class="tbs-stat-card__body">
+                        <div class="tbs-stat-card__label">Support</div>
+                        <div class="tbs-stat-card__hint">Get help</div>
+                    </div>
+                    <div class="tbs-stat-card__arrow" aria-hidden="true">›</div>
+                </a>
+            </div>
+        </div>
 
-        <section class="stats-cards">
-            <div class="card">
-                <h3>Total Orders</h3>
-                <p id="total-orders">0</p>
+        @* Recent orders placeholder — fully wired in Step 21 *@
+        <div class="tbs-dashboard__section">
+            <div class="tbs-section-header">
+                <h2 class="tbs-section-title">Recent Orders</h2>
+                <a asp-controller="Order" asp-action="History" class="tbs-section-link">
+                    View all &rarr;
+                </a>
             </div>
-            <div class="card">
-                <h3>Revenue</h3>
-                <p id="revenue">$0.00</p>
+            <div class="tbs-card tbs-dashboard__empty-orders" id="recent-orders-panel">
+                <p class="tbs-dashboard__empty-text">
+                    You have no recent orders.
+                    <a asp-controller="Product" asp-action="List">Start shopping →</a>
+                </p>
             </div>
-            <div class="card">
-                <h3>Products</h3>
-                <p id="total-products">0</p>
-            </div>
-            <div class="card">
-                <h3>Customers</h3>
-                <p id="total-customers">0</p>
-            </div>
-        </section>
+        </div>
 
-        <section class="recent-orders">
-            <h2>Recent Orders</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Order #</th>
-                        <th>Customer</th>
-                        <th>Items</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="orders-table">
-                    <!-- Populated by JS -->
-                </tbody>
-            </table>
-        </section>
-    </main>
+        @* Quick shop CTA *@
+        <div class="tbs-dashboard__cta">
+            <a asp-controller="Product" asp-action="List" class="btn tbs-btn-accent">
+                Browse Catalog
+            </a>
+            <a asp-controller="Cart" asp-action="ViewCart" class="btn tbs-btn-outline">
+                View Cart
+            </a>
+        </div>
+
+    </div>
 </div>
 
 @section Scripts {
-    <script>
-        const stats = {
-            totalOrders: 124,
-            revenue: 15480.75,
-            totalProducts: 42,
-            totalCustomers: 68
-        };
-
-        document.getElementById('total-orders').textContent = stats.totalOrders;
-        document.getElementById('revenue').textContent = `$${stats.revenue.toFixed(2)}`;
-        document.getElementById('total-products').textContent = stats.totalProducts;
-        document.getElementById('total-customers').textContent = stats.totalCustomers;
-
-        const recentOrders = [
-            { id: 'TB001', customer: 'John Doe', items: 2, total: 250, status: 'Shipped' },
-            { id: 'TB002', customer: 'Jane Smith', items: 1, total: 1200, status: 'Processing' },
-            { id: 'TB003', customer: 'Mike Brown', items: 3, total: 560, status: 'Delivered' }
-        ];
-
-        const ordersTable = document.getElementById('orders-table');
-        recentOrders.forEach(order => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${order.id}</td>
-                <td>${order.customer}</td>
-                <td>${order.items}</td>
-                <td>$${order.total.toFixed(2)}</td>
-                <td>${order.status}</td>
-            `;
-            ordersTable.appendChild(tr);
-        });
-    </script>
+    <script src="~/js/customer.js" asp-append-version="true"></script>
 }

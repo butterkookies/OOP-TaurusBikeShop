@@ -1,36 +1,73 @@
-@model dynamic
+@* WebApplication/Views/Cart/Partials/_CartItem.cshtml *@
+@model WebApplication.Models.ViewModels.CartItemViewModel
 
-<div class="cart-item" data-id="@Model.Id">
-    <div class="item-image">
-        <img src="@Model.ImageUrl" alt="@Model.Name" />
+<div class="tbs-cart-item" id="cart-item-@Model.CartItemId" data-cart-item-id="@Model.CartItemId">
+
+    @* Product image *@
+    <div class="tbs-cart-item__img-wrap">
+        @if (Model.ImageUrl != null)
+        {
+            <img src="@Model.ImageUrl"
+                 alt="@Model.ProductName"
+                 class="tbs-cart-item__img"
+                 loading="lazy" />
+        }
+        else
+        {
+            <div class="tbs-cart-item__img-placeholder" aria-hidden="true">&#9651;</div>
+        }
     </div>
-    <div class="item-details">
-        <h3>@Model.Name</h3>
-        <p class="item-price">$@Model.Price.ToString("F2")</p>
-        <div class="quantity-control">
-            <button class="decrease">-</button>
-            <input type="number" class="quantity" value="@Model.Quantity" min="1" />
-            <button class="increase">+</button>
-        </div>
+
+    @* Info *@
+    <div class="tbs-cart-item__info">
+        <h3 class="tbs-cart-item__name">
+            <a asp-controller="Product" asp-action="Detail"
+               asp-route-id="@Model.ProductId">@Model.ProductName</a>
+        </h3>
+        @if (!string.IsNullOrWhiteSpace(Model.VariantName))
+        {
+            <p class="tbs-cart-item__variant">@Model.VariantName</p>
+        }
+        <p class="tbs-cart-item__unit-price">@Model.FormattedUnitPrice each</p>
     </div>
-    <div class="item-actions">
-        <button class="remove-item">Remove 🗑️</button>
+
+    @* Qty stepper *@
+    <div class="tbs-cart-item__qty">
+        <button type="button"
+                class="tbs-qty-btn tbs-cart-item__qty-btn"
+                data-action="decrease"
+                data-cart-item-id="@Model.CartItemId"
+                aria-label="Decrease quantity">−</button>
+        <input type="number"
+               class="tbs-qty-input tbs-cart-item__qty-input"
+               value="@Model.Quantity"
+               min="1"
+               max="99"
+               data-cart-item-id="@Model.CartItemId"
+               aria-label="Quantity" />
+        <button type="button"
+                class="tbs-qty-btn tbs-cart-item__qty-btn"
+                data-action="increase"
+                data-cart-item-id="@Model.CartItemId"
+                aria-label="Increase quantity">+</button>
     </div>
+
+    @* Line total *@
+    <div class="tbs-cart-item__total"
+         id="line-total-@Model.CartItemId">
+        @Model.FormattedLineTotal
+    </div>
+
+    @* Remove *@
+    <button type="button"
+            class="tbs-cart-item__remove"
+            data-cart-item-id="@Model.CartItemId"
+            aria-label="Remove @Model.ProductName from cart">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+             fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+        </svg>
+    </button>
+
 </div>
-
-@section Scripts {
-    <script>
-        document.querySelectorAll('.cart-item').forEach(item => {
-            const input = item.querySelector('.quantity');
-            item.querySelector('.increase').addEventListener('click', () => {
-                input.value = parseInt(input.value) + 1;
-            });
-            item.querySelector('.decrease').addEventListener('click', () => {
-                if(parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;
-            });
-            item.querySelector('.remove-item').addEventListener('click', () => {
-                item.remove();
-            });
-        });
-    </script>
-}

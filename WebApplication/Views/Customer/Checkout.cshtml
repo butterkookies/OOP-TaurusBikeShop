@@ -1,90 +1,249 @@
+@* WebApplication/Views/Checkout/Checkout.cshtml *@
+@model WebApplication.Models.ViewModels.CheckoutViewModel
 @{
-    ViewData["Title"] = "Checkout - Taurus Bike Shop";
-    Layout = "_Layout";
+    ViewData["Title"] = "Checkout";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/checkout.css" />
+    <link rel="stylesheet" href="~/css/checkout.css" asp-append-version="true" />
 }
 
-<div class="checkout-page">
-    <header class="checkout-header">
-        <h1>🛵 Checkout</h1>
-        <a href="/Cart" class="back-to-cart">← Back to Cart</a>
-    </header>
+@Html.AntiForgeryToken()
 
-    <main class="checkout-main">
-        <section class="checkout-steps">
-            <div class="step active">1. Shipping</div>
-            <div class="step">2. Payment</div>
-            <div class="step">3. Review</div>
-        </section>
+<div class="tbs-checkout-page">
+    <div class="container">
 
-        <form id="checkout-form" class="checkout-form">
-            <fieldset>
-                <legend>Shipping Details</legend>
-                <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" name="fullName" required />
+        <div class="tbs-page-header">
+            <h1 class="tbs-page-header__title">Checkout</h1>
+        </div>
 
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required />
+        <form asp-action="PlaceOrder" asp-controller="Checkout" method="post"
+              id="checkout-form" novalidate>
+            @Html.AntiForgeryToken()
 
-                <label for="address">Address</label>
-                <input type="text" id="address" name="address" required />
+            <div class="tbs-checkout-layout">
 
-                <label for="city">City</label>
-                <input type="text" id="city" name="city" required />
+                @* =================== LEFT: FORM =================== *@
+                <div class="tbs-checkout-layout__form">
 
-                <label for="zip">ZIP Code</label>
-                <input type="text" id="zip" name="zip" required />
-            </fieldset>
+                    @* ── DELIVERY ADDRESS ── *@
+                    <div class="tbs-checkout-section">
+                        <h2 class="tbs-checkout-section__title">Delivery Address</h2>
 
-            <fieldset>
-                <legend>Payment Method</legend>
-                <label>
-                    <input type="radio" name="payment" value="gcash" checked /> GCash
-                </label>
-                <label>
-                    <input type="radio" name="payment" value="cod" /> Cash on Delivery
-                </label>
-            </fieldset>
+                        @if (Model.SavedAddresses.Any())
+                        {
+                            <div class="tbs-address-selector" role="radiogroup"
+                                 aria-label="Select delivery address">
+                                @foreach (WebApplication.Models.Entities.Address addr in Model.SavedAddresses)
+                                {
+                                    <label class="tbs-address-option @(Model.SelectedAddressId == addr.AddressId ? "tbs-address-option--selected" : "")">
+                                        <input type="radio"
+                                               name="SelectedAddressId"
+                                               value="@addr.AddressId"
+                                               class="tbs-address-option__radio"
+                                               @(Model.SelectedAddressId == addr.AddressId ? "checked" : "") />
+                                        <div class="tbs-address-option__body">
+                                            <span class="tbs-address-option__label">@addr.Label</span>
+                                            <address class="tbs-address-option__address">
+                                                @addr.Street, @addr.City@(!string.IsNullOrEmpty(addr.Province) ? $", {addr.Province}" : "")
+                                                — @addr.PostalCode
+                                            </address>
+                                        </div>
+                                        @if (addr.IsDefault)
+                                        {
+                                            <span class="tbs-address-option__default">Default</span>
+                                        }
+                                    </label>
+                                }
+                            </div>
+                            <a asp-controller="Customer" asp-action="Profile"
+                               class="tbs-checkout-section__manage-link">
+                                + Manage addresses
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="tbs-checkout-section__empty">
+                                <p>No saved addresses found.</p>
+                                <a asp-controller="Customer" asp-action="Profile"
+                                   class="btn tbs-btn-primary">
+                                    Add Address
+                                </a>
+                            </div>
+                        }
+                        <span asp-validation-for="SelectedAddressId"
+                              class="tbs-field-error"></span>
+                    </div>
 
-            <div class="checkout-summary">
-                <p>Subtotal: <span id="subtotal">$0.00</span></p>
-                <p>Shipping: <span id="shipping">$0.00</span></p>
-                <p class="total">Total: <span id="total">$0.00</span></p>
+                    @* ── DELIVERY METHOD ── *@
+                    <div class="tbs-checkout-section">
+                        <h2 class="tbs-checkout-section__title">Delivery Method</h2>
+                        <div class="tbs-delivery-options" role="radiogroup"
+                             aria-label="Select delivery method">
+
+                            <label class="tbs-delivery-option">
+                                <input type="radio" name="DeliveryMethod" value="Lalamove"
+                                       class="tbs-delivery-option__radio"
+                                       @(Model.DeliveryMethod == "Lalamove" ? "checked" : "") />
+                                <div class="tbs-delivery-option__body">
+                                    <span class="tbs-delivery-option__name">Lalamove</span>
+                                    <span class="tbs-delivery-option__fee"
+                                          id="fee-Lalamove">
+                                        ₱@CheckoutViewModel.LalamoveFee.ToString("N2")
+                                    </span>
+                                </div>
+                            </label>
+
+                            <label class="tbs-delivery-option">
+                                <input type="radio" name="DeliveryMethod" value="LBC"
+                                       class="tbs-delivery-option__radio"
+                                       @(Model.DeliveryMethod == "LBC" ? "checked" : "") />
+                                <div class="tbs-delivery-option__body">
+                                    <span class="tbs-delivery-option__name">LBC</span>
+                                    <span class="tbs-delivery-option__fee"
+                                          id="fee-LBC">
+                                        ₱@CheckoutViewModel.LBCFee.ToString("N2")
+                                    </span>
+                                </div>
+                            </label>
+
+                            <label class="tbs-delivery-option">
+                                <input type="radio" name="DeliveryMethod" value="Pickup"
+                                       class="tbs-delivery-option__radio"
+                                       @(Model.DeliveryMethod == "Pickup" ? "checked" : "") />
+                                <div class="tbs-delivery-option__body">
+                                    <span class="tbs-delivery-option__name">
+                                        In-Store Pickup
+                                    </span>
+                                    <span class="tbs-delivery-option__fee">Free</span>
+                                </div>
+                            </label>
+
+                        </div>
+                        <span asp-validation-for="DeliveryMethod"
+                              class="tbs-field-error"></span>
+                    </div>
+
+                    @* ── PAYMENT METHOD ── *@
+                    <div class="tbs-checkout-section">
+                        <h2 class="tbs-checkout-section__title">Payment Method</h2>
+                        <div class="tbs-payment-options" role="radiogroup"
+                             aria-label="Select payment method">
+
+                            <label class="tbs-payment-option">
+                                <input type="radio" name="PaymentMethod" value="GCash"
+                                       class="tbs-payment-option__radio"
+                                       @(Model.PaymentMethod == "GCash" ? "checked" : "") />
+                                <div class="tbs-payment-option__body">
+                                    <span class="tbs-payment-option__name">GCash</span>
+                                    <span class="tbs-payment-option__note">
+                                        You'll upload your proof of payment after placing your order.
+                                    </span>
+                                </div>
+                            </label>
+
+                            <label class="tbs-payment-option">
+                                <input type="radio" name="PaymentMethod" value="BankTransfer"
+                                       class="tbs-payment-option__radio"
+                                       @(Model.PaymentMethod == "BankTransfer" ? "checked" : "") />
+                                <div class="tbs-payment-option__body">
+                                    <span class="tbs-payment-option__name">Bank Transfer (BPI)</span>
+                                    <span class="tbs-payment-option__note">
+                                        24-hour verification window after submitting proof.
+                                    </span>
+                                </div>
+                            </label>
+
+                        </div>
+                        <span asp-validation-for="PaymentMethod"
+                              class="tbs-field-error"></span>
+                    </div>
+
+                    @* ── VOUCHER ── *@
+                    <div class="tbs-checkout-section">
+                        <h2 class="tbs-checkout-section__title">Voucher / Promo Code</h2>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.VoucherCode))
+                        {
+                            <div class="tbs-voucher-applied" id="voucher-applied-banner">
+                                <span class="tbs-voucher-applied__icon">✓</span>
+                                <span id="voucher-applied-label">
+                                    @Model.VoucherCode applied
+                                </span>
+                                <button type="button" class="tbs-voucher-applied__remove"
+                                        id="voucher-remove-btn"
+                                        aria-label="Remove voucher">
+                                    ✕
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div id="voucher-applied-banner" style="display:none">
+                                <div class="tbs-voucher-applied">
+                                    <span class="tbs-voucher-applied__icon">✓</span>
+                                    <span id="voucher-applied-label"></span>
+                                    <button type="button"
+                                            class="tbs-voucher-applied__remove"
+                                            id="voucher-remove-btn"
+                                            aria-label="Remove voucher">
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="tbs-voucher-row" id="voucher-input-row">
+                            <input type="text"
+                                   id="voucher-code-input"
+                                   class="tbs-input"
+                                   placeholder="Enter voucher code"
+                                   autocomplete="off"
+                                   aria-label="Voucher code" />
+                            <button type="button"
+                                    id="voucher-apply-btn"
+                                    class="btn tbs-btn-outline">
+                                Apply
+                            </button>
+                        </div>
+                        <p class="tbs-field-error"
+                           id="voucher-error"
+                           style="display:none"></p>
+
+                        @* Hidden fields — populated by voucher.js *@
+                        <input type="hidden" name="VoucherCode"
+                               value="@Model.VoucherCode" />
+                        <input type="hidden" name="DiscountAmount"
+                               value="@Model.DiscountAmount" />
+                    </div>
+
+                    @* Submit *@
+                    <button type="submit"
+                            class="btn tbs-btn-accent tbs-btn-full tbs-checkout-submit"
+                            id="place-order-btn">
+                        Place Order
+                    </button>
+
+                    <p class="tbs-checkout-legal">
+                        By placing your order you agree to our
+                        <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a>.
+                        No refunds. Payment confirmation required within 24 hours.
+                    </p>
+
+                </div>
+
+                @* =================== RIGHT: ORDER SUMMARY =================== *@
+                <aside class="tbs-checkout-layout__summary">
+                    @await Html.PartialAsync("_OrderSummary", Model)
+                </aside>
+
             </div>
-
-            <button type="submit" class="place-order-btn">Place Order</button>
         </form>
-    </main>
+    </div>
 </div>
 
 @section Scripts {
-    <script>
-        const cart = [
-            { id: 1, name: "Taurus MTB Bike", qty: 1, price: 1200 },
-            { id: 2, name: "Helmet Pro Series", qty: 2, price: 80 }
-        ];
-
-        const subtotalEl = document.getElementById('subtotal');
-        const shippingEl = document.getElementById('shipping');
-        const totalEl = document.getElementById('total');
-
-        function updateSummary() {
-            let subtotal = 0;
-            cart.forEach(item => subtotal += item.qty * item.price);
-            const shipping = subtotal > 0 ? 50 : 0;
-            subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
-            shippingEl.textContent = `$${shipping.toFixed(2)}`;
-            totalEl.textContent = `$${(subtotal + shipping).toFixed(2)}`;
-        }
-
-        document.getElementById('checkout-form').addEventListener('submit', e => {
-            e.preventDefault();
-            alert("Order placed successfully! Thank you for shopping at Taurus Bike Shop.");
-        });
-
-        updateSummary();
-    </script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="~/js/voucher.js"   asp-append-version="true"></script>
+    <script src="~/js/checkout.js"  asp-append-version="true"></script>
 }

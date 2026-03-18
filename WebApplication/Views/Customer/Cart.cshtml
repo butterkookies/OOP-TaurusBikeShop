@@ -1,104 +1,114 @@
+@* WebApplication/Views/Cart/Cart.cshtml *@
+@model WebApplication.Models.ViewModels.CartViewModel
 @{
-    ViewData["Title"] = "Cart - Taurus Bike Shop";
-    Layout = "_Layout";
+    ViewData["Title"] = "Shopping Cart";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/cart.css" />
+    <link rel="stylesheet" href="~/css/cart.css"      asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/cart-item.css" asp-append-version="true" />
 }
 
-<div class="cart-page">
-    <header class="cart-header">
-        <h1>🛒 Your Cart</h1>
-        <a href="/" class="continue-shopping">← Continue Shopping</a>
-    </header>
+@Html.AntiForgeryToken()
 
-    <main class="cart-main">
-        <table class="cart-table">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Total</th>
-                    <th>Remove</th>
-                </tr>
-            </thead>
-            <tbody id="cart-items">
-                <!-- Dynamically populated with JS -->
-            </tbody>
-        </table>
+<div class="tbs-cart-page">
+    <div class="container">
 
-        <div class="cart-summary">
-            <div class="summary-details">
-                <p>Subtotal: <span id="subtotal">$0.00</span></p>
-                <p>Shipping: <span id="shipping">$0.00</span></p>
-                <p class="total">Total: <span id="total">$0.00</span></p>
-            </div>
-            <button id="checkout-btn" class="checkout-btn">Proceed to Checkout</button>
+        <div class="tbs-page-header">
+            <h1 class="tbs-page-header__title">Shopping Cart</h1>
+            @if (!Model.IsEmpty)
+            {
+                <span class="tbs-cart-page__count">
+                    @Model.TotalQuantity item@(Model.TotalQuantity != 1 ? "s" : "")
+                </span>
+            }
         </div>
-    </main>
+
+        @if (Model.IsEmpty)
+        {
+            <div class="tbs-cart-page__empty">
+                <div class="tbs-cart-page__empty-icon" aria-hidden="true">🛒</div>
+                <h2 class="tbs-cart-page__empty-title">Your cart is empty</h2>
+                <p class="tbs-cart-page__empty-text">
+                    Browse our catalog and add items to get started.
+                </p>
+                <a asp-controller="Product" asp-action="List"
+                   class="btn tbs-btn-accent tbs-btn-lg">
+                    Shop Now
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="tbs-cart-layout">
+
+                @* ==================== ITEMS ==================== *@
+                <div class="tbs-cart-layout__items">
+
+                    <div class="tbs-cart-items" id="cart-items-list">
+                        @foreach (WebApplication.Models.ViewModels.CartItemViewModel item in Model.Items)
+                        {
+                            @await Html.PartialAsync("_CartItem", item)
+                        }
+                    </div>
+
+                    <div class="tbs-cart-actions">
+                        <a asp-controller="Product" asp-action="List"
+                           class="tbs-cart-actions__continue">
+                            ← Continue Shopping
+                        </a>
+                    </div>
+                </div>
+
+                @* ==================== ORDER SUMMARY ==================== *@
+                <aside class="tbs-cart-layout__summary">
+                    <div class="tbs-order-summary">
+                        <h2 class="tbs-order-summary__title">Order Summary</h2>
+
+                        <div class="tbs-order-summary__row">
+                            <span>Subtotal</span>
+                            <span id="cart-subtotal">@Model.FormattedSubTotal</span>
+                        </div>
+
+                        @if (Model.DiscountAmount > 0)
+                        {
+                            <div class="tbs-order-summary__row tbs-order-summary__row--discount">
+                                <span>Discount (@Model.AppliedVoucherCode)</span>
+                                <span>−₱@Model.DiscountAmount.ToString("N2")</span>
+                            </div>
+                        }
+
+                        <div class="tbs-order-summary__row tbs-order-summary__row--shipping">
+                            <span>Shipping</span>
+                            <span class="tbs-order-summary__shipping-note">
+                                Calculated at checkout
+                            </span>
+                        </div>
+
+                        <div class="tbs-order-summary__divider"></div>
+
+                        <div class="tbs-order-summary__row tbs-order-summary__row--total">
+                            <span>Estimated Total</span>
+                            <span id="cart-total">@Model.FormattedSubTotal</span>
+                        </div>
+
+                        <a asp-controller="Checkout" asp-action="Index"
+                           class="btn tbs-btn-accent tbs-btn-full tbs-order-summary__checkout-btn">
+                            Proceed to Checkout
+                        </a>
+
+                        <div class="tbs-order-summary__payment-note">
+                            <span>Accepted payments:</span>
+                            <strong>GCash</strong> &bull; <strong>Bank Transfer</strong>
+                        </div>
+                    </div>
+                </aside>
+
+            </div>
+        }
+    </div>
 </div>
 
 @section Scripts {
-    <script>
-        // Sample cart data (replace with server-side or API)
-        const cart = [
-            { id: 1, name: "Taurus MTB Bike", qty: 1, price: 1200 },
-            { id: 2, name: "Helmet Pro Series", qty: 2, price: 80 }
-        ];
-
-        const cartItemsEl = document.getElementById('cart-items');
-        const subtotalEl = document.getElementById('subtotal');
-        const shippingEl = document.getElementById('shipping');
-        const totalEl = document.getElementById('total');
-
-        function renderCart() {
-            cartItemsEl.innerHTML = '';
-            let subtotal = 0;
-            cart.forEach(item => {
-                const total = item.qty * item.price;
-                subtotal += total;
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>
-                        <input type="number" min="1" value="${item.qty}" data-id="${item.id}" class="qty-input"/>
-                    </td>
-                    <td>$${item.price.toFixed(2)}</td>
-                    <td>$${total.toFixed(2)}</td>
-                    <td><button class="remove-btn" data-id="${item.id}">✖</button></td>
-                `;
-                cartItemsEl.appendChild(row);
-            });
-            const shipping = subtotal > 0 ? 50 : 0;
-            subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
-            shippingEl.textContent = `$${shipping.toFixed(2)}`;
-            totalEl.textContent = `$${(subtotal + shipping).toFixed(2)}`;
-        }
-
-        cartItemsEl.addEventListener('input', e => {
-            if(e.target.classList.contains('qty-input')){
-                const id = parseInt(e.target.dataset.id);
-                const item = cart.find(i => i.id === id);
-                item.qty = parseInt(e.target.value);
-                renderCart();
-            }
-        });
-
-        cartItemsEl.addEventListener('click', e => {
-            if(e.target.classList.contains('remove-btn')){
-                const id = parseInt(e.target.dataset.id);
-                const index = cart.findIndex(i => i.id === id);
-                if(index !== -1) cart.splice(index, 1);
-                renderCart();
-            }
-        });
-
-        document.getElementById('checkout-btn').addEventListener('click', () => {
-            alert("Proceeding to checkout...");
-        });
-
-        renderCart();
-    </script>
+    <script src="~/js/cart.js" asp-append-version="true"></script>
 }

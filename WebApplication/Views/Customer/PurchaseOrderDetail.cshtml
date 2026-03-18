@@ -1,0 +1,165 @@
+@* WebApplication/Views/Customer/PurchaseOrderDetail.cshtml *@
+@* Admin/Manager role only *@
+@model WebApplication.Models.Entities.PurchaseOrder
+@using WebApplication.Models.Entities
+@{
+    ViewData["Title"] = $"Purchase Order #{Model.PurchaseOrderId}";
+    string badgeCss = Model.Status switch
+    {
+        PurchaseOrderStatuses.Pending   => "tbs-badge--pending",
+        PurchaseOrderStatuses.Received  => "tbs-badge--delivered",
+        PurchaseOrderStatuses.Cancelled => "tbs-badge--cancelled",
+        _                               => "tbs-badge--pending"
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/supplier.css" asp-append-version="true" />
+}
+
+<div class="tbs-supplier-page">
+    <div class="container">
+
+        <ol class="tbs-breadcrumb">
+            <li><a asp-controller="Supplier" asp-action="Index">Suppliers</a></li>
+            <li>
+                <a asp-controller="Supplier"
+                   asp-action="PurchaseOrders"
+                   asp-route-supplierId="@Model.SupplierId">
+                    @(Model.Supplier?.Name ?? "Purchase Orders")
+                </a>
+            </li>
+            <li>PO #@Model.PurchaseOrderId</li>
+        </ol>
+
+        <div class="tbs-page-header">
+    <div>
+        <h1 class="tbs-page-header__title">PO #@Model.PurchaseOrderId</h1>
+        <p class="tbs-page-header__subtitle">
+            Ordered @Model.OrderDate.ToString("MMMM d, yyyy")
+            @if (Model.CreatedBy != null)
+            {
+                var createdBy = Model.CreatedBy;
+                <text> · Created by @createdBy.FirstName @createdBy.LastName</text>
+            }
+        </p>
+    </div>
+    <span class="tbs-badge @badgeCss">@Model.Status</span>
+</div>
+        <div class="tbs-po-detail__layout">
+
+            @* =================== LINE ITEMS =================== *@
+            <div class="tbs-po-detail__main">
+                <div class="tbs-card">
+                    <h2 class="tbs-card__title">Line Items</h2>
+
+                    <div class="tbs-po-items">
+                        @foreach (PurchaseOrderItem item in Model.Items)
+                        {
+                            <div class="tbs-po-item">
+                                <div class="tbs-po-item__info">
+                                    <span class="tbs-po-item__name">
+                                        @(item.Product?.Name ?? "Product")
+                                    </span>
+                                    @if (!string.IsNullOrWhiteSpace(item.Variant?.VariantName)
+                                         && item.Variant.VariantName != "Default")
+                                    {
+                                        <span class="tbs-po-item__variant">
+                                            @item.Variant.VariantName
+                                        </span>
+                                    }
+                                </div>
+                                <div class="tbs-po-item__numbers">
+                                    <span class="tbs-po-item__qty">
+                                        Qty: @item.Quantity
+                                    </span>
+                                    <span class="tbs-po-item__price">
+                                        ₱@item.UnitCost.ToString("N2") / unit
+                                    </span>
+                                    <span class="tbs-po-item__subtotal">
+                                        ₱@((item.Quantity * item.UnitCost).ToString("N2"))
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @* Total *@
+                    <div class="tbs-po-detail__total">
+                        <span>Total</span>
+                        <span class="tbs-po-detail__total-value">
+                            ₱@Model.Items.Sum(i => i.Quantity * i.UnitCost).ToString("N2")
+                        </span>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Notes))
+                {
+                    <div class="tbs-card mt-3">
+                        <h2 class="tbs-card__title">Notes</h2>
+                        <p class="tbs-po-detail__notes">@Model.Notes</p>
+                    </div>
+                }
+            </div>
+
+            @* =================== SIDEBAR =================== *@
+            <aside class="tbs-po-detail__aside">
+                <div class="tbs-card">
+                    <h2 class="tbs-card__title">Supplier</h2>
+                    @if (Model.Supplier != null)
+                    {
+                        <dl class="tbs-supplier-card__details">
+                            <div class="tbs-supplier-card__detail">
+                                <dt>Name</dt>
+                                <dd>@Model.Supplier.Name</dd>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(Model.Supplier.ContactPerson))
+                            {
+                                <div class="tbs-supplier-card__detail">
+                                    <dt>Contact</dt>
+                                    <dd>@Model.Supplier.ContactPerson</dd>
+                                </div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.Supplier.Email))
+                            {
+                                <div class="tbs-supplier-card__detail">
+                                    <dt>Email</dt>
+                                    <dd>
+                                        <a href="mailto:@Model.Supplier.Email">
+                                            @Model.Supplier.Email
+                                        </a>
+                                    </dd>
+                                </div>
+                            }
+                        </dl>
+                    }
+                </div>
+
+                <div class="tbs-card mt-3">
+                    <h2 class="tbs-card__title">Timeline</h2>
+                    <dl class="tbs-supplier-card__details">
+                        <div class="tbs-supplier-card__detail">
+                            <dt>Ordered</dt>
+                            <dd>@Model.OrderDate.ToString("MMM d, yyyy")</dd>
+                        </div>
+                        @if (Model.ExpectedDate.HasValue)
+                        {
+                            <div class="tbs-supplier-card__detail">
+                                <dt>Expected</dt>
+                                <dd>@Model.ExpectedDate.Value.ToString("MMM d, yyyy")</dd>
+                            </div>
+                        }
+                        @if (Model.ReceivedDate.HasValue)
+                        {
+                            <div class="tbs-supplier-card__detail">
+                                <dt>Received</dt>
+                                <dd>@Model.ReceivedDate.Value.ToString("MMM d, yyyy")</dd>
+                            </div>
+                        }
+                    </dl>
+                </div>
+            </aside>
+
+        </div>
+    </div>
+</div>

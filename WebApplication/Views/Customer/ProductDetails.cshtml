@@ -1,63 +1,316 @@
+@* WebApplication/Views/Customer/ProductDetails.cshtml *@
+@model WebApplication.Models.ViewModels.ProductDetailViewModel
 @{
-    ViewData["Title"] = "Product Details - Taurus Bike Shop";
-    Layout = "_Layout";
+    ViewData["Title"] = Model.Name;
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/productdetails.css" />
+    <link rel="stylesheet" href="~/css/product-details.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/review.css"          asp-append-version="true" />
 }
 
-<div class="product-page">
-    <div class="product-gallery">
-        <img id="main-image" src="~/images/bike1.jpg" alt="Taurus MTB Bike" />
-        <div class="thumbnail-row">
-            <img src="~/images/bike1.jpg" alt="Taurus MTB Bike" class="thumb active" />
-            <img src="~/images/bike2.jpg" alt="Taurus MTB Bike Side" class="thumb" />
-            <img src="~/images/bike3.jpg" alt="Taurus MTB Bike Closeup" class="thumb" />
-        </div>
-    </div>
+@Html.AntiForgeryToken()
 
-    <div class="product-info">
-        <h1>Taurus MTB Bike</h1>
-        <p class="price">$1,200.00</p>
-        <p class="description">
-            Experience the thrill of the trail with the Taurus MTB Bike, built for speed, durability, and style. Perfect for both beginners and seasoned riders.
-        </p>
+<div class="tbs-product-detail">
+    <div class="container">
 
-        <div class="quantity-selector">
-            <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" min="1" value="1" />
+        @* Breadcrumb *@
+        <ol class="tbs-breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><a asp-controller="Product" asp-action="List">Catalog</a></li>
+            <li>
+                <a asp-controller="Product" asp-action="List"
+                   asp-route-categoryId="@ViewBag.CategoryId">@Model.Category</a>
+            </li>
+            <li>@Model.Name</li>
+        </ol>
+
+        <div class="row g-5">
+
+            @* ==================== IMAGE GALLERY ==================== *@
+            <div class="col-12 col-md-6">
+                <div class="tbs-gallery">
+
+                    @* Main image *@
+                    <div class="tbs-gallery__main">
+                        @if (Model.PrimaryImageUrl != null)
+                        {
+                            <img src="@Model.PrimaryImageUrl"
+                                 alt="@Model.Name"
+                                 class="tbs-gallery__main-img"
+                                 id="main-product-img"
+                                 loading="eager" />
+                        }
+                        else
+                        {
+                            <div class="tbs-gallery__placeholder" aria-label="No image available">
+                                <span aria-hidden="true">&#9651;</span>
+                            </div>
+                        }
+                    </div>
+
+                    @* Thumbnail row *@
+                    @if (Model.Images.Count > 1)
+                    {
+                        <div class="tbs-gallery__thumbs">
+                            @foreach (WebApplication.Models.Entities.ProductImage img in Model.Images)
+                            {
+                                <button type="button"
+                                        class="tbs-gallery__thumb @(img.IsPrimary ? "tbs-gallery__thumb--active" : "")"
+                                        data-src="@img.ImageUrl"
+                                        aria-label="View image">
+                                    <img src="@img.ImageUrl" alt="" loading="lazy" />
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* ==================== PRODUCT INFO ==================== *@
+            <div class="col-12 col-md-6">
+                <div class="tbs-product-detail__info">
+
+                    @if (Model.Brand != null)
+                    {
+                        <p class="tbs-product-detail__brand">@Model.Brand</p>
+                    }
+
+                    <h1 class="tbs-product-detail__name">@Model.Name</h1>
+
+                    @* Rating summary *@
+                    @if (Model.ReviewCount > 0)
+                    {
+                        <div class="tbs-product-detail__rating">
+                            <div class="tbs-stars tbs-stars--sm" aria-label="@Model.AverageRating out of 5">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span class="tbs-star @(i <= (int)Model.AverageRating ? "tbs-star--filled" : (i - 0.5m <= Model.AverageRating ? "tbs-star--half" : ""))">★</span>
+                                }
+                            </div>
+                            <span class="tbs-product-detail__rating-count">(@Model.ReviewCount review@(Model.ReviewCount != 1 ? "s" : ""))</span>
+                        </div>
+                    }
+
+                    @* Price *@
+                    <div class="tbs-product-detail__price" id="displayed-price">
+                        @Model.FormattedPrice
+                    </div>
+
+                    @* Short description *@
+                    @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
+                    {
+                        <p class="tbs-product-detail__short-desc">@Model.ShortDescription</p>
+                    }
+
+                    @* Variant selector *@
+                    @if (Model.Variants.Count > 1 ||
+                         (Model.Variants.Count == 1 && Model.Variants[0].VariantName != "Default"))
+                    {
+                        <div class="tbs-product-detail__variants">
+                            <div class="tbs-label mb-2">Select Option</div>
+                            <div class="tbs-variant-selector" id="variant-selector">
+                                @foreach (WebApplication.Models.Entities.ProductVariant v in Model.Variants)
+                                {
+                                    <button type="button"
+                                            class="tbs-variant-btn @(v.ProductVariantId == Model.SelectedVariantId ? "tbs-variant-btn--selected" : "") @(v.StockQuantity == 0 ? "tbs-variant-btn--oos" : "")"
+                                            data-variant-id="@v.ProductVariantId"
+                                            data-additional-price="@v.AdditionalPrice"
+                                            @(v.StockQuantity == 0 ? "disabled" : "")
+                                            aria-pressed="@(v.ProductVariantId == Model.SelectedVariantId ? "true" : "false")">
+                                        @v.VariantName
+                                        @if (v.StockQuantity == 0)
+                                        {
+                                            <span class="tbs-variant-btn__oos"> (Out of Stock)</span>
+                                        }
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @* Stock status *@
+                    <div class="tbs-product-detail__stock" id="stock-status">
+                        @if (Model.IsOutOfStock)
+                        {
+                            <span class="tbs-stock-badge tbs-stock-badge--oos">Out of Stock</span>
+                        }
+                        else if (Model.TotalStock <= 5)
+                        {
+                            <span class="tbs-stock-badge tbs-stock-badge--low">
+                                Only @Model.TotalStock left
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="tbs-stock-badge tbs-stock-badge--in">In Stock</span>
+                        }
+                    </div>
+
+                    @* Add to cart / Wishlist *@
+                    <div class="tbs-product-detail__actions">
+                        @if (!Model.IsOutOfStock)
+                        {
+                            <div class="tbs-qty-selector">
+                                <button type="button" class="tbs-qty-btn" id="qty-minus" aria-label="Decrease quantity">−</button>
+                                <input type="number" id="qty-input" class="tbs-qty-input"
+                                       value="1" min="1" max="99" aria-label="Quantity" />
+                                <button type="button" class="tbs-qty-btn" id="qty-plus" aria-label="Increase quantity">+</button>
+                            </div>
+
+                            <button type="button"
+                                    class="btn tbs-btn-accent tbs-btn-lg tbs-add-to-cart-btn"
+                                    id="add-to-cart-btn"
+                                    data-product-id="@Model.ProductId"
+                                    data-variant-id="@Model.SelectedVariantId">
+                                Add to Cart
+                            </button>
+                        }
+
+                        <button type="button"
+                                class="tbs-wishlist-toggle @(Model.IsInWishlist ? "tbs-wishlist-toggle--active" : "")"
+                                data-product-id="@Model.ProductId"
+                                aria-label="@(Model.IsInWishlist ? "Remove from wishlist" : "Add to wishlist")"
+                                aria-pressed="@(Model.IsInWishlist ? "true" : "false")">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                                 fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
         </div>
 
-        <div class="product-actions">
-            <button id="add-to-cart">Add to Cart 🛒</button>
-            <button id="buy-now">Buy Now 💳</button>
+        @* ==================== SPECS TABLE ==================== *@
+        @{
+            bool hasSpecs = Model.Material != null || Model.Color != null ||
+                Model.WheelSize != null || Model.SpeedCompatibility != null ||
+                Model.BoostCompatible != null || Model.TubelessReady != null ||
+                Model.AxleStandard != null || Model.SuspensionTravel != null ||
+                Model.BrakeType != null || !string.IsNullOrWhiteSpace(Model.AdditionalSpecs);
+        }
+        @if (hasSpecs || !string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="tbs-product-detail__tabs mt-5">
+                <div class="tbs-tabs" id="detail-tabs">
+                    <button class="tbs-tab tbs-tab--active" data-tab="description">Description</button>
+                    @if (hasSpecs)
+                    {
+                        <button class="tbs-tab" data-tab="specs">Specifications</button>
+                    }
+                </div>
+
+                <div class="tbs-tab-panel tbs-tab-panel--active" id="tab-description">
+                    <p>@(Model.Description ?? Model.ShortDescription ?? "No description available.")</p>
+                </div>
+
+                @if (hasSpecs)
+                {
+                    <div class="tbs-tab-panel" id="tab-specs">
+                        <table class="tbs-specs-table">
+                            @if (Model.Material != null)
+                            { <tr><th>Material</th><td>@Model.Material</td></tr> }
+                            @if (Model.Color != null)
+                            { <tr><th>Color</th><td>@Model.Color</td></tr> }
+                            @if (Model.WheelSize != null)
+                            { <tr><th>Wheel Size</th><td>@Model.WheelSize</td></tr> }
+                            @if (Model.SpeedCompatibility != null)
+                            { <tr><th>Speed Compatibility</th><td>@Model.SpeedCompatibility</td></tr> }
+                            @if (Model.BrakeType != null)
+                            { <tr><th>Brake Type</th><td>@Model.BrakeType</td></tr> }
+                            @if (Model.AxleStandard != null)
+                            { <tr><th>Axle Standard</th><td>@Model.AxleStandard</td></tr> }
+                            @if (Model.SuspensionTravel != null)
+                            { <tr><th>Suspension Travel</th><td>@Model.SuspensionTravel</td></tr> }
+                            @if (Model.BoostCompatible != null)
+                            { <tr><th>Boost Compatible</th><td>@(Model.BoostCompatible.Value ? "Yes" : "No")</td></tr> }
+                            @if (Model.TubelessReady != null)
+                            { <tr><th>Tubeless Ready</th><td>@(Model.TubelessReady.Value ? "Yes" : "No")</td></tr> }
+                            @if (!string.IsNullOrWhiteSpace(Model.AdditionalSpecs))
+                            { <tr><th>Additional Specs</th><td>@Model.AdditionalSpecs</td></tr> }
+                        </table>
+                    </div>
+                }
+            </div>
+        }
+
+        @* ==================== REVIEWS ==================== *@
+        <div class="tbs-product-detail__reviews mt-5" id="reviews-section">
+            <div class="tbs-section-header">
+                <h2 class="tbs-section-title">Customer Reviews</h2>
+                @if (Model.ReviewCount > 0)
+                {
+                    <div class="tbs-product-detail__avg-rating">
+                        <span class="tbs-avg-rating__score">@Model.AverageRating.ToString("0.0")</span>
+                        <span class="tbs-avg-rating__max">/5</span>
+                        <span class="tbs-avg-rating__count">(@Model.ReviewCount)</span>
+                    </div>
+                }
+            </div>
+
+            @* Submit review form — authenticated users with verified purchase *@
+            @if (Model.CanReview)
+            {
+                <div class="tbs-review-form-wrapper">
+                    @await Html.PartialAsync("~/Views/Customer/Partials/_ReviewForm.cshtml",
+                        new WebApplication.Models.ViewModels.ReviewViewModel
+                        {
+                            ProductId = Model.ProductId,
+                            OrderId   = 0
+                        })
+                </div>
+            }
+
+            @* Review list *@
+            <div id="review-list">
+                @if (!Model.Reviews.Any())
+                {
+                    <p class="tbs-reviews__empty">No reviews yet. Be the first to review this product.</p>
+                }
+                else
+                {
+                    @foreach (WebApplication.Models.ViewModels.ReviewViewModel review in Model.Reviews)
+                    {
+                        <div class="tbs-review-card">
+                            <div class="tbs-review-card__header">
+                                <div class="tbs-stars tbs-stars--sm" aria-label="@review.Rating out of 5">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <span class="tbs-star @(i <= review.Rating ? "tbs-star--filled" : "")">★</span>
+                                    }
+                                </div>
+                                @if (review.IsVerifiedPurchase)
+                                {
+                                    <span class="tbs-review-card__verified">✓ Verified Purchase</span>
+                                }
+                            </div>
+                            <p class="tbs-review-card__comment">@review.Comment</p>
+                            <div class="tbs-review-card__meta">
+                                <strong>@review.ReviewerName</strong>
+                                <span>@review.CreatedAt</span>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.ReviewCount > Model.Reviews.Count)
+                    {
+                        <button type="button" class="btn tbs-btn-outline mt-3"
+                                id="load-more-reviews"
+                                data-product-id="@Model.ProductId"
+                                data-page="2">
+                            Load More Reviews
+                        </button>
+                    }
+                }
+            </div>
         </div>
+
     </div>
 </div>
 
 @section Scripts {
-    <script>
-        const mainImage = document.getElementById('main-image');
-        const thumbs = document.querySelectorAll('.thumb');
-
-        thumbs.forEach(thumb => {
-            thumb.addEventListener('click', () => {
-                mainImage.src = thumb.src;
-                thumbs.forEach(t => t.classList.remove('active'));
-                thumb.classList.add('active');
-            });
-        });
-
-        document.getElementById('add-to-cart').addEventListener('click', () => {
-            const qty = parseInt(document.getElementById('quantity').value);
-            alert(`Added ${qty} Taurus MTB Bike(s) to your cart!`);
-        });
-
-        document.getElementById('buy-now').addEventListener('click', () => {
-            const qty = parseInt(document.getElementById('quantity').value);
-            alert(`Proceeding to buy ${qty} Taurus MTB Bike(s)...`);
-            window.location.href = '/Checkout';
-        });
-    </script>
+    <script src="~/js/product-catalog.js" asp-append-version="true"></script>
+    <script src="~/js/review.js"          asp-append-version="true"></script>
 }

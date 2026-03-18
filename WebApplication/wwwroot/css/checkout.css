@@ -1,126 +1,272 @@
-/* File: wwwroot/css/checkout.css */
+/* WebApplication/wwwroot/css/checkout.css */
 
-.checkout-page {
-    font-family: 'Segoe UI', sans-serif;
-    background: #fff5f5;
-    padding: 20px;
-    min-height: 90vh;
-    color: #1a1a1a;
+.tbs-checkout-page {
+    padding: 2.5rem 0 5rem;
 }
 
-.checkout-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
+/* Two-column layout */
+.tbs-checkout-layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 2.5rem;
+    align-items: start;
+}
+.tbs-checkout-layout__summary {
+    position: sticky;
+    top: 88px;
 }
 
-.checkout-header h1 {
-    color: #d32f2f;
-    font-size: 2rem;
-    font-weight: bold;
-    letter-spacing: 1px;
+/* Checkout sections */
+.tbs-checkout-section {
+    background: var(--tbs-white);
+    border: 1px solid var(--tbs-gray-100);
+    border-radius: var(--tbs-card-radius);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
 }
-
-.back-to-cart {
-    color: #d32f2f;
-    text-decoration: none;
-    font-weight: bold;
-    transition: all 0.3s ease;
+.tbs-checkout-section__title {
+    font-family: var(--tbs-font-display);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--tbs-gray-800);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--tbs-gray-100);
 }
-
-.back-to-cart:hover {
-    color: #a71d1d;
+.tbs-checkout-section__manage-link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--tbs-accent);
 }
-
-.checkout-steps {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 30px;
-}
-
-.step {
-    flex: 1;
+.tbs-checkout-section__empty {
     text-align: center;
-    padding: 10px 0;
-    background: #f5f5f5;
-    border-radius: 8px;
-    color: #999;
-    font-weight: bold;
-    position: relative;
-    transition: all 0.3s ease;
+    padding: 1rem 0;
+    color: var(--tbs-gray-400);
 }
 
-.step.active {
-    background: #d32f2f;
-    color: #fff;
+/* Address selector */
+.tbs-address-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
 }
-
-.checkout-form fieldset {
-    border: 1px solid #eee;
-    padding: 20px;
-    margin-bottom: 20px;
+.tbs-address-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 1rem;
+    border: 1.5px solid var(--tbs-gray-200);
     border-radius: 10px;
+    cursor: pointer;
+    transition: border-color var(--tbs-transition), background-color var(--tbs-transition);
+    position: relative;
 }
-
-.checkout-form legend {
-    font-weight: bold;
-    color: #b71c1c;
-    padding: 0 10px;
+.tbs-address-option:hover {
+    border-color: var(--tbs-accent-light);
 }
-
-.checkout-form label {
+.tbs-address-option--selected,
+.tbs-address-option:has(input:checked) {
+    border-color: var(--tbs-accent);
+    background: rgba(255,107,0,0.04);
+}
+.tbs-address-option__radio {
+    margin-top: 3px;
+    accent-color: var(--tbs-accent);
+    flex-shrink: 0;
+}
+.tbs-address-option__label {
+    font-family: var(--tbs-font-display);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--tbs-accent);
     display: block;
-    margin: 10px 0 5px;
+    margin-bottom: 0.25rem;
+}
+.tbs-address-option__address {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--tbs-gray-800);
+    font-style: normal;
+    margin: 0;
+}
+.tbs-address-option__default {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.75rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    background: var(--tbs-accent);
+    color: var(--tbs-white);
+    padding: 0.15rem 0.45rem;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
-.checkout-form input[type="text"],
-.checkout-form input[type="email"] {
-    width: 100%;
-    padding: 10px;
+/* Delivery options */
+.tbs-delivery-options,
+.tbs-payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+.tbs-delivery-option,
+.tbs-payment-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 1rem;
+    border: 1.5px solid var(--tbs-gray-200);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color var(--tbs-transition), background-color var(--tbs-transition);
+}
+.tbs-delivery-option:hover,
+.tbs-payment-option:hover {
+    border-color: var(--tbs-accent-light);
+}
+.tbs-delivery-option:has(input:checked),
+.tbs-payment-option:has(input:checked) {
+    border-color: var(--tbs-accent);
+    background: rgba(255,107,0,0.04);
+}
+.tbs-delivery-option__radio,
+.tbs-payment-option__radio {
+    margin-top: 3px;
+    accent-color: var(--tbs-accent);
+    flex-shrink: 0;
+}
+.tbs-delivery-option__body,
+.tbs-payment-option__body {
+    flex: 1;
+}
+.tbs-delivery-option__name,
+.tbs-payment-option__name {
+    font-weight: 700;
+    font-size: 0.9375rem;
+    color: var(--tbs-gray-800);
+    display: block;
+}
+.tbs-delivery-option__fee {
+    font-size: 0.875rem;
+    color: var(--tbs-accent);
+    font-weight: 600;
+}
+.tbs-payment-option__note {
+    font-size: 0.8rem;
+    color: var(--tbs-gray-400);
+    display: block;
+    margin-top: 0.2rem;
+    line-height: 1.5;
+}
+
+/* Voucher row */
+.tbs-voucher-row {
+    display: flex;
+    gap: 0.625rem;
+    margin-top: 0.25rem;
+}
+.tbs-voucher-row .tbs-input {
+    flex: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.tbs-voucher-applied {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--tbs-success-light);
+    border: 1px solid rgba(22,163,74,0.3);
     border-radius: 8px;
-    border: 1px solid #ccc;
+    padding: 0.625rem 0.875rem;
+    margin-bottom: 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--tbs-success);
+}
+.tbs-voucher-applied__icon {
     font-size: 1rem;
 }
-
-.checkout-form input[type="radio"] {
-    margin-right: 10px;
-}
-
-.checkout-summary {
-    font-size: 1.2rem;
-    line-height: 1.6;
-    margin-bottom: 20px;
-}
-
-.checkout-summary .total {
-    font-weight: bold;
-    font-size: 1.4rem;
-    color: #b71c1c;
-}
-
-.place-order-btn {
-    background: #d32f2f;
-    color: #fff;
+.tbs-voucher-applied__remove {
+    background: none;
     border: none;
-    padding: 15px 30px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    border-radius: 8px;
+    color: var(--tbs-success);
     cursor: pointer;
-    transition: all 0.3s ease;
+    margin-left: auto;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    transition: opacity var(--tbs-transition);
+    padding: 0;
+    line-height: 1;
+}
+.tbs-voucher-applied__remove:hover { opacity: 1; }
+
+/* Submit */
+.tbs-checkout-submit {
+    padding: 1rem;
+    font-size: 1.0625rem;
+    letter-spacing: 0.08em;
+}
+.tbs-checkout-legal {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--tbs-gray-400);
+    margin-top: 1rem;
+    line-height: 1.6;
+}
+.tbs-checkout-legal a {
+    color: var(--tbs-gray-400);
+    text-decoration: underline;
 }
 
-.place-order-btn:hover {
-    background: #b71c1c;
+/* Order summary checkout variant */
+.tbs-order-summary--checkout .tbs-order-summary__items {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+.tbs-order-summary__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+.tbs-order-summary__item-name {
+    color: var(--tbs-gray-600);
+    flex: 1;
+    min-width: 0;
+}
+.tbs-order-summary__item-variant {
+    color: var(--tbs-gray-400);
+    font-size: 0.8rem;
+}
+.tbs-order-summary__item-qty {
+    color: var(--tbs-gray-400);
+    font-size: 0.8rem;
+    margin-left: 0.25rem;
+}
+.tbs-order-summary__item-total {
+    font-weight: 600;
+    color: var(--tbs-gray-800);
+    white-space: nowrap;
 }
 
-@media (max-width: 768px){
-    .checkout-steps {
-        flex-direction: column;
-        gap: 10px;
+/* Responsive */
+@media (max-width: 991.98px) {
+    .tbs-checkout-layout {
+        grid-template-columns: 1fr;
     }
-    .place-order-btn {
-        width: 100%;
+    .tbs-checkout-layout__summary {
+        position: static;
+        order: -1;
     }
 }

@@ -1,42 +1,63 @@
-<footer class="site-footer">
-    <div class="footer-content">
-        <div class="footer-brand">
-            <h2>Taurus 🐂 Bike Shop</h2>
-            <p>Ride Bold. Ride Strong. Ride Taurus.</p>
-        </div>
+@* WebApplication/Views/Shared/_Footer.cshtml *@
+<footer class="tbs-footer">
+    <div class="container">
+        <div class="row tbs-footer__grid">
 
-        <div class="footer-links">
-            <div class="links-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/Products">Products</a></li>
-                    <li><a href="/Cart">Cart</a></li>
-                    <li><a href="/Orders">Order History</a></li>
+            @* Brand column *@
+            <div class="col-lg-4 col-md-6 tbs-footer__brand-col">
+                <div class="tbs-footer__brand">
+                    <span class="tbs-footer__brand-mark">&#9651;</span>
+                    <span class="tbs-footer__brand-name">TAURUS</span>
+                </div>
+                <p class="tbs-footer__tagline">
+                    Premium bikes and components for every rider — from trail to road, beginner to pro.
+                </p>
+                <p class="tbs-footer__address">
+                    Philippines &nbsp;·&nbsp; GCash &amp; Bank Transfer accepted
+                </p>
+            </div>
+
+            @* Shop links *@
+            <div class="col-lg-2 col-md-3 col-6 tbs-footer__links-col">
+                <h6 class="tbs-footer__heading">Shop</h6>
+                <ul class="tbs-footer__links">
+                    <li><a asp-controller="Product" asp-action="List">All Products</a></li>
+                    <li><a asp-controller="Product" asp-action="List" asp-route-categoryCode="UNIT">Complete Bikes</a></li>
+                    <li><a asp-controller="Product" asp-action="List" asp-route-categoryCode="FRAME">Frames</a></li>
+                    <li><a asp-controller="Product" asp-action="List" asp-route-categoryCode="UPGKIT">Upgrade Kits</a></li>
                 </ul>
             </div>
-            <div class="links-section">
-                <h3>Customer Support</h3>
-                <ul>
-                    <li><a href="/Profile">Profile</a></li>
-                    <li><a href="/Contact">Contact Us</a></li>
-                    <li><a href="/FAQ">FAQ</a></li>
+
+            @* Account links *@
+            <div class="col-lg-2 col-md-3 col-6 tbs-footer__links-col">
+                <h6 class="tbs-footer__heading">Account</h6>
+                <ul class="tbs-footer__links">
+                    <li><a asp-controller="Customer" asp-action="Login">Sign In</a></li>
+                    <li><a asp-controller="Customer" asp-action="Register">Register</a></li>
+                    <li><a asp-controller="Order" asp-action="History">My Orders</a></li>
+                    <li><a asp-controller="Wishlist" asp-action="ViewWishlist">Wishlist</a></li>
                 </ul>
             </div>
+
+            @* Support links *@
+            <div class="col-lg-4 col-md-6 tbs-footer__links-col">
+                <h6 class="tbs-footer__heading">Support</h6>
+                <ul class="tbs-footer__links">
+                    <li><a asp-controller="Support" asp-action="Create">Contact Support</a></li>
+                    <li><a asp-controller="Home" asp-action="Privacy">Privacy Policy</a></li>
+                </ul>
+                <p class="tbs-footer__courier-note mt-3">
+                    <strong>Delivery via:</strong> Lalamove &amp; LBC
+                </p>
+            </div>
+
         </div>
 
-        <div class="footer-social">
-            <h3>Follow Us</h3>
-            <a href="#" class="social-icon">🐦</a>
-            <a href="#" class="social-icon">📘</a>
-            <a href="#" class="social-icon">📸</a>
+        <div class="tbs-footer__bottom">
+            <hr class="tbs-footer__divider" />
+            <p class="tbs-footer__copyright">
+                &copy; @DateTime.Now.Year Taurus Bike Shop. All rights reserved.
+            </p>
         </div>
-    </div>
-    <div class="footer-bottom">
-        <p>&copy; 2026 Taurus Bike Shop. All rights reserved.</p>
     </div>
 </footer>
-
-@section Styles {
-    <link rel="stylesheet" href="~/Shared/footer.css" />
-}
