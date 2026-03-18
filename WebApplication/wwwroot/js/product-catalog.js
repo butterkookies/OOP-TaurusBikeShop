@@ -1,111 +1,302 @@
-/* ═══════════════════════════════════════════════════════════════
-   TAURUS BIKE SHOP — PRODUCT CATALOG JAVASCRIPT
-   File:    wwwroot/js/product-catalog.js
-   Used by: Views/Customer/ProductCatalog.cshtml
+// WebApplication/wwwroot/js/product-catalog.js
+// Handles: catalog filter AJAX, search debounce, wishlist toggle,
+// variant selector on product detail page, thumbnail gallery.
+// Depends on: utils.js
 
-   Features:
-   - Category tab filtering (All/Mountain/Road/Fixie/Kids/Others)
-   - Part-type dropdown filter
-   - Live search (name, brand, part type)
-   - Sort (default / price asc / price desc / name A-Z)
-   - Wishlist heart toggle
-   - Add to Cart green feedback
-═══════════════════════════════════════════════════════════════ */
+'use strict';
 
-(function () {
+document.addEventListener('DOMContentLoaded', () => {
 
-    var grid    = document.getElementById('catalogGrid');
-    var cards   = Array.from(grid.querySelectorAll('.product-card'));
-    var search  = document.getElementById('catalogSearch');
-    var ptSel   = document.getElementById('partTypeSelect');
-    var sortSel = document.getElementById('catalogSort');
-    var countEl = document.getElementById('countNum');
-    var emptyEl = document.getElementById('catalogEmpty');
-    var tabs    = document.querySelectorAll('.filter-tab');
-    var activeCat = 'all';
+    // =========================================================================
+    // CATALOG PAGE — filter and search
+    // =========================================================================
+    const applyBtn   = document.getElementById('apply-filters-btn');
+    const searchInput= document.getElementById('search-input');
 
-    /* ── Count badges on tabs ── */
-    ['all','mountain','road','fixie','kids','others'].forEach(function(cat) {
-        var el = document.getElementById('cnt-' + cat);
-        if (!el) return;
-        el.textContent = cat === 'all'
-            ? cards.length
-            : cards.filter(function(c) { return c.dataset.category === cat; }).length;
-    });
-
-    /* ── Filter + Sort engine ── */
-    function applyFilters() {
-        var q     = search.value.toLowerCase().trim();
-        var pt    = ptSel.value;
-        var sort  = sortSel.value;
-
-        var visible = cards.filter(function(c) {
-            var okCat  = activeCat === 'all' || c.dataset.category === activeCat;
-            var okPart = pt === 'all' || c.dataset.parttype === pt;
-            var okQ    = !q || c.dataset.name.includes(q) || c.dataset.brand.includes(q)
-                            || c.dataset.parttype.toLowerCase().includes(q);
-            return okCat && okPart && okQ;
-        });
-
-        visible.sort(function(a, b) {
-            if (sort === 'price-asc')  return +a.dataset.price - +b.dataset.price;
-            if (sort === 'price-desc') return +b.dataset.price - +a.dataset.price;
-            if (sort === 'name-asc')   return a.dataset.name.localeCompare(b.dataset.name);
-            return 0;
-        });
-
-        cards.forEach(function(c) { c.style.display = 'none'; });
-        visible.forEach(function(c, i) {
-            c.style.display = 'flex';
-            c.style.order   = i;
-            c.style.animation = 'none';
-            void c.offsetWidth;
-            c.style.animation      = 'fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both';
-            c.style.animationDelay = (i * 0.02) + 's';
-        });
-
-        countEl.textContent = visible.length;
-        emptyEl.classList.toggle('visible', visible.length === 0);
+    if (applyBtn) {
+        applyBtn.addEventListener('click', applyFilters);
     }
 
-    /* ── Tab click ── */
-    tabs.forEach(function(tab) {
-        tab.addEventListener('click', function() {
-            tabs.forEach(function(t) { t.classList.remove('active'); });
-            this.classList.add('active');
-            activeCat = this.dataset.cat;
-            ptSel.value = 'all';
-            applyFilters();
+    if (searchInput) {
+        searchInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') applyFilters();
+        });
+
+        // Debounced auto-search (300ms)
+        searchInput.addEventListener('input', debounce(applyFilters, 300));
+    }
+
+    function applyFilters() {
+        const params = new URLSearchParams();
+
+        // Category
+        const catRadio = document.querySelector('input[name="categoryId"]:checked');
+        if (catRadio?.value) params.set('categoryId', catRadio.value);
+
+        // Brand
+        const brandRadio = document.querySelector('input[name="brandId"]:checked');
+        if (brandRadio?.value) params.set('brandId', brandRadio.value);
+
+        // Price
+        const minPrice = document.getElementById('min-price')?.value;
+        const maxPrice = document.getElementById('max-price')?.value;
+        if (minPrice) params.set('minPrice', minPrice);
+        if (maxPrice) params.set('maxPrice', maxPrice);
+
+        // Search
+        const search = searchInput?.value?.trim();
+        if (search) params.set('search', search);
+
+        window.location.href = `/Product/List?${params.toString()}`;
+    }
+
+    // =========================================================================
+    // WISHLIST TOGGLE — both catalog cards and product detail page
+    // =========================================================================
+    document.addEventListener('click', async e => {
+        const wishlistBtn = e.target.closest('.tbs-product-card__wishlist, .tbs-wishlist-toggle');
+        if (!wishlistBtn) return;
+
+        const productId = wishlistBtn.dataset.productId;
+        if (!productId) return;
+
+        try {
+            const response = await fetchWithCSRF('/Wishlist/Toggle', {
+                method: 'POST',
+                body: JSON.stringify({ productId: parseInt(productId, 10) })
+            });
+            const data = await parseJsonResponse(response);
+
+            if (!data.success) {
+                if (response.status === 401) {
+                    window.location.href = '/Customer/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                } else {
+                    showAlert('error', data.message ?? 'Unable to update wishlist.');
+                }
+                return;
+            }
+
+            // Toggle active state on all wishlist buttons for this product
+            document.querySelectorAll(
+                `.tbs-product-card__wishlist[data-product-id="${productId}"],
+                 .tbs-wishlist-toggle[data-product-id="${productId}"]`
+            ).forEach(btn => {
+                const isNowInWishlist = data.data?.isInWishlist ?? false;
+                btn.classList.toggle('tbs-product-card__wishlist--active', isNowInWishlist);
+                btn.classList.toggle('tbs-wishlist-toggle--active', isNowInWishlist);
+                btn.setAttribute('aria-pressed', isNowInWishlist ? 'true' : 'false');
+                btn.setAttribute('aria-label',
+                    isNowInWishlist ? 'Remove from wishlist' : 'Add to wishlist');
+            });
+
+        } catch {
+            showAlert('error', 'Unable to update wishlist. Please try again.');
+        }
+    });
+
+    // =========================================================================
+    // QUICK ADD TO CART — from catalog product cards
+    // =========================================================================
+    document.addEventListener('click', async e => {
+        const cartBtn = e.target.closest('.tbs-product-card__cart-btn');
+        if (!cartBtn) return;
+
+        const card = cartBtn.closest('.tbs-product-card');
+        const productId = card?.dataset.productId;
+        if (!productId) return;
+
+        cartBtn.disabled = true;
+
+        try {
+            const response = await fetchWithCSRF('/Cart/AddToCart', {
+                method: 'POST',
+                body: JSON.stringify({ productId: parseInt(productId, 10), qty: 1 })
+            });
+            const data = await parseJsonResponse(response);
+
+            if (data.success) {
+                showAlert('success', 'Added to cart!');
+                refreshCartBadge();
+            } else {
+                showAlert('error', data.message ?? 'Could not add to cart.');
+            }
+        } catch {
+            showAlert('error', 'Could not add to cart. Please try again.');
+        } finally {
+            cartBtn.disabled = false;
+        }
+    });
+
+    // =========================================================================
+    // PRODUCT DETAIL PAGE — variant selector
+    // =========================================================================
+    const variantBtns = document.querySelectorAll('.tbs-variant-btn:not([disabled])');
+    const addToCartBtn = document.getElementById('add-to-cart-btn');
+    const displayedPrice = document.getElementById('displayed-price');
+
+    variantBtns.forEach(btn => {
+        btn.addEventListener('click', async () => {
+            variantBtns.forEach(b => {
+                b.classList.remove('tbs-variant-btn--selected');
+                b.setAttribute('aria-pressed', 'false');
+            });
+            btn.classList.add('tbs-variant-btn--selected');
+            btn.setAttribute('aria-pressed', 'true');
+
+            const variantId = btn.dataset.variantId;
+            if (addToCartBtn) addToCartBtn.dataset.variantId = variantId;
+
+            try {
+                const response = await fetch(`/Product/GetVariantPrice?variantId=${variantId}`);
+                const data = await response.json();
+                if (data.success && displayedPrice) {
+                    displayedPrice.textContent = data.data.formattedPrice;
+                }
+            } catch { /* non-fatal */ }
         });
     });
 
-    search.addEventListener('input', applyFilters);
-    ptSel.addEventListener('change', applyFilters);
-    sortSel.addEventListener('change', applyFilters);
+    // =========================================================================
+    // PRODUCT DETAIL PAGE — add to cart button
+    // =========================================================================
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', async () => {
+            const productId = addToCartBtn.dataset.productId;
+            const variantId = addToCartBtn.dataset.variantId;
+            const qty = parseInt(document.getElementById('qty-input')?.value ?? '1', 10);
 
-    /* ── Wishlist toggle ── */
-    grid.addEventListener('click', function(e) {
-        var w = e.target.closest('.card-wish');
-        if (w) { e.stopPropagation(); w.classList.toggle('active'); }
+            addToCartBtn.disabled = true;
+            addToCartBtn.textContent = 'Adding…';
+
+            try {
+                const response = await fetchWithCSRF('/Cart/AddToCart', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        productId: parseInt(productId, 10),
+                        variantId: variantId ? parseInt(variantId, 10) : null,
+                        qty
+                    })
+                });
+                const data = await parseJsonResponse(response);
+
+                if (data.success) {
+                    showAlert('success', 'Added to cart!');
+                    refreshCartBadge();
+                } else {
+                    showAlert('error', data.message ?? 'Could not add to cart.');
+                }
+            } catch {
+                showAlert('error', 'Could not add to cart. Please try again.');
+            } finally {
+                addToCartBtn.disabled = false;
+                addToCartBtn.textContent = 'Add to Cart';
+            }
+        });
+    }
+
+    // =========================================================================
+    // PRODUCT DETAIL PAGE — quantity stepper
+    // =========================================================================
+    const qtyInput = document.getElementById('qty-input');
+    document.getElementById('qty-minus')?.addEventListener('click', () => {
+        if (qtyInput && parseInt(qtyInput.value, 10) > 1)
+            qtyInput.value = parseInt(qtyInput.value, 10) - 1;
+    });
+    document.getElementById('qty-plus')?.addEventListener('click', () => {
+        if (qtyInput && parseInt(qtyInput.value, 10) < 99)
+            qtyInput.value = parseInt(qtyInput.value, 10) + 1;
     });
 
-    /* ── Add to Cart feedback ── */
-    grid.addEventListener('click', function(e) {
-        var btn = e.target.closest('.btn-cart');
-        if (!btn || btn.dataset.loading) return;
-        btn.dataset.loading = '1';
-        var orig = btn.innerHTML;
-        btn.innerHTML = '<span>Added &#10003;</span>';
-        btn.style.background = '#22C55E';
-        setTimeout(function() {
-            btn.innerHTML = orig;
-            btn.style.background = '';
-            delete btn.dataset.loading;
-        }, 1800);
+    // =========================================================================
+    // PRODUCT DETAIL PAGE — thumbnail gallery
+    // =========================================================================
+    document.querySelectorAll('.tbs-gallery__thumb').forEach(thumb => {
+        thumb.addEventListener('click', () => {
+            const mainImg = document.getElementById('main-product-img');
+            if (mainImg) mainImg.src = thumb.dataset.src;
+            document.querySelectorAll('.tbs-gallery__thumb')
+                .forEach(t => t.classList.remove('tbs-gallery__thumb--active'));
+            thumb.classList.add('tbs-gallery__thumb--active');
+        });
     });
 
-    /* ── Init ── */
-    applyFilters();
+    // =========================================================================
+    // PRODUCT DETAIL PAGE — tabs
+    // =========================================================================
+    document.querySelectorAll('.tbs-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tbs-tab').forEach(t => t.classList.remove('tbs-tab--active'));
+            document.querySelectorAll('.tbs-tab-panel').forEach(p => p.classList.remove('tbs-tab-panel--active'));
+            tab.classList.add('tbs-tab--active');
+            const panel = document.getElementById(`tab-${tab.dataset.tab}`);
+            if (panel) panel.classList.add('tbs-tab-panel--active');
+        });
+    });
 
-}());
+    // =========================================================================
+    // PRODUCT DETAIL PAGE — OTP modal countdown (shared util)
+    // =========================================================================
+    initOTPCountdown();
 
+});
+
+// =============================================================================
+// OTP countdown timer — shared by Register and Payment pages
+// =============================================================================
+function initOTPCountdown() {
+    const countdownEl = document.getElementById('otp-countdown');
+    const resendBtn   = document.getElementById('otp-resend-btn');
+    if (!countdownEl) return;
+
+    let seconds = 10 * 60; // 10 minutes
+
+    const interval = setInterval(() => {
+        seconds--;
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        countdownEl.textContent = `${m}:${s}`;
+
+        if (seconds <= 0) {
+            clearInterval(interval);
+            countdownEl.textContent = '00:00';
+            countdownEl.style.color = 'var(--tbs-error)';
+            if (resendBtn) resendBtn.disabled = false;
+        }
+    }, 1000);
+
+    // Enable resend button after 60 seconds
+    setTimeout(() => {
+        if (resendBtn) resendBtn.disabled = false;
+    }, 60000);
+
+    // Resend handler
+    resendBtn?.addEventListener('click', async () => {
+        const email = document.querySelector('input[name="email"]')?.value;
+        if (!email) return;
+
+        resendBtn.disabled = true;
+        resendBtn.textContent = 'Sending…';
+
+        try {
+            const response = await fetchWithCSRF('/Customer/ResendOTP', {
+                method: 'POST',
+                body: JSON.stringify({ email })
+            });
+            const data = await parseJsonResponse(response);
+
+            if (data.success) {
+                showAlert('success', data.message ?? 'New code sent.');
+                // Reset countdown
+                seconds = 10 * 60;
+            } else {
+                showAlert('error', data.message ?? 'Failed to resend code.');
+                resendBtn.disabled = false;
+            }
+        } catch {
+            showAlert('error', 'Failed to resend code.');
+            resendBtn.disabled = false;
+        } finally {
+            resendBtn.textContent = 'Resend Code';
+        }
+    });
+}

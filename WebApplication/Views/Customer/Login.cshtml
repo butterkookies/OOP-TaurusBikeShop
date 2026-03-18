@@ -1,797 +1,104 @@
+@* WebApplication/Views/Customer/Login.cshtml *@
+@model WebApplication.Models.ViewModels.LoginViewModel
 @{
-    ViewData["Title"] = "Customer Login";
-    Layout = null;
+    ViewData["Title"] = "Sign In";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] — Taurus Bike Shop</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
 
-<div class="login-page">
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+}
 
-    <!-- Atmospheric Background -->
-    <div class="bg-overlay"></div>
-    <div class="bg-grid"></div>
-    <div class="bg-red-glow"></div>
+<div class="tbs-auth-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-5">
 
-    <!-- Split Layout -->
-    <div class="login-split">
+                <div class="tbs-auth-card">
 
-        <!-- Left Panel — Brand Identity -->
-        <div class="brand-panel">
-            <div class="brand-panel__inner">
-                <div class="brand-logo">
-                    <span class="brand-logo__bull">&#9650;</span>
+                    @* Header *@
+                    <div class="tbs-auth-card__header">
+                        <div class="tbs-auth-card__logo" aria-hidden="true">&#9651;</div>
+                        <h1 class="tbs-auth-card__title">Welcome Back</h1>
+                        <p class="tbs-auth-card__subtitle">Sign in to your Taurus account</p>
+                    </div>
+
+                    @* Validation summary *@
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="tbs-auth-card__error" role="alert">
+                            <asp-validation-summary asp-validation-group="" />
+                        </div>
+                    }
+
+                    @* Form *@
+                    <form asp-action="Login" asp-controller="Customer" method="post"
+                          class="tbs-auth-form" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="ReturnUrl" />
+
+                        <div class="tbs-form-group">
+                            <label asp-for="Email" class="tbs-label">Email Address</label>
+                            <input asp-for="Email"
+                                   class="tbs-input"
+                                   type="email"
+                                   autocomplete="email"
+                                   placeholder="you@example.com" />
+                            <span asp-validation-for="Email" class="tbs-field-error"></span>
+                        </div>
+
+                        <div class="tbs-form-group">
+                            <label asp-for="Password" class="tbs-label">Password</label>
+                            <div class="tbs-input-group">
+                                <input asp-for="Password"
+                                       class="tbs-input"
+                                       type="password"
+                                       autocomplete="current-password"
+                                       placeholder="Enter your password"
+                                       id="password-input" />
+                                <button type="button"
+                                        class="tbs-input-group__toggle"
+                                        aria-label="Toggle password visibility"
+                                        data-target="password-input">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                         fill="currentColor" viewBox="0 0 16 16" class="tbs-eye-icon">
+                                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="tbs-field-error"></span>
+                        </div>
+
+                        <button type="submit" class="btn tbs-btn-accent tbs-btn-full">
+                            Sign In
+                        </button>
+
+                    </form>
+
+                    <div class="tbs-auth-card__footer">
+                        Don't have an account?
+                        <a asp-action="Register" asp-controller="Customer">Create one</a>
+                    </div>
+
                 </div>
-                <h1 class="brand-name">TAURUS</h1>
-                <p class="brand-tagline">Bike Shop</p>
-                <div class="brand-divider"></div>
-                <p class="brand-copy">Built for the road.<br>Forged for the rider.</p>
-
-                <div class="brand-stats">
-                    <div class="stat">
-                        <span class="stat__number">500+</span>
-                        <span class="stat__label">Models</span>
-                    </div>
-                    <div class="stat-sep"></div>
-                    <div class="stat">
-                        <span class="stat__number">12K+</span>
-                        <span class="stat__label">Riders</span>
-                    </div>
-                    <div class="stat-sep"></div>
-                    <div class="stat">
-                        <span class="stat__number">10yr</span>
-                        <span class="stat__label">Legacy</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Decorative wheel -->
-            <div class="deco-wheel">
-                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="100" r="95" stroke="#E10600" stroke-width="1.5" stroke-dasharray="6 4"/>
-                    <circle cx="100" cy="100" r="70" stroke="#ffffff10" stroke-width="1"/>
-                    <circle cx="100" cy="100" r="12" fill="#E10600"/>
-                    <line x1="100" y1="5" x2="100" y2="88" stroke="#ffffff20" stroke-width="1.5"/>
-                    <line x1="100" y1="112" x2="100" y2="195" stroke="#ffffff20" stroke-width="1.5"/>
-                    <line x1="5" y1="100" x2="88" y2="100" stroke="#ffffff20" stroke-width="1.5"/>
-                    <line x1="112" y1="100" x2="195" y2="100" stroke="#ffffff20" stroke-width="1.5"/>
-                    <line x1="32" y1="32" x2="91" y2="91" stroke="#ffffff15" stroke-width="1.5"/>
-                    <line x1="109" y1="109" x2="168" y2="168" stroke="#ffffff15" stroke-width="1.5"/>
-                    <line x1="168" y1="32" x2="109" y2="91" stroke="#ffffff15" stroke-width="1.5"/>
-                    <line x1="91" y1="109" x2="32" y2="168" stroke="#ffffff15" stroke-width="1.5"/>
-                    <line x1="100" y1="5" x2="32" y2="168" stroke="#E1060015" stroke-width="1"/>
-                    <line x1="100" y1="5" x2="168" y2="168" stroke="#E1060015" stroke-width="1"/>
-                </svg>
             </div>
         </div>
-
-        <!-- Right Panel — Login Form -->
-        <div class="form-panel">
-            <div class="form-panel__inner">
-
-                <div class="form-header">
-                    <div class="form-header__eyebrow">Welcome back</div>
-                    <h2 class="form-header__title">Sign In</h2>
-                    <p class="form-header__sub">Access your Taurus account</p>
-                </div>
-
-                <form method="post" action="/Customer/Login" class="login-form" id="loginForm" novalidate>
-
-                    <div class="field-group">
-                        <label for="email" class="field-label">Email Address</label>
-                        <div class="field-wrap">
-                            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                <polyline points="22,6 12,13 2,6"/>
-                            </svg>
-                            <input type="email" class="field-input" id="email" name="email"
-                                   placeholder="you@example.com" required autocomplete="email">
-                            <div class="field-line"></div>
-                        </div>
-                    </div>
-
-                    <div class="field-group">
-                        <label for="password" class="field-label">Password</label>
-                        <div class="field-wrap">
-                            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                            </svg>
-                            <input type="password" class="field-input" id="password" name="password"
-                                   placeholder="Enter your password" required autocomplete="current-password">
-                            <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
-                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
-                            </button>
-                            <div class="field-line"></div>
-                        </div>
-                    </div>
-
-                    <div class="form-options">
-                        <label class="remember-label">
-                            <input type="checkbox" name="rememberMe" class="remember-checkbox">
-                            <span class="remember-custom"></span>
-                            <span class="remember-text">Remember me</span>
-                        </label>
-                        <a href="#" class="forgot-link">Forgot password?</a>
-                    </div>
-
-                    <button type="submit" class="btn-login" id="loginBtn">
-                        <span class="btn-login__text">Sign In</span>
-                        <span class="btn-login__arrow">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                <line x1="5" y1="12" x2="19" y2="12"/>
-                                <polyline points="12 5 19 12 12 19"/>
-                            </svg>
-                        </span>
-                        <span class="btn-login__loader" id="btnLoader"></span>
-                    </button>
-
-                    <div class="form-footer">
-                        <span class="form-footer__text">New to Taurus?</span>
-                        <a href="/Customer/Register" class="form-footer__link">Create an account &rarr;</a>
-                    </div>
-
-                </form>
-
-            </div>
-        </div>
-
     </div>
 </div>
 
-<style>
-/* ============================================================
-   TAURUS BIKE SHOP — LOGIN PAGE
-   Dark / Red Premium Aesthetic
-   ============================================================ */
-
-:root {
-    --bg-base:       #0B0B0B;
-    --bg-surface:    #111111;
-    --bg-card:       #161616;
-    --bg-input:      #1A1A1A;
-    --red:           #E10600;
-    --red-hover:     #FF1A17;
-    --red-dim:       #E1060022;
-    --white:         #FFFFFF;
-    --text-primary:  #F0F0F0;
-    --text-secondary:#888888;
-    --text-muted:    #444444;
-    --border:        #2A2A2A;
-    --border-focus:  #E10600;
-
-    --font-display:  'Bebas Neue', sans-serif;
-    --font-cond:     'Barlow Condensed', sans-serif;
-    --font-body:     'Barlow', sans-serif;
-
-    --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
-    --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-*, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-/* ---- PAGE SHELL ---- */
-.login-page {
-    position: relative;
-    min-height: 100vh;
-    background: var(--bg-base);
-    overflow: hidden;
-    font-family: var(--font-body);
-}
-
-/* Atmospheric layers */
-.bg-overlay {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 20% 50%, #1a0202 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-}
-
-.bg-grid {
-    position: fixed;
-    inset: 0;
-    background-image:
-        linear-gradient(#ffffff04 1px, transparent 1px),
-        linear-gradient(90deg, #ffffff04 1px, transparent 1px);
-    background-size: 48px 48px;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.bg-red-glow {
-    position: fixed;
-    top: 50%;
-    left: 30%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, #E1060018 0%, transparent 65%);
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 0;
-    animation: glowPulse 6s ease-in-out infinite;
-}
-
-@@keyframes glowPulse {
-    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-    50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.08); }
-}
-
-/* ---- SPLIT LAYOUT ---- */
-.login-split {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    min-height: 100vh;
-}
-
-/* ---- BRAND PANEL (LEFT) ---- */
-.brand-panel {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 48px;
-    border-right: 1px solid #E1060030;
-    overflow: hidden;
-}
-
-.brand-panel::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, #0f0000 0%, #0B0B0B 60%, #130000 100%);
-}
-
-.brand-panel__inner {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-}
-
-.brand-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 24px;
-    border: 1.5px solid var(--red);
-    background: var(--red-dim);
-    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-    animation: fadeSlideUp 0.8s var(--ease-out) both;
-}
-
-.brand-logo__bull {
-    font-size: 22px;
-    color: var(--red);
-    line-height: 1;
-    margin-top: 14px;
-}
-
-.brand-name {
-    font-family: var(--font-display);
-    font-size: clamp(52px, 6vw, 80px);
-    color: var(--white);
-    letter-spacing: 0.06em;
-    line-height: 1;
-    animation: fadeSlideUp 0.8s 0.1s var(--ease-out) both;
-}
-
-.brand-tagline {
-    font-family: var(--font-cond);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.35em;
-    color: var(--red);
-    text-transform: uppercase;
-    margin-top: 6px;
-    animation: fadeSlideUp 0.8s 0.15s var(--ease-out) both;
-}
-
-.brand-divider {
-    width: 40px;
-    height: 2px;
-    background: var(--red);
-    margin: 28px auto;
-    animation: expandWidth 1s 0.4s var(--ease-out) both;
-}
-
-@@keyframes expandWidth {
-    from { width: 0; opacity: 0; }
-    to   { width: 40px; opacity: 1; }
-}
-
-.brand-copy {
-    font-family: var(--font-body);
-    font-size: 16px;
-    font-weight: 300;
-    line-height: 1.7;
-    color: var(--text-secondary);
-    letter-spacing: 0.02em;
-    animation: fadeSlideUp 0.8s 0.25s var(--ease-out) both;
-}
-
-.brand-stats {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-top: 44px;
-    justify-content: center;
-    animation: fadeSlideUp 0.8s 0.35s var(--ease-out) both;
-}
-
-.stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-}
-
-.stat__number {
-    font-family: var(--font-display);
-    font-size: 26px;
-    color: var(--white);
-    letter-spacing: 0.04em;
-}
-
-.stat__label {
-    font-family: var(--font-cond);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    color: var(--text-muted);
-    text-transform: uppercase;
-}
-
-.stat-sep {
-    width: 1px;
-    height: 32px;
-    background: var(--border);
-}
-
-/* Decorative wheel */
-.deco-wheel {
-    position: absolute;
-    bottom: -100px;
-    right: -100px;
-    width: 340px;
-    height: 340px;
-    opacity: 0.35;
-    animation: spinSlow 60s linear infinite;
-}
-
-@@keyframes spinSlow {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-}
-
-/* ---- FORM PANEL (RIGHT) ---- */
-.form-panel {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 48px;
-}
-
-.form-panel__inner {
-    width: 100%;
-    max-width: 420px;
-    animation: fadeSlideUp 0.9s 0.2s var(--ease-out) both;
-}
-
-/* Form Header */
-.form-header {
-    margin-bottom: 40px;
-}
-
-.form-header__eyebrow {
-    font-family: var(--font-cond);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.35em;
-    color: var(--red);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-}
-
-.form-header__title {
-    font-family: var(--font-display);
-    font-size: 54px;
-    color: var(--white);
-    letter-spacing: 0.04em;
-    line-height: 1;
-}
-
-.form-header__sub {
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin-top: 8px;
-    font-weight: 300;
-}
-
-/* ---- FORM FIELDS ---- */
-.login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.field-label {
-    font-family: var(--font-cond);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    transition: color 0.2s;
-}
-
-.field-group:focus-within .field-label {
-    color: var(--red);
-}
-
-.field-wrap {
-    position: relative;
-}
-
-.field-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
-    color: var(--text-muted);
-    transition: color 0.2s;
-    pointer-events: none;
-}
-
-.field-group:focus-within .field-icon {
-    color: var(--red);
-}
-
-.field-input {
-    width: 100%;
-    height: 52px;
-    padding: 0 44px 0 44px;
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--text-primary);
-    font-family: var(--font-body);
-    font-size: 15px;
-    font-weight: 400;
-    outline: none;
-    transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
-    letter-spacing: 0.01em;
-}
-
-.field-input::placeholder {
-    color: var(--text-muted);
-    font-weight: 300;
-}
-
-.field-input:focus {
-    border-color: var(--red);
-    background: #1E0A0A;
-    box-shadow: 0 0 0 3px #E1060015, inset 0 1px 0 #E1060010;
-}
-
-.field-input:-webkit-autofill,
-.field-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px #1E0A0A inset !important;
-    -webkit-text-fill-color: var(--text-primary) !important;
-    border-color: var(--red) !important;
-}
-
-/* Animated bottom line */
-.field-line {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--red);
-    border-radius: 0 0 4px 4px;
-    transition: width 0.3s var(--ease-out);
-}
-
-.field-group:focus-within .field-line {
-    width: 100%;
-}
-
-/* Password toggle */
-.toggle-password {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    color: var(--text-muted);
-    transition: color 0.2s;
-    display: flex;
-    align-items: center;
-}
-
-.toggle-password:hover { color: var(--red); }
-
-.eye-icon {
-    width: 16px;
-    height: 16px;
-}
-
-/* ---- FORM OPTIONS ---- */
-.form-options {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: -8px;
-}
-
-.remember-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    user-select: none;
-}
-
-.remember-checkbox { display: none; }
-
-.remember-custom {
-    width: 16px;
-    height: 16px;
-    border: 1.5px solid var(--border);
-    border-radius: 3px;
-    background: var(--bg-input);
-    position: relative;
-    flex-shrink: 0;
-    transition: border-color 0.2s, background 0.2s;
-}
-
-.remember-checkbox:checked + .remember-custom {
-    background: var(--red);
-    border-color: var(--red);
-}
-
-.remember-checkbox:checked + .remember-custom::after {
-    content: '';
-    position: absolute;
-    left: 4px;
-    top: 1px;
-    width: 5px;
-    height: 9px;
-    border: 2px solid #fff;
-    border-top: none;
-    border-left: none;
-    transform: rotate(45deg);
-}
-
-.remember-text {
-    font-size: 13px;
-    color: var(--text-secondary);
-}
-
-.forgot-link {
-    font-family: var(--font-cond);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: color 0.2s;
-}
-
-.forgot-link:hover { color: var(--red); }
-
-/* ---- LOGIN BUTTON ---- */
-.btn-login {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    width: 100%;
-    height: 56px;
-    margin-top: 8px;
-    background: var(--red);
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    overflow: hidden;
-    font-family: var(--font-cond);
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--white);
-    transition: background 0.25s, transform 0.15s, box-shadow 0.25s;
-}
-
-.btn-login::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, #FF2A27 0%, #C00000 100%);
-    opacity: 0;
-    transition: opacity 0.25s;
-}
-
-.btn-login:hover {
-    background: var(--red-hover);
-    box-shadow: 0 8px 32px #E1060050, 0 2px 8px #E1060030;
-    transform: translateY(-1px);
-}
-
-.btn-login:hover::before { opacity: 1; }
-
-.btn-login:active {
-    transform: translateY(0px);
-    box-shadow: 0 4px 16px #E1060040;
-}
-
-.btn-login__text { position: relative; z-index: 1; }
-
-.btn-login__arrow {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    transition: transform 0.25s var(--ease-spring);
-}
-
-.btn-login__arrow svg { width: 18px; height: 18px; }
-
-.btn-login:hover .btn-login__arrow {
-    transform: translateX(4px);
-}
-
-.btn-login__loader {
-    display: none;
-    position: absolute;
-    right: 20px;
-    width: 18px;
-    height: 18px;
-    border: 2px solid #ffffff40;
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-}
-
-@@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.btn-login.loading .btn-login__text,
-.btn-login.loading .btn-login__arrow { opacity: 0; }
-.btn-login.loading .btn-login__loader { display: block; }
-.btn-login.loading { pointer-events: none; background: #9a0400; }
-
-/* ---- FORM FOOTER ---- */
-.form-footer {
-    text-align: center;
-    font-size: 14px;
-    color: var(--text-secondary);
-    padding-top: 8px;
-}
-
-.form-footer__link {
-    color: var(--red);
-    font-weight: 600;
-    text-decoration: none;
-    margin-left: 6px;
-    transition: color 0.2s, letter-spacing 0.2s;
-}
-
-.form-footer__link:hover {
-    color: var(--red-hover);
-    letter-spacing: 0.02em;
-}
-
-/* ---- ANIMATIONS ---- */
-@@keyframes fadeSlideUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ---- RESPONSIVE ---- */
-@@media (max-width: 900px) {
-    .login-split {
-        grid-template-columns: 1fr;
-    }
-
-    .brand-panel {
-        display: none;
-    }
-
-    .form-panel {
-        padding: 48px 24px;
-        min-height: 100vh;
-    }
-
-    .form-panel__inner {
-        max-width: 100%;
-    }
-}
-
-@@media (max-width: 480px) {
-    .form-header__title { font-size: 42px; }
-    .form-panel { padding: 40px 20px; }
-}
-</style>
-
-<script>
-(function () {
-    /* --- Password toggle --- */
-    const toggleBtn = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('password');
-    const eyeIcon = toggleBtn?.querySelector('.eye-icon');
-
-    if (toggleBtn && passwordInput) {
-        toggleBtn.addEventListener('click', function () {
-            const isVisible = passwordInput.type === 'text';
-            passwordInput.type = isVisible ? 'password' : 'text';
-            eyeIcon.innerHTML = isVisible
-                ? `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`
-                : `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        // Password visibility toggle
+        document.querySelectorAll('.tbs-input-group__toggle').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const input = document.getElementById(btn.dataset.target);
+                if (input) {
+                    input.type = input.type === 'password' ? 'text' : 'password';
+                    btn.setAttribute('aria-pressed', input.type === 'text');
+                }
+            });
         });
-    }
-
-    /* --- Login button loading state --- */
-    const loginForm = document.getElementById('loginForm');
-    const loginBtn = document.getElementById('loginBtn');
-
-    if (loginForm && loginBtn) {
-        loginForm.addEventListener('submit', function (e) {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            if (email && password) {
-                loginBtn.classList.add('loading');
-            }
-        });
-    }
-
-    /* --- Input focus ripple effect --- */
-    document.querySelectorAll('.field-input').forEach(function (input) {
-        input.addEventListener('focus', function () {
-            this.closest('.field-group')
-                ?.querySelector('.field-label')
-                ?.classList.add('active');
-        });
-        input.addEventListener('blur', function () {
-            this.closest('.field-group')
-                ?.querySelector('.field-label')
-                ?.classList.remove('active');
-        });
-    });
-})();
-</script>
-</body>
-</html>
+    </script>
+}

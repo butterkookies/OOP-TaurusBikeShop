@@ -1,27 +1,61 @@
-@model dynamic
+@* WebApplication/Views/Checkout/Partials/_OrderSummary.cshtml *@
+@* Model: CheckoutViewModel — used on the checkout page sidebar *@
+@model WebApplication.Models.ViewModels.CheckoutViewModel
 
-<div class="order-summary">
-    <h2>📝 Order Summary</h2>
-    <ul class="summary-items">
-        @foreach(var item in Model.Items)
+<div class="tbs-order-summary tbs-order-summary--checkout">
+    <h2 class="tbs-order-summary__title">Order Summary</h2>
+
+    @* Line items *@
+    <ul class="tbs-order-summary__items">
+        @foreach (WebApplication.Models.ViewModels.CartItemViewModel item in Model.CartItems)
         {
-            <li>
-                <span class="item-name">@item.Name (x@item.Quantity)</span>
-                <span class="item-price">$@item.TotalPrice.ToString("F2")</span>
+            <li class="tbs-order-summary__item">
+                <span class="tbs-order-summary__item-name">
+                    @item.ProductName
+                    @if (!string.IsNullOrWhiteSpace(item.VariantName))
+                    {
+                        <span class="tbs-order-summary__item-variant">(@item.VariantName)</span>
+                    }
+                    <span class="tbs-order-summary__item-qty">&times;@item.Quantity</span>
+                </span>
+                <span class="tbs-order-summary__item-total">@item.FormattedLineTotal</span>
             </li>
         }
     </ul>
-    <div class="summary-total">
-        <span>Total:</span>
-        <span class="total-price">$@Model.Total.ToString("F2")</span>
-    </div>
-    <button id="proceedCheckout" class="btn-proceed">Proceed to Checkout 🛒</button>
-</div>
 
-@section Scripts {
-    <script>
-        document.getElementById('proceedCheckout').addEventListener('click', () => {
-            window.location.href = '/Checkout';
-        });
-    </script>
-}
+    <div class="tbs-order-summary__divider"></div>
+
+    @* Subtotal *@
+    <div class="tbs-order-summary__row">
+        <span>Subtotal</span>
+        <span id="checkout-subtotal-value">@Model.FormattedSubTotal</span>
+    </div>
+
+    @* Discount *@
+    <div class="tbs-order-summary__row tbs-order-summary__row--discount"
+         id="checkout-discount-row-wrapper"
+         style="@(Model.DiscountAmount > 0 ? "" : "display:none")">
+        <span>Voucher Discount</span>
+        <span id="checkout-discount-row">−₱@Model.DiscountAmount.ToString("N2")</span>
+    </div>
+
+    @* Shipping *@
+    <div class="tbs-order-summary__row">
+        <span>Shipping</span>
+        <span id="checkout-shipping-fee">
+            @(Model.ShippingFee > 0 ? $"₱{Model.ShippingFee:N2}" : "TBD")
+        </span>
+    </div>
+
+    <div class="tbs-order-summary__divider"></div>
+
+    @* Grand total *@
+    <div class="tbs-order-summary__row tbs-order-summary__row--total">
+        <span>Total</span>
+        <span id="checkout-grand-total-row">@Model.FormattedSubTotal</span>
+    </div>
+
+    <p class="tbs-order-summary__payment-note">
+        GCash &bull; Bank Transfer
+    </p>
+</div>

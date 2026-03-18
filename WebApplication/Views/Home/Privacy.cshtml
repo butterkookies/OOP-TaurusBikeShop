@@ -1,6 +1,56 @@
-﻿@{
+﻿@* WebApplication/Views/Home/Privacy.cshtml *@
+@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container tbs-legal-page">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="tbs-legal-page__title">Privacy Policy</h1>
+            <p class="tbs-legal-page__date">Last updated: @DateTime.Now.Year</p>
+
+            <section class="tbs-legal-page__section">
+                <h2>Information We Collect</h2>
+                <p>
+                    When you register or place an order, we collect your name, email address,
+                    phone number, and shipping address. Payment transactions are processed
+                    via GCash or bank transfer — we do not store card details.
+                </p>
+            </section>
+
+            <section class="tbs-legal-page__section">
+                <h2>How We Use Your Information</h2>
+                <p>
+                    Your information is used to process orders, send order confirmations and
+                    delivery updates, respond to support requests, and improve our service.
+                    We do not sell your personal data to third parties.
+                </p>
+            </section>
+
+            <section class="tbs-legal-page__section">
+                <h2>Delivery Partners</h2>
+                <p>
+                    Your name and shipping address are shared with Lalamove or LBC as required
+                    to fulfil your delivery. These couriers have their own privacy policies.
+                </p>
+            </section>
+
+            <section class="tbs-legal-page__section">
+                <h2>Data Retention</h2>
+                <p>
+                    Order records and associated personal data are retained for a minimum of
+                    five years for legal and accounting compliance. You may request deletion
+                    of your account data by contacting our support team.
+                </p>
+            </section>
+
+            <section class="tbs-legal-page__section">
+                <h2>Contact</h2>
+                <p>
+                    For privacy-related questions, please
+                    <a asp-controller="Support" asp-action="Create">contact our support team</a>.
+                </p>
+            </section>
+        </div>
+    </div>
+</div>

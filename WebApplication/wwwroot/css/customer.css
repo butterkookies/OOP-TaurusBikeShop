@@ -1,104 +1,204 @@
-/* ===========================
-   PAGE BACKGROUND
-   =========================== */
-.register-page {
-    min-height: 90vh;
+/* WebApplication/wwwroot/css/customer.css
+   Shared styles for all authenticated customer pages —
+   sidebar, breadcrumbs, page headers, customer card layout.
+   Loaded on all customer-area views via _Layout.cshtml.
+*/
+
+/* =============================================================================
+   CUSTOMER PAGE LAYOUT
+   ============================================================================= */
+.tbs-customer-page {
+    padding: 2.5rem 0;
+}
+
+.tbs-customer-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* =============================================================================
+   SIDEBAR
+   ============================================================================= */
+.tbs-sidebar {
+    background: var(--tbs-white);
+    border: 1px solid var(--tbs-gray-100);
+    border-radius: var(--tbs-card-radius);
+    padding: 1.5rem;
+    position: sticky;
+    top: 88px;
+}
+
+.tbs-sidebar__user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--tbs-gray-100);
+}
+.tbs-sidebar__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--tbs-accent);
+    color: var(--tbs-white);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
-    background: #f8f8f8;
-    /* subtle light gray to make cards pop */
-}
-
-/* ===========================
-   CARD
-   =========================== */
-.register-card {
-    background: white;
-    padding: 30px 25px;
-    border-radius: 14px;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.register-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
-}
-
-/* ===========================
-   BRAND
-   =========================== */
-.brand-title {
+    font-family: var(--tbs-font-display);
     font-weight: 700;
-    color: #8B0000;
-    /* muted bulls red */
-    font-size: 2.5rem;
-}
-
-/* ===========================
-   BUTTON
-   =========================== */
-.btn-taurus {
-    background-color: #8B0000;
-    color: white;
-    border: none;
-    padding: 10px 25px;
     font-size: 1rem;
+    flex-shrink: 0;
+}
+.tbs-sidebar__user-name {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--tbs-gray-800);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tbs-sidebar__user-email {
+    font-size: 0.75rem;
+    color: var(--tbs-gray-400);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tbs-sidebar__nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.tbs-sidebar__nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
     border-radius: 8px;
-    transition: background-color 0.3s ease;
-}
-
-.btn-taurus:hover {
-    background-color: #6d0000;
-    color: white;
-}
-
-/* ===========================
-   SECTION TITLES
-   =========================== */
-.section-title {
+    font-size: 0.875rem;
     font-weight: 600;
-    margin-bottom: 15px;
-    color: #8B0000;
-}
-
-.section-divider {
-    margin: 25px 0;
-    border-top: 2px solid #8B0000;
-    width: 50px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* ===========================
-   LOGIN LINK
-   =========================== */
-.login-link {
-    color: #8B0000;
-    font-weight: 500;
+    color: var(--tbs-gray-600);
     text-decoration: none;
+    transition: background-color var(--tbs-transition), color var(--tbs-transition);
+}
+.tbs-sidebar__nav a:hover,
+.tbs-sidebar__nav a.active {
+    background-color: var(--tbs-gray-50);
+    color: var(--tbs-accent);
+}
+.tbs-sidebar__nav a.active {
+    background-color: rgba(255,107,0,0.08);
 }
 
-.login-link:hover {
-    text-decoration: underline;
+/* =============================================================================
+   BREADCRUMBS
+   ============================================================================= */
+.tbs-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    font-size: 0.8rem;
+}
+.tbs-breadcrumb li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--tbs-gray-400);
+}
+.tbs-breadcrumb li::after {
+    content: '/';
+    color: var(--tbs-gray-200);
+}
+.tbs-breadcrumb li:last-child::after {
+    display: none;
+}
+.tbs-breadcrumb a {
+    color: var(--tbs-gray-400);
+    text-decoration: none;
+    transition: color var(--tbs-transition);
+}
+.tbs-breadcrumb a:hover {
+    color: var(--tbs-accent);
+}
+.tbs-breadcrumb li:last-child {
+    color: var(--tbs-gray-800);
+    font-weight: 600;
 }
 
-/* ===========================
-   RESPONSIVE TYPOGRAPHY
-   =========================== */
-@media (max-width: 768px) {
-    .brand-title {
-        font-size: 2rem;
-    }
-
-    .register-card {
-        padding: 20px;
-    }
-
-    .btn-taurus {
-        padding: 8px 20px;
-        font-size: 0.95rem;
-    }
+/* =============================================================================
+   PAGE TITLE BAR
+   ============================================================================= */
+.tbs-page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 2px solid var(--tbs-gray-100);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
+.tbs-page-header__title {
+    font-size: 1.75rem;
+    margin: 0;
+}
+.tbs-page-header__subtitle {
+    font-size: 0.875rem;
+    color: var(--tbs-gray-400);
+    margin: 0.25rem 0 0;
+    font-family: var(--tbs-font-body);
+    font-weight: 400;
+}
+
+/* =============================================================================
+   CONTENT CARDS
+   ============================================================================= */
+.tbs-card {
+    background: var(--tbs-white);
+    border: 1px solid var(--tbs-gray-100);
+    border-radius: var(--tbs-card-radius);
+    padding: 1.5rem;
+    box-shadow: var(--tbs-shadow-sm);
+}
+.tbs-card__title {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tbs-gray-800);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--tbs-gray-100);
+}
+
+/* =============================================================================
+   STATUS BADGES
+   ============================================================================= */
+.tbs-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.tbs-badge--pending     { background: var(--tbs-warning-light);  color: var(--tbs-warning); }
+.tbs-badge--processing  { background: var(--tbs-info-light);     color: var(--tbs-info); }
+.tbs-badge--shipped     { background: #EDE9FE;                   color: #7C3AED; }
+.tbs-badge--delivered   { background: var(--tbs-success-light);  color: var(--tbs-success); }
+.tbs-badge--cancelled   { background: var(--tbs-error-light);    color: var(--tbs-error); }
+.tbs-badge--onhold      { background: #FFF7ED;                   color: #EA580C; }
+.tbs-badge--pickup      { background: #F0FDF4;                   color: #15803D; }

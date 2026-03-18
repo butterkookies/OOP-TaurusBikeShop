@@ -1,372 +1,213 @@
-@* ═══════════════════════════════════════════════════════════════
-   TAURUS BIKE SHOP — PRODUCT CATALOG VIEW
-   File:    Views/Customer/ProductCatalog.cshtml
-   Layout:  Views/Shared/_Layout.cshtml (via _ViewStart.cshtml)
-
-   Styles:  wwwroot/css/product-catalog.css
-   Scripts: wwwroot/js/product-catalog.js  (via @section Scripts)
-
-   TEMP DATA: Replace 'products' array + @foreach (var p in products)
-              with @model + @foreach (var p in Model) when DB is ready.
-════════════════════════════════════════════════════════════════ *@
-
+@* WebApplication/Views/Customer/ProductCatalog.cshtml *@
+@model IEnumerable<WebApplication.Models.ViewModels.ProductViewModel>
+@using WebApplication.Models.Entities
 @{
     ViewData["Title"] = "Product Catalog";
-
-    var products = new[]
-    {
-        @* ── COMPLETE BIKES ── *@
-        new { Id=1,   Name="2021 Pinewood Climber CARBON 27.5",   PartType="Complete Bike",   Category="mountain", Price=40000, Brand="Pinewood",        Desc="Premium carbon full-suspension 27.5 MTB built for aggressive trail riding." },
-        new { Id=2,   Name="Cult Odyssey Hydro Brakes 27.5",      PartType="Complete Bike",   Category="mountain", Price=14500, Brand="Cult",             Desc="Hydraulic disc brake MTB with 27.5 wheels, perfect for trail enthusiasts." },
-        new { Id=3,   Name="Ryder X3 27.5 MT200 Hydro (3x8)",     PartType="Complete Bike",   Category="mountain", Price=12500, Brand="Ryder",            Desc="3x8 drivetrain mountain bike with MT200 hydraulic brakes and 27.5 wheels." },
-        new { Id=4,   Name="Pinewood Trident Flux",                PartType="Complete Bike",   Category="mountain", Price=17500, Brand="Pinewood",        Desc="Versatile hardtail mountain bike built for performance on varied terrain." },
-        new { Id=5,   Name="Garuda Rampage",                       PartType="Complete Bike",   Category="mountain", Price=14500, Brand="Garuda",           Desc="Aggressive geometry mountain bike ideal for trail and enduro riding." },
-        new { Id=6,   Name="Pinewood Challenger",                  PartType="Complete Bike",   Category="mountain", Price=15500, Brand="Pinewood",        Desc="Hardtail challenger with reliable components for everyday trail riding." },
-        new { Id=7,   Name="Toseek Chester 700c Disc Brake (2x9)", PartType="Complete Bike",   Category="road",     Price=11000, Brand="Toseek",           Desc="Alloy 700c road or gravel bike with disc brakes and 2x9 drivetrain." },
-        new { Id=8,   Name="Kespor Stork Feather CX 1.0 2022",    PartType="Complete Bike",   Category="road",     Price=55000, Brand="Kespor",           Desc="High-end 2022 cyclocross gravel bike with featherlight performance build." },
-        new { Id=9,   Name="Pinewood Lancer 1.0 2022 Gravel RX",  PartType="Complete Bike",   Category="road",     Price=15500, Brand="Pinewood",        Desc="2x9 gravel adventure bike with endurance geometry and disc brakes." },
-        @* ── FRAMES ── *@
-        new { Id=10,  Name="ELVES NANDOR",                         PartType="Frame",           Category="mountain", Price=32000, Brand="Elves",            Desc="Carbon fiber MTB frame — ultralight and stiff for race-level performance." },
-        new { Id=11,  Name="Ryder X2",                             PartType="Frame",           Category="mountain", Price=4500,  Brand="Ryder",            Desc="Alloy hardtail MTB frame with modern geometry and tapered head tube." },
-        new { Id=12,  Name="MountainPeak Monster",                 PartType="Frame",           Category="mountain", Price=6500,  Brand="MountainPeak",     Desc="Burly alloy frame designed for aggressive trail and enduro use." },
-        new { Id=13,  Name="Mountainpeak Everest 2",               PartType="Frame",           Category="mountain", Price=7800,  Brand="MountainPeak",     Desc="Updated Everest 2 frame with improved weld quality and geometry." },
-        new { Id=14,  Name="Specialized Stumpjumper",              PartType="Frame",           Category="mountain", Price=22000, Brand="Specialized",      Desc="Iconic trail MTB frame trusted by riders worldwide for decades." },
-        new { Id=15,  Name="Weapon Stealth 29",                    PartType="Frame",           Category="mountain", Price=6500,  Brand="Weapon",           Desc="Stealth 29er alloy frame built for speed on cross-country trails." },
-        new { Id=16,  Name="Weapon Spartan 29",                    PartType="Frame",           Category="mountain", Price=8500,  Brand="Weapon",           Desc="Race-oriented 29er frame with aggressive trail geometry." },
-        new { Id=17,  Name="Saturn Calypso",                       PartType="Frame",           Category="road",     Price=8800,  Brand="Saturn",           Desc="Lightweight road and gravel alloy frame with internal cable routing." },
-        new { Id=18,  Name="Saturn Dione",                         PartType="Frame",           Category="road",     Price=7000,  Brand="Saturn",           Desc="Versatile endurance frame compatible with road and light gravel setups." },
-        new { Id=19,  Name="Sagmit Chaser",                        PartType="Frame",           Category="mountain", Price=7500,  Brand="Sagmit",           Desc="Alloy trail frame with slack geometry, made for technical singletrack." },
-        new { Id=20,  Name="COLE NX 27.5 TRI-FACTOR 2021",        PartType="Frame",           Category="mountain", Price=6000,  Brand="Cole",             Desc="2021 model tri-factor alloy frame with BOOST spacing compatibility." },
-        new { Id=21,  Name="Speedone Floater BOOST",               PartType="Frame",           Category="mountain", Price=8500,  Brand="Speedone",         Desc="BOOST-compatible alloy MTB frame optimized for wider tire clearance." },
-        @* ── FORKS ── *@
-        new { Id=22,  Name="Aeroic Air Fork",                      PartType="Fork",            Category="mountain", Price=2900,  Brand="Aeroic",           Desc="Entry-level air suspension fork, smooth performance for trail riding." },
-        new { Id=23,  Name="Weapon Cannon35 BOOST",                PartType="Fork",            Category="mountain", Price=7000,  Brand="Weapon",           Desc="35mm stanchion BOOST air fork with lockout and rebound control." },
-        new { Id=24,  Name="Weapon Rifle",                         PartType="Fork",            Category="mountain", Price=6000,  Brand="Weapon",           Desc="Air suspension fork with 100mm travel, ideal for XC and trail." },
-        new { Id=25,  Name="Weapon Rocket",                        PartType="Fork",            Category="mountain", Price=6000,  Brand="Weapon",           Desc="Performance air fork with tool-free adjustments and tapered steerer." },
-        new { Id=26,  Name="Fork Weapon Tower",                    PartType="Fork",            Category="mountain", Price=4000,  Brand="Weapon",           Desc="Budget-friendly air fork offering reliable suspension for casual riders." },
-        new { Id=27,  Name="Speedone Soldier BOOST Fork",          PartType="Fork",            Category="mountain", Price=5900,  Brand="Speedone",         Desc="BOOST spacing fork with air spring and remote lockout capability." },
-        new { Id=28,  Name="Manitou Markhor BOOST",                PartType="Fork",            Category="mountain", Price=12000, Brand="Manitou",          Desc="Trail-tuned air fork with IsoFlow technology for active suspension feel." },
-        new { Id=29,  Name="Manitou Machete Comp BOOST",           PartType="Fork",            Category="mountain", Price=16500, Brand="Manitou",          Desc="Competition-grade air fork with 34mm stanchions and precise damping." },
-        new { Id=30,  Name="Manitou Mattoc Comp BOOST",            PartType="Fork",            Category="mountain", Price=25000, Brand="Manitou",          Desc="High-end enduro fork with Dorado-derived damper technology." },
-        new { Id=31,  Name="SR Suntour Epixon Stealth",            PartType="Fork",            Category="mountain", Price=8600,  Brand="SR Suntour",       Desc="Air fork with stealth routing and remote lockout for trail bikes." },
-        new { Id=32,  Name="SR Suntour Raidon BOOST",              PartType="Fork",            Category="mountain", Price=9000,  Brand="SR Suntour",       Desc="BOOST-compatible trail fork with NC Loc remote lockout system." },
-        new { Id=33,  Name="SR Suntour XCR 32 BOOST",              PartType="Fork",            Category="mountain", Price=52000, Brand="SR Suntour",       Desc="Premium XCR 32 coil air fork for cross-country race performance." },
-        @* ── HUBS ── *@
-        new { Id=34,  Name="LDCNC 3.0 Hubs",                       PartType="Hubs",            Category="others",   Price=2200,  Brand="LDCNC",            Desc="CNC machined alloy hubs with sealed bearings for smooth, reliable roll." },
-        new { Id=35,  Name="SpeedOne Soldier BOOST Hubs",          PartType="Hubs",            Category="others",   Price=3400,  Brand="SpeedOne",         Desc="BOOST-spacing hubs with quick engagement freehub body." },
-        new { Id=36,  Name="Genova Big Dipper",                    PartType="Hubs",            Category="others",   Price=3000,  Brand="Genova",           Desc="Reliable alloy hubs with sealed cartridge bearings for trail use." },
-        new { Id=37,  Name="Weapon Animal Hubs",                   PartType="Hubs",            Category="others",   Price=4500,  Brand="Weapon",           Desc="High-end CNC hubs with precision bearings and fast engagement ratchet." },
-        new { Id=38,  Name="Sagmit EVO3 Hubs",                     PartType="Hubs",            Category="others",   Price=3400,  Brand="Sagmit",           Desc="EVO3 alloy hubs built for durability on technical terrain." },
-        new { Id=39,  Name="Ragusa R100 Hubs",                     PartType="Hubs",            Category="others",   Price=950,   Brand="Ragusa",           Desc="Budget-friendly hubs with basic sealed bearings for casual riding." },
-        new { Id=40,  Name="SpeedOne Soldier Hubs",                PartType="Hubs",            Category="others",   Price=3000,  Brand="SpeedOne",         Desc="Standard alloy hubs compatible with most wheel builds." },
-        new { Id=41,  Name="SpeedOne Pilot Carbon Hubs",           PartType="Hubs",            Category="others",   Price=3450,  Brand="SpeedOne",         Desc="Carbon-body hubs offering weight savings for performance builds." },
-        new { Id=42,  Name="SpeedOne Torpedo Hubs",                PartType="Hubs",            Category="others",   Price=3600,  Brand="SpeedOne",         Desc="Premium sealed bearing hubs with high engagement and low drag." },
-        new { Id=43,  Name="Origin8 NON BOOST Hubs",               PartType="Hubs",            Category="others",   Price=5200,  Brand="Origin8",          Desc="Non-boost alloy hubs with wide flange design for improved stiffness." },
-        @* ── UPGRADE KITS ── *@
-        new { Id=44,  Name="Sagmit Edison 12spd Upgrade Kit",      PartType="Upgrade Kit",     Category="mountain", Price=5200,  Brand="Sagmit",           Desc="12-speed upgrade kit with derailleur, shifter, and cassette for MTB." },
-        new { Id=45,  Name="12spd LTwoo AX Upkit + IXF Crank",    PartType="Upgrade Kit",     Category="mountain", Price=8000,  Brand="LTwoo",            Desc="Complete 12-speed drivetrain upgrade kit with IXF crankset included." },
-        new { Id=46,  Name="Deore M6100 12spd + Weapon Cogs",      PartType="Upgrade Kit",     Category="mountain", Price=9000,  Brand="Shimano",          Desc="Shimano Deore M6100 12-speed groupset with Weapon compatible cassette." },
-        new { Id=47,  Name="ZEE M640 10spd Upgrade Kit",           PartType="Upgrade Kit",     Category="mountain", Price=6800,  Brand="Shimano",          Desc="Shimano ZEE M640 gravity-oriented 10-speed drivetrain kit." },
-        new { Id=48,  Name="SRAM NX Eagle 12spd with BB",          PartType="Upgrade Kit",     Category="mountain", Price=13000, Brand="SRAM",             Desc="SRAM NX Eagle 12-speed groupset with bottom bracket — full upgrade kit." },
-        @* ── STEMS ── *@
-        new { Id=49,  Name="Handle Post Controltech ONE",          PartType="Stem",            Category="others",   Price=1800,  Brand="Controltech",      Desc="Alloy stem with clean aesthetics and solid clamp for precise steering." },
-        new { Id=50,  Name="HandlePost ControlTech Standard",      PartType="Stem",            Category="others",   Price=1600,  Brand="Controltech",      Desc="Standard alloy handlepost compatible with most quill configurations." },
-        new { Id=51,  Name="SeatPost ControlTech ONE",             PartType="Stem",            Category="others",   Price=1700,  Brand="Controltech",      Desc="Lightweight alloy seatpost with dual-bolt clamp and micro-adjust." },
-        new { Id=52,  Name="HandlePost ControlTech CLS",           PartType="Stem",            Category="others",   Price=1800,  Brand="Controltech",      Desc="CLS series handlepost with cable guide and adjustable angle." },
-        new { Id=53,  Name="Weapon Fury Stem",                     PartType="Stem",            Category="others",   Price=850,   Brand="Weapon",           Desc="Short, stiff alloy stem for aggressive trail and enduro setups." },
-        new { Id=54,  Name="Weapon Ambush Stem",                   PartType="Stem",            Category="others",   Price=1000,  Brand="Weapon",           Desc="Trail-tuned alloy stem with 6-degree rise for comfortable reach." },
-        new { Id=55,  Name="Weapon Savage Stem",                   PartType="Stem",            Category="others",   Price=1100,  Brand="Weapon",           Desc="Burly alloy stem engineered for abuse on gnarly descents." },
-        new { Id=56,  Name="Weapon Beast Stem",                    PartType="Stem",            Category="others",   Price=1200,  Brand="Weapon",           Desc="CNC alloy stem with reinforced clamp for enduro-level riding." },
-        new { Id=57,  Name="Weapon Animal Stem",                   PartType="Stem",            Category="others",   Price=1100,  Brand="Weapon",           Desc="Versatile alloy stem compatible with 31.8mm handlebars." },
-        new { Id=58,  Name="Weapon Predator Stem",                 PartType="Stem",            Category="others",   Price=1000,  Brand="Weapon",           Desc="Compact alloy stem for precise trail bike handling." },
-        @* ── HANDLEBARS ── *@
-        new { Id=59,  Name="Handle Bar Pro LT",                    PartType="Handlebar",       Category="mountain", Price=1800,  Brand="Pro",              Desc="Lightweight alloy flat bar with 780mm width for trail MTB use." },
-        new { Id=60,  Name="Handle Bar Pro Koryak",                PartType="Handlebar",       Category="mountain", Price=2200,  Brand="Pro",              Desc="Riser handlebar with 20mm rise and 9-degree backsweep for comfort." },
-        new { Id=61,  Name="Drop Bar Gravel Pro LT",               PartType="Handlebar",       Category="road",     Price=1800,  Brand="Pro",              Desc="Compact drop bar for gravel riding — lightweight alloy construction." },
-        new { Id=62,  Name="Drop Bar Gravel Pro Discovery",        PartType="Handlebar",       Category="road",     Price=2200,  Brand="Pro",              Desc="Wider flare drop bar optimized for gravel and adventure riding." },
-        new { Id=63,  Name="Answer ProTaper 20x20",                PartType="Handlebar",       Category="kids",     Price=2000,  Brand="Answer",           Desc="20-inch BMX-style bar compatible with kids and youth bike builds." },
-        new { Id=64,  Name="Answer ProTaper",                      PartType="Handlebar",       Category="mountain", Price=2000,  Brand="Answer",           Desc="ProTaper alloy riser bar — strong, lightweight, and rider-proven." },
-        new { Id=65,  Name="Answer ProTaper 7050 Aluminum",        PartType="Handlebar",       Category="mountain", Price=1600,  Brand="Answer",           Desc="7050-series alloy bar with 31.8mm clamp for MTB and BMX crossover." },
-        new { Id=66,  Name="Sagmit Brooklyn 3.0",                  PartType="Handlebar",       Category="others",   Price=550,   Brand="Sagmit",           Desc="Budget alloy flat bar suited for fixie, commuter, and casual builds." },
-        new { Id=67,  Name="Sagmit Shadow",                        PartType="Handlebar",       Category="others",   Price=550,   Brand="Sagmit",           Desc="Minimalist alloy bar for urban commuters and fixie riders." },
-        new { Id=68,  Name="Sagmit Static",                        PartType="Handlebar",       Category="fixie",    Price=750,   Brand="Sagmit",           Desc="Fixie-oriented flat bar with clean finish and 25.4mm clamp diameter." },
-        @* ── SADDLES ── *@
-        new { Id=69,  Name="Sagmit RedClassic Skull Saddle",       PartType="Saddle",          Category="others",   Price=450,   Brand="Sagmit",           Desc="Sport saddle with skull graphic — lightweight foam padding." },
-        new { Id=70,  Name="Genova Jupiter Saddle",                PartType="Saddle",          Category="others",   Price=450,   Brand="Genova",           Desc="Comfortable all-around saddle for casual and trail riders." },
-        new { Id=71,  Name="Giant Saddle (Solid)",                 PartType="Saddle",          Category="others",   Price=450,   Brand="Giant",            Desc="Performance saddle without center cutout for firm support." },
-        new { Id=72,  Name="Giant Saddle (Relief Channel)",        PartType="Saddle",          Category="others",   Price=450,   Brand="Giant",            Desc="Anatomic saddle with center relief channel for reduced pressure." },
-        new { Id=73,  Name="Ragusa R-100 Saddle",                  PartType="Saddle",          Category="others",   Price=450,   Brand="Ragusa",           Desc="Entry-level sport saddle with durable cover and solid base." },
-        new { Id=74,  Name="San Marco Road Saddle",                PartType="Saddle",          Category="road",     Price=450,   Brand="San Marco",        Desc="Classic road saddle with narrow profile for efficient pedaling." },
-        new { Id=75,  Name="Velo Plush Saddle",                    PartType="Saddle",          Category="others",   Price=450,   Brand="Velo",             Desc="Plush padded saddle — ideal for commuters and recreational cyclists." },
-        new { Id=76,  Name="Sagmit Oilslick Saddle",               PartType="Saddle",          Category="others",   Price=550,   Brand="Sagmit",           Desc="Eye-catching oilslick finish saddle for fixie and street builds." },
-        new { Id=77,  Name="Genova Mars Saddle",                   PartType="Saddle",          Category="others",   Price=450,   Brand="Genova",           Desc="Lightweight sport saddle for aggressive riding positions." },
-        new { Id=78,  Name="Specialized Black Saddle",             PartType="Saddle",          Category="others",   Price=450,   Brand="Specialized",      Desc="Specialized alloy-railed saddle in clean matte black finish." },
-        new { Id=79,  Name="Specialized M811 Saddle",              PartType="Saddle",          Category="others",   Price=450,   Brand="Specialized",      Desc="M811 series saddle with Body Geometry-inspired shaping." },
-        new { Id=80,  Name="Easydo ES-01 Saddle",                  PartType="Saddle",          Category="others",   Price=450,   Brand="Easydo",           Desc="Affordable ES-01 saddle with semi-gloss finish and foam padding." },
-        @* ── HANDLE GRIPS ── *@
-        new { Id=81,  Name="Silicon Grip Seer 5mm",                PartType="Handle Grip",     Category="mountain", Price=330,   Brand="Seer",             Desc="5mm soft silicone grip with textured pattern for trail control." },
-        new { Id=82,  Name="Silicon Grip Seer 7mm",                PartType="Handle Grip",     Category="mountain", Price=400,   Brand="Seer",             Desc="Thicker 7mm silicone grip for maximum vibration dampening." },
-        new { Id=83,  Name="Seer Polymer Bartape",                 PartType="Handle Grip",     Category="road",     Price=350,   Brand="Seer",             Desc="Polymer bar tape for road bikes — comfortable and easy to wrap." },
-        new { Id=84,  Name="Seer Art Racing Edition BarTape",      PartType="Handle Grip",     Category="road",     Price=400,   Brand="Seer",             Desc="Premium racing bar tape with eye-catching art edition graphics." },
-        new { Id=85,  Name="Seer SILICON Hornet Bar Tape",         PartType="Handle Grip",     Category="road",     Price=450,   Brand="Seer",             Desc="Silicone Hornet bar tape — superior grip in wet and dry conditions." },
-        new { Id=86,  Name="Seer POLYMER Hornet Bar Tape",         PartType="Handle Grip",     Category="road",     Price=450,   Brand="Seer",             Desc="Hornet polymer tape with high-density foam backing for comfort." },
-        new { Id=87,  Name="Seer Super Lite Bar Tape",             PartType="Handle Grip",     Category="road",     Price=300,   Brand="Seer",             Desc="Ultra-light bar tape for road and gravel race builds." },
-        new { Id=88,  Name="Attack Dual Lock-On Grip",             PartType="Handle Grip",     Category="mountain", Price=370,   Brand="Attack",           Desc="Dual lock-on collar grip — no tape, no twist, no slippage." },
-        new { Id=89,  Name="Weapon Race Grip w/ Palm Rest",        PartType="Handle Grip",     Category="mountain", Price=400,   Brand="Weapon",           Desc="Ergonomic grip with palm rest for reduced hand fatigue on long rides." },
-        new { Id=90,  Name="Weapon Rubix Grip",                    PartType="Handle Grip",     Category="mountain", Price=200,   Brand="Weapon",           Desc="Budget dual-compound grip for everyday trail and commuter use." },
-        new { Id=91,  Name="Weapon Wave Grip",                     PartType="Handle Grip",     Category="mountain", Price=350,   Brand="Weapon",           Desc="Wave-textured grip for confident control on technical trails." },
-        @* ── PEDALS ── *@
-        new { Id=92,  Name="Speedone Soldier Pedal",               PartType="Pedals",          Category="others",   Price=1200,  Brand="Speedone",         Desc="Alloy platform pedal with removable pins for maximum grip." },
-        new { Id=93,  Name="Speedone Pilot Pedal",                 PartType="Pedals",          Category="others",   Price=1200,  Brand="Speedone",         Desc="Thin profile alloy pedal with sealed bearings and traction pins." },
-        new { Id=94,  Name="Pedal Sagmit 610",                     PartType="Pedals",          Category="others",   Price=800,   Brand="Sagmit",           Desc="Budget alloy platform pedal with reliable sealed axle bearing." },
-        new { Id=95,  Name="Pedal Sagmit 614",                     PartType="Pedals",          Category="others",   Price=800,   Brand="Sagmit",           Desc="Wide alloy platform with concave body for better foot grip." },
-        new { Id=96,  Name="Ragusa R700 Pedal",                    PartType="Pedals",          Category="others",   Price=500,   Brand="Ragusa",           Desc="Lightweight flat pedal with nylon body for casual riders." },
-        new { Id=97,  Name="Ragusa CNC Sealed 712",                PartType="Pedals",          Category="others",   Price=800,   Brand="Ragusa",           Desc="CNC machined sealed bearing pedal for smooth rotation." },
-        new { Id=98,  Name="Sagmit 622 CNC Sealed",                PartType="Pedals",          Category="others",   Price=800,   Brand="Sagmit",           Desc="CNC pedal with sealed cartridge bearing for all-weather use." },
-        new { Id=99,  Name="Sagmit 618 CNC Sealed",                PartType="Pedals",          Category="others",   Price=800,   Brand="Sagmit",           Desc="Mid-range sealed bearing alloy platform with pin traction." },
-        new { Id=100, Name="MKS JAPAN GR-9",                       PartType="Pedals",          Category="others",   Price=1200,  Brand="MKS",              Desc="Japanese-made MKS alloy pedal — trusted quality for road and urban." },
-        new { Id=101, Name="MKS Sylvan Touring",                   PartType="Pedals",          Category="road",     Price=1400,  Brand="MKS",              Desc="Classic MKS touring pedal — durable, smooth, and road-ready." },
-        new { Id=102, Name="MKS BM7",                              PartType="Pedals",          Category="fixie",    Price=1550,  Brand="MKS",              Desc="MKS BM7 platform pedal popular for fixie and urban track builds." },
-        @* ── RIMS / WHEELSET ── *@
-        new { Id=103, Name="LDCNC RS300 700c Rim Brake",           PartType="Rims / Wheelset", Category="road",     Price=5100,  Brand="LDCNC",            Desc="700c double-wall alloy rim set with rim brake surface for road builds." },
-        new { Id=104, Name="Sagmit Aero Rim",                      PartType="Rims / Wheelset", Category="mountain", Price=1500,  Brand="Sagmit",           Desc="Aero-profile alloy rim for MTB, compatible with standard hubs." },
-        new { Id=105, Name="Sagmit Legend M32",                    PartType="Rims / Wheelset", Category="mountain", Price=1600,  Brand="Sagmit",           Desc="32-hole alloy rim with reinforced eyelets for durability on trails." },
-        new { Id=106, Name="Kore Realm 4.2",                       PartType="Rims / Wheelset", Category="mountain", Price=1100,  Brand="Kore",             Desc="Budget trail rim with 4.2mm wall for use with standard MTB tires." },
-        new { Id=107, Name="WTB i21 Tubeless Ready",               PartType="Rims / Wheelset", Category="mountain", Price=1600,  Brand="WTB",              Desc="21mm inner width tubeless-ready rim ideal for XC and trail tires." },
-        new { Id=108, Name="WTB i25 Tubeless Ready",               PartType="Rims / Wheelset", Category="mountain", Price=1600,  Brand="WTB",              Desc="25mm inner width tubeless-ready rim for plus and trail tire setups." },
-        new { Id=109, Name="American Classic Feldspar 290 TR",     PartType="Rims / Wheelset", Category="mountain", Price=1800,  Brand="American Classic", Desc="290g tubeless-ready rim — lightweight option for XC race builds." },
-        new { Id=110, Name="Jalco Wellington Tubeless Ready",      PartType="Rims / Wheelset", Category="mountain", Price=1400,  Brand="Jalco",            Desc="Wellington tubeless-ready alloy rim for trail and all-mountain use." },
-        new { Id=111, Name="Speedone Pilot Rim",                   PartType="Rims / Wheelset", Category="mountain", Price=2000,  Brand="Speedone",         Desc="Double-wall alloy rim with eyelet reinforcement for aggressive riding." },
-        new { Id=112, Name="Speedone Bazooka Rim",                 PartType="Rims / Wheelset", Category="mountain", Price=1700,  Brand="Speedone",         Desc="Wide-profile alloy rim compatible with 2.4-inch plus trail tires." },
-        new { Id=113, Name="Speedone Soldier Rim",                 PartType="Rims / Wheelset", Category="mountain", Price=1900,  Brand="Speedone",         Desc="32-hole alloy rim for general trail and enduro wheel builds." },
-        new { Id=114, Name="Sagmit Safarri Rim",                   PartType="Rims / Wheelset", Category="mountain", Price=1700,  Brand="Sagmit",           Desc="Safari-series wide alloy rim built for plus-size tire fitment." },
-        new { Id=115, Name="Jalco Maranello 700c",                 PartType="Rims / Wheelset", Category="road",     Price=1500,  Brand="Jalco",            Desc="700c road alloy rim with smooth brake track for rim-brake builds." },
-        new { Id=116, Name="Kore Realm 2.4",                       PartType="Rims / Wheelset", Category="mountain", Price=1200,  Brand="Kore",             Desc="2.4-inch clearance alloy rim for standard trail tire combinations." },
-        @* ── TIRES AND TUBES ── *@
-        new { Id=117, Name="Maxxis Ikon 27.5 x 2.20 Tanwall",     PartType="Tires / Tubes",   Category="mountain", Price=1500,  Brand="Maxxis",           Desc="Tanwall Ikon XC tire for 27.5 — fast-rolling with light casing." },
-        new { Id=118, Name="Maxxis Ardent 29 x 2.25 Tanwall",     PartType="Tires / Tubes",   Category="mountain", Price=1500,  Brand="Maxxis",           Desc="Tanwall Ardent trail tire for 29ers — great traction and cornering." },
-        new { Id=119, Name="Maxxis Ikon 29 x 2.20",               PartType="Tires / Tubes",   Category="mountain", Price=1500,  Brand="Maxxis",           Desc="Fast-rolling 29-inch XC tire for hardpack and cross-country racing." },
-        new { Id=120, Name="Maxxis Crossmark II 27.5 x 2.25",     PartType="Tires / Tubes",   Category="mountain", Price=1500,  Brand="Maxxis",           Desc="Cross-country 27.5 tire with open tread for mixed terrain." },
-        new { Id=121, Name="Maxxis Ikon 29 x 2.20 Tanwall",       PartType="Tires / Tubes",   Category="mountain", Price=1500,  Brand="Maxxis",           Desc="Tanwall Ikon for 29ers — lightweight XC casing with efficient roll." },
-        new { Id=122, Name="Maxxis Rekon Race 27.5 x 2.25",       PartType="Tires / Tubes",   Category="mountain", Price=1500,  Brand="Maxxis",           Desc="Race-tuned 27.5-inch tire with cornering knobs for technical XC." },
-        new { Id=123, Name="Maxxis Ardent 27.5 x 2.25",           PartType="Tires / Tubes",   Category="mountain", Price=1500,  Brand="Maxxis",           Desc="All-around 27.5-inch trail tire with balanced traction and speed." },
-        new { Id=124, Name="Maxxis Ardent Race 27.5 x 2.20",      PartType="Tires / Tubes",   Category="mountain", Price=1500,  Brand="Maxxis",           Desc="Lightweight race casing Ardent for competitive 27.5-inch XC builds." },
-        new { Id=125, Name="Maxxis Tube (Standard)",               PartType="Tires / Tubes",   Category="others",   Price=250,   Brand="Maxxis",           Desc="Standard inner tube for MTB and road tires — reliable and durable." },
-        new { Id=126, Name="Sagmit Inner Tube",                    PartType="Tires / Tubes",   Category="others",   Price=150,   Brand="Sagmit",           Desc="Budget replacement inner tube for MTB and commuter tires." },
-        new { Id=127, Name="Size 20 Leo Tube (Kids)",              PartType="Tires / Tubes",   Category="kids",     Price=85,    Brand="Leo",              Desc="20-inch inner tube for kids bike wheels — Schrader valve." },
-        new { Id=128, Name="Size 26 Leo Tube",                     PartType="Tires / Tubes",   Category="others",   Price=100,   Brand="Leo",              Desc="26-inch inner tube compatible with most standard MTB wheels." },
-        new { Id=129, Name="Size 20 Tire (Kids)",                  PartType="Tires / Tubes",   Category="kids",     Price=380,   Brand="Generic",          Desc="20-inch replacement tire for youth and kids bikes." },
-        new { Id=130, Name="Size 16 Tire (Kids)",                  PartType="Tires / Tubes",   Category="kids",     Price=280,   Brand="Generic",          Desc="16-inch tire for toddler and young kids bikes." },
-        new { Id=131, Name="Size 16 Tube (Kids)",                  PartType="Tires / Tubes",   Category="kids",     Price=85,    Brand="Generic",          Desc="16-inch inner tube for small kids bikes — Schrader valve." },
-        @* ── CHAINS ── *@
-        new { Id=132, Name="8spd SUMC CP Chain",                   PartType="Chain",           Category="others",   Price=300,   Brand="SUMC",             Desc="8-speed chain with CP coating and quick-connect missing link." },
-        new { Id=133, Name="9spd SUMC CP Chain",                   PartType="Chain",           Category="others",   Price=380,   Brand="SUMC",             Desc="9-speed chain for MTB and road drivetrains with missing link." },
-        new { Id=134, Name="10spd SUMC CP Chain",                  PartType="Chain",           Category="others",   Price=450,   Brand="SUMC",             Desc="10-speed narrow chain with missing link and CP anti-rust coating." },
-        new { Id=135, Name="11spd SUMC CP Chain",                  PartType="Chain",           Category="others",   Price=650,   Brand="SUMC",             Desc="11-speed compatible chain with precision rivets and missing link." },
-        new { Id=136, Name="12spd SUMC CP Chain",                  PartType="Chain",           Category="mountain", Price=1050,  Brand="SUMC",             Desc="12-speed MTB chain with CP coating for Eagle and Deore 12s systems." },
-        new { Id=137, Name="8spd SUMC Oilslick 116L",              PartType="Chain",           Category="fixie",    Price=450,   Brand="SUMC",             Desc="Oilslick rainbow-finish 8-speed chain — popular for fixie builds." },
-        new { Id=138, Name="10spd SUMC Oilslick 116L",             PartType="Chain",           Category="others",   Price=750,   Brand="SUMC",             Desc="10-speed oilslick chain with iridescent finish and missing link." },
-        new { Id=139, Name="11spd SUMC Oilslick 116L",             PartType="Chain",           Category="others",   Price=1200,  Brand="SUMC",             Desc="11-speed oilslick chain for premium aesthetic builds." },
-        new { Id=140, Name="12spd KMC X-Series Grey",              PartType="Chain",           Category="mountain", Price=1500,  Brand="KMC",              Desc="KMC X-series 12-speed chain in grey — compatible with Eagle and Deore." },
-        new { Id=141, Name="11spd KMC X-Series Grey",              PartType="Chain",           Category="others",   Price=1100,  Brand="KMC",              Desc="KMC 11-speed chain with X-Bridge technology for smooth shifting." },
-        new { Id=142, Name="10spd KMC X-Series Grey",              PartType="Chain",           Category="others",   Price=900,   Brand="KMC",              Desc="KMC 10-speed grey chain for MTB and road groupsets." },
-        new { Id=143, Name="9spd KMC X-Series Gold",               PartType="Chain",           Category="others",   Price=1800,  Brand="KMC",              Desc="KMC gold-finished 9-speed chain for premium show builds." },
-        new { Id=144, Name="10spd KMC X-Series Gold",              PartType="Chain",           Category="others",   Price=1800,  Brand="KMC",              Desc="KMC X-series 10-speed in gold finish for standout builds." },
-        new { Id=145, Name="12spd KMC X-Series Gold",              PartType="Chain",           Category="mountain", Price=2400,  Brand="KMC",              Desc="Premium gold 12-speed KMC chain for high-performance MTB setups." },
-        new { Id=146, Name="CT-1HX 116L Heavy Duty FIXIE",         PartType="Chain",           Category="fixie",    Price=350,   Brand="CT",               Desc="Heavy-duty single-speed fixie chain — 116 links, built to last." },
-        new { Id=147, Name="GT-10 Single Speed Chain 126L",        PartType="Chain",           Category="fixie",    Price=500,   Brand="GT",               Desc="Single-speed chain — 126 links, ideal for fixie and track bikes." },
-        new { Id=148, Name="GT-11 Single Speed Chain 126L",        PartType="Chain",           Category="fixie",    Price=700,   Brand="GT",               Desc="Premium 126-link chain for fixie and single-speed track builds." },
-    };
+    int    currentPage = ViewBag.CurrentPage ?? 1;
+    int    totalPages  = ViewBag.TotalPages  ?? 1;
+    int    totalCount  = ViewBag.TotalCount  ?? 0;
+    int?   catId       = ViewBag.CategoryId;
+    int?   brandId     = ViewBag.BrandId;
+    decimal? minPrice  = ViewBag.MinPrice;
+    decimal? maxPrice  = ViewBag.MaxPrice;
+    string? search     = ViewBag.Search;
+    IEnumerable<Brand>    brands     = ViewBag.Brands     ?? Enumerable.Empty<Brand>();
+    IEnumerable<Category> categories = ViewBag.Categories ?? Enumerable.Empty<Category>();
 }
 
-@* ── External stylesheet — no embedded <style> block needed ── *@
-<link rel="stylesheet" href="~/css/product-catalog.css" asp-append-version="true" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/product-catalog.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/product-card.css"    asp-append-version="true" />
+}
 
-@* ══════════════════════════════════════════════════════
-   HERO BANNER
-══════════════════════════════════════════════════════ *@
-<div class="catalog-page">
+@* Hidden CSRF token for AJAX calls on this page *@
+@Html.AntiForgeryToken()
 
-    <div class="catalog-hero">
-        <div class="catalog-hero__glow"></div>
-        <div class="container">
-            <p class="catalog-hero__eyebrow">Taurus Bike Shop</p>
-            <h1 class="catalog-hero__title">PARTS &amp; <span>BIKES</span></h1>
-            <p class="catalog-hero__sub">@products.Length premium products — frames, forks, drivetrain, tires &amp; more.</p>
-        </div>
-    </div>
-
+<div class="tbs-catalog-page">
     <div class="container">
 
-        @* ══════════════════════════════════════════════════════
-           TOOLBAR — live search + part-type dropdown + sort
-        ══════════════════════════════════════════════════════ *@
-        <div class="catalog-toolbar">
-
-            <div class="toolbar-search">
-                <svg class="toolbar-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-                <input type="text" class="toolbar-search__input" id="catalogSearch"
-                       placeholder="Search products, brands..." autocomplete="off">
-            </div>
-
-            <select class="toolbar-part-select" id="partTypeSelect">
-                <option value="all">All Part Types</option>
-                <option value="Complete Bike">Complete Bike</option>
-                <option value="Frame">Frame</option>
-                <option value="Fork">Fork</option>
-                <option value="Hubs">Hubs</option>
-                <option value="Upgrade Kit">Upgrade Kit</option>
-                <option value="Stem">Stem</option>
-                <option value="Handlebar">Handlebar</option>
-                <option value="Saddle">Saddle</option>
-                <option value="Handle Grip">Handle Grip</option>
-                <option value="Pedals">Pedals</option>
-                <option value="Rims / Wheelset">Rims / Wheelset</option>
-                <option value="Tires / Tubes">Tires / Tubes</option>
-                <option value="Chain">Chain</option>
-            </select>
-
-            <select class="toolbar-sort" id="catalogSort">
-                <option value="default">Sort: Default</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="name-asc">Name: A to Z</option>
-            </select>
-
-            <div class="toolbar-count">
-                Showing <span id="countNum">0</span> products
-            </div>
+        @* Page header *@
+        <div class="tbs-catalog__header">
+            <h1 class="tbs-catalog__title">Product Catalog</h1>
+            <p class="tbs-catalog__count">
+                @totalCount product@(totalCount != 1 ? "s" : "") found
+            </p>
         </div>
 
-        @* ══════════════════════════════════════════════════════
-           CATEGORY FILTER TABS
-           data-cat must match the Category field on each product.
-        ══════════════════════════════════════════════════════ *@
-        <div class="catalog-filter-tabs">
-            <button class="filter-tab active" data-cat="all">
-                All Types <span class="filter-tab__count" id="cnt-all">0</span>
-            </button>
-            <button class="filter-tab" data-cat="mountain">
-                Mountain <span class="filter-tab__count" id="cnt-mountain">0</span>
-            </button>
-            <button class="filter-tab" data-cat="road">
-                Road <span class="filter-tab__count" id="cnt-road">0</span>
-            </button>
-            <button class="filter-tab" data-cat="fixie">
-                Fixie <span class="filter-tab__count" id="cnt-fixie">0</span>
-            </button>
-            <button class="filter-tab" data-cat="kids">
-                Kids <span class="filter-tab__count" id="cnt-kids">0</span>
-            </button>
-            <button class="filter-tab" data-cat="others">
-                Others <span class="filter-tab__count" id="cnt-others">0</span>
-            </button>
-        </div>
+        <div class="tbs-catalog__layout">
 
-        @* ══════════════════════════════════════════════════════
-           PRODUCT GRID
-        ══════════════════════════════════════════════════════ *@
-        <div class="catalog-grid" id="catalogGrid">
+            @* ======================== FILTER SIDEBAR ======================== *@
+            <aside class="tbs-catalog__sidebar" id="filter-sidebar" aria-label="Product filters">
 
-            @foreach (var p in products)
-            {
-                var badgeColor = p.PartType switch {
-                    "Complete Bike"    => "var(--c-unit)",
-                    "Frame"            => "var(--c-frame)",
-                    "Fork"             => "var(--c-fork)",
-                    "Hubs"             => "var(--c-hubs)",
-                    "Upgrade Kit"      => "var(--c-upkit)",
-                    "Stem"             => "var(--c-stem)",
-                    "Handlebar"        => "var(--c-bar)",
-                    "Saddle"           => "var(--c-saddle)",
-                    "Handle Grip"      => "var(--c-grip)",
-                    "Pedals"           => "var(--c-pedals)",
-                    "Rims / Wheelset"  => "var(--c-rims)",
-                    "Tires / Tubes"    => "var(--c-tires)",
-                    "Chain"            => "var(--c-chain)",
-                    _                  => "var(--c-unit)"
-                };
-
-                var iconSvg = p.PartType switch {
-                    "Complete Bike"    => @"<circle cx='12' cy='12' r='9'/><circle cx='12' cy='12' r='3'/><line x1='12' y1='3' x2='12' y2='9'/><line x1='12' y1='15' x2='12' y2='21'/><line x1='3' y1='12' x2='9' y2='12'/><line x1='15' y1='12' x2='21' y2='12'/>",
-                    "Frame"            => @"<rect x='3' y='9' width='18' height='10' rx='2'/><line x1='8' y1='9' x2='8' y2='19'/><line x1='16' y1='9' x2='16' y2='19'/>",
-                    "Fork"             => @"<line x1='12' y1='2' x2='12' y2='22'/><path d='M5 22l7-14 7 14'/>",
-                    "Upgrade Kit"      => @"<circle cx='12' cy='12' r='3'/><path d='M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83'/>",
-                    "Chain"            => @"<path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/>",
-                    "Pedals"           => @"<rect x='2' y='10' width='20' height='4' rx='2'/><line x1='7' y1='10' x2='7' y2='14'/><line x1='12' y1='10' x2='12' y2='14'/><line x1='17' y1='10' x2='17' y2='14'/>",
-                    "Saddle"           => @"<path d='M4 15c0-4 3-7 8-7s8 3 8 7'/><line x1='12' y1='8' x2='12' y2='20'/>",
-                    "Tires / Tubes"    => @"<circle cx='12' cy='12' r='10'/><circle cx='12' cy='12' r='3'/>",
-                    _                  => @"<circle cx='12' cy='12' r='10'/><line x1='12' y1='8' x2='12' y2='12'/><line x1='12' y1='16' x2='12.01' y2='16'/>"
-                };
-
-                <div class="product-card"
-                     data-category="@p.Category"
-                     data-parttype="@p.PartType"
-                     data-price="@p.Price"
-                     data-name="@p.Name.ToLower()"
-                     data-brand="@p.Brand.ToLower()">
-
-                    <span class="card-badge" style="background:@badgeColor">@p.PartType</span>
-
-                    <button class="card-wish" aria-label="Add to wishlist">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                        </svg>
-                    </button>
-
-                    <div class="card-img-wrap">
-                        <div class="card-img-placeholder">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                                @Html.Raw(iconSvg)
-                            </svg>
-                            <span>@p.Brand</span>
-                        </div>
-                        <div class="card-overlay">
-                            <button class="btn-quick">Quick View</button>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        <span class="card-part-type" style="color:@badgeColor">@p.PartType</span>
-                        <span class="card-brand">@p.Brand</span>
-                        <h3 class="card-name">@p.Name</h3>
-                        <p class="card-desc">@p.Desc</p>
-                        <div class="card-price">&#8369;@p.Price.ToString("N0")</div>
-                        <div class="card-actions">
-                            <button class="btn-cart">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                                </svg>
-                                Add to Cart
-                            </button>
-                            <button class="btn-details" title="View Details">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
+                @* Search *@
+                <div class="tbs-filter-group">
+                    <label class="tbs-filter-group__label" for="search-input">Search</label>
+                    <input type="text"
+                           id="search-input"
+                           class="tbs-input"
+                           placeholder="Search products…"
+                           value="@search" />
                 </div>
-            }
 
-            <div class="catalog-empty" id="catalogEmpty">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-                <p class="catalog-empty__title">No Products Found</p>
-                <p class="catalog-empty__sub">Try adjusting your search or filter.</p>
+                @* Categories *@
+                <div class="tbs-filter-group">
+                    <div class="tbs-filter-group__label">Category</div>
+                    <ul class="tbs-filter-list" id="category-list">
+                        <li>
+                            <label class="tbs-filter-check @(catId == null ? "tbs-filter-check--active" : "")">
+                                <input type="radio" name="categoryId" value=""
+                                       @(catId == null ? "checked" : "") class="tbs-filter-radio" />
+                                All Categories
+                            </label>
+                        </li>
+                        @foreach (Category cat in categories)
+                        {
+                            <li>
+                                <label class="tbs-filter-check @(catId == cat.CategoryId ? "tbs-filter-check--active" : "")">
+                                    <input type="radio" name="categoryId" value="@cat.CategoryId"
+                                           @(catId == cat.CategoryId ? "checked" : "") class="tbs-filter-radio" />
+                                    @cat.Name
+                                </label>
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                @* Brands *@
+                @if (brands.Any())
+                {
+                    <div class="tbs-filter-group">
+                        <div class="tbs-filter-group__label">Brand</div>
+                        <ul class="tbs-filter-list" id="brand-list">
+                            <li>
+                                <label class="tbs-filter-check @(brandId == null ? "tbs-filter-check--active" : "")">
+                                    <input type="radio" name="brandId" value=""
+                                           @(brandId == null ? "checked" : "") class="tbs-filter-radio" />
+                                    All Brands
+                                </label>
+                            </li>
+                            @foreach (Brand brand in brands)
+                            {
+                                <li>
+                                    <label class="tbs-filter-check @(brandId == brand.BrandId ? "tbs-filter-check--active" : "")">
+                                        <input type="radio" name="brandId" value="@brand.BrandId"
+                                               @(brandId == brand.BrandId ? "checked" : "") class="tbs-filter-radio" />
+                                        @brand.BrandName
+                                    </label>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                @* Price range *@
+                <div class="tbs-filter-group">
+                    <div class="tbs-filter-group__label">Price Range (₱)</div>
+                    <div class="tbs-price-range">
+                        <input type="number" id="min-price" class="tbs-input tbs-price-range__input"
+                               placeholder="Min" value="@minPrice" min="0" step="100" />
+                        <span class="tbs-price-range__sep">—</span>
+                        <input type="number" id="max-price" class="tbs-input tbs-price-range__input"
+                               placeholder="Max" value="@maxPrice" min="0" step="100" />
+                    </div>
+                </div>
+
+                @* Apply / Clear *@
+                <button type="button" class="btn tbs-btn-accent tbs-btn-full mt-2" id="apply-filters-btn">
+                    Apply Filters
+                </button>
+                <a asp-action="List" asp-controller="Product"
+                   class="btn tbs-btn-outline tbs-btn-full mt-2">
+                    Clear All
+                </a>
+
+            </aside>
+
+            @* ======================== PRODUCT GRID ======================== *@
+            <div class="tbs-catalog__main">
+
+                @* Sort bar *@
+                <div class="tbs-catalog__sort-bar">
+                    <span class="tbs-catalog__showing">
+                        Showing @((currentPage - 1) * 12 + 1)–@(Math.Min(currentPage * 12, totalCount))
+                        of @totalCount
+                    </span>
+                </div>
+
+                @* Grid *@
+                @if (!Model.Any())
+                {
+                    <div class="tbs-catalog__empty">
+                        <div class="tbs-catalog__empty-icon" aria-hidden="true">🔍</div>
+                        <p class="tbs-catalog__empty-text">No products found matching your filters.</p>
+                        <a asp-action="List" asp-controller="Product" class="btn tbs-btn-accent">
+                            Clear Filters
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="row g-3" id="product-grid">
+                        @foreach (WebApplication.Models.ViewModels.ProductViewModel product in Model)
+                        {
+                            <div class="col-6 col-lg-4">
+                                @await Html.PartialAsync("_ProductCard", product)
+                            </div>
+                        }
+                    </div>
+
+                    @* Pagination *@
+                    @if (totalPages > 1)
+                    {
+                        <nav class="tbs-pagination" aria-label="Product pages">
+                            @if (currentPage > 1)
+                            {
+                                <a class="tbs-pagination__btn"
+                                   asp-action="List" asp-controller="Product"
+                                   asp-route-page="@(currentPage - 1)"
+                                   asp-route-categoryId="@catId"
+                                   asp-route-brandId="@brandId"
+                                   asp-route-search="@search"
+                                   aria-label="Previous page">
+                                    &lsaquo;
+                                </a>
+                            }
+
+                            @for (int p = Math.Max(1, currentPage - 2);
+                                  p <= Math.Min(totalPages, currentPage + 2); p++)
+                            {
+                                <a class="tbs-pagination__btn @(p == currentPage ? "tbs-pagination__btn--active" : "")"
+                                   asp-action="List" asp-controller="Product"
+                                   asp-route-page="@p"
+                                   asp-route-categoryId="@catId"
+                                   asp-route-brandId="@brandId"
+                                   asp-route-search="@search"
+                                   aria-label="Page @p"
+                                   @(p == currentPage ? "aria-current=page" : "")>
+                                    @p
+                                </a>
+                            }
+
+                            @if (currentPage < totalPages)
+                            {
+                                <a class="tbs-pagination__btn"
+                                   asp-action="List" asp-controller="Product"
+                                   asp-route-page="@(currentPage + 1)"
+                                   asp-route-categoryId="@catId"
+                                   asp-route-brandId="@brandId"
+                                   asp-route-search="@search"
+                                   aria-label="Next page">
+                                    &rsaquo;
+                                </a>
+                            }
+                        </nav>
+                    }
+                }
             </div>
-
         </div>
     </div>
 </div>
 
-@* ── JS loaded last via Scripts section so DOM is ready ── *@
 @section Scripts {
     <script src="~/js/product-catalog.js" asp-append-version="true"></script>
 }

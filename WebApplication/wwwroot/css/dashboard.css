@@ -1,145 +1,84 @@
-/* File: wwwroot/css/dashboard.css */
+/* WebApplication/wwwroot/css/dashboard.css */
 
-.dashboard-page {
+.tbs-dashboard__stats {
+    margin-bottom: 2.5rem;
+}
+
+.tbs-stat-card {
     display: flex;
-    min-height: 90vh;
-    font-family: 'Segoe UI', sans-serif;
-    background: #fff5f5;
-    color: #1a1a1a;
-}
-
-.sidebar {
-    width: 220px;
-    background: #d32f2f;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-}
-
-.brand h2 {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-.sidebar-nav a {
-    display: block;
-    color: #fff;
-    text-decoration: none;
-    padding: 12px 15px;
-    margin: 5px 0;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-}
-
-.sidebar-nav a.active, .sidebar-nav a:hover {
-    background: #b71c1c;
-}
-
-.main-content {
-    flex: 1;
-    padding: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 1rem;
+    background: var(--tbs-white);
+    border: 1.5px solid var(--tbs-gray-100);
+    border-radius: var(--tbs-card-radius);
+    padding: 1.25rem;
+    text-decoration: none;
+    transition: border-color var(--tbs-transition), box-shadow var(--tbs-transition), transform var(--tbs-transition);
+    height: 100%;
+}
+.tbs-stat-card:hover {
+    border-color: var(--tbs-accent);
+    box-shadow: var(--tbs-shadow-md);
+    transform: translateY(-2px);
+    color: inherit;
 }
 
-.dashboard-header h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #d32f2f;
+.tbs-stat-card__icon {
+    font-size: 1.75rem;
+    line-height: 1;
+    flex-shrink: 0;
 }
-
-.header-actions button {
-    background: #fff;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 6px;
-    margin-left: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.tbs-stat-card__body {
+    flex: 1;
+    min-width: 0;
 }
-
-.header-actions button:hover {
-    background: #f5f5f5;
-}
-
-.stats-cards {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.stats-cards .card {
-    background: #fff;
-    flex: 1 1 200px;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-    text-align: center;
-}
-
-.stats-cards .card h3 {
-    color: #b71c1c;
-    margin-bottom: 10px;
-}
-
-.stats-cards .card p {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.recent-orders h2 {
-    margin-bottom: 15px;
-    color: #d32f2f;
-}
-
-.recent-orders table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border-radius: 12px;
+.tbs-stat-card__label {
+    font-family: var(--tbs-font-display);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tbs-gray-800);
+    white-space: nowrap;
     overflow: hidden;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    text-overflow: ellipsis;
+}
+.tbs-stat-card__hint {
+    font-size: 0.75rem;
+    color: var(--tbs-gray-400);
+    margin-top: 0.1rem;
+}
+.tbs-stat-card__arrow {
+    font-size: 1.25rem;
+    color: var(--tbs-gray-200);
+    flex-shrink: 0;
+    line-height: 1;
+    transition: color var(--tbs-transition);
+}
+.tbs-stat-card:hover .tbs-stat-card__arrow {
+    color: var(--tbs-accent);
 }
 
-.recent-orders th, .recent-orders td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #eee;
-    text-align: left;
+.tbs-dashboard__section {
+    margin-bottom: 2.5rem;
 }
 
-.recent-orders th {
-    background: #d32f2f;
-    color: #fff;
+.tbs-dashboard__empty-orders {
+    text-align: center;
+    padding: 2.5rem;
+}
+.tbs-dashboard__empty-text {
+    color: var(--tbs-gray-400);
+    margin: 0;
+    font-size: 0.9375rem;
+}
+.tbs-dashboard__empty-text a {
+    color: var(--tbs-accent);
+    font-weight: 600;
 }
 
-.recent-orders tr:hover {
-    background: #fff0f0;
-}
-
-@media (max-width: 992px) {
-    .dashboard-page {
-        flex-direction: column;
-    }
-    .sidebar {
-        width: 100%;
-        flex-direction: row;
-        overflow-x: auto;
-    }
-    .sidebar-nav a {
-        margin: 0 5px;
-    }
-    .stats-cards {
-        flex-direction: column;
-    }
+.tbs-dashboard__cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
