@@ -186,6 +186,7 @@ public sealed class ProductRepository : Repository<Product>
         return await Context.Products
             .AsNoTracking()
             .Include(p => p.Brand)
+            .Include(p => p.Category)
             .Include(p => p.Images.Where(i => i.IsPrimary))
             .Include(p => p.Variants.Where(v => v.IsActive))
             .Where(p => p.IsActive && p.IsFeatured && p.Category.IsActive)

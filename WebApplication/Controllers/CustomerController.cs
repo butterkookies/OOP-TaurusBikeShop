@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication.BusinessLogic.Interfaces;
+using WebApplication.Models;
 using WebApplication.Models.Entities;
 using WebApplication.Models.ViewModels;
 

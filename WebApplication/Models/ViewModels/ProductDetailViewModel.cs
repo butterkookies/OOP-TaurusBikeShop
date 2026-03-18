@@ -70,7 +70,7 @@ public sealed class ProductDetailViewModel
     public IReadOnlyList<ProductImage> Images { get; set; } = [];
 
     /// <summary>First page of reviews for initial render. More loaded via AJAX.</summary>
-    public IReadOnlyList<ReviewViewModel> Reviews { get; set; } = [];
+    public IReadOnlyList<ProductReviewViewModel> Reviews { get; set; } = [];
 
     /// <summary>Average rating across all reviews, rounded to 1 decimal.</summary>
     public decimal AverageRating { get; set; }

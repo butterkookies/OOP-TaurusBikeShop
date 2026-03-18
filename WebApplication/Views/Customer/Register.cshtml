@@ -147,7 +147,7 @@
 @* OTP Modal — shown after successful POST *@
 @if (showOTPModal)
 {
-    @await Html.PartialAsync("_OTPModal", otpEmail)
+    @await Html.PartialAsync("~/Views/Customer/Partials/_OTPModal.cshtml", otpEmail)
 }
 
 @section Scripts {

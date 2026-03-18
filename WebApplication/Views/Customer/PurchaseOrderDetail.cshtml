@@ -74,10 +74,10 @@
                                         Qty: @item.Quantity
                                     </span>
                                     <span class="tbs-po-item__price">
-                                        ₱@item.UnitCost.ToString("N2") / unit
+                                        ₱@item.UnitPrice.ToString("N2") / unit
                                     </span>
                                     <span class="tbs-po-item__subtotal">
-                                        ₱@((item.Quantity * item.UnitCost).ToString("N2"))
+                                        ₱@((item.Quantity * item.UnitPrice).ToString("N2"))
                                     </span>
                                 </div>
                             </div>
@@ -88,18 +88,11 @@
                     <div class="tbs-po-detail__total">
                         <span>Total</span>
                         <span class="tbs-po-detail__total-value">
-                            ₱@Model.Items.Sum(i => i.Quantity * i.UnitCost).ToString("N2")
+                            ₱@Model.Items.Sum(i => i.Quantity * i.UnitPrice).ToString("N2")
                         </span>
                     </div>
                 </div>
 
-                @if (!string.IsNullOrWhiteSpace(Model.Notes))
-                {
-                    <div class="tbs-card mt-3">
-                        <h2 class="tbs-card__title">Notes</h2>
-                        <p class="tbs-po-detail__notes">@Model.Notes</p>
-                    </div>
-                }
             </div>
 
             @* =================== SIDEBAR =================== *@
@@ -142,18 +135,18 @@
                             <dt>Ordered</dt>
                             <dd>@Model.OrderDate.ToString("MMM d, yyyy")</dd>
                         </div>
-                        @if (Model.ExpectedDate.HasValue)
+                        @if (Model.ExpectedDeliveryDate.HasValue)
                         {
                             <div class="tbs-supplier-card__detail">
                                 <dt>Expected</dt>
-                                <dd>@Model.ExpectedDate.Value.ToString("MMM d, yyyy")</dd>
+                                <dd>@Model.ExpectedDeliveryDate.Value.ToString("MMM d, yyyy")</dd>
                             </div>
                         }
-                        @if (Model.ReceivedDate.HasValue)
+                        @if (Model.Status == PurchaseOrderStatuses.Received)
                         {
                             <div class="tbs-supplier-card__detail">
                                 <dt>Received</dt>
-                                <dd>@Model.ReceivedDate.Value.ToString("MMM d, yyyy")</dd>
+                                <dd>@Model.CreatedAt.ToString("MMM d, yyyy")</dd>
                             </div>
                         }
                     </dl>

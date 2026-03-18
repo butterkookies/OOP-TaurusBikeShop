@@ -100,13 +100,13 @@ public sealed class ProductController : Controller
             ViewBag.MaxPrice        = maxPrice;
             ViewBag.Search          = search;
 
-            return View(products);
+            return View("~/Views/Customer/ProductCatalog.cshtml", products);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading product catalog.");
             TempData["error"] = "Unable to load products. Please try again.";
-            return View(Array.Empty<ProductViewModel>());
+            return View("~/Views/Customer/ProductCatalog.cshtml", Array.Empty<ProductViewModel>());
         }
     }
 
@@ -136,7 +136,7 @@ public sealed class ProductController : Controller
             }
 
             ViewData["Title"] = vm.Name;
-            return View(vm);
+            return View("~/Views/Customer/ProductDetails.cshtml", vm);
         }
         catch (Exception ex)
         {

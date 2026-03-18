@@ -33,7 +33,7 @@ public class Repository<T> : IRepository<T> where T : class
     /// repositories can access it directly for complex queries and
     /// multi-table transactions without breaking encapsulation.
     /// </summary>
-    protected readonly AppDbContext Context;
+    protected internal readonly AppDbContext Context;
 
     /// <summary>
     /// The EF Core DbSet for entity type <typeparamref name="T"/>.

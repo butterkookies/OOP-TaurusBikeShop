@@ -48,7 +48,7 @@
                     <div class="tbs-cart-items" id="cart-items-list">
                         @foreach (WebApplication.Models.ViewModels.CartItemViewModel item in Model.Items)
                         {
-                            @await Html.PartialAsync("_CartItem", item)
+                            @await Html.PartialAsync("~/Views/Customer/Partials/_CartItem.cshtml", item)
                         }
                     </div>
 
