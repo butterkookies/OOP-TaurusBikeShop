@@ -1,0 +1,20 @@
+@* WebApplication/Views/Customer/Partials/_PaymentStatusBadge.cshtml *@
+@model string
+@{
+    string css = Model switch
+    {
+        "Pending"              => "tbs-badge--pending",
+        "VerificationPending"  => "tbs-badge--pending",
+        "VerificationRejected" => "tbs-badge--cancelled",
+        "Completed"            => "tbs-badge--delivered",
+        "Failed"               => "tbs-badge--cancelled",
+        _                      => "tbs-badge--pending"
+    };
+    string label = Model switch
+    {
+        "VerificationPending"  => "Awaiting Verification",
+        "VerificationRejected" => "Rejected",
+        _                      => Model
+    };
+}
+<span class="tbs-badge @css" aria-label="Payment status: @label">@label</span>

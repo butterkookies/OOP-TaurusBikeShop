@@ -157,6 +157,41 @@ public sealed class OrderController : Controller
     }
 
     // =========================================================================
+    // POST /Order/ConfirmDelivery
+    // =========================================================================
+
+    /// <summary>
+    /// Customer confirms they have physically received their shipped order.
+    /// Transitions status Shipped → Delivered and finalises inventory.
+    /// Flowchart: Part 6 — D26 (Confirm Order Received) → D28A / D28B.
+    /// </summary>
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ConfirmDelivery(
+        int orderId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            ServiceResult result = await _orderService.ConfirmDeliveryAsync(
+                orderId, GetCurrentUserId(), cancellationToken);
+
+            TempData[result.IsSuccess ? "success" : "error"] =
+                result.IsSuccess
+                    ? "Thank you! Your delivery has been confirmed."
+                    : result.Error;
+
+            return RedirectToAction(nameof(Detail), new { orderId });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "ConfirmDelivery failed for order {OrderId}.", orderId);
+            TempData["error"] = "Unable to confirm delivery. Please try again.";
+            return RedirectToAction(nameof(Detail), new { orderId });
+        }
+    }
+
+    // =========================================================================
     // Private helpers
     // =========================================================================
 

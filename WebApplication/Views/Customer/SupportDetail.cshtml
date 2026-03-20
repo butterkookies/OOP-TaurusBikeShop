@@ -1,0 +1,128 @@
+@* WebApplication/Views/Customer/SupportDetail.cshtml *@
+@model WebApplication.Models.ViewModels.SupportTicketViewModel
+@{
+    ViewData["Title"] = $"Ticket #{Model.TicketId}";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/support.css" asp-append-version="true" />
+}
+
+@Html.AntiForgeryToken()
+
+<div class="tbs-support-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-9">
+
+                <ol class="tbs-breadcrumb">
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-controller="Support" asp-action="Index">Support</a></li>
+                    <li>Ticket #@Model.TicketId</li>
+                </ol>
+
+                @* Header *@
+                <div class="tbs-page-header">
+                    <div>
+                        <h1 class="tbs-page-header__title">@Model.Subject</h1>
+                        <p class="tbs-page-header__subtitle">
+                            Ticket #@Model.TicketId
+                            &middot; @Model.Category
+                            &middot; Opened @Model.FormattedCreatedAt
+                        </p>
+                    </div>
+                    <div class="tbs-support-detail__status">
+                        @await Html.PartialAsync(
+                            "~/Views/Customer/Partials/_TicketStatusBadge.cshtml",
+                            Model.Status)
+                    </div>
+                </div>
+
+                @* Order reference *@
+                @if (Model.OrderId.HasValue)
+                {
+                    <div class="tbs-support-detail__order-ref">
+                        <span aria-hidden="true">📦</span>
+                        Regarding
+                        <a asp-controller="Order"
+                           asp-action="Detail"
+                           asp-route-orderId="@Model.OrderId">
+                            Order @(Model.OrderNumber ?? $"#{Model.OrderId}")
+                        </a>
+                    </div>
+                }
+
+                @* Reply thread *@
+                <div class="tbs-ticket-thread" id="ticket-thread">
+                    @foreach (WebApplication.Models.ViewModels.SupportReplyViewModel reply in Model.Replies)
+                    {
+                        <div class="tbs-reply @(reply.IsStaff ? "tbs-reply--staff" : "tbs-reply--customer")">
+                            <div class="tbs-reply__header">
+                                <strong class="tbs-reply__author">@reply.AuthorName</strong>
+                                @if (reply.IsStaff)
+                                {
+                                    <span class="tbs-reply__staff-badge">Support Team</span>
+                                }
+                                <span class="tbs-reply__time">@reply.FormattedCreatedAt</span>
+                            </div>
+                            <div class="tbs-reply__body">@reply.Message</div>
+                        </div>
+                    }
+                </div>
+
+                @* Reply form — shown when ticket is still open *@
+                @if (Model.CanReply)
+                {
+                    <div class="tbs-ticket-reply-form">
+                        <h2 class="tbs-ticket-reply-form__title">Add a Reply</h2>
+                        <form asp-action="Reply" asp-controller="Support"
+                              method="post" id="reply-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="ticketId" value="@Model.TicketId" />
+
+                            <div class="tbs-form-group">
+                                <label class="tbs-label" for="reply-message">
+                                    Your Message
+                                </label>
+                                <textarea id="reply-message"
+                                          name="message"
+                                          class="tbs-input tbs-ticket-reply-form__textarea"
+                                          rows="4"
+                                          placeholder="Type your reply…"
+                                          required
+                                          maxlength="2000"></textarea>
+                                <div class="tbs-support-create__char-count">
+                                    <span id="reply-char-count">0</span> / 2000
+                                </div>
+                            </div>
+
+                            <button type="submit"
+                                    class="btn tbs-btn-accent"
+                                    id="reply-submit-btn">
+                                Send Reply
+                            </button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <div class="tbs-ticket-closed-notice">
+                        <p>
+                            This ticket is <strong>@Model.Status.ToLower()</strong>
+                            and cannot receive new replies.
+                            <a asp-controller="Support" asp-action="Create">
+                                Open a new ticket
+                            </a>
+                            if you need further assistance.
+                        </p>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/support.js" asp-append-version="true"></script>
+}

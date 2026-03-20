@@ -6,13 +6,34 @@ using WebApplication.Models.Entities;
 
 namespace WebApplication.BackgroundJobs;
 
+/// <summary>
+/// Polls the product-variant table every 10 seconds to keep a live inventory
+/// count available to the rest of the application.
+/// Flowchart: Part 11 — "Every 10 Seconds".
+/// <para>
+/// SystemLog summary entries are throttled to once every 5 minutes to prevent
+/// log flooding (10-second intervals would otherwise produce ~8,640 rows/day
+/// of BackgroundJobStart/Complete noise).
+/// </para>
+/// </summary>
 public sealed class InventorySyncJob : BackgroundService
 {
-    private static readonly TimeSpan CycleInterval = TimeSpan.FromMinutes(60);
-    private readonly IServiceScopeFactory _scopeFactory;
+    // Flowchart Part 11: sync every 10 seconds.
+    private static readonly TimeSpan CycleInterval      = TimeSpan.FromSeconds(10);
+
+    // Write a SystemLog summary entry at most once per this interval.
+    private static readonly TimeSpan SummaryLogInterval = TimeSpan.FromMinutes(5);
+
+    private readonly IServiceScopeFactory      _scopeFactory;
     private readonly ILogger<InventorySyncJob> _logger;
 
-    public InventorySyncJob(IServiceScopeFactory scopeFactory, ILogger<InventorySyncJob> logger)
+    // BackgroundService is registered as singleton — this field persists
+    // across cycles and controls the SystemLog write throttle.
+    private DateTime _nextSummaryLogAt = DateTime.MinValue;
+
+    public InventorySyncJob(
+        IServiceScopeFactory      scopeFactory,
+        ILogger<InventorySyncJob> logger)
     {
         _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
         _logger       = logger       ?? throw new ArgumentNullException(nameof(logger));
@@ -44,38 +65,36 @@ public sealed class InventorySyncJob : BackgroundService
 
         try
         {
-            await context.SystemLogs.AddAsync(new SystemLog
-            {
-                EventType        = SystemLogEvents.BackgroundJobStart,
-                EventDescription = $"{nameof(InventorySyncJob)} cycle started.",
-                CreatedAt        = DateTime.UtcNow
-            }, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            _logger.LogWarning(ex, "{Job} could not write start log — DB may be unavailable.",
-                nameof(InventorySyncJob));
-        }
+            int variantCount = await context.ProductVariants
+                .AsNoTracking()
+                .CountAsync(cancellationToken);
 
-        try
-        {
-            int variantCount = await context.ProductVariants.AsNoTracking().CountAsync(cancellationToken);
-            _logger.LogInformation("InventorySyncJob: checked {VariantCount} product variants.", variantCount);
+            // Debug-level log on every cycle — only visible when debug logging
+            // is explicitly enabled; does not write to SystemLog.
+            _logger.LogDebug("InventorySyncJob: checked {VariantCount} product variants.",
+                variantCount);
 
-            await context.SystemLogs.AddAsync(new SystemLog
+            // Throttle SystemLog writes — skip writing a DB row on every 10-second
+            // cycle; only persist a summary entry once per SummaryLogInterval.
+            bool writeSummaryLog = DateTime.UtcNow >= _nextSummaryLogAt;
+            if (writeSummaryLog)
             {
-                EventType        = SystemLogEvents.InventorySync,
-                EventDescription = $"Inventory sync completed. {variantCount} variants checked.",
-                CreatedAt        = DateTime.UtcNow
-            }, cancellationToken);
-            await context.SystemLogs.AddAsync(new SystemLog
-            {
-                EventType        = SystemLogEvents.BackgroundJobComplete,
-                EventDescription = $"{nameof(InventorySyncJob)} cycle completed.",
-                CreatedAt        = DateTime.UtcNow
-            }, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
+                await context.SystemLogs.AddAsync(new SystemLog
+                {
+                    EventType        = SystemLogEvents.InventorySync,
+                    EventDescription = $"Inventory sync completed. {variantCount} variants checked.",
+                    CreatedAt        = DateTime.UtcNow
+                }, cancellationToken);
+                await context.SystemLogs.AddAsync(new SystemLog
+                {
+                    EventType        = SystemLogEvents.BackgroundJobComplete,
+                    EventDescription = $"{nameof(InventorySyncJob)} periodic summary logged.",
+                    CreatedAt        = DateTime.UtcNow
+                }, cancellationToken);
+                await context.SaveChangesAsync(cancellationToken);
+
+                _nextSummaryLogAt = DateTime.UtcNow.Add(SummaryLogInterval);
+            }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

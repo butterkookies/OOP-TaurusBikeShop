@@ -9,8 +9,8 @@ using WebApplication.Models.ViewModels;
 namespace WebApplication.Controllers;
 
 /// <summary>
-/// Handles the landing page and privacy page.
-/// No authentication required for any action in this controller.
+/// Handles the homepage and shared static pages.
+/// No authentication required.
 /// </summary>
 public sealed class HomeController : Controller
 {
@@ -19,7 +19,6 @@ public sealed class HomeController : Controller
 
     private const int FeaturedProductCount = 8;
 
-    /// <inheritdoc/>
     public HomeController(
         IProductService productService,
         ILogger<HomeController> logger)
@@ -30,13 +29,8 @@ public sealed class HomeController : Controller
 
     // =========================================================================
     // GET /
-    // GET /Home/Index
     // =========================================================================
 
-    /// <summary>
-    /// Renders the homepage with featured products.
-    /// Unauthenticated access is permitted.
-    /// </summary>
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
@@ -58,7 +52,6 @@ public sealed class HomeController : Controller
     // GET /Home/Privacy
     // =========================================================================
 
-    /// <summary>Renders the static privacy policy page.</summary>
     [HttpGet]
     public IActionResult Privacy() => View();
 
@@ -66,28 +59,17 @@ public sealed class HomeController : Controller
     // GET /Home/Error
     // =========================================================================
 
-    /// <summary>
-    /// Unhandled exception fallback. Retrieves the exception context from
-    /// the <see cref="IExceptionHandlerPathFeature"/> and renders the error view.
-    /// </summary>
     [HttpGet]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        IExceptionHandlerPathFeature? exceptionFeature =
+        IExceptionHandlerPathFeature? feature =
             HttpContext.Features.Get<IExceptionHandlerPathFeature>();
 
-        if (exceptionFeature?.Error != null)
-        {
-            _logger.LogError(
-                exceptionFeature.Error,
-                "Unhandled exception on path: {Path}",
-                exceptionFeature.Path);
-        }
+        if (feature?.Error != null)
+            _logger.LogError(feature.Error,
+                "Unhandled exception on path: {Path}", feature.Path);
 
-        return View(new ErrorViewModel
-        {
-            RequestId = HttpContext.TraceIdentifier
-        });
+        return View(new ErrorViewModel { RequestId = HttpContext.TraceIdentifier });
     }
 }

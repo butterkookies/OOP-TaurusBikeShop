@@ -1,0 +1,20 @@
+@* WebApplication/Views/Customer/Partials/_TicketStatusBadge.cshtml *@
+@model string
+@{
+    string css = Model switch
+    {
+        "Open"             => "tbs-badge--processing",
+        "InProgress"       => "tbs-badge--pending",
+        "AwaitingResponse" => "tbs-badge--onhold",
+        "Resolved"         => "tbs-badge--delivered",
+        "Closed"           => "tbs-badge--cancelled",
+        _                  => "tbs-badge--pending"
+    };
+    string label = Model switch
+    {
+        "InProgress"       => "In Progress",
+        "AwaitingResponse" => "Awaiting Response",
+        _                  => Model
+    };
+}
+<span class="tbs-badge @css" aria-label="Ticket status: @label">@label</span>

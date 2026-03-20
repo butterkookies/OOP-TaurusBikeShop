@@ -9,8 +9,21 @@ using WebApplication.Utilities;
 namespace WebApplication.BusinessLogic.Services;
 
 /// <summary>
-/// Implements <see cref="IVoucherService"/> — 5-step voucher validation chain
+/// Implements <see cref="IVoucherService"/> — 6-step voucher validation chain
 /// and usage recording at order creation.
+/// <para>
+/// Validation order follows flowchart Part 15 (V6 → V7 → V8 → V9 → V10):
+/// <list type="number">
+///   <item><description>Code format (local, no DB)</description></item>
+///   <item><description>Exists and IsActive</description></item>
+///   <item><description>Within StartDate / EndDate window</description></item>
+///   <item><description>Subtotal meets MinimumOrderAmount</description></item>
+///   <item><description>Global usage cap (MaxUses)</description></item>
+///   <item><description>Per-user usage cap (MaxUsesPerUser)</description></item>
+/// </list>
+/// Steps 1–4 are cheap (no extra DB round-trips); steps 5–6 are DB queries
+/// and are intentionally deferred until the cart value is confirmed valid.
+/// </para>
 /// </summary>
 public sealed class VoucherService : IVoucherService
 {
@@ -45,7 +58,15 @@ public sealed class VoucherService : IVoucherService
         if (voucher.EndDate.HasValue && now > voucher.EndDate.Value)
             return Fail("This voucher has expired.");
 
-        // ── Step 4: Global usage cap ───────────────────────────────────────
+        // ── Step 4: Minimum order amount ───────────────────────────────────
+        // Checked before the usage-cap queries (steps 5-6) so we skip two
+        // unnecessary database round-trips when the cart subtotal is too low.
+        // Flowchart reference: Part 15 — V8 (before V9 / V10).
+        if (voucher.MinimumOrderAmount.HasValue && orderSubTotal < voucher.MinimumOrderAmount.Value)
+            return Fail(
+                $"This voucher requires a minimum order of \u20b1{voucher.MinimumOrderAmount.Value:N2}.");
+
+        // ── Step 5: Global usage cap ───────────────────────────────────────
         if (voucher.MaxUses.HasValue)
         {
             int globalCount =
@@ -54,7 +75,7 @@ public sealed class VoucherService : IVoucherService
                 return Fail("This voucher has reached its maximum number of uses.");
         }
 
-        // ── Step 5: Per-user usage cap ─────────────────────────────────────
+        // ── Step 6: Per-user usage cap ─────────────────────────────────────
         if (voucher.MaxUsesPerUser.HasValue)
         {
             int userCount = await _voucherRepo.GetUserUsageCountAsync(
@@ -62,11 +83,6 @@ public sealed class VoucherService : IVoucherService
             if (userCount >= voucher.MaxUsesPerUser.Value)
                 return Fail("You have already used this voucher the maximum number of times.");
         }
-
-        // ── Minimum order value check ──────────────────────────────────────
-        if (voucher.MinimumOrderAmount.HasValue && orderSubTotal < voucher.MinimumOrderAmount.Value)
-            return Fail(
-                $"This voucher requires a minimum order of ₱{voucher.MinimumOrderAmount.Value:N2}.");
 
         // ── Calculate discount ─────────────────────────────────────────────
         decimal discountAmount = voucher.DiscountType == DiscountTypes.Percentage
@@ -80,11 +96,11 @@ public sealed class VoucherService : IVoucherService
 
         string formattedDiscount = voucher.DiscountType == DiscountTypes.Percentage
             ? $"{voucher.DiscountValue:0.##}% off"
-            : $"₱{discountAmount:N2} off";
+            : $"\u20b1{discountAmount:N2} off";
 
         string description = voucher.DiscountType == DiscountTypes.Percentage
             ? $"{voucher.DiscountValue:0.##}% off your order"
-            : $"₱{voucher.DiscountValue:N2} off your order";
+            : $"\u20b1{voucher.DiscountValue:N2} off your order";
 
         return new VoucherValidationResult
         {
@@ -92,7 +108,7 @@ public sealed class VoucherService : IVoucherService
             DiscountAmount    = discountAmount,
             FormattedDiscount = formattedDiscount,
             NewTotal          = newTotal,
-            FormattedNewTotal = $"₱{newTotal:N2}",
+            FormattedNewTotal = $"\u20b1{newTotal:N2}",
             VoucherCode       = voucher.Code,
             Description       = description
         };

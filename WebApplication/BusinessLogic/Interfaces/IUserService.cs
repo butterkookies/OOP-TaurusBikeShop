@@ -51,16 +51,22 @@ public interface IUserService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Resends a fresh OTP to the given email address.
+    /// Resends a fresh OTP to the given email address (and optionally via SMS).
     /// Invalidates any prior unused OTP for that email.
     /// </summary>
     /// <param name="email">The email address to resend the OTP to.</param>
+    /// <param name="phoneNumber">
+    /// Optional Philippine mobile number to also send the OTP via SMS.
+    /// Pass <c>null</c> if the phone number is not available in the current
+    /// request context (e.g. during a plain AJAX resend with no stored session).
+    /// </param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>
     /// A <see cref="ServiceResult"/> indicating success or failure.
     /// </returns>
     Task<ServiceResult> ResendOTPAsync(
         string email,
+        string? phoneNumber = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>

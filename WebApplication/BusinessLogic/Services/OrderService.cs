@@ -201,11 +201,14 @@ public sealed class OrderService : IOrderService
             // ── 7. Create PickupOrder if in-store pickup ───────────────────
             if (vm.DeliveryMethod == "Pickup")
             {
+                // PickupReadyAt and PickupExpiresAt are set by AdminSystem when the
+                // order is marked ReadyForPickup (PickupExpiresAt = PickupReadyAt + 3 days).
+                // Do NOT set PickupExpiresAt here — the expiry window must start when
+                // the customer is actually notified, not at order placement.
                 PickupOrder pickup = new()
                 {
-                    PickupOrderId   = order.OrderId,
-                    OrderId         = order.OrderId,
-                    PickupExpiresAt = DateTime.UtcNow.AddDays(3)
+                    PickupOrderId = order.OrderId,
+                    OrderId       = order.OrderId
                 };
                 await _context.PickupOrders.AddAsync(pickup, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -343,6 +346,14 @@ public sealed class OrderService : IOrderService
 
         try
         {
+            // Load order WITH change-tracking so the status update is persisted.
+            // GetOrderWithDetailsAsync uses AsNoTracking — setting a property on
+            // that entity would be silently discarded by SaveChangesAsync.
+            Order trackedOrder = await _context.Orders
+                .FirstOrDefaultAsync(o => o.OrderId == orderId, cancellationToken)
+                ?? throw new InvalidOperationException(
+                    $"Order {orderId} not found for status update.");
+
             // Unlock inventory — InventoryLog Unlock entry per item
             foreach (OrderItem item in order.Items)
             {
@@ -370,14 +381,14 @@ public sealed class OrderService : IOrderService
                 await _context.InventoryLogs.AddAsync(unlockLog, cancellationToken);
             }
 
-            order.OrderStatus = OrderStatuses.Cancelled;
+            trackedOrder.OrderStatus = OrderStatuses.Cancelled;
 
             SystemLog sysLog = new()
             {
-                UserId    = userId,
-                EventType = SystemLogEvents.OrderStatusChange,
-                EventDescription =$"Order #{order.OrderNumber} cancelled by customer.",
-                CreatedAt = DateTime.UtcNow
+                UserId           = userId,
+                EventType        = SystemLogEvents.OrderStatusChange,
+                EventDescription = $"Order #{order.OrderNumber} cancelled by customer.",
+                CreatedAt        = DateTime.UtcNow
             };
             await _context.SystemLogs.AddAsync(sysLog, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
@@ -390,6 +401,142 @@ public sealed class OrderService : IOrderService
             await tx.RollbackAsync(cancellationToken);
             _logger.LogError(ex, "CancelOrderAsync failed for order {OrderId}.", orderId);
             return ServiceResult.Fail("Unable to cancel order. Please try again.");
+        }
+    }
+
+    // =========================================================================
+    // ConfirmDeliveryAsync
+    // =========================================================================
+
+    /// <inheritdoc/>
+    public async Task<ServiceResult> ConfirmDeliveryAsync(
+        int orderId,
+        int userId,
+        CancellationToken cancellationToken = default)
+    {
+        // Load full order (AsNoTracking) for guard checks and item iteration.
+        Order? order = await _orderRepo.GetOrderWithDetailsAsync(orderId, cancellationToken);
+
+        if (order is null || order.UserId != userId)
+            return ServiceResult.Fail("Order not found.");
+
+        if (order.IsWalkIn)
+            return ServiceResult.Fail(
+                "Walk-in POS orders are fulfilled immediately and cannot be confirmed here.");
+
+        if (order.PickupOrder != null)
+            return ServiceResult.Fail(
+                "Store pickup orders are confirmed at the counter by staff.");
+
+        if (order.OrderStatus == OrderStatuses.Delivered)
+            return ServiceResult.Fail("This order has already been confirmed as delivered.");
+
+        if (order.OrderStatus != OrderStatuses.Shipped)
+            return ServiceResult.Fail(
+                "Only orders that are out for delivery can be confirmed. " +
+                "Please contact support if you believe this is an error.");
+
+        await using IDbContextTransaction tx =
+            await _context.Database.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            // Load order WITH change-tracking for the status update.
+            Order trackedOrder = await _context.Orders
+                .FirstOrDefaultAsync(o => o.OrderId == orderId, cancellationToken)
+                ?? throw new InvalidOperationException(
+                    $"Order {orderId} not found for status update.");
+
+            trackedOrder.OrderStatus = OrderStatuses.Delivered;
+
+            // ── Inventory: Unlock + Sale pair per line item ────────────────
+            // Lock was applied at order creation (StockQuantity was already
+            // decremented then). This pair restores it in the ledger (Unlock)
+            // and immediately re-consumes it as a confirmed sale (Sale).
+            // Net StockQuantity change = 0. Audit trail: Lock → Unlock → Sale.
+            foreach (OrderItem item in order.Items)
+            {
+                if (item.ProductVariantId is null) continue;
+
+                ProductVariant? variant = await _context.ProductVariants
+                    .FirstOrDefaultAsync(
+                        v => v.ProductVariantId == item.ProductVariantId,
+                        cancellationToken);
+
+                if (variant is null) continue;
+
+                // Unlock: reverse the reservation (+qty)
+                variant.StockQuantity += item.Quantity;
+                await _context.InventoryLogs.AddAsync(new InventoryLog
+                {
+                    ProductId        = item.ProductId,
+                    ProductVariantId = item.ProductVariantId,
+                    OrderId          = orderId,
+                    ChangeQuantity   = item.Quantity,
+                    ChangeType       = InventoryChangeTypes.Unlock,
+                    ChangedByUserId  = userId,
+                    Notes            = $"Lock released — Order #{order.OrderNumber} confirmed delivered.",
+                    CreatedAt        = DateTime.UtcNow
+                }, cancellationToken);
+
+                // Sale: record actual consumption (-qty) — net change = 0
+                variant.StockQuantity -= item.Quantity;
+                await _context.InventoryLogs.AddAsync(new InventoryLog
+                {
+                    ProductId        = item.ProductId,
+                    ProductVariantId = item.ProductVariantId,
+                    OrderId          = orderId,
+                    ChangeQuantity   = -item.Quantity,
+                    ChangeType       = InventoryChangeTypes.Sale,
+                    ChangedByUserId  = userId,
+                    Notes            = $"Sale finalised — Order #{order.OrderNumber} delivered to customer.",
+                    CreatedAt        = DateTime.UtcNow
+                }, cancellationToken);
+            }
+
+            await _context.SystemLogs.AddAsync(new SystemLog
+            {
+                UserId           = userId,
+                EventType        = SystemLogEvents.OrderStatusChange,
+                EventDescription =
+                    $"Order #{order.OrderNumber} confirmed delivered by customer. " +
+                    $"Status: {OrderStatuses.Shipped} → {OrderStatuses.Delivered}.",
+                CreatedAt = DateTime.UtcNow
+            }, cancellationToken);
+
+            await _context.SaveChangesAsync(cancellationToken);
+            await tx.CommitAsync(cancellationToken);
+
+            // ── Queue notification outside transaction (non-critical) ──────
+            User? user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
+
+            if (user?.Email != null)
+            {
+                await _notifications.QueueAsync(
+                    channel:   NotifChannels.Email,
+                    notifType: NotifTypes.DeliveryConfirmation,
+                    recipient: user.Email,
+                    subject:   $"Delivery confirmed — Order {order.OrderNumber}",
+                    body:
+                        $"Hi {user.FirstName},\n\n" +
+                        $"Thank you for confirming receipt of your order {order.OrderNumber}.\n\n" +
+                        $"We hope you enjoy your purchase! If you have any concerns, please " +
+                        $"contact our support team from your order detail page.\n\n" +
+                        $"— Taurus Bike Shop",
+                    userId:            userId,
+                    orderId:           orderId,
+                    cancellationToken: cancellationToken);
+            }
+
+            return ServiceResult.Ok();
+        }
+        catch (Exception ex)
+        {
+            await tx.RollbackAsync(cancellationToken);
+            _logger.LogError(ex, "ConfirmDeliveryAsync failed for order {OrderId}.", orderId);
+            return ServiceResult.Fail("Unable to confirm delivery. Please try again.");
         }
     }
 
@@ -439,23 +586,30 @@ public sealed class OrderService : IOrderService
 
         decimal subTotal = items.Sum(i => i.LineTotal);
 
+        bool isPickup = order.PickupOrder != null;
+
         return new OrderViewModel
         {
-            OrderId         = order.OrderId,
-            OrderNumber     = order.OrderNumber,
-            OrderStatus     = order.OrderStatus,
-            OrderDate       = order.OrderDate,
-            ItemCount       = items.Count,
-            Items           = items.AsReadOnly(),
-            SubTotal        = subTotal,
-            ShippingFee     = order.ShippingFee,
-            DiscountAmount  = order.DiscountAmount,
-            DeliveryMethod  = order.PickupOrder != null ? "Pickup" : "Delivery",
-            ShippingAddress = order.ShippingAddress,
-            PickupOrder     = order.PickupOrder,
-            Payments        = order.Payments.ToList().AsReadOnly(),
-            Deliveries      = order.Deliveries.ToList().AsReadOnly(),
-            IsCancellable   = CancellableStatuses.Contains(order.OrderStatus)
+            OrderId               = order.OrderId,
+            OrderNumber           = order.OrderNumber,
+            OrderStatus           = order.OrderStatus,
+            OrderDate             = order.OrderDate,
+            ItemCount             = items.Count,
+            Items                 = items.AsReadOnly(),
+            SubTotal              = subTotal,
+            ShippingFee           = order.ShippingFee,
+            DiscountAmount        = order.DiscountAmount,
+            DeliveryMethod        = isPickup ? "Pickup" : "Delivery",
+            ShippingAddress       = order.ShippingAddress,
+            PickupOrder           = order.PickupOrder,
+            Payments              = order.Payments.ToList().AsReadOnly(),
+            Deliveries            = order.Deliveries.ToList().AsReadOnly(),
+            IsCancellable         = CancellableStatuses.Contains(order.OrderStatus),
+            // Delivery confirmation is only available for courier-delivery orders
+            // (not pickup, not walk-in) that are currently in Shipped status.
+            IsDeliveryConfirmable = !order.IsWalkIn
+                                    && !isPickup
+                                    && order.OrderStatus == OrderStatuses.Shipped
         };
     }
 

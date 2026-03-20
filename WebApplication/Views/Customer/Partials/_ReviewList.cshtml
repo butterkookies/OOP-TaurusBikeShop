@@ -1,0 +1,29 @@
+@* WebApplication/Views/Customer/Partials/_ReviewList.cshtml *@
+@* Model: IReadOnlyList<ReviewViewModel> — rendered by LoadMore AJAX *@
+@model IReadOnlyList<WebApplication.Models.ViewModels.ReviewViewModel>
+
+@foreach (WebApplication.Models.ViewModels.ReviewViewModel review in Model)
+{
+    <div class="tbs-review-card">
+        <div class="tbs-review-card__header">
+            <div class="tbs-stars tbs-stars--sm" aria-label="@review.Rating out of 5">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <span class="tbs-star @(i <= review.Rating ? "tbs-star--filled" : "")">★</span>
+                }
+            </div>
+            @if (review.IsVerifiedPurchase)
+            {
+                <span class="tbs-review-card__verified">✓ Verified Purchase</span>
+            }
+        </div>
+        @if (!string.IsNullOrWhiteSpace(review.Comment))
+        {
+            <p class="tbs-review-card__comment">@review.Comment</p>
+        }
+        <div class="tbs-review-card__meta">
+            <strong>@review.ReviewerName</strong>
+            <span>@review.CreatedAt</span>
+        </div>
+    </div>
+}

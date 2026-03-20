@@ -1,0 +1,92 @@
+@* WebApplication/Views/Customer/PurchaseOrderList.cshtml *@
+@* Admin/Manager role only *@
+@model IReadOnlyList<WebApplication.Models.Entities.PurchaseOrder>
+@using WebApplication.Models.Entities
+@{
+    ViewData["Title"] = ViewData["Title"] ?? "Purchase Orders";
+    Supplier? supplier = ViewBag.Supplier as Supplier;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/supplier.css" asp-append-version="true" />
+}
+
+<div class="tbs-supplier-page">
+    <div class="container">
+
+        <ol class="tbs-breadcrumb">
+            <li><a asp-controller="Supplier" asp-action="Index">Suppliers</a></li>
+            <li>@(supplier?.Name ?? "Purchase Orders")</li>
+        </ol>
+
+        <div class="tbs-page-header">
+            <div>
+                <h1 class="tbs-page-header__title">
+                    Purchase Orders
+                    @if (supplier != null)
+                    {
+                        <span class="tbs-po-page__supplier">— @supplier.Name</span>
+                    }
+                </h1>
+                <p class="tbs-page-header__subtitle">
+                    @Model.Count order@(Model.Count != 1 ? "s" : "")
+                </p>
+            </div>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="tbs-supplier-empty">
+                <p>No purchase orders found for this supplier.</p>
+            </div>
+        }
+        else
+        {
+            <div class="tbs-po-list">
+                @foreach (PurchaseOrder po in Model)
+                {
+                    <a asp-controller="Supplier"
+                       asp-action="PurchaseOrderDetail"
+                       asp-route-purchaseOrderId="@po.PurchaseOrderId"
+                       class="tbs-po-row">
+
+                        <div class="tbs-po-row__id">
+                            <span class="tbs-po-row__label">PO #</span>
+                            <span class="tbs-po-row__value">@po.PurchaseOrderId</span>
+                        </div>
+
+                        <div class="tbs-po-row__date">
+                            <span class="tbs-po-row__label">Order Date</span>
+                            <span class="tbs-po-row__value">
+                                @po.OrderDate.ToString("MMM d, yyyy")
+                            </span>
+                        </div>
+
+                        <div class="tbs-po-row__items">
+                            <span class="tbs-po-row__label">Line Items</span>
+                            <span class="tbs-po-row__value">
+                                @po.Items.Count item@(po.Items.Count != 1 ? "s" : "")
+                            </span>
+                        </div>
+
+                        <div class="tbs-po-row__status">
+                            @{
+                                string badgeCss = po.Status switch
+                                {
+                                    PurchaseOrderStatuses.Pending   => "tbs-badge--pending",
+                                    PurchaseOrderStatuses.Received  => "tbs-badge--delivered",
+                                    PurchaseOrderStatuses.Cancelled => "tbs-badge--cancelled",
+                                    _                               => "tbs-badge--pending"
+                                };
+                            }
+                            <span class="tbs-badge @badgeCss">@po.Status</span>
+                        </div>
+
+                        <div class="tbs-po-row__arrow" aria-hidden="true">›</div>
+                    </a>
+                }
+            </div>
+        }
+
+    </div>
+</div>
