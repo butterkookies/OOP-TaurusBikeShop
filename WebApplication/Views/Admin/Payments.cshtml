@@ -1,0 +1,122 @@
+@using WebApplication.Models.Entities
+@model IEnumerable<Payment>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pending Payments - Admin Panel</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body { background:#0B0B0B; color:#F0F0F0; font-family:'Segoe UI',sans-serif; }
+        .sidebar { width:220px; min-height:100vh; background:#111; border-right:1px solid #1e1e1e; padding:20px 0; position:fixed; top:0; left:0; }
+        .sidebar-brand { font-size:18px; font-weight:700; letter-spacing:.2em; color:#E10600; text-transform:uppercase; padding:12px 20px 24px; }
+        .sidebar a { display:block; padding:10px 20px; color:#888; font-size:13px; letter-spacing:.08em; text-transform:uppercase; text-decoration:none; transition:color .2s; }
+        .sidebar a:hover, .sidebar a.active { color:#F0F0F0; background:#1a1a1a; }
+        .main-content { margin-left:220px; padding:32px; }
+        .payment-card { background:#111; border:1px solid #1e1e1e; border-radius:8px; padding:20px; margin-bottom:16px; }
+        .info-label { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#555; margin-bottom:2px; }
+        .info-value { font-size:14px; color:#ccc; }
+        .proof-img { max-width:200px; border-radius:6px; border:1px solid #333; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-brand">&#9650; Admin</div>
+    <a href="/Admin/Dashboard">Dashboard</a>
+    <a href="/Admin/Orders">Orders</a>
+    <a href="/Admin/Payments" class="active">Payments</a>
+    <a href="/Admin/Logout" style="color:#555;">Logout</a>
+</div>
+
+<div class="main-content">
+    <h2 style="font-size:22px; font-weight:700; margin-bottom:6px;">Pending Payments</h2>
+    <p class="text-muted" style="font-size:13px; margin-bottom:28px;">Review and approve or reject submitted payment proofs.</p>
+
+    @if (!Model.Any())
+    {
+        <div class="payment-card text-center py-5">
+            <p class="text-muted mb-0">No payments pending verification.</p>
+        </div>
+    }
+
+    @foreach (var payment in Model)
+    {
+        <div class="payment-card">
+            <div class="row g-3 align-items-start">
+                <div class="col-md-3">
+                    <p class="info-label">Order</p>
+                    <p class="info-value mb-1">
+                        <a href="/Admin/OrderDetail/@payment.OrderId" style="color:#E10600; text-decoration:none;">
+                            #@(payment.Order?.OrderNumber ?? payment.OrderId.ToString())
+                        </a>
+                    </p>
+                    <p class="info-label mt-2">Customer</p>
+                    <p class="info-value mb-1">@(payment.Order?.User?.FullName ?? "Unknown")</p>
+                    <p class="info-value" style="font-size:12px; color:#666;">@payment.Order?.User?.Email</p>
+                </div>
+                <div class="col-md-2">
+                    <p class="info-label">Method</p>
+                    <p class="info-value mb-2">@payment.PaymentMethod</p>
+                    <p class="info-label">Amount</p>
+                    <p class="info-value" style="color:#E10600; font-weight:700; font-size:18px;">&#8369;@payment.Amount.ToString("N2")</p>
+                </div>
+                <div class="col-md-2">
+                    <p class="info-label">Reference #</p>
+                    <p class="info-value mb-2" style="font-family:monospace;">@(payment.ReferenceNumber ?? "—")</p>
+                    <p class="info-label">Submitted</p>
+                    <p class="info-value" style="font-size:13px;">@(payment.PaymentDate?.ToString("MMM d, yyyy h:mm tt") ?? "—")</p>
+                </div>
+                <div class="col-md-3">
+                    @if (payment.ProofImageUrl != null)
+                    {
+                        <p class="info-label mb-2">Proof</p>
+                        <img src="@payment.ProofImageUrl" alt="Proof" class="proof-img" />
+                    }
+                    else
+                    {
+                        <p class="text-muted" style="font-size:13px;">No proof image uploaded.</p>
+                    }
+                </div>
+                <div class="col-md-2 d-flex flex-column gap-2">
+                    <form method="post" action="/Admin/ApprovePayment">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="paymentId" value="@payment.PaymentId" />
+                        <input type="hidden" name="orderId" value="@payment.OrderId" />
+                        <button type="submit" class="btn btn-success btn-sm w-100"
+                                onclick="return confirm('Approve payment for order #@(payment.Order?.OrderNumber)?')">
+                            Approve
+                        </button>
+                    </form>
+                    <form method="post" action="/Admin/RejectPayment" id="rejectForm_@payment.PaymentId">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="paymentId" value="@payment.PaymentId" />
+                        <input type="hidden" name="orderId" value="@payment.OrderId" />
+                        <input type="hidden" name="reason" id="rejectReason_@payment.PaymentId" />
+                        <button type="button" class="btn btn-danger btn-sm w-100"
+                                onclick="promptReject(@payment.PaymentId)">
+                            Reject
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function promptReject(paymentId) {
+        const reason = prompt('Enter rejection reason:');
+        if (reason && reason.trim()) {
+            document.getElementById('rejectReason_' + paymentId).value = reason.trim();
+            document.getElementById('rejectForm_' + paymentId).submit();
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+@using WebApplication.Models.Entities
+@model Order
+@{
+    Layout = null;
+    var payment = Model.Payments.FirstOrDefault();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Detail - Admin Panel</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body { background:#0B0B0B; color:#F0F0F0; font-family:'Segoe UI',sans-serif; }
+        .sidebar { width:220px; min-height:100vh; background:#111; border-right:1px solid #1e1e1e; padding:20px 0; position:fixed; top:0; left:0; }
+        .sidebar-brand { font-size:18px; font-weight:700; letter-spacing:.2em; color:#E10600; text-transform:uppercase; padding:12px 20px 24px; }
+        .sidebar a { display:block; padding:10px 20px; color:#888; font-size:13px; letter-spacing:.08em; text-transform:uppercase; text-decoration:none; transition:color .2s; }
+        .sidebar a:hover, .sidebar a.active { color:#F0F0F0; background:#1a1a1a; }
+        .main-content { margin-left:220px; padding:32px; }
+        .info-card { background:#111; border:1px solid #1e1e1e; border-radius:8px; padding:20px; margin-bottom:20px; }
+        .info-label { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#555; margin-bottom:2px; }
+        .info-value { font-size:14px; color:#ccc; }
+        table { background:#111; border-radius:8px; overflow:hidden; }
+        th { background:#1a1a1a; color:#888; font-size:12px; letter-spacing:.1em; text-transform:uppercase; border-color:#222 !important; }
+        td { border-color:#1e1e1e !important; color:#ccc; font-size:14px; vertical-align:middle; }
+        .badge-status { font-size:11px; padding:4px 10px; border-radius:4px; letter-spacing:.05em; text-transform:uppercase; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-brand">&#9650; Admin</div>
+    <a href="/Admin/Dashboard">Dashboard</a>
+    <a href="/Admin/Orders" class="active">Orders</a>
+    <a href="/Admin/Payments">Payments</a>
+    <a href="/Admin/Logout" style="color:#555;">Logout</a>
+</div>
+
+<div class="main-content">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="/Admin/Orders" style="color:#666; text-decoration:none;">&larr; Orders</a>
+        <h2 style="font-size:22px; font-weight:700; margin:0;">Order #@Model.OrderNumber</h2>
+        <span class="badge-status"
+              style="background:@(Model.OrderStatus=="Processing"?"#002a1a":Model.OrderStatus=="PendingVerification"?"#1a1a00":"#1a1a1a");
+                     color:@(Model.OrderStatus=="Processing"?"#28a745":Model.OrderStatus=="PendingVerification"?"#ffc107":"#aaa");">
+            @Model.OrderStatus
+        </span>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <div class="info-card">
+                <p class="info-label">Customer</p>
+                <p class="info-value mb-1">@(Model.User?.FullName ?? "Walk-in Customer")</p>
+                <p class="info-value" style="font-size:13px; color:#666;">@Model.User?.Email</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-card">
+                <p class="info-label">Shipping</p>
+                <p class="info-value mb-0">@Model.ShippingAddress</p>
+                <p class="info-value mb-0">@Model.ShippingCity, @Model.ShippingPostalCode</p>
+                <p class="info-value" style="font-size:13px; color:#666;">@Model.ContactPhone</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-card">
+                <p class="info-label">Order Date</p>
+                <p class="info-value mb-1">@Model.OrderDate.ToString("MMMM d, yyyy h:mm tt")</p>
+                <p class="info-label mt-2">Total Amount</p>
+                <p class="info-value" style="color:#E10600; font-size:20px; font-weight:700;">&#8369;@Model.TotalAmount.ToString("N2")</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="info-card mb-3">
+        <h5 style="font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:#666; margin-bottom:16px;">Order Items</h5>
+        <div class="table-responsive">
+            <table class="table table-dark mb-0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <tr>
+                            <td>@(item.Product?.Name ?? "Unknown")</td>
+                            <td>@item.Quantity</td>
+                            <td>&#8369;@item.UnitPrice.ToString("N2")</td>
+                            <td>&#8369;@item.Subtotal.ToString("N2")</td>
+                        </tr>
+                    }
+                    <tr style="border-top:1px solid #333;">
+                        <td colspan="3" class="text-end" style="color:#888;">Shipping Fee</td>
+                        <td>&#8369;@Model.ShippingFee.ToString("N2")</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-end" style="color:#F0F0F0; font-weight:600;">Total</td>
+                        <td style="color:#E10600; font-weight:700;">&#8369;@Model.TotalAmount.ToString("N2")</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Payment Info -->
+    @if (payment != null)
+    {
+        <div class="info-card">
+            <h5 style="font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:#666; margin-bottom:16px;">Payment</h5>
+            <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                    <p class="info-label">Method</p>
+                    <p class="info-value">@payment.PaymentMethod</p>
+                </div>
+                <div class="col-md-3">
+                    <p class="info-label">Status</p>
+                    <p class="info-value">@payment.PaymentStatus</p>
+                </div>
+                <div class="col-md-3">
+                    <p class="info-label">Reference #</p>
+                    <p class="info-value">@(payment.ReferenceNumber ?? "—")</p>
+                </div>
+                <div class="col-md-3">
+                    <p class="info-label">Date</p>
+                    <p class="info-value">@(payment.PaymentDate?.ToString("MMM d, yyyy") ?? "—")</p>
+                </div>
+            </div>
+
+            @if (payment.RejectionReason != null)
+            {
+                <div class="alert alert-danger py-2" style="font-size:13px;">
+                    <strong>Rejection Reason:</strong> @payment.RejectionReason
+                </div>
+            }
+
+            @if (payment.ProofImageUrl != null)
+            {
+                <div class="mb-3">
+                    <p class="info-label mb-2">Proof Image</p>
+                    <img src="@payment.ProofImageUrl" alt="Payment Proof" style="max-width:300px; border-radius:6px; border:1px solid #333;" />
+                </div>
+            }
+
+            @if (payment.PaymentStatus == "PendingVerification")
+            {
+                <div class="d-flex gap-3 mt-3">
+                    <form method="post" action="/Admin/ApprovePayment">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="paymentId" value="@payment.PaymentId" />
+                        <input type="hidden" name="orderId" value="@Model.OrderId" />
+                        <button type="submit" class="btn btn-success"
+                                onclick="return confirm('Approve this payment?')">
+                            Approve Payment
+                        </button>
+                    </form>
+
+                    <form method="post" action="/Admin/RejectPayment" id="rejectForm_@payment.PaymentId">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="paymentId" value="@payment.PaymentId" />
+                        <input type="hidden" name="orderId" value="@Model.OrderId" />
+                        <input type="hidden" name="reason" id="rejectReason_@payment.PaymentId" />
+                        <button type="button" class="btn btn-danger"
+                                onclick="promptReject(@payment.PaymentId)">
+                            Reject Payment
+                        </button>
+                    </form>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function promptReject(paymentId) {
+        const reason = prompt('Enter rejection reason:');
+        if (reason && reason.trim()) {
+            document.getElementById('rejectReason_' + paymentId).value = reason.trim();
+            document.getElementById('rejectForm_' + paymentId).submit();
+        }
+    }
+</script>
+</body>
+</html>

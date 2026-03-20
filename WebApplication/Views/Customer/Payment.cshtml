@@ -1,3 +1,4 @@
+@model WebApplication.Models.ViewModels.PaymentDetailDto
 @{
     ViewData["Title"] = "Payment - Taurus Bike Shop";
     Layout = "_Layout";
@@ -7,75 +8,136 @@
     <link rel="stylesheet" href="~/css/payment.css" />
 }
 
-<div class="payment-page">
-    <header class="payment-header">
-        <h1>💳 Payment</h1>
-        <a href="/Customer/Checkout" class="btn-back">← Back to Checkout</a>
+<div class="payment-page" style="max-width:680px; margin:40px auto; padding:0 16px;">
+    <header class="payment-header" style="margin-bottom:24px;">
+        <h1 style="font-family:'Bebas Neue',sans-serif; letter-spacing:.1em; color:#F0F0F0;">Payment</h1>
+        <a href="/Customer/Checkout" class="btn btn-outline-secondary btn-sm">&larr; Back to Checkout</a>
     </header>
 
-    <main class="payment-main">
-        <section class="payment-methods">
-            <h2>Select Payment Method</h2>
-            <form id="payment-form">
-                <label class="payment-option">
-                    <input type="radio" name="payment" value="gcash" checked />
-                    <span class="label-text">GCash</span>
-                </label>
-                <label class="payment-option">
-                    <input type="radio" name="payment" value="credit" />
-                    <span class="label-text">Credit/Debit Card</span>
-                </label>
-                <label class="payment-option">
-                    <input type="radio" name="payment" value="cod" />
-                    <span class="label-text">Cash on Delivery</span>
-                </label>
+    @if (Model != null)
+    {
+        <div class="card bg-dark border-secondary mb-4" style="border-radius:8px;">
+            <div class="card-body">
+                <p class="mb-1 text-muted" style="font-size:13px; letter-spacing:.1em; text-transform:uppercase;">Order</p>
+                <h5 class="mb-0">#@Model.OrderNumber</h5>
+                <hr class="border-secondary" />
+                <p class="mb-0">Amount Due: <strong style="color:#E10600; font-size:20px;">&#8369;@Model.GrandTotal.ToString("N2")</strong></p>
+            </div>
+        </div>
 
-                <div class="payment-details" id="gcash-details">
-                    <p>Scan the QR code below with GCash to complete your payment.</p>
-                    <img src="~/images/gcash-qr.png" alt="GCash QR Code" />
+        @if (Model.PaymentStatus == "VerificationRejected" && Model.RejectionReason != null)
+        {
+            <div class="alert alert-danger" role="alert">
+                <strong>Payment Rejected:</strong> @Model.RejectionReason
+                <br /><small>Please resubmit your proof of payment.</small>
+            </div>
+        }
+
+        @if (Model.PaymentStatus == "PendingVerification")
+        {
+            <div class="alert alert-warning" role="alert">
+                Your payment proof has been submitted and is awaiting admin verification.
+            </div>
+        }
+
+        @if (Model.PaymentStatus == "Completed")
+        {
+            <div class="alert alert-success" role="alert">
+                Payment has been verified and approved!
+            </div>
+        }
+    }
+
+    <ul class="nav nav-tabs mb-3" id="paymentTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="gcash-tab" data-bs-toggle="tab" data-bs-target="#gcash" type="button" role="tab">GCash</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="bank-tab" data-bs-toggle="tab" data-bs-target="#bank" type="button" role="tab">Bank Transfer</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="paymentTabContent">
+        <!-- GCash Tab -->
+        <div class="tab-pane fade show active" id="gcash" role="tabpanel">
+            <div class="card bg-dark border-secondary" style="border-radius:8px;">
+                <div class="card-body">
+                    <p style="color:#aaa; font-size:14px;">Send your payment via GCash to the number below, then enter your reference number.</p>
+                    <div class="mb-3 p-3 rounded" style="background:#1a1a1a; text-align:center;">
+                        <p class="mb-1 text-muted" style="font-size:12px; letter-spacing:.1em; text-transform:uppercase;">GCash Number</p>
+                        <p class="mb-0" style="font-size:22px; font-weight:700; letter-spacing:.05em;">0917-TAURUS-1</p>
+                        <p class="mb-0 text-muted" style="font-size:13px;">Taurus Bike Shop</p>
+                    </div>
+
+                    <form method="post" action="/Payment/SubmitGCash" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="orderId" value="@(Model?.OrderId ?? 0)" />
+
+                        <div class="mb-3">
+                            <label for="gcashRefNumber" class="form-label">GCash Reference Number</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" id="gcashRefNumber"
+                                   name="gcashRefNumber" placeholder="e.g. 1234567890" required
+                                   value="@(Model?.PaymentMethod == "GCash" ? "" : "")" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="gcashScreenshot" class="form-label">Screenshot (optional)</label>
+                            <input type="file" class="form-control bg-dark text-light border-secondary" id="gcashScreenshot"
+                                   name="screenshot" accept="image/*" />
+                        </div>
+
+                        @if (Model?.ProofImageUrl != null && Model.PaymentMethod == "GCash")
+                        {
+                            <p class="text-muted" style="font-size:12px;">Previous proof uploaded.</p>
+                        }
+
+                        <button type="submit" class="btn btn-danger w-100" style="background:#E10600; border:none;">
+                            Submit GCash Payment
+                        </button>
+                    </form>
                 </div>
+            </div>
+        </div>
 
-                <div class="payment-details" id="card-details" style="display:none;">
-                    <label for="cardNumber">Card Number</label>
-                    <input type="text" id="cardNumber" placeholder="XXXX-XXXX-XXXX-XXXX" required />
+        <!-- Bank Transfer Tab -->
+        <div class="tab-pane fade" id="bank" role="tabpanel">
+            <div class="card bg-dark border-secondary" style="border-radius:8px;">
+                <div class="card-body">
+                    <p style="color:#aaa; font-size:14px;">Transfer to our bank account and provide your reference number.</p>
+                    <div class="mb-3 p-3 rounded" style="background:#1a1a1a;">
+                        <p class="mb-1 text-muted" style="font-size:12px; letter-spacing:.1em; text-transform:uppercase;">Bank Details</p>
+                        <p class="mb-1"><strong>Bank:</strong> BDO Unibank</p>
+                        <p class="mb-1"><strong>Account Name:</strong> Taurus Bike Shop Inc.</p>
+                        <p class="mb-0"><strong>Account Number:</strong> 1234-5678-9012</p>
+                    </div>
 
-                    <label for="expiry">Expiry Date</label>
-                    <input type="text" id="expiry" placeholder="MM/YY" required />
+                    <form method="post" action="/Payment/SubmitBankTransfer" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="orderId" value="@(Model?.OrderId ?? 0)" />
 
-                    <label for="cvv">CVV</label>
-                    <input type="text" id="cvv" placeholder="XXX" required />
+                        <div class="mb-3">
+                            <label for="bankRefNumber" class="form-label">Bank Reference / Transaction Number</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" id="bankRefNumber"
+                                   name="bankRefNumber" placeholder="e.g. TXN-1234567890" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="bankScreenshot" class="form-label">Screenshot (optional)</label>
+                            <input type="file" class="form-control bg-dark text-light border-secondary" id="bankScreenshot"
+                                   name="screenshot" accept="image/*" />
+                        </div>
+
+                        @if (Model?.ProofImageUrl != null && Model.PaymentMethod == "BankTransfer")
+                        {
+                            <p class="text-muted" style="font-size:12px;">Previous proof uploaded.</p>
+                        }
+
+                        <button type="submit" class="btn btn-danger w-100" style="background:#E10600; border:none;">
+                            Submit Bank Transfer
+                        </button>
+                    </form>
                 </div>
-
-                <button type="submit" class="pay-btn">Pay Now</button>
-            </form>
-        </section>
-    </main>
+            </div>
+        </div>
+    </div>
 </div>
-
-@section Scripts {
-    <script>
-        const paymentForm = document.getElementById('payment-form');
-        const gcashDetails = document.getElementById('gcash-details');
-        const cardDetails = document.getElementById('card-details');
-
-        paymentForm.addEventListener('change', e => {
-            const selected = paymentForm.payment.value;
-            if(selected === 'gcash'){
-                gcashDetails.style.display = 'block';
-                cardDetails.style.display = 'none';
-            } else if(selected === 'credit'){
-                gcashDetails.style.display = 'none';
-                cardDetails.style.display = 'block';
-            } else {
-                gcashDetails.style.display = 'none';
-                cardDetails.style.display = 'none';
-            }
-        });
-
-        paymentForm.addEventListener('submit', e => {
-            e.preventDefault();
-            alert("Payment successful! Thank you for shopping at Taurus Bike Shop.");
-            window.location.href = "/Customer/Confirmation";
-        });
-    </script>
-}

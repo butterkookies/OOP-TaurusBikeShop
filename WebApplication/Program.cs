@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WebApplication.BackgroundJobs;
 using WebApplication.BusinessLogic.Interfaces;
 using WebApplication.BusinessLogic.Services;
 using WebApplication.DataAccess.Context;
@@ -26,10 +27,20 @@ builder.Services.AddScoped<ICartRepository,    CartRepository>();
 builder.Services.AddScoped<IOrderRepository,   OrderRepository>();
 
 // ── Services ─────────────────────────────────────────────────────────────────
-builder.Services.AddScoped<IUserService,    UserService>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ICartService,    CartService>();
-builder.Services.AddScoped<IOrderService,   OrderService>();
+builder.Services.AddScoped<IUserService,      UserService>();
+builder.Services.AddScoped<IProductService,   ProductService>();
+builder.Services.AddScoped<ICartService,      CartService>();
+builder.Services.AddScoped<IOrderService,     OrderService>();
+builder.Services.AddScoped<IPaymentService,   PaymentService>();
+builder.Services.AddScoped<IDeliveryService,  DeliveryService>();
+builder.Services.AddScoped<IReviewService,    ReviewService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<ISupportService,   SupportService>();
+
+// ── Background Jobs ───────────────────────────────────────────────────────────
+builder.Services.AddHostedService<PendingOrderMonitorJob>();
+builder.Services.AddHostedService<PaymentTimeoutJob>();
+builder.Services.AddHostedService<StockMonitorJob>();
 
 // ── MVC ───────────────────────────────────────────────────────────────────────
 builder.Services.AddControllersWithViews();

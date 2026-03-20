@@ -16,6 +16,7 @@ namespace WebApplication.DataAccess.Context
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Delivery> Deliveries { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<SupportTicket> SupportTickets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -142,6 +143,22 @@ namespace WebApplication.DataAccess.Context
                 e.HasOne(r => r.Order)
                  .WithMany(o => o.Reviews)
                  .HasForeignKey(r => r.OrderId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // SupportTicket
+            modelBuilder.Entity<SupportTicket>(e =>
+            {
+                e.HasKey(t => t.TicketId);
+                e.Property(t => t.Subject).HasMaxLength(200).IsRequired();
+                e.Property(t => t.Status).HasMaxLength(50).IsRequired();
+                e.HasOne(t => t.User)
+                 .WithMany()
+                 .HasForeignKey(t => t.UserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+                e.HasOne(t => t.Order)
+                 .WithMany()
+                 .HasForeignKey(t => t.OrderId)
                  .OnDelete(DeleteBehavior.Restrict);
             });
         }

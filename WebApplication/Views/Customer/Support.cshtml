@@ -1,0 +1,122 @@
+@using WebApplication.Models.Entities
+@model IEnumerable<SupportTicket>
+@{
+    ViewData["Title"] = "Support - Taurus Bike Shop";
+    Layout = "_Layout";
+}
+
+<div class="container py-4" style="max-width:900px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">Support Center</h2>
+        <a href="/Customer/Dashboard" class="btn btn-outline-secondary btn-sm">← Back to Dashboard</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- ── Open a Support Ticket ──────────────────────────── -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-dark text-white fw-semibold">
+            Open a Support Ticket
+        </div>
+        <div class="card-body">
+            <form asp-controller="Support" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Order Number <span class="text-muted small">(optional)</span></label>
+                    <input type="number" name="orderId" class="form-control"
+                           placeholder="Leave blank if not order-related" min="1" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Subject <span class="text-danger">*</span></label>
+                    <input type="text" name="subject" class="form-control" required maxlength="200"
+                           placeholder="Brief description of your issue" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Message <span class="text-danger">*</span></label>
+                    <textarea name="message" class="form-control" rows="4" required maxlength="2000"
+                              placeholder="Describe your issue in detail..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-danger">Submit Ticket</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── My Tickets ─────────────────────────────────────── -->
+    <h4 class="fw-semibold mb-3">My Tickets</h4>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center text-muted py-5">
+            <p class="mb-0">You have no support tickets yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Subject</th>
+                            <th>Order</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ticket in Model)
+                        {
+                            var badgeClass = ticket.Status switch {
+                                "Open"       => "bg-primary",
+                                "InProgress" => "bg-warning text-dark",
+                                "Resolved"   => "bg-success",
+                                "Closed"     => "bg-secondary",
+                                _            => "bg-secondary"
+                            };
+                            <tr>
+                                <td class="text-muted small">@ticket.TicketId</td>
+                                <td>@ticket.Subject</td>
+                                <td>
+                                    @if (ticket.Order != null)
+                                    {
+                                        <span class="text-muted small">@ticket.Order.OrderNumber</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                                <td><span class="badge @badgeClass">@ticket.Status</span></td>
+                                <td class="small text-muted">@ticket.CreatedAt.ToString("MMM d, yyyy")</td>
+                                <td>
+                                    <a href="/Support/Detail/@ticket.TicketId"
+                                       class="btn btn-outline-secondary btn-sm">View</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

@@ -13,6 +13,34 @@ namespace WebApplication.Controllers
             _cartService = cartService;
         }
 
+        // GET /Cart
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            int? userId = HttpContext.Session.GetInt32(SessionUserId);
+            if (userId == null)
+                return RedirectToAction("Login", "Customer");
+
+            var cart = await _cartService.GetCartAsync(userId.Value);
+            return View("~/Views/Customer/Cart.cshtml", cart);
+        }
+
+        // GET /Cart/GetItems
+        [HttpGet]
+        public async Task<IActionResult> GetItems()
+        {
+            int? userId = HttpContext.Session.GetInt32(SessionUserId);
+            if (userId == null) return Json(new { success = false });
+
+            var cart = await _cartService.GetCartAsync(userId.Value);
+            return Json(new
+            {
+                success = true,
+                items = cart.Items,
+                subtotal = cart.Items.Sum(i => i.Quantity * i.UnitPrice)
+            });
+        }
+
         // POST /Cart/Add
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -40,10 +68,18 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Update(int productId, int quantity)
         {
             int? userId = HttpContext.Session.GetInt32(SessionUserId);
-            if (userId == null) return Unauthorized();
+            if (userId == null) return Json(new { success = false, message = "Not logged in." });
 
             await _cartService.UpdateQuantityAsync(userId.Value, productId, quantity);
-            return Ok();
+
+            var cart = await _cartService.GetCartAsync(userId.Value);
+            return Json(new
+            {
+                success  = true,
+                subtotal = cart.Subtotal,
+                shipping = cart.ShippingFee,
+                total    = cart.Total
+            });
         }
 
         // POST /Cart/Remove
@@ -52,10 +88,18 @@ namespace WebApplication.Controllers
         public async Task<IActionResult> Remove(int productId)
         {
             int? userId = HttpContext.Session.GetInt32(SessionUserId);
-            if (userId == null) return Unauthorized();
+            if (userId == null) return Json(new { success = false, message = "Not logged in." });
 
             await _cartService.RemoveFromCartAsync(userId.Value, productId);
-            return Ok();
+
+            var cart = await _cartService.GetCartAsync(userId.Value);
+            return Json(new
+            {
+                success  = true,
+                subtotal = cart.Subtotal,
+                shipping = cart.ShippingFee,
+                total    = cart.Total
+            });
         }
 
         // GET /Cart/Count

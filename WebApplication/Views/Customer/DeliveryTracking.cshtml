@@ -1,0 +1,335 @@
+@using WebApplication.Models.Entities
+@{
+    ViewData["Title"] = "Delivery Tracking - Taurus Bike Shop";
+    Layout = "_Layout";
+
+    int    orderId     = ViewBag.OrderId;
+    string orderNumber = ViewBag.OrderNumber ?? "";
+    string orderStatus = ViewBag.OrderStatus ?? "Pending";
+    var    delivery    = ViewBag.Delivery as Delivery;
+
+    // Map order/delivery status to step index (0-based)
+    // Steps: Placed(0) -> PendingVerification(1) -> Processing(2) -> Shipped(3) -> Delivered(4)
+    int currentStep = 0;
+    string trackingStatus = delivery?.DeliveryStatus ?? orderStatus;
+
+    if (orderStatus == "PendingVerification" || orderStatus == "Pending")
+        currentStep = 1;
+    else if (orderStatus == "Processing" || orderStatus == "Confirmed")
+        currentStep = 2;
+    else if (orderStatus == "Shipped" || trackingStatus == "InTransit")
+        currentStep = 3;
+    else if (orderStatus == "Delivered" || trackingStatus == "Delivered")
+        currentStep = 4;
+    else
+        currentStep = 0;
+}
+
+@section Styles {
+    <style>
+        .tracking-page {
+            max-width: 760px;
+            margin: 48px auto;
+            padding: 0 16px;
+        }
+
+        .tracking-header {
+            margin-bottom: 32px;
+        }
+
+        .tracking-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f0f0f0;
+            margin-bottom: 4px;
+        }
+
+        .tracking-header .order-ref {
+            font-size: 13px;
+            color: #888;
+        }
+
+        /* Step tracker */
+        .step-tracker {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 48px;
+        }
+
+        .step-tracker::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #2a2a2a;
+            z-index: 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 2px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .step.completed .step-circle {
+            background: #198754;
+            border-color: #198754;
+            color: #fff;
+        }
+
+        .step.active .step-circle {
+            background: #E10600;
+            border-color: #E10600;
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(225, 6, 0, 0.2);
+        }
+
+        .step-label {
+            font-size: 11px;
+            color: #555;
+            text-align: center;
+            max-width: 80px;
+            line-height: 1.4;
+        }
+
+        .step.completed .step-label,
+        .step.active .step-label {
+            color: #f0f0f0;
+        }
+
+        /* Delivery info card */
+        .tracking-card {
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .tracking-card h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 16px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #1e1e1e;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-row .label {
+            color: #666;
+            min-width: 160px;
+            flex-shrink: 0;
+        }
+
+        .info-row .value {
+            color: #f0f0f0;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending    { background: #2a2000; color: #f5a623; border: 1px solid #4a3800; }
+        .status-intransit  { background: #001a3a; color: #4da6ff; border: 1px solid #003070; }
+        .status-delivered  { background: #002a12; color: #4caf7d; border: 1px solid #004020; }
+        .status-failed     { background: #2a0000; color: #ff5252; border: 1px solid #4a0000; }
+
+        .preparing-notice {
+            text-align: center;
+            padding: 32px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .preparing-notice .icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #888;
+            font-size: 14px;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: #E10600; }
+    </style>
+}
+
+<div class="tracking-page">
+
+    <div class="tracking-header">
+        <h1>Delivery Tracking</h1>
+        <p class="order-ref">Order #@orderNumber</p>
+    </div>
+
+    <!-- Step Tracker -->
+    <div class="step-tracker">
+        @{
+            var steps = new[] {
+                new { Icon = "&#128203;", Label = "Order Placed" },
+                new { Icon = "&#128269;", Label = "Pending Verification" },
+                new { Icon = "&#9881;",  Label = "Processing" },
+                new { Icon = "&#128666;", Label = "Shipped" },
+                new { Icon = "&#127968;", Label = "Delivered" }
+            };
+        }
+        @for (int i = 0; i < steps.Length; i++)
+        {
+            string stepClass = i < currentStep ? "step completed"
+                             : i == currentStep ? "step active"
+                             : "step";
+            <div class="@stepClass">
+                <div class="step-circle">
+                    @if (i < currentStep)
+                    {
+                        <span>&#10003;</span>
+                    }
+                    else
+                    {
+                        <span>@Html.Raw(steps[i].Icon)</span>
+                    }
+                </div>
+                <span class="step-label">@steps[i].Label</span>
+            </div>
+        }
+    </div>
+
+    <!-- Delivery Details -->
+    @if (delivery != null)
+    {
+        <div class="tracking-card">
+            <h2>Delivery Information</h2>
+
+            <div class="info-row">
+                <span class="label">Status</span>
+                <span class="value">
+                    @{
+                        string badgeClass = delivery.DeliveryStatus switch {
+                            "InTransit"  => "status-badge status-intransit",
+                            "Delivered"  => "status-badge status-delivered",
+                            "Failed"     => "status-badge status-failed",
+                            _            => "status-badge status-pending"
+                        };
+                        string badgeLabel = delivery.DeliveryStatus switch {
+                            "InTransit" => "In Transit",
+                            "Delivered" => "Delivered",
+                            "Failed"    => "Failed",
+                            _           => "Pending"
+                        };
+                    }
+                    <span class="@badgeClass">@badgeLabel</span>
+                </span>
+            </div>
+
+            @if (!string.IsNullOrEmpty(delivery.LalamoveReference))
+            {
+                <div class="info-row">
+                    <span class="label">Lalamove Reference</span>
+                    <span class="value">@delivery.LalamoveReference</span>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(delivery.DriverName))
+            {
+                <div class="info-row">
+                    <span class="label">Driver Name</span>
+                    <span class="value">@delivery.DriverName</span>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(delivery.DriverPhone))
+            {
+                <div class="info-row">
+                    <span class="label">Driver Contact</span>
+                    <span class="value">
+                        <a href="tel:@delivery.DriverPhone" style="color:#E10600; text-decoration:none;">@delivery.DriverPhone</a>
+                    </span>
+                </div>
+            }
+
+            @if (delivery.EstimatedDeliveryTime.HasValue)
+            {
+                <div class="info-row">
+                    <span class="label">Estimated Delivery</span>
+                    <span class="value">@delivery.EstimatedDeliveryTime.Value.ToLocalTime().ToString("MMM dd, yyyy h:mm tt")</span>
+                </div>
+            }
+
+            @if (delivery.ActualDeliveryTime.HasValue)
+            {
+                <div class="info-row">
+                    <span class="label">Delivered At</span>
+                    <span class="value">@delivery.ActualDeliveryTime.Value.ToLocalTime().ToString("MMM dd, yyyy h:mm tt")</span>
+                </div>
+            }
+
+            <div class="info-row">
+                <span class="label">Tracking Created</span>
+                <span class="value">@delivery.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy h:mm tt")</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="tracking-card">
+            <div class="preparing-notice">
+                <span class="icon">&#128230;</span>
+                <strong style="color:#f0f0f0; display:block; margin-bottom:8px;">Preparing your order</strong>
+                Your order has been received and is being prepared. Delivery tracking details will appear here once your order is dispatched.
+            </div>
+        </div>
+    }
+
+    <!-- Back link -->
+    <a href="/Customer/OrderHistory" class="back-link">
+        &#8592; Back to Order History
+    </a>
+
+</div>

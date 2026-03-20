@@ -13,6 +13,7 @@ namespace WebApplication.Models.Entities
         public string? PostalCode { get; set; }
         public bool IsActive { get; set; } = true;
         public bool IsWalkIn { get; set; } = false;
+        public bool IsAdmin { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastLoginAt { get; set; }
 

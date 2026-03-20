@@ -1,0 +1,195 @@
+@using WebApplication.Models.Entities
+@model IEnumerable<SupportTicket>
+@{
+    ViewData["Title"] = "Support Tickets - Taurus Admin";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">Support Tickets</h2>
+        <a href="/Customer/Dashboard" class="btn btn-outline-secondary btn-sm">← Back to Dashboard</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- ── Stats Row ─────────────────────────────────────── -->
+    @{
+        var open       = Model.Count(t => t.Status == "Open");
+        var inProgress = Model.Count(t => t.Status == "InProgress");
+        var resolved   = Model.Count(t => t.Status == "Resolved");
+        var closed     = Model.Count(t => t.Status == "Closed");
+    }
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card text-center border-primary">
+                <div class="card-body py-2">
+                    <div class="fs-3 fw-bold text-primary">@open</div>
+                    <div class="small text-muted">Open</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center border-warning">
+                <div class="card-body py-2">
+                    <div class="fs-3 fw-bold text-warning">@inProgress</div>
+                    <div class="small text-muted">In Progress</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center border-success">
+                <div class="card-body py-2">
+                    <div class="fs-3 fw-bold text-success">@resolved</div>
+                    <div class="small text-muted">Resolved</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center border-secondary">
+                <div class="card-body py-2">
+                    <div class="fs-3 fw-bold text-secondary">@closed</div>
+                    <div class="small text-muted">Closed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Ticket Table ──────────────────────────────────── -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">All Tickets</span>
+            <span class="badge bg-secondary">@Model.Count() total</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Customer</th>
+                            <th>Subject</th>
+                            <th>Order</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ticket in Model)
+                        {
+                            var badgeClass = ticket.Status switch {
+                                "Open"       => "bg-primary",
+                                "InProgress" => "bg-warning text-dark",
+                                "Resolved"   => "bg-success",
+                                "Closed"     => "bg-secondary",
+                                _            => "bg-secondary"
+                            };
+                            <tr>
+                                <td class="text-muted small">@ticket.TicketId</td>
+                                <td>
+                                    @if (ticket.User != null)
+                                    {
+                                        <span>@ticket.User.FullName</span><br />
+                                        <small class="text-muted">@ticket.User.Email</small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">User #@ticket.UserId</span>
+                                    }
+                                </td>
+                                <td>@ticket.Subject</td>
+                                <td>
+                                    @if (ticket.Order != null)
+                                    {
+                                        <span class="text-muted small">@ticket.Order.OrderNumber</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                                <td><span class="badge @badgeClass">@ticket.Status</span></td>
+                                <td class="small text-muted">@ticket.CreatedAt.ToString("MMM d, yyyy")</td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#respondModal"
+                                            data-ticket-id="@ticket.TicketId"
+                                            data-ticket-subject="@ticket.Subject"
+                                            data-current-response="@ticket.AdminResponse"
+                                            data-current-status="@ticket.Status">
+                                        Respond
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">No tickets found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Respond Modal ─────────────────────────────────────── -->
+<div class="modal fade" id="respondModal" tabindex="-1" aria-labelledby="respondModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form asp-controller="Admin" asp-action="RespondToTicket" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ticketId" id="modalTicketId" />
+
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="respondModalLabel">Respond to Ticket</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-3" id="modalSubject"></p>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Status</label>
+                        <select name="status" id="modalStatus" class="form-select">
+                            <option value="Open">Open</option>
+                            <option value="InProgress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Admin Response</label>
+                        <textarea name="response" id="modalResponse" class="form-control" rows="5"
+                                  placeholder="Write your response here..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Save Response</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('respondModal').addEventListener('show.bs.modal', function (event) {
+            var btn = event.relatedTarget;
+            document.getElementById('modalTicketId').value   = btn.getAttribute('data-ticket-id');
+            document.getElementById('modalSubject').textContent = 'Subject: ' + btn.getAttribute('data-ticket-subject');
+            document.getElementById('modalResponse').value   = btn.getAttribute('data-current-response') || '';
+            document.getElementById('modalStatus').value     = btn.getAttribute('data-current-status') || 'Open';
+        });
+    </script>
+}

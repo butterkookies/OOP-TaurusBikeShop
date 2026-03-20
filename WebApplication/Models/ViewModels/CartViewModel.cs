@@ -17,5 +17,7 @@ namespace WebApplication.Models.ViewModels
         public decimal ShippingFee => Items.Count > 0 ? 150m : 0m;
         public decimal Total => Subtotal + ShippingFee;
         public int ItemCount => Items.Sum(i => i.Quantity);
+        public string FormattedSubtotal => "\u20b1" + Subtotal.ToString("N2");
+        public string FormattedTotal => "\u20b1" + Total.ToString("N2");
     }
 }

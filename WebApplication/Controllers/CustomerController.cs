@@ -9,16 +9,18 @@ namespace WebApplication.Controllers
         private readonly IUserService    _userService;
         private readonly IProductService _productService;
         private readonly IOrderService   _orderService;
+        private readonly IReviewService  _reviewService;
 
         // Session key for logged-in user ID
         private const string SessionUserId   = "UserId";
         private const string SessionUserName = "UserName";
 
-        public CustomerController(IUserService userService, IProductService productService, IOrderService orderService)
+        public CustomerController(IUserService userService, IProductService productService, IOrderService orderService, IReviewService reviewService)
         {
             _userService    = userService;
             _productService = productService;
             _orderService   = orderService;
+            _reviewService  = reviewService;
         }
 
         // ─────────────────────────────────────────
@@ -158,6 +160,17 @@ namespace WebApplication.Controllers
                 IsFeatured       = product.IsFeatured,
                 IsActive         = product.IsActive
             };
+
+            int? userId = HttpContext.Session.GetInt32(SessionUserId);
+
+            var reviews       = await _reviewService.GetProductReviewsAsync(id);
+            bool canReview    = userId != null && await _reviewService.CanReviewAsync(userId.Value, id);
+            double avgRating  = await _reviewService.GetAverageRatingAsync(id);
+
+            ViewBag.Reviews       = reviews;
+            ViewBag.CanReview     = canReview;
+            ViewBag.AverageRating = avgRating;
+
             return View(vm);
         }
 

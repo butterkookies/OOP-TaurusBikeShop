@@ -1,0 +1,155 @@
+@using WebApplication.Models.Entities
+@model IEnumerable<Product>
+@{
+    ViewData["Title"] = "Inventory Management - Taurus Admin";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">Inventory Management</h2>
+        <a href="/Customer/Dashboard" class="btn btn-outline-secondary btn-sm">← Back to Dashboard</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">All Active Products</span>
+            <span class="badge bg-secondary">@Model.Count() products</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Stock Qty</th>
+                            <th>Status</th>
+                            <th class="text-center">Adjust Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in Model)
+                        {
+                            var rowClass = product.StockQuantity == 0 ? "table-danger"
+                                         : product.StockQuantity <= 5 ? "table-warning"
+                                         : "";
+                            <tr class="@rowClass">
+                                <td class="text-muted small">@product.ProductId</td>
+                                <td>
+                                    <span class="fw-medium">@product.Name</span>
+                                    @if (!string.IsNullOrEmpty(product.SKU))
+                                    {
+                                        <br /><small class="text-muted">@product.SKU</small>
+                                    }
+                                </td>
+                                <td>@(product.Category?.Name ?? "—")</td>
+                                <td>
+                                    <span class="fw-bold @(product.StockQuantity == 0 ? "text-danger" : product.StockQuantity <= 5 ? "text-warning" : "text-success")">
+                                        @product.StockQuantity
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (product.StockQuantity == 0)
+                                    {
+                                        <span class="badge bg-danger">Out of Stock</span>
+                                    }
+                                    else if (product.StockQuantity <= 5)
+                                    {
+                                        <span class="badge bg-warning text-dark">Low Stock</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">OK</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                        <!-- Add Stock -->
+                                        <form asp-controller="Inventory" asp-action="Adjust" method="post" class="d-inline-flex align-items-center gap-1">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@product.ProductId" />
+                                            <input type="hidden" name="reason" value="Manual increase" />
+                                            <input type="number" name="delta" value="1" min="1" max="9999"
+                                                   class="form-control form-control-sm text-center"
+                                                   style="width:70px;" />
+                                            <button type="submit" class="btn btn-success btn-sm" title="Add stock">+ Add</button>
+                                        </form>
+
+                                        <!-- Remove Stock -->
+                                        <form asp-controller="Inventory" asp-action="Adjust" method="post" class="d-inline-flex align-items-center gap-1">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@product.ProductId" />
+                                            <input type="hidden" name="reason" value="Manual decrease" />
+                                            <input type="number" id="remove_@product.ProductId" value="1" min="1" max="9999"
+                                                   class="form-control form-control-sm text-center"
+                                                   style="width:70px;" />
+                                            <input type="hidden" name="delta" id="delta_@product.ProductId" value="-1" />
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Remove stock"
+                                                    onclick="setNegativeDelta(@product.ProductId)">- Remove</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">No active products found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock Summary Card -->
+    @{
+        var lowStock = Model.Where(p => p.StockQuantity <= 5).ToList();
+    }
+    @if (lowStock.Any())
+    {
+        <div class="card border-warning mt-4">
+            <div class="card-header bg-warning text-dark fw-semibold">
+                Low Stock Alert — @lowStock.Count product(s) need attention
+            </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var p in lowStock)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>@p.Name</span>
+                        <span class="badge @(p.StockQuantity == 0 ? "bg-danger" : "bg-warning text-dark")">
+                            @p.StockQuantity units
+                        </span>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function setNegativeDelta(productId) {
+            var qty = parseInt(document.getElementById('remove_' + productId).value) || 1;
+            document.getElementById('delta_' + productId).value = -Math.abs(qty);
+        }
+    </script>
+}

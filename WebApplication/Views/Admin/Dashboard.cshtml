@@ -1,0 +1,86 @@
+@{
+    Layout = null;
+    var orderCount   = (int)(ViewBag.OrderCount   ?? 0);
+    var userCount    = (int)(ViewBag.UserCount     ?? 0);
+    var pendingCount = (int)(ViewBag.PendingCount  ?? 0);
+    var totalRevenue = (decimal)(ViewBag.TotalRevenue ?? 0m);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Taurus Bike Shop</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body { background:#0B0B0B; color:#F0F0F0; font-family:'Segoe UI',sans-serif; }
+        .sidebar { width:220px; min-height:100vh; background:#111; border-right:1px solid #1e1e1e; padding:20px 0; position:fixed; top:0; left:0; }
+        .sidebar-brand { font-size:18px; font-weight:700; letter-spacing:.2em; color:#E10600; text-transform:uppercase; padding:12px 20px 24px; }
+        .sidebar a { display:block; padding:10px 20px; color:#888; font-size:13px; letter-spacing:.08em; text-transform:uppercase; text-decoration:none; transition:color .2s; }
+        .sidebar a:hover, .sidebar a.active { color:#F0F0F0; background:#1a1a1a; }
+        .main-content { margin-left:220px; padding:32px; }
+        .stat-card { background:#111; border:1px solid #1e1e1e; border-radius:8px; padding:24px; }
+        .stat-label { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:#666; margin-bottom:4px; }
+        .stat-value { font-size:32px; font-weight:700; color:#F0F0F0; }
+        .stat-value.accent { color:#E10600; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-brand">&#9650; Admin</div>
+    <a href="/Admin/Dashboard" class="active">Dashboard</a>
+    <a href="/Admin/Orders">Orders</a>
+    <a href="/Admin/Payments">Payments</a>
+    <a href="/Admin/Logout" style="margin-top:auto; color:#555;">Logout</a>
+</div>
+
+<div class="main-content">
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:8px;">Dashboard</h2>
+    <p class="text-muted" style="font-size:13px; margin-bottom:28px;">Overview of store activity</p>
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Total Orders</div>
+                <div class="stat-value">@orderCount</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Customers</div>
+                <div class="stat-value">@userCount</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Pending Verification</div>
+                <div class="stat-value accent">@pendingCount</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value">&#8369;@totalRevenue.ToString("N0")</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-2">
+        <div class="col-md-6">
+            <div class="stat-card" style="padding:20px;">
+                <h5 style="font-size:14px; letter-spacing:.1em; text-transform:uppercase; color:#888; margin-bottom:16px;">Quick Actions</h5>
+                <a href="/Admin/Payments" class="btn btn-sm mb-2 me-2" style="background:#E10600; color:#fff; border:none;">
+                    Review Pending Payments (@pendingCount)
+                </a>
+                <a href="/Admin/Orders" class="btn btn-sm btn-outline-secondary mb-2">
+                    View All Orders
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

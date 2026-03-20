@@ -1,3 +1,4 @@
+@model WebApplication.Models.ViewModels.CartViewModel
 @{
     ViewData["Title"] = "Cart - Taurus Bike Shop";
     Layout = "_Layout";
@@ -7,98 +8,92 @@
     <link rel="stylesheet" href="~/css/cart.css" />
 }
 
-<div class="cart-page">
-    <header class="cart-header">
-        <h1>🛒 Your Cart</h1>
-        <a href="/" class="continue-shopping">← Continue Shopping</a>
+@Html.AntiForgeryToken()
+
+<div class="cart-page" style="max-width:860px; margin:40px auto; padding:0 16px;">
+    <header class="cart-header" style="margin-bottom:24px;">
+        <h1 style="font-family:'Bebas Neue',sans-serif; letter-spacing:.1em; color:#F0F0F0;">Your Cart</h1>
+        <a href="/Customer/ProductCatalog" style="color:#888; font-size:13px;">&larr; Continue Shopping</a>
     </header>
 
     <main class="cart-main">
-        <table class="cart-table">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Total</th>
-                    <th>Remove</th>
-                </tr>
-            </thead>
-            <tbody id="cart-items">
-                <!-- Dynamically populated with JS -->
-            </tbody>
-        </table>
-
-        <div class="cart-summary">
-            <div class="summary-details">
-                <p>Subtotal: <span id="subtotal">$0.00</span></p>
-                <p>Shipping: <span id="shipping">$0.00</span></p>
-                <p class="total">Total: <span id="total">$0.00</span></p>
+        @if (Model == null || !Model.Items.Any())
+        {
+            <div class="text-center py-5">
+                <p class="text-muted mb-3">Your cart is empty.</p>
+                <a href="/Customer/ProductCatalog" class="btn" style="background:#E10600; color:#fff; border:none;">Shop Now</a>
             </div>
-            <button id="checkout-btn" class="checkout-btn">Proceed to Checkout</button>
-        </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="cart-table w-100" style="border-collapse:collapse;">
+                    <thead>
+                        <tr style="border-bottom:1px solid #2a2a2a;">
+                            <th style="padding:10px 8px; text-align:left; color:#666; font-size:12px; letter-spacing:.1em; text-transform:uppercase;">Product</th>
+                            <th style="padding:10px 8px; text-align:center; color:#666; font-size:12px; letter-spacing:.1em; text-transform:uppercase;">Qty</th>
+                            <th style="padding:10px 8px; text-align:right; color:#666; font-size:12px; letter-spacing:.1em; text-transform:uppercase;">Price</th>
+                            <th style="padding:10px 8px; text-align:right; color:#666; font-size:12px; letter-spacing:.1em; text-transform:uppercase;">Total</th>
+                            <th style="padding:10px 8px; text-align:center; color:#666; font-size:12px; letter-spacing:.1em; text-transform:uppercase;">Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items">
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr style="border-bottom:1px solid #1a1a1a;">
+                                <td style="padding:14px 8px; color:#F0F0F0;">@item.ProductName</td>
+                                <td style="padding:14px 8px; text-align:center;">
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <button type="button" data-action="decrease"
+                                                style="background:#1a1a1a; border:1px solid #333; color:#ccc; width:28px; height:28px; border-radius:4px; cursor:pointer; line-height:1;">-</button>
+                                        <input type="number" min="1" value="@item.Quantity"
+                                               class="qty-input"
+                                               data-product-id="@item.ProductId"
+                                               data-unit-price="@item.UnitPrice"
+                                               style="width:48px; text-align:center; background:#1a1a1a; border:1px solid #333; color:#F0F0F0; border-radius:4px; padding:4px;" />
+                                        <button type="button" data-action="increase"
+                                                style="background:#1a1a1a; border:1px solid #333; color:#ccc; width:28px; height:28px; border-radius:4px; cursor:pointer; line-height:1;">+</button>
+                                    </div>
+                                </td>
+                                <td style="padding:14px 8px; text-align:right; color:#aaa;">&#8369;@item.UnitPrice.ToString("N2")</td>
+                                <td style="padding:14px 8px; text-align:right; color:#F0F0F0;"
+                                    data-line-total="@item.LineTotal">&#8369;@item.LineTotal.ToString("N2")</td>
+                                <td style="padding:14px 8px; text-align:center;">
+                                    <button type="button" class="remove-btn"
+                                            data-product-id="@item.ProductId"
+                                            style="background:none; border:none; color:#E10600; font-size:16px; cursor:pointer; padding:4px 8px;">&#10005;</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="cart-summary" style="margin-top:24px; display:flex; justify-content:flex-end;">
+                <div style="background:#111; border:1px solid #1e1e1e; border-radius:8px; padding:20px; min-width:280px;">
+                    <p style="display:flex; justify-content:space-between; color:#888; font-size:14px;">
+                        <span>Subtotal</span>
+                        <span id="subtotal">&#8369;@Model.Subtotal.ToString("N2")</span>
+                    </p>
+                    <p style="display:flex; justify-content:space-between; color:#888; font-size:14px;">
+                        <span>Shipping</span>
+                        <span id="shipping">&#8369;@Model.ShippingFee.ToString("N2")</span>
+                    </p>
+                    <hr style="border-color:#2a2a2a;" />
+                    <p style="display:flex; justify-content:space-between; color:#F0F0F0; font-size:18px; font-weight:700; margin-bottom:16px;">
+                        <span>Total</span>
+                        <span id="total">&#8369;@Model.Total.ToString("N2")</span>
+                    </p>
+                    <button id="checkout-btn" class="btn w-100"
+                            style="background:#E10600; border:none; color:#fff; font-weight:600; letter-spacing:.08em; padding:10px;">
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        }
     </main>
 </div>
 
 @section Scripts {
-    <script>
-        // Sample cart data (replace with server-side or API)
-        const cart = [
-            { id: 1, name: "Taurus MTB Bike", qty: 1, price: 1200 },
-            { id: 2, name: "Helmet Pro Series", qty: 2, price: 80 }
-        ];
-
-        const cartItemsEl = document.getElementById('cart-items');
-        const subtotalEl = document.getElementById('subtotal');
-        const shippingEl = document.getElementById('shipping');
-        const totalEl = document.getElementById('total');
-
-        function renderCart() {
-            cartItemsEl.innerHTML = '';
-            let subtotal = 0;
-            cart.forEach(item => {
-                const total = item.qty * item.price;
-                subtotal += total;
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td>
-                        <input type="number" min="1" value="${item.qty}" data-id="${item.id}" class="qty-input"/>
-                    </td>
-                    <td>$${item.price.toFixed(2)}</td>
-                    <td>$${total.toFixed(2)}</td>
-                    <td><button class="remove-btn" data-id="${item.id}">✖</button></td>
-                `;
-                cartItemsEl.appendChild(row);
-            });
-            const shipping = subtotal > 0 ? 50 : 0;
-            subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
-            shippingEl.textContent = `$${shipping.toFixed(2)}`;
-            totalEl.textContent = `$${(subtotal + shipping).toFixed(2)}`;
-        }
-
-        cartItemsEl.addEventListener('input', e => {
-            if(e.target.classList.contains('qty-input')){
-                const id = parseInt(e.target.dataset.id);
-                const item = cart.find(i => i.id === id);
-                item.qty = parseInt(e.target.value);
-                renderCart();
-            }
-        });
-
-        cartItemsEl.addEventListener('click', e => {
-            if(e.target.classList.contains('remove-btn')){
-                const id = parseInt(e.target.dataset.id);
-                const index = cart.findIndex(i => i.id === id);
-                if(index !== -1) cart.splice(index, 1);
-                renderCart();
-            }
-        });
-
-        document.getElementById('checkout-btn').addEventListener('click', () => {
-            window.location.href = '/Customer/Checkout';
-        });
-
-        renderCart();
-    </script>
+    <script src="~/js/cart.js" asp-append-version="true"></script>
 }
