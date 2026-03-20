@@ -12,3 +12,4 @@ wwwroot/lib/
 node_modules/
 *.db
 *.log
+.claude/

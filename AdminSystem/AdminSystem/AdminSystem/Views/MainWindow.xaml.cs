@@ -1,360 +1,290 @@
-﻿// ═══════════════════════════════════════════════════════════════════════
-//  WalkInPOS_CartLogic.cs
-//  Taurus Bike Shop — Walk-In POS Cart Feature
-//
-//  ADD THIS REGION into AdminDashboardWindow.xaml.cs
-//
-//  Features:
-//  • CartItem model with quantity, price, subtotal
-//  • AddToCart() triggered by product tile click OR "Add to Cart" button
-//  • Live running total, item count, VAT breakdown
-//  • Quantity increment / decrement per cart row
-//  • Remove individual item
-//  • Clear cart
-//  • Checkout with confirmation dialog
-// ═══════════════════════════════════════════════════════════════════════
-
-// ── 1. ADD THESE USINGS at the top of AdminDashboardWindow.xaml.cs ──────
+using System;
 using System.Collections.ObjectModel;
-using System.Linq;
+using System.Windows;
+using AdminSystem.Helpers;
+using AdminSystem.Models;
+using AdminSystem.Repositories;
+using AdminSystem.Services;
+using AdminSystem.ViewModels;
 
-// ════════════════════════════════════════════════════════════════════════
-//  2. CART ITEM MODEL  (place just before the AdminDashboardWindow class,
-//     or in its own file CartItem.cs inside the TaurusBikeShop namespace)
-// ════════════════════════════════════════════════════════════════════════
-namespace TaurusBikeShop
+namespace AdminSystem.Views
 {
-    public class CartItem
+    public partial class MainWindow : Window
     {
-        public string ProductId { get; set; }
-        public string Name { get; set; }
-        public string Category { get; set; }
-        public decimal UnitPrice { get; set; }
-        public int Quantity { get; set; }
-        public decimal Subtotal => UnitPrice * Quantity;
+        // ── Repositories (shared) ──────────────────────────────────────────
+        private readonly OrderRepository     _orderRepo     = new OrderRepository();
+        private readonly PaymentRepository   _paymentRepo   = new PaymentRepository();
+        private readonly ProductRepository   _productRepo   = new ProductRepository();
+        private readonly InventoryRepository _inventoryRepo = new InventoryRepository();
+        private readonly UserRepository      _userRepo      = new UserRepository();
 
-        /// Displayed in the DataGrid — e.g. "₱ 2,499.00"
-        public string UnitPriceDisplay => $"₱ {UnitPrice:N2}";
-        public string SubtotalDisplay => $"₱ {Subtotal:N2}";
-    }
-}
+        // ── Services ──────────────────────────────────────────────────────
+        private IOrderService     _orderSvc;
+        private IPaymentService   _paymentSvc;
+        private IProductService   _productSvc;
+        private IInventoryService _inventorySvc;
+        private IDeliveryService  _deliverySvc;
+        private ISupportService   _supportSvc;
+        private IReportService    _reportSvc;
 
-// ════════════════════════════════════════════════════════════════════════
-//  3. PASTE THIS REGION inside the AdminDashboardWindow class body
-//     (right after the existing Pending Orders region)
-// ════════════════════════════════════════════════════════════════════════
+        // ── Cached UserControl views (lazy) ───────────────────────────────
+        private DashboardView  _dashboardView;
+        private OrdersView     _ordersView;
+        private POSView        _posView;
+        private ProductsView   _productsView;
+        private InventoryView  _inventoryView;
+        private DeliveryView   _deliveryView;
+        private VouchersView   _vouchersView;
+        private SupportView    _supportView;
+        private UsersView      _usersView;
+        private ReportsView    _reportsView;
 
-/* ─── Walk-In POS ─────────────────────────────────────────────────────── */
+        // ── Activity feed backing list ─────────────────────────────────────
+        private readonly ObservableCollection<PendingPaymentItem> _pendingPayments
+            = new ObservableCollection<PendingPaymentItem>();
 
-// Cart data source bound to DgCart DataGrid in XAML
-private ObservableCollection<CartItem> _cartItems = new ObservableCollection<CartItem>();
-
-/// <summary>
-/// Call once in the constructor, AFTER InitializeComponent():
-///     InitWalkInPOS();
-/// </summary>
-private void InitWalkInPOS()
-{
-    // Bind cart grid
-    DgCart.ItemsSource = _cartItems;
-    _cartItems.CollectionChanged += (s, e) => RefreshCartTotals();
-
-    // Product tile / Add-to-Cart button wiring
-    // Each product Button must have:
-    //   Tag="{Binding}"  or  Tag="ProductId|Name|Category|Price"  (pipe-delimited)
-    // Wire them here — add as many as you have:
-    POS_AddBike001.Click += POS_ProductButton_Click;
-    POS_AddBike002.Click += POS_ProductButton_Click;
-    POS_AddAccessory001.Click += POS_ProductButton_Click;
-    POS_AddPart001.Click += POS_ProductButton_Click;
-    // ... repeat for every product tile button
-
-    // Cart action buttons
-    POS_ClearCartButton.Click += POS_ClearCart_Click;
-    POS_CheckoutButton.Click += POS_Checkout_Click;
-    POS_ApplyDiscountButton.Click += POS_ApplyDiscount_Click;
-
-    // Qty controls inside the DataGrid are wired via event bubbling — see
-    // DgCart_CellButtonClick below (attach in XAML via ButtonBase.Click on DgCart)
-}
-
-// ════════════════════════════════════════════════════════════════════════
-//  ADD TO CART  — called by both tile-click and explicit "Add" button
-// ════════════════════════════════════════════════════════════════════════
-
-/// <summary>
-/// Primary entry point. Pass product details directly when a tile is clicked.
-/// </summary>
-private void AddToCart(string productId, string name, string category, decimal unitPrice)
-{
-    CartItem existing = _cartItems.FirstOrDefault(i => i.ProductId == productId);
-    if (existing != null)
-    {
-        existing.Quantity++;
-        // Force DataGrid row refresh (ObservableCollection doesn't track property changes)
-        int idx = _cartItems.IndexOf(existing);
-        _cartItems[idx] = existing;     // triggers CollectionChanged → RefreshCartTotals
-    }
-    else
-    {
-        _cartItems.Add(new CartItem
+        public MainWindow()
         {
-            ProductId = productId,
-            Name = name,
-            Category = category,
-            UnitPrice = unitPrice,
-            Quantity = 1
-        });
-    }
+            InitializeComponent();
 
-    // Flash the cart panel to give visual feedback
-    AnimateCartFlash();
-}
+            // Build services
+            _orderSvc     = new OrderService(_orderRepo);
+            _paymentSvc   = new PaymentService(_paymentRepo);
+            _productSvc   = new ProductService(_productRepo);
+            _inventorySvc = new InventoryService(_inventoryRepo, _productRepo);
+            _deliverySvc  = new DeliveryService();
+            _supportSvc   = new SupportService();
+            _reportSvc    = new ReportService(_inventoryRepo, _productRepo);
 
-// ════════════════════════════════════════════════════════════════════════
-//  PRODUCT TILE / ADD-TO-CART BUTTON CLICK
-//  Convention: Button.Tag = "ProductId|Display Name|Category|Price"
-//  Example Tag value:  "BIKE-001|Trek FX 3 Disc|Bikes|24999.00"
-// ════════════════════════════════════════════════════════════════════════
-private void POS_ProductButton_Click(object sender, RoutedEventArgs e)
-{
-    Button btn = sender as Button;
-    if (btn?.Tag == null) return;
+            // Top-bar user display
+            if (App.CurrentUser != null)
+                TbCurrentUser.Text = App.CurrentUser.FullName;
 
-    string[] parts = btn.Tag.ToString().Split('|');
-    if (parts.Length < 4) return;
+            // Wire nav buttons
+            BtnNavDashboard.Click  += (s, e) => Navigate(PageNames.Dashboard);
+            BtnNavOrders.Click     += (s, e) => Navigate(PageNames.Orders);
+            BtnNavPOS.Click        += (s, e) => Navigate(PageNames.POS);
+            BtnNavInventory.Click  += (s, e) => Navigate(PageNames.Inventory);
+            BtnNavDelivery.Click   += (s, e) => Navigate(PageNames.Delivery);
+            BtnNavReports.Click    += (s, e) => Navigate(PageNames.Reports);
+            BtnNavSupport.Click    += (s, e) => Navigate(PageNames.Support);
+            BtnNavProducts.Click   += (s, e) => Navigate(PageNames.Products);
+            BtnNavVouchers.Click   += (s, e) => Navigate(PageNames.Vouchers);
+            BtnNavUsers.Click      += (s, e) => Navigate(PageNames.Users);
 
-    if (!decimal.TryParse(parts[3], out decimal price)) return;
+            // Sidebar buttons that navigate from activity feed
+            ReviewInventoryButton.Click += (s, e) => Navigate(PageNames.Inventory);
+            ViewTicketButton.Click      += (s, e) => Navigate(PageNames.Support);
 
-    AddToCart(
-        productId: parts[0],
-        name: parts[1],
-        category: parts[2],
-        unitPrice: price
-    );
-}
+            // Wire activity feed list
+            ActivityPendingPaymentsList.ItemsSource = _pendingPayments;
 
-// ════════════════════════════════════════════════════════════════════════
-//  DATAGRID QTY BUTTONS  (+ / − / Remove)
-//  In XAML, set ButtonBase.Click="DgCart_CellButtonClick" on <DataGrid>
-// ════════════════════════════════════════════════════════════════════════
-private void DgCart_CellButtonClick(object sender, RoutedEventArgs e)
-{
-    if (!(e.OriginalSource is Button btn)) return;
-    if (!(btn.DataContext is CartItem item)) return;
+            LoadActivityFeed();
+            Navigate(PageNames.Dashboard);
+        }
 
-    int idx = _cartItems.IndexOf(item);
-    if (idx < 0) return;
-
-    switch (btn.Tag?.ToString())
-    {
-        case "Increment":
-            item.Quantity++;
-            _cartItems[idx] = item;
-            break;
-
-        case "Decrement":
-            if (item.Quantity > 1)
+        // ── Navigation ────────────────────────────────────────────────────
+        private void Navigate(string page)
+        {
+            switch (page)
             {
-                item.Quantity--;
-                _cartItems[idx] = item;
+                case PageNames.Dashboard:
+                    if (_dashboardView == null)
+                        _dashboardView = new DashboardView(
+                            new DashboardViewModel(_orderSvc, _paymentSvc,
+                                                   _inventorySvc, _reportSvc));
+                    ContentArea.Content = _dashboardView;
+                    _dashboardView.Refresh();
+                    PageTitleTextBlock.Text     = "Dashboard";
+                    PageBreadcrumbTextBlock.Text = "Admin → Dashboard";
+                    break;
+
+                case PageNames.Orders:
+                    if (_ordersView == null)
+                        _ordersView = new OrdersView(new OrderViewModel(_orderSvc));
+                    ContentArea.Content = _ordersView;
+                    _ordersView.Refresh();
+                    PageTitleTextBlock.Text     = "Orders";
+                    PageBreadcrumbTextBlock.Text = "Admin → Orders";
+                    break;
+
+                case PageNames.POS:
+                    if (_posView == null)
+                        _posView = new POSView(new POSViewModel(_productSvc));
+                    ContentArea.Content = _posView;
+                    _posView.Refresh();
+                    PageTitleTextBlock.Text     = "Point of Sale";
+                    PageBreadcrumbTextBlock.Text = "Admin → POS";
+                    break;
+
+                case PageNames.Products:
+                    if (_productsView == null)
+                        _productsView = new ProductsView(
+                            new ProductViewModel(_productSvc));
+                    ContentArea.Content = _productsView;
+                    _productsView.Refresh();
+                    PageTitleTextBlock.Text     = "Products";
+                    PageBreadcrumbTextBlock.Text = "Admin → Products";
+                    break;
+
+                case PageNames.Inventory:
+                    if (_inventoryView == null)
+                        _inventoryView = new InventoryView(
+                            new InventoryViewModel(_inventorySvc));
+                    ContentArea.Content = _inventoryView;
+                    _inventoryView.Refresh();
+                    PageTitleTextBlock.Text     = "Inventory";
+                    PageBreadcrumbTextBlock.Text = "Admin → Inventory";
+                    break;
+
+                case PageNames.Delivery:
+                    if (_deliveryView == null)
+                        _deliveryView = new DeliveryView(
+                            new DeliveryViewModel(_deliverySvc));
+                    ContentArea.Content = _deliveryView;
+                    _deliveryView.Refresh();
+                    PageTitleTextBlock.Text     = "Delivery";
+                    PageBreadcrumbTextBlock.Text = "Admin → Delivery";
+                    break;
+
+                case PageNames.Vouchers:
+                    if (_vouchersView == null)
+                        _vouchersView = new VouchersView(new VoucherViewModel());
+                    ContentArea.Content = _vouchersView;
+                    _vouchersView.Refresh();
+                    PageTitleTextBlock.Text     = "Vouchers";
+                    PageBreadcrumbTextBlock.Text = "Admin → Vouchers";
+                    break;
+
+                case PageNames.Support:
+                    if (_supportView == null)
+                        _supportView = new SupportView(
+                            new SupportViewModel(_supportSvc));
+                    ContentArea.Content = _supportView;
+                    _supportView.Refresh();
+                    PageTitleTextBlock.Text     = "Support";
+                    PageBreadcrumbTextBlock.Text = "Admin → Support";
+                    break;
+
+                case PageNames.Users:
+                    if (_usersView == null)
+                        _usersView = new UsersView(
+                            new UsersViewModel(_userRepo));
+                    ContentArea.Content = _usersView;
+                    _usersView.Refresh();
+                    PageTitleTextBlock.Text     = "Users";
+                    PageBreadcrumbTextBlock.Text = "Admin → Users";
+                    break;
+
+                case PageNames.Reports:
+                    if (_reportsView == null)
+                        _reportsView = new ReportsView(
+                            new ReportViewModel(_reportSvc));
+                    ContentArea.Content = _reportsView;
+                    _reportsView.Refresh();
+                    PageTitleTextBlock.Text     = "Reports";
+                    PageBreadcrumbTextBlock.Text = "Admin → Reports";
+                    break;
             }
-            else
+        }
+
+        // ── Activity Feed ─────────────────────────────────────────────────
+        private void LoadActivityFeed()
+        {
+            try
             {
-                _cartItems.RemoveAt(idx);
+                _pendingPayments.Clear();
+                foreach (Payment p in _paymentSvc.GetPendingVerification())
+                {
+                    _pendingPayments.Add(new PendingPaymentItem
+                    {
+                        PaymentId      = p.PaymentId,
+                        OrderRef       = "Order #" + p.OrderId,
+                        Method         = p.PaymentMethod,
+                        CreatedDisplay = p.CreatedAt.ToString("hh:mm tt"),
+                        AmountDisplay  = string.Format("\u20B1 {0:N2}", p.Amount)
+                    });
+                }
+
+                int low = 0;
+                try { low = System.Linq.Enumerable.Count(_inventorySvc.GetLowStockVariants()); }
+                catch { }
+
+                ActivityLowStockBadge.Text  = low.ToString();
+                ActivityLowStockDetail.Text = low > 0
+                    ? low + " variant(s) below reorder threshold."
+                    : "All stock levels healthy.";
+                ActivityLowStockPanel.Visibility = low > 0
+                    ? Visibility.Visible : Visibility.Collapsed;
+
+                bool online = DatabaseHelper.TestConnection();
+                ActivityDbStatus.Text = online ? "Database \u2022 Online" : "Database \u2022 Offline";
+                ActivityDbDot.Fill = online ? AppColors.Success : AppColors.Accent;
             }
-            break;
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[ActivityFeed] " + ex.Message);
+            }
+        }
 
-        case "Remove":
-            _cartItems.RemoveAt(idx);
-            break;
-    }
-}
+        // ── Verify Payment (activity feed button) ─────────────────────────
+        private void BtnVerifyPayment_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Controls.Button btn =
+                sender as System.Windows.Controls.Button;
+            if (btn == null || btn.Tag == null) return;
 
-// ════════════════════════════════════════════════════════════════════════
-//  CART TOTALS  — called every time _cartItems changes
-// ════════════════════════════════════════════════════════════════════════
-private const decimal VAT_RATE = 0.12m;   // 12% Philippine VAT
+            int paymentId;
+            if (!int.TryParse(btn.Tag.ToString(), out paymentId)) return;
 
-private decimal _discountAmount = 0m;
+            Payment p = _paymentSvc.GetPaymentById(paymentId);
+            if (p == null) return;
 
-private void RefreshCartTotals()
-{
-    int totalQty = _cartItems.Sum(i => i.Quantity);
-    decimal subtotal = _cartItems.Sum(i => i.Subtotal);
-    decimal afterDiscount = subtotal - _discountAmount;
-    decimal vat = afterDiscount * VAT_RATE;
-    decimal grandTotal = afterDiscount + vat;
+            if (MessageBox.Show(
+                    string.Format("Approve payment of \u20B1{0:N2} for Order #{1}?",
+                        p.Amount, p.OrderId),
+                    "Approve Payment",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question)
+                == MessageBoxResult.Yes)
+            {
+                _paymentSvc.ApprovePayment(paymentId);
+                LoadActivityFeed();
+                MessageBox.Show("Payment approved.", "Done",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
 
-    // Update UI labels (wire these x:Name values in XAML)
-    POS_ItemCountLabel.Text = totalQty == 1
-        ? "1 item"
-        : totalQty + " items";
+        // ── Sign-out ──────────────────────────────────────────────────────
+        private void BtnNavSignOut_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Sign out of Taurus Bike Shop Admin?",
+                    "Sign Out",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question)
+                == MessageBoxResult.Yes)
+                NavigationHelper.SignOut(this);
+        }
 
-    POS_SubtotalLabel.Text = $"₱ {subtotal:N2}";
-    POS_DiscountLabel.Text = _discountAmount > 0
-        ? $"− ₱ {_discountAmount:N2}"
-        : "₱ 0.00";
-    POS_VATLabel.Text = $"₱ {vat:N2}";
-    POS_GrandTotalLabel.Text = $"₱ {grandTotal:N2}";
-
-    // Disable checkout if cart is empty
-    POS_CheckoutButton.IsEnabled = _cartItems.Count > 0;
-}
-
-// ════════════════════════════════════════════════════════════════════════
-//  DISCOUNT
-// ════════════════════════════════════════════════════════════════════════
-private void POS_ApplyDiscount_Click(object sender, RoutedEventArgs e)
-{
-    string input = POS_DiscountTextBox.Text.Trim();
-    if (!decimal.TryParse(input, out decimal discount) || discount < 0)
-    {
-        MessageBox.Show("Please enter a valid discount amount.", "Invalid Discount",
-            MessageBoxButton.OK, MessageBoxImage.Warning);
-        return;
-    }
-
-    decimal subtotal = _cartItems.Sum(i => i.Subtotal);
-    if (discount > subtotal)
-    {
-        MessageBox.Show("Discount cannot exceed subtotal.", "Invalid Discount",
-            MessageBoxButton.OK, MessageBoxImage.Warning);
-        return;
+        // ── Window closing ────────────────────────────────────────────────
+        private void Window_Closing(object sender,
+            System.ComponentModel.CancelEventArgs e)
+        {
+            if (MessageBox.Show(
+                    "Exit Taurus Bike Shop Admin?", "Exit",
+                    MessageBoxButton.YesNo, MessageBoxImage.Question)
+                != MessageBoxResult.Yes)
+                e.Cancel = true;
+        }
     }
 
-    _discountAmount = discount;
-    RefreshCartTotals();
-}
-
-// ════════════════════════════════════════════════════════════════════════
-//  CLEAR CART
-// ════════════════════════════════════════════════════════════════════════
-private void POS_ClearCart_Click(object sender, RoutedEventArgs e)
-{
-    if (_cartItems.Count == 0) return;
-    if (MessageBox.Show("Clear all items from the cart?", "Clear Cart",
-            MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+    // ── DTO for activity feed pending-payment items ───────────────────────
+    public class PendingPaymentItem
     {
-        _cartItems.Clear();
-        _discountAmount = 0m;
-        POS_DiscountTextBox.Text = string.Empty;
+        public int    PaymentId      { get; set; }
+        public string OrderRef       { get; set; }
+        public string Method         { get; set; }
+        public string CreatedDisplay { get; set; }
+        public string AmountDisplay  { get; set; }
     }
 }
-
-// ════════════════════════════════════════════════════════════════════════
-//  CHECKOUT
-// ════════════════════════════════════════════════════════════════════════
-private void POS_Checkout_Click(object sender, RoutedEventArgs e)
-{
-    if (_cartItems.Count == 0) return;
-
-    decimal subtotal = _cartItems.Sum(i => i.Subtotal);
-    decimal after = subtotal - _discountAmount;
-    decimal vat = after * VAT_RATE;
-    decimal grandTotal = after + vat;
-
-    string summary = string.Format(
-        "Items : {0}\nSubtotal : ₱ {1:N2}\nDiscount : − ₱ {2:N2}\nVAT (12%) : ₱ {3:N2}\n\nTotal Due : ₱ {4:N2}\n\nProceed to payment?",
-        _cartItems.Sum(i => i.Quantity),
-        subtotal, _discountAmount, vat, grandTotal);
-
-    if (MessageBox.Show(summary, "Confirm Checkout",
-            MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-    {
-        // TODO: Save transaction to DB, print receipt
-        MessageBox.Show("Transaction recorded! Receipt printing...", "Success",
-            MessageBoxButton.OK, MessageBoxImage.Information);
-
-        _cartItems.Clear();
-        _discountAmount = 0m;
-        POS_DiscountTextBox.Text = string.Empty;
-    }
-}
-
-// ════════════════════════════════════════════════════════════════════════
-//  VISUAL FEEDBACK — cart flash animation
-// ════════════════════════════════════════════════════════════════════════
-private void AnimateCartFlash()
-{
-    // Briefly highlights the cart panel border to confirm item was added.
-    // Requires a Border named POS_CartPanelBorder in XAML.
-    if (POS_CartPanelBorder == null) return;
-
-    var highlight = new System.Windows.Media.Animation.ColorAnimation
-    {
-        To = System.Windows.Media.Color.FromRgb(0xFF, 0xD7, 0x00), // gold flash
-        Duration = TimeSpan.FromMilliseconds(150),
-        AutoReverse = true,
-        FillBehavior = System.Windows.Media.Animation.FillBehavior.Stop
-    };
-
-    var brush = new System.Windows.Media.SolidColorBrush(
-        ((System.Windows.Media.SolidColorBrush)POS_CartPanelBorder.BorderBrush).Color);
-    POS_CartPanelBorder.BorderBrush = brush;
-    brush.BeginAnimation(System.Windows.Media.SolidColorBrush.ColorProperty, highlight);
-}
-
-// ════════════════════════════════════════════════════════════════════════
-//  4. XAML WIRING CHECKLIST  (PageWalkInPOS inside AdminDashboardWindow.xaml)
-// ════════════════════════════════════════════════════════════════════════
-
-  ── Product Tiles ────────────────────────────────────────────────────
-  Each clickable product card/button:
-
-      < Button x: Name = "POS_AddBike001"
-              Tag = "BIKE-001|Trek FX 3 Disc|Bikes|24999.00"
-              Style = "{StaticResource ProductTileStyle}" >
-          < StackPanel >
-              < TextBlock Text = "Trek FX 3 Disc" />
-              < TextBlock Text = "₱ 24,999.00" />   ← this is the price that gets clicked
-          </StackPanel>
-      </Button>
-
-  ── Cart DataGrid ────────────────────────────────────────────────────
-
-      <DataGrid x:Name = "DgCart"
-                AutoGenerateColumns = "False"
-                ButtonBase.Click = "DgCart_CellButtonClick" >
-          < DataGrid.Columns >
-              < DataGridTextColumn  Header = "Product"   Binding = "{Binding Name}"            Width = "*" />
-              < DataGridTextColumn  Header = "Unit Price" Binding = "{Binding UnitPriceDisplay}" Width = "100" />
-              < DataGridTemplateColumn Header = "Qty" Width = "90" >
-                  < DataGridTemplateColumn.CellTemplate >
-                      < DataTemplate >
-                          < StackPanel Orientation = "Horizontal" >
-                              < Button Tag = "Decrement" Content = "−" Width = "24" />
-                              < TextBlock Text = "{Binding Quantity}" VerticalAlignment = "Center" Margin = "4,0" />
-                              < Button Tag = "Increment" Content = "+" Width = "24" />
-                          </ StackPanel >
-                      </ DataTemplate >
-                  </ DataGridTemplateColumn.CellTemplate >
-              </ DataGridTemplateColumn >
-              < DataGridTextColumn  Header = "Subtotal"  Binding = "{Binding SubtotalDisplay}" Width = "110" />
-              < DataGridTemplateColumn Header = "" Width = "30" >
-                  < DataGridTemplateColumn.CellTemplate >
-                      < DataTemplate >
-                          < Button Tag = "Remove" Content = "✕" />
-                      </ DataTemplate >
-                  </ DataGridTemplateColumn.CellTemplate >
-              </ DataGridTemplateColumn >
-          </ DataGrid.Columns >
-      </ DataGrid >
-
-  ── Totals Panel ─────────────────────────────────────────────────────
-
-      <Border x:Name = "POS_CartPanelBorder" BorderThickness = "2" CornerRadius = "8" >
-          < StackPanel Margin = "16" >
-              < TextBlock x: Name = "POS_ItemCountLabel" />
-              < TextBlock Text = "Subtotal" />< TextBlock x: Name = "POS_SubtotalLabel" />
-              < TextBlock Text = "Discount" />< TextBlock x: Name = "POS_DiscountLabel" />
-              < TextBlock Text = "VAT 12%" />< TextBlock x: Name = "POS_VATLabel" />
-              < TextBlock Text = "TOTAL" />< TextBlock x: Name = "POS_GrandTotalLabel" FontSize = "20" FontWeight = "Bold" />
-
-              < TextBox x: Name = "POS_DiscountTextBox" PlaceholderText = "Discount (₱)" />
-              < Button  x: Name = "POS_ApplyDiscountButton" Content = "Apply Discount" />
-              < Button  x: Name = "POS_ClearCartButton"     Content = "Clear Cart" />
-              < Button  x: Name = "POS_CheckoutButton"      Content = "Checkout →" />
-          </ StackPanel >
-      </ Border >
-*/

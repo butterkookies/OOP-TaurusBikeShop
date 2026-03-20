@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "WebApplication (HTTP)",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "WebApplication", "--launch-profile", "http"],
+      "port": 5064
+    },
+    {
+      "name": "WebApplication (HTTPS)",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "WebApplication", "--launch-profile", "https"],
+      "port": 7177
+    }
+  ]
+}
