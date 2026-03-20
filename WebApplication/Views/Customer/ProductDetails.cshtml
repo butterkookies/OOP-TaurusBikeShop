@@ -4,7 +4,7 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/productdetails.css" />
+    <link rel="stylesheet" href="~/css/product-details.css" />
 }
 
 <div class="product-page">
@@ -57,7 +57,7 @@
         document.getElementById('buy-now').addEventListener('click', () => {
             const qty = parseInt(document.getElementById('quantity').value);
             alert(`Proceeding to buy ${qty} Taurus MTB Bike(s)...`);
-            window.location.href = '/Checkout';
+            window.location.href = '/Customer/Checkout';
         });
     </script>
 }

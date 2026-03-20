@@ -10,7 +10,7 @@
 <div class="payment-page">
     <header class="payment-header">
         <h1>💳 Payment</h1>
-        <a href="/Checkout" class="btn-back">← Back to Checkout</a>
+        <a href="/Customer/Checkout" class="btn-back">← Back to Checkout</a>
     </header>
 
     <main class="payment-main">
@@ -75,7 +75,7 @@
         paymentForm.addEventListener('submit', e => {
             e.preventDefault();
             alert("Payment successful! Thank you for shopping at Taurus Bike Shop.");
-            window.location.href = "/Confirmation";
+            window.location.href = "/Customer/Confirmation";
         });
     </script>
 }

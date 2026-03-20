@@ -15,14 +15,12 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        document.querySelectorAll('.btn-add-cart').forEach(btn => {
-            btn.addEventListener('click', e => {
-                const card = e.target.closest('.product-card');
-                const productId = card.dataset.id;
-                alert(`Product ${productId} added to cart!`);
-            });
+<script>
+    document.querySelectorAll('.btn-add-cart').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const card = e.target.closest('.product-card');
+            const productId = card.dataset.id;
+            alert(`Product ${productId} added to cart!`);
         });
-    </script>
-}
+    });
+</script>

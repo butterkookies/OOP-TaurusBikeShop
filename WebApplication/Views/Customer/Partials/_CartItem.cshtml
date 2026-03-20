@@ -18,19 +18,17 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        document.querySelectorAll('.cart-item').forEach(item => {
-            const input = item.querySelector('.quantity');
-            item.querySelector('.increase').addEventListener('click', () => {
-                input.value = parseInt(input.value) + 1;
-            });
-            item.querySelector('.decrease').addEventListener('click', () => {
-                if(parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;
-            });
-            item.querySelector('.remove-item').addEventListener('click', () => {
-                item.remove();
-            });
+<script>
+    document.querySelectorAll('.cart-item').forEach(item => {
+        const input = item.querySelector('.quantity');
+        item.querySelector('.increase').addEventListener('click', () => {
+            input.value = parseInt(input.value) + 1;
         });
-    </script>
-}
+        item.querySelector('.decrease').addEventListener('click', () => {
+            if(parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;
+        });
+        item.querySelector('.remove-item').addEventListener('click', () => {
+            item.remove();
+        });
+    });
+</script>
