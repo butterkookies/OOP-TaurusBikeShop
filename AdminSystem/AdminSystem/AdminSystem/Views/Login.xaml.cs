@@ -1,177 +1,145 @@
-﻿// Login.xaml.cs
-// C# 7.3 compatible
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using AdminSystem.Helpers;
+using AdminSystem.Models;
+using AdminSystem.Repositories;
 
-namespace TaurusBikeShop
+namespace AdminSystem.Views
 {
     public partial class Login : Window
     {
         private bool _passwordVisible = false;
+        private readonly UserRepository _userRepo = new UserRepository();
 
         public Login()
         {
             InitializeComponent();
-
-            // Wire all events — no Click= in XAML
-            BtnLogin.Click += BtnLogin_Click;
+            BtnLogin.Click          += BtnLogin_Click;
             BtnTogglePassword.Click += BtnTogglePassword_Click;
             BtnForgotPassword.Click += BtnForgotPassword_Click;
-
-            TbUsername.KeyDown += Field_KeyDown;
-            PbPassword.KeyDown += Field_KeyDown;
+            TbUsername.KeyDown      += Field_KeyDown;
+            PbPassword.KeyDown      += Field_KeyDown;
             TbPasswordVisible.KeyDown += Field_KeyDown;
-
-            // Keep the two password fields in sync
-            TbPasswordVisible.TextChanged += TbPasswordVisible_TextChanged;
-
+            TbPasswordVisible.TextChanged += (s, e) =>
+            {
+                if (_passwordVisible) PbPassword.Password = TbPasswordVisible.Text;
+            };
+            TbUsername.TextChanged      += (s, e) => HideError(TbUsernameError);
+            PbPassword.PasswordChanged  += (s, e) => HideError(TbPasswordError);
             TbUsername.Focus();
         }
 
-        // ── SYNC: when visible textbox changes, update PasswordBox ──────
-        private void TbPasswordVisible_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            if (_passwordVisible)
-                PbPassword.Password = TbPasswordVisible.Text;
-        }
-
-        // ── ENTER KEY on any field ───────────────────────────────────────
         private void Field_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
-                AttemptLogin();
+            if (e.Key == Key.Enter) AttemptLogin();
         }
 
-        // ── SHOW / HIDE PASSWORD TOGGLE ──────────────────────────────────
         private void BtnTogglePassword_Click(object sender, RoutedEventArgs e)
         {
             _passwordVisible = !_passwordVisible;
-
             if (_passwordVisible)
             {
-                TbPasswordVisible.Text = PbPassword.Password;
-                PbPassword.Visibility = Visibility.Collapsed;
+                TbPasswordVisible.Text       = PbPassword.Password;
+                PbPassword.Visibility        = Visibility.Collapsed;
                 TbPasswordVisible.Visibility = Visibility.Visible;
-                TbEyeIcon.Foreground = new System.Windows.Media.SolidColorBrush(
-                                                System.Windows.Media.Color.FromRgb(0xCC, 0x00, 0x00));
+                TbEyeIcon.Foreground = AppColors.EyeOn;
                 TbPasswordVisible.CaretIndex = TbPasswordVisible.Text.Length;
                 TbPasswordVisible.Focus();
             }
             else
             {
-                PbPassword.Password = TbPasswordVisible.Text;
+                PbPassword.Password          = TbPasswordVisible.Text;
                 TbPasswordVisible.Visibility = Visibility.Collapsed;
-                PbPassword.Visibility = Visibility.Visible;
-                TbEyeIcon.Foreground = new System.Windows.Media.SolidColorBrush(
-                                                System.Windows.Media.Color.FromRgb(0x60, 0x60, 0x60));
+                PbPassword.Visibility        = Visibility.Visible;
+                TbEyeIcon.Foreground = AppColors.EyeOff;
                 PbPassword.Focus();
             }
         }
 
         private void BtnForgotPassword_Click(object sender, RoutedEventArgs e)
         {
-            string user = TbUsername.Text.Trim();
-
-            if (string.IsNullOrEmpty(user))
-            {
-                MessageBox.Show(
-                    "Please enter your username before requesting a password reset.",
-                    "Username Required",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                TbUsername.Focus();
-                return;
-            }
-
-            // TODO: trigger actual password reset via your backend
             MessageBox.Show(
-                "Password reset instructions have been sent to the email address linked to \"" + user + "\".\n\nPlease check your inbox.",
-                "Reset Email Sent",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+                "Please contact your system administrator to reset your password.",
+                "Password Reset", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        // ── SIGN IN ──────────────────────────────────────────────────────
-        private void BtnLogin_Click(object sender, RoutedEventArgs e)
-        {
-            AttemptLogin();
-        }
+        private void BtnLogin_Click(object sender, RoutedEventArgs e) => AttemptLogin();
 
         private void AttemptLogin()
         {
-            string user = TbUsername.Text.Trim();
-            string pass = _passwordVisible ? TbPasswordVisible.Text : PbPassword.Password;
+            HideError(TbUsernameError);
+            HideError(TbPasswordError);
+            HideError(TbConnectionError);
 
-            // Both empty
-            if (string.IsNullOrEmpty(user) && string.IsNullOrEmpty(pass))
+            string email    = TbUsername.Text.Trim();
+            string password = _passwordVisible
+                ? TbPasswordVisible.Text : PbPassword.Password;
+
+            bool valid = true;
+            if (string.IsNullOrEmpty(email))
             {
-                MessageBox.Show(
-                    "Both username and password are empty.\nPlease fill in your credentials to sign in.",
-                    "Fields Required",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                ShowError(TbUsernameError, "Email address is required.");
                 TbUsername.Focus();
-                return;
+                valid = false;
             }
-
-            // Empty username only
-            if (string.IsNullOrEmpty(user))
+            if (string.IsNullOrEmpty(password))
             {
-                MessageBox.Show(
-                    "Username cannot be empty.\nPlease enter your username.",
-                    "Username Required",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                TbUsername.Focus();
-                return;
+                ShowError(TbPasswordError, "Password is required.");
+                if (valid) { if (_passwordVisible) TbPasswordVisible.Focus(); else PbPassword.Focus(); }
+                valid = false;
             }
+            if (!valid) return;
 
-            // Empty password only
-            if (string.IsNullOrEmpty(pass))
+            BtnLogin.IsEnabled = false;
+            BtnLogin.Content   = "Signing in...";
+
+            try
             {
-                MessageBox.Show(
-                    "Password cannot be empty.\nPlease enter your password.",
-                    "Password Required",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                if (_passwordVisible) TbPasswordVisible.Focus();
-                else PbPassword.Focus();
-                return;
-            }
+                User user = _userRepo.FindByEmail(email);
+                if (user == null)
+                {
+                    ShowError(TbUsernameError, "No account found with that email address.");
+                    TbUsername.SelectAll(); TbUsername.Focus();
+                    return;
+                }
+                if (!user.IsActive)
+                {
+                    ShowError(TbUsernameError, "This account has been deactivated.");
+                    return;
+                }
+                if (!PasswordHelper.Verify(password, user.PasswordHash))
+                {
+                    ShowError(TbPasswordError, "Incorrect password. Please try again.");
+                    PbPassword.Clear(); TbPasswordVisible.Clear();
+                    if (_passwordVisible) TbPasswordVisible.Focus(); else PbPassword.Focus();
+                    return;
+                }
 
-            // TODO: replace with your database authentication call
-            // Check username exists (demo: only "admin" is valid)
-            if (user != "admin")
+                _userRepo.UpdateLastLogin(user.UserId);
+                App.CurrentUser = user;
+                NavigationHelper.NavigateToMain(this);
+            }
+            catch (System.Exception ex)
             {
-                MessageBox.Show(
-                    "The username \"" + user + "\" was not found.\nPlease check your username and try again.",
-                    "Incorrect Username",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                TbUsername.SelectAll();
-                TbUsername.Focus();
-                return;
+                ShowError(TbConnectionError,
+                    "Cannot connect to database: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("[Login] " + ex.ToString());
             }
-
-            // Username correct but wrong password
-            if (pass != "admin123")
+            finally
             {
-                MessageBox.Show(
-                    "The password you entered is incorrect.\nPlease try again or use Forgot password.",
-                    "Incorrect Password",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                PbPassword.Clear();
-                TbPasswordVisible.Clear();
-                if (_passwordVisible) TbPasswordVisible.Focus();
-                else PbPassword.Focus();
-                return;
+                BtnLogin.IsEnabled = true;
+                BtnLogin.Content   = "Sign In";
             }
+        }
 
-            // SUCCESS
-            AdminDashboardWindow dashboard = new AdminDashboardWindow();
-            dashboard.Show();
-            this.Close();
+        private static void ShowError(TextBlock tb, string message)
+        {
+            tb.Text = message; tb.Visibility = Visibility.Visible;
+        }
+        private static void HideError(TextBlock tb)
+        {
+            tb.Visibility = Visibility.Collapsed; tb.Text = string.Empty;
         }
     }
 }
