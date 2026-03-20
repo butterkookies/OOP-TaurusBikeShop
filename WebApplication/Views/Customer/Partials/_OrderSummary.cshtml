@@ -1,11 +1,9 @@
-@* WebApplication/Views/Checkout/Partials/_OrderSummary.cshtml *@
-@* Model: CheckoutViewModel — used on the checkout page sidebar *@
+@* WebApplication/Views/Customer/Partials/_OrderSummary.cshtml *@
 @model WebApplication.Models.ViewModels.CheckoutViewModel
 
 <div class="tbs-order-summary tbs-order-summary--checkout">
     <h2 class="tbs-order-summary__title">Order Summary</h2>
 
-    @* Line items *@
     <ul class="tbs-order-summary__items">
         @foreach (WebApplication.Models.ViewModels.CartItemViewModel item in Model.CartItems)
         {
@@ -25,13 +23,11 @@
 
     <div class="tbs-order-summary__divider"></div>
 
-    @* Subtotal *@
     <div class="tbs-order-summary__row">
         <span>Subtotal</span>
         <span id="checkout-subtotal-value">@Model.FormattedSubTotal</span>
     </div>
 
-    @* Discount *@
     <div class="tbs-order-summary__row tbs-order-summary__row--discount"
          id="checkout-discount-row-wrapper"
          style="@(Model.DiscountAmount > 0 ? "" : "display:none")">
@@ -39,7 +35,6 @@
         <span id="checkout-discount-row">−₱@Model.DiscountAmount.ToString("N2")</span>
     </div>
 
-    @* Shipping *@
     <div class="tbs-order-summary__row">
         <span>Shipping</span>
         <span id="checkout-shipping-fee">
@@ -49,7 +44,6 @@
 
     <div class="tbs-order-summary__divider"></div>
 
-    @* Grand total *@
     <div class="tbs-order-summary__row tbs-order-summary__row--total">
         <span>Total</span>
         <span id="checkout-grand-total-row">@Model.FormattedSubTotal</span>

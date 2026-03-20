@@ -74,4 +74,38 @@ public interface IOrderService
         int orderId,
         int userId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Confirms that a shipped delivery order has been physically received
+    /// by the customer. Transitions the order from <c>Shipped</c> to
+    /// <c>Delivered</c> and finalises inventory by writing paired
+    /// <c>Unlock</c> + <c>Sale</c> InventoryLog entries per line item.
+    /// <para>
+    /// Only valid for orders in <c>Shipped</c> status that are not walk-in
+    /// POS orders and not store-pickup orders.
+    /// </para>
+    /// <para>
+    /// Executes atomically in a single DB transaction:
+    /// <list type="number">
+    ///   <item>Sets OrderStatus to Delivered.</item>
+    ///   <item>Per item: writes Unlock entry (+qty, releases the lock in the ledger)
+    ///     and Sale entry (-qty, records actual consumption). Net StockQuantity
+    ///     change is zero — stock was already decremented at order placement.</item>
+    ///   <item>Writes a SystemLog OrderStatusChange entry.</item>
+    /// </list>
+    /// A DeliveryConfirmation notification is queued outside the transaction.
+    /// </para>
+    /// Flowchart reference: Part 6 — D28A (Update Order Status: Delivered)
+    /// and D28B (Unlock Pending Stock in InventoryLog).
+    /// </summary>
+    /// <param name="orderId">The order to confirm.</param>
+    /// <param name="userId">The authenticated customer confirming receipt.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>
+    /// A <see cref="ServiceResult"/> indicating success or a descriptive error.
+    /// </returns>
+    Task<ServiceResult> ConfirmDeliveryAsync(
+        int orderId,
+        int userId,
+        CancellationToken cancellationToken = default);
 }

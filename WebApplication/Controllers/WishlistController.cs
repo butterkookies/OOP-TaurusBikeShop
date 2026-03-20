@@ -10,8 +10,8 @@ using WebApplication.Models.ViewModels;
 namespace WebApplication.Controllers;
 
 /// <summary>
-/// Handles the wishlist page and AJAX toggle endpoint.
-/// All actions require authentication — wishlist is not available to guests.
+/// Handles the wishlist page and AJAX toggle/remove/move-to-cart endpoints.
+/// All actions require authentication.
 /// </summary>
 [Authorize]
 public sealed class WishlistController : Controller
@@ -20,7 +20,6 @@ public sealed class WishlistController : Controller
     private readonly ICartService     _cartService;
     private readonly ILogger<WishlistController> _logger;
 
-    /// <inheritdoc/>
     public WishlistController(
         IWishlistService wishlistService,
         ICartService     cartService,
@@ -35,9 +34,6 @@ public sealed class WishlistController : Controller
     // GET /Wishlist
     // =========================================================================
 
-    /// <summary>
-    /// Renders the full wishlist page with all saved products.
-    /// </summary>
     [HttpGet]
     public async Task<IActionResult> ViewWishlist(CancellationToken cancellationToken)
     {
@@ -47,7 +43,7 @@ public sealed class WishlistController : Controller
                 await _wishlistService.GetWishlistAsync(GetCurrentUserId(), cancellationToken);
 
             ViewData["Title"] = "My Wishlist";
-            return View("Wishlist", vm);
+            return View("~/Views/Customer/Wishlist.cshtml", vm);
         }
         catch (Exception ex)
         {
@@ -61,12 +57,6 @@ public sealed class WishlistController : Controller
     // AJAX POST /Wishlist/Toggle
     // =========================================================================
 
-    /// <summary>
-    /// Toggles a product in or out of the user's wishlist.
-    /// Returns JSON with the new <c>isInWishlist</c> state.
-    /// Called by <c>product-catalog.js</c> for both catalog cards
-    /// and the product detail page.
-    /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Toggle(
@@ -97,11 +87,6 @@ public sealed class WishlistController : Controller
     // AJAX POST /Wishlist/Remove
     // =========================================================================
 
-    /// <summary>
-    /// Removes a product from the wishlist.
-    /// Used by the Remove button on the Wishlist page.
-    /// Returns JSON for the AJAX call in <c>wishlist.js</c>.
-    /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Remove(
@@ -128,10 +113,6 @@ public sealed class WishlistController : Controller
     // AJAX POST /Wishlist/MoveToCart
     // =========================================================================
 
-    /// <summary>
-    /// Moves a wishlisted product directly into the cart, then removes
-    /// it from the wishlist. The default variant and quantity 1 are used.
-    /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> MoveToCart(
@@ -148,7 +129,6 @@ public sealed class WishlistController : Controller
             if (!cartResult.IsSuccess)
                 return Json(ApiResponse.Fail(cartResult.Error!));
 
-            // Remove from wishlist after successfully adding to cart
             await _wishlistService.RemoveAsync(userId, productId, cancellationToken);
 
             int cartCount = await _cartService.GetCartCountAsync(userId, null, cancellationToken);

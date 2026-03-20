@@ -26,7 +26,15 @@ public sealed class OrderViewModel
     public PickupOrder? PickupOrder { get; set; }
     public IReadOnlyList<Payment>   Payments   { get; set; } = [];
     public IReadOnlyList<Delivery>  Deliveries { get; set; } = [];
-    public bool IsCancellable       { get; set; }
+    public bool IsCancellable          { get; set; }
+
+    /// <summary>
+    /// True when the customer can confirm receipt of this order.
+    /// Only set for delivery orders (not pickup, not walk-in) in
+    /// <c>Shipped</c> status. Drives the "Confirm Delivery" button on the
+    /// order detail page. Flowchart: Part 6 — D26.
+    /// </summary>
+    public bool IsDeliveryConfirmable  { get; set; }
 
     // Computed
     public decimal GrandTotal =>

@@ -1,0 +1,120 @@
+@* WebApplication/Views/Customer/Reviews.cshtml *@
+@* Customer's own review history + pending reviews *@
+@{
+    ViewData["Title"] = "My Reviews";
+    var submitted = ViewBag.Submitted as IReadOnlyList<WebApplication.Models.ViewModels.ReviewViewModel>
+        ?? new List<WebApplication.Models.ViewModels.ReviewViewModel>();
+    var pending   = ViewBag.Pending   as IReadOnlyList<WebApplication.Models.ViewModels.ReviewViewModel>
+        ?? new List<WebApplication.Models.ViewModels.ReviewViewModel>();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/review.css" asp-append-version="true" />
+}
+
+<div class="tbs-reviews-page">
+    <div class="container">
+
+        <div class="tbs-page-header">
+            <h1 class="tbs-page-header__title">My Reviews</h1>
+        </div>
+
+        @* =================== PENDING REVIEWS =================== *@
+        @if (pending.Any())
+        {
+            <section class="tbs-reviews-section">
+                <h2 class="tbs-reviews-section__title">
+                    Awaiting Your Review
+                    <span class="tbs-reviews-section__count">@pending.Count</span>
+                </h2>
+                <p class="tbs-reviews-section__subtitle">
+                    You've received these products — share your experience!
+                </p>
+                <div class="tbs-pending-reviews">
+                    @foreach (var item in pending)
+                    {
+                        <div class="tbs-pending-review-card">
+                            <div class="tbs-pending-review-card__info">
+                                <span class="tbs-pending-review-card__name">
+                                    @item.ProductName
+                                </span>
+                                <span class="tbs-pending-review-card__badge">
+                                    ✓ Verified Purchase
+                                </span>
+                            </div>
+                            <a asp-controller="Product"
+                               asp-action="Detail"
+                               asp-route-id="@item.ProductId"
+                               asp-fragment="reviews-section"
+                               class="btn tbs-btn-accent tbs-pending-review-card__btn">
+                                Write Review
+                            </a>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+
+        @* =================== SUBMITTED REVIEWS =================== *@
+        <section class="tbs-reviews-section">
+            <h2 class="tbs-reviews-section__title">
+                Reviews I've Written
+                @if (submitted.Any())
+                {
+                    <span class="tbs-reviews-section__count">@submitted.Count</span>
+                }
+            </h2>
+
+            @if (!submitted.Any())
+            {
+                <div class="tbs-reviews-empty">
+                    <p>You haven't written any reviews yet.</p>
+                    @if (!pending.Any())
+                    {
+                        <p class="tbs-reviews-empty__hint">
+                            Reviews become available after your orders are delivered.
+                        </p>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="tbs-submitted-reviews">
+                    @foreach (var review in submitted)
+                    {
+                        <div class="tbs-submitted-review-card">
+                            <div class="tbs-submitted-review-card__header">
+                                <a asp-controller="Product"
+                                   asp-action="Detail"
+                                   asp-route-id="@review.ProductId"
+                                   class="tbs-submitted-review-card__product">
+                                    @review.ProductName
+                                </a>
+                                <span class="tbs-submitted-review-card__date">
+                                    @review.CreatedAt
+                                </span>
+                            </div>
+                            <div class="tbs-stars tbs-stars--sm"
+                                 aria-label="@review.Rating out of 5">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span class="tbs-star @(i <= review.Rating ? "tbs-star--filled" : "")">★</span>
+                                }
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(review.Comment))
+                            {
+                                <p class="tbs-submitted-review-card__comment">
+                                    @review.Comment
+                                </p>
+                            }
+                            <span class="tbs-submitted-review-card__verified">
+                                ✓ Verified Purchase
+                            </span>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+
+    </div>
+</div>

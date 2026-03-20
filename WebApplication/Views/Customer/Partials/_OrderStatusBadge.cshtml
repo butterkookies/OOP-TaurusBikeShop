@@ -1,0 +1,24 @@
+@* WebApplication/Views/Customer/Partials/_OrderStatusBadge.cshtml *@
+@model string
+@{
+    string css = Model switch
+    {
+        "Pending"             => "tbs-badge--pending",
+        "PendingVerification" => "tbs-badge--pending",
+        "OnHold"              => "tbs-badge--onhold",
+        "Processing"          => "tbs-badge--processing",
+        "ReadyForPickup"      => "tbs-badge--pickup",
+        "PickedUp"            => "tbs-badge--pickup",
+        "Shipped"             => "tbs-badge--shipped",
+        "Delivered"           => "tbs-badge--delivered",
+        "Cancelled"           => "tbs-badge--cancelled",
+        _                     => "tbs-badge--pending"
+    };
+    string label = Model switch
+    {
+        "PendingVerification" => "Pending Verification",
+        "ReadyForPickup"      => "Ready for Pickup",
+        _                     => Model
+    };
+}
+<span class="tbs-badge @css" aria-label="Order status: @label">@label</span>

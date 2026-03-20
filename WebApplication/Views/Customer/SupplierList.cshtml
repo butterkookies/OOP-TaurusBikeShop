@@ -1,0 +1,88 @@
+@* WebApplication/Views/Customer/SupplierList.cshtml *@
+@* Admin/Manager role only *@
+@model IReadOnlyList<WebApplication.Models.Entities.Supplier>
+@{
+    ViewData["Title"] = "Suppliers";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/supplier.css" asp-append-version="true" />
+}
+
+<div class="tbs-supplier-page">
+    <div class="container">
+
+        <div class="tbs-page-header">
+            <div>
+                <h1 class="tbs-page-header__title">Suppliers</h1>
+                <p class="tbs-page-header__subtitle">
+                    @Model.Count active supplier@(Model.Count != 1 ? "s" : "")
+                </p>
+            </div>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="tbs-supplier-empty">
+                <p>No active suppliers found.</p>
+            </div>
+        }
+        else
+        {
+            <div class="tbs-supplier-grid">
+                @foreach (WebApplication.Models.Entities.Supplier supplier in Model)
+                {
+                    <div class="tbs-supplier-card">
+                        <div class="tbs-supplier-card__header">
+                            <h3 class="tbs-supplier-card__name">@supplier.Name</h3>
+                            <span class="tbs-badge tbs-badge--delivered">Active</span>
+                        </div>
+
+                        <dl class="tbs-supplier-card__details">
+                            @if (!string.IsNullOrWhiteSpace(supplier.ContactPerson))
+                            {
+                                <div class="tbs-supplier-card__detail">
+                                    <dt>Contact</dt>
+                                    <dd>@supplier.ContactPerson</dd>
+                                </div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(supplier.Email))
+                            {
+                                <div class="tbs-supplier-card__detail">
+                                    <dt>Email</dt>
+                                    <dd>
+                                        <a href="mailto:@supplier.Email">@supplier.Email</a>
+                                    </dd>
+                                </div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(supplier.Phone))
+                            {
+                                <div class="tbs-supplier-card__detail">
+                                    <dt>Phone</dt>
+                                    <dd>@supplier.Phone</dd>
+                                </div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(supplier.Address))
+                            {
+                                <div class="tbs-supplier-card__detail">
+                                    <dt>Address</dt>
+                                    <dd>@supplier.Address</dd>
+                                </div>
+                            }
+                        </dl>
+
+                        <div class="tbs-supplier-card__footer">
+                            <a asp-controller="Supplier"
+                               asp-action="PurchaseOrders"
+                               asp-route-supplierId="@supplier.SupplierId"
+                               class="btn tbs-btn-outline tbs-supplier-card__btn">
+                                View Purchase Orders
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+    </div>
+</div>

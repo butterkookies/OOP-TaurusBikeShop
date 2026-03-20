@@ -24,7 +24,6 @@ public sealed class CartController : Controller
 
     private const string GuestSessionCookieName = "tbs_guest";
 
-    /// <inheritdoc/>
     public CartController(
         ICartService cartService,
         AppDbContext context,
@@ -39,9 +38,6 @@ public sealed class CartController : Controller
     // GET /Cart — full cart page
     // =========================================================================
 
-    /// <summary>
-    /// Renders the full cart page. Accessible to authenticated and guest users.
-    /// </summary>
     [HttpGet]
     public async Task<IActionResult> ViewCart(CancellationToken cancellationToken)
     {
@@ -50,7 +46,7 @@ public sealed class CartController : Controller
             (int? userId, int? guestId) = GetCartOwner();
             CartViewModel vm = await _cartService.GetCartAsync(userId, guestId, cancellationToken);
             ViewData["Title"] = "Shopping Cart";
-            return View("Cart", vm);
+            return View("~/Views/Customer/Cart.cshtml", vm);
         }
         catch (Exception ex)
         {
@@ -64,9 +60,6 @@ public sealed class CartController : Controller
     // AJAX POST /Cart/AddToCart
     // =========================================================================
 
-    /// <summary>
-    /// Adds a product/variant to the cart. Returns JSON with updated cart count.
-    /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddToCart(
@@ -77,8 +70,8 @@ public sealed class CartController : Controller
     {
         try
         {
-            int? userId   = GetCurrentUserId();
-            int? guestId  = userId.HasValue ? null : await EnsureGuestSessionAsync(cancellationToken);
+            int? userId  = GetCurrentUserId();
+            int? guestId = userId.HasValue ? null : await EnsureGuestSessionAsync(cancellationToken);
 
             ServiceResult result = await _cartService.AddItemAsync(
                 userId, guestId, productId, variantId, qty, cancellationToken);
@@ -100,9 +93,6 @@ public sealed class CartController : Controller
     // AJAX POST /Cart/UpdateQuantity
     // =========================================================================
 
-    /// <summary>
-    /// Updates a cart item's quantity. Returns updated line total and subtotal.
-    /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateQuantity(
@@ -142,9 +132,6 @@ public sealed class CartController : Controller
     // AJAX POST /Cart/RemoveFromCart
     // =========================================================================
 
-    /// <summary>
-    /// Removes a cart item. Returns updated subtotal and cart count.
-    /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RemoveFromCart(
@@ -181,10 +168,6 @@ public sealed class CartController : Controller
     // AJAX GET /Cart/GetCartCount
     // =========================================================================
 
-    /// <summary>
-    /// Returns the total item count for the navbar cart badge.
-    /// Called by <c>site.js</c> on every page load.
-    /// </summary>
     [HttpGet]
     public async Task<IActionResult> GetCartCount(CancellationToken cancellationToken)
     {
@@ -216,10 +199,6 @@ public sealed class CartController : Controller
         return int.TryParse(cookie, out int id) ? id : null;
     }
 
-    /// <summary>
-    /// Returns (userId, guestSessionId) for the current request.
-    /// Authenticated users always use userId; guests use guestSessionId.
-    /// </summary>
     private (int? UserId, int? GuestSessionId) GetCartOwner()
     {
         int? userId = GetCurrentUserId();
@@ -228,10 +207,6 @@ public sealed class CartController : Controller
             : (null, GetGuestSessionId());
     }
 
-    /// <summary>
-    /// Returns an existing guest session ID from the cookie, or creates a new
-    /// <see cref="GuestSession"/> row and sets the cookie for new guest visitors.
-    /// </summary>
     private async Task<int?> EnsureGuestSessionAsync(CancellationToken cancellationToken)
     {
         int? existing = GetGuestSessionId();

@@ -150,8 +150,9 @@ public sealed class CustomerController : Controller
     }
 
     /// <summary>
-    /// POST /Customer/ResendOTP — resends a fresh OTP to the given email.
-    /// Returns JSON for the AJAX call in _OTPModal.cshtml.
+    /// POST /Customer/ResendOTP — resends a fresh OTP to the given email
+    /// (and via SMS if the phone number can be recovered from the stored
+    /// registration session). Returns JSON for the AJAX call in _OTPModal.cshtml.
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -161,9 +162,21 @@ public sealed class CustomerController : Controller
     {
         try
         {
-            ServiceResult result = await _userService.ResendOTPAsync(email, cancellationToken);
+            // Recover the phone number from the stored registration ViewModel so
+            // the SMS OTP is also resent. Peek() reads TempData without consuming
+            // it, keeping the ViewModel available for subsequent VerifyOTP and
+            // ResendOTP calls in the same registration session.
+            string? phone = null;
+            if (TempData.Peek(TempDataRegisterVm) is string serialisedVm)
+            {
+                RegisterViewModel? storedVm =
+                    System.Text.Json.JsonSerializer.Deserialize<RegisterViewModel>(serialisedVm);
+                phone = storedVm?.PhoneNumber;
+            }
+
+            ServiceResult result = await _userService.ResendOTPAsync(email, phone, cancellationToken);
             return Json(result.IsSuccess
-                ? ApiResponse.Ok(message: "A new code has been sent to your email.")
+                ? ApiResponse.Ok(message: "A new code has been sent to your email and phone.")
                 : ApiResponse.Fail(result.Error!));
         }
         catch (Exception ex)

@@ -1,12 +1,13 @@
 @* WebApplication/Views/Customer/Dashboard.cshtml *@
+@model WebApplication.Models.ViewModels.DashboardViewModel
 @{
     ViewData["Title"] = "My Dashboard";
-    string customerName = ViewBag.CustomerName ?? "Customer";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/customer.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/customer.css"  asp-append-version="true" />
     <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/order.css"     asp-append-version="true" />
 }
 
 <div class="tbs-customer-page">
@@ -15,79 +16,192 @@
         @* Page header *@
         <div class="tbs-page-header">
             <div>
-                <h1 class="tbs-page-header__title">Welcome back, @customerName.Split(' ')[0]</h1>
-                <p class="tbs-page-header__subtitle">Here's what's happening with your account</p>
+                <h1 class="tbs-page-header__title">
+                    Welcome back, @Model.FirstName
+                </h1>
+                <p class="tbs-page-header__subtitle">
+                    Here's what's happening with your account
+                </p>
             </div>
         </div>
 
-        @* Quick stat cards *@
+        @* ==================== STAT CARDS ==================== *@
         <div class="row g-3 tbs-dashboard__stats">
+
             <div class="col-6 col-md-3">
-                <a asp-controller="Order" asp-action="History" class="tbs-stat-card">
+                <a asp-controller="Order" asp-action="History"
+                   class="tbs-stat-card">
                     <div class="tbs-stat-card__icon" aria-hidden="true">📦</div>
                     <div class="tbs-stat-card__body">
-                        <div class="tbs-stat-card__label">My Orders</div>
-                        <div class="tbs-stat-card__hint">View history</div>
+                        <div class="tbs-stat-card__number">@Model.TotalOrders</div>
+                        <div class="tbs-stat-card__label">Total Orders</div>
+                        @if (Model.ActiveOrders > 0)
+                        {
+                            <div class="tbs-stat-card__hint">
+                                @Model.ActiveOrders active
+                            </div>
+                        }
                     </div>
                     <div class="tbs-stat-card__arrow" aria-hidden="true">›</div>
                 </a>
             </div>
+
             <div class="col-6 col-md-3">
-                <a asp-controller="Wishlist" asp-action="ViewWishlist" class="tbs-stat-card">
+                <a asp-controller="Wishlist" asp-action="ViewWishlist"
+                   class="tbs-stat-card">
                     <div class="tbs-stat-card__icon" aria-hidden="true">❤️</div>
                     <div class="tbs-stat-card__body">
+                        <div class="tbs-stat-card__number">@Model.WishlistCount</div>
                         <div class="tbs-stat-card__label">Wishlist</div>
                         <div class="tbs-stat-card__hint">Saved items</div>
                     </div>
                     <div class="tbs-stat-card__arrow" aria-hidden="true">›</div>
                 </a>
             </div>
+
             <div class="col-6 col-md-3">
-                <a asp-controller="Customer" asp-action="Profile" class="tbs-stat-card">
-                    <div class="tbs-stat-card__icon" aria-hidden="true">👤</div>
+                <a asp-controller="Review" asp-action="MyReviews"
+                   class="tbs-stat-card @(Model.HasPendingReviews ? "tbs-stat-card--highlight" : "")">
+                    <div class="tbs-stat-card__icon" aria-hidden="true">⭐</div>
                     <div class="tbs-stat-card__body">
-                        <div class="tbs-stat-card__label">Profile</div>
-                        <div class="tbs-stat-card__hint">Settings &amp; addresses</div>
+                        <div class="tbs-stat-card__number">@Model.PendingReviewCount</div>
+                        <div class="tbs-stat-card__label">Pending Reviews</div>
+                        <div class="tbs-stat-card__hint">
+                            @(Model.HasPendingReviews ? "Ready to review" : "All caught up")
+                        </div>
                     </div>
                     <div class="tbs-stat-card__arrow" aria-hidden="true">›</div>
                 </a>
             </div>
+
             <div class="col-6 col-md-3">
-                <a asp-controller="Support" asp-action="Create" class="tbs-stat-card">
+                <a asp-controller="Support" asp-action="Index"
+                   class="tbs-stat-card @(Model.HasOpenTickets ? "tbs-stat-card--highlight" : "")">
                     <div class="tbs-stat-card__icon" aria-hidden="true">💬</div>
                     <div class="tbs-stat-card__body">
-                        <div class="tbs-stat-card__label">Support</div>
-                        <div class="tbs-stat-card__hint">Get help</div>
+                        <div class="tbs-stat-card__number">@Model.OpenTicketCount</div>
+                        <div class="tbs-stat-card__label">Open Tickets</div>
+                        <div class="tbs-stat-card__hint">
+                            @(Model.HasOpenTickets ? "Awaiting response" : "No open issues")
+                        </div>
                     </div>
                     <div class="tbs-stat-card__arrow" aria-hidden="true">›</div>
                 </a>
             </div>
+
         </div>
 
-        @* Recent orders placeholder — fully wired in Step 21 *@
+        @* ==================== PENDING REVIEWS PROMPT ==================== *@
+        @if (Model.HasPendingReviews)
+        {
+            <div class="tbs-dashboard__review-prompt">
+                <div class="tbs-dashboard__review-prompt-text">
+                    <span aria-hidden="true">⭐</span>
+                    You have <strong>@Model.PendingReviewCount</strong>
+                    product@(Model.PendingReviewCount != 1 ? "s" : "") to review
+                </div>
+                <div class="tbs-dashboard__review-prompt-items">
+                    @foreach (WebApplication.Models.ViewModels.ReviewViewModel item
+                        in Model.PendingReviews)
+                    {
+                        <a asp-controller="Product"
+                           asp-action="Detail"
+                           asp-route-id="@item.ProductId"
+                           asp-fragment="reviews-section"
+                           class="tbs-dashboard__review-item">
+                            @item.ProductName
+                        </a>
+                    }
+                    @if (Model.PendingReviewCount > 3)
+                    {
+                        <a asp-controller="Review" asp-action="MyReviews"
+                           class="tbs-dashboard__review-item tbs-dashboard__review-item--more">
+                            +@(Model.PendingReviewCount - 3) more →
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+
+        @* ==================== RECENT ORDERS ==================== *@
         <div class="tbs-dashboard__section">
             <div class="tbs-section-header">
                 <h2 class="tbs-section-title">Recent Orders</h2>
-                <a asp-controller="Order" asp-action="History" class="tbs-section-link">
+                <a asp-controller="Order" asp-action="History"
+                   class="tbs-section-link">
                     View all &rarr;
                 </a>
             </div>
-            <div class="tbs-card tbs-dashboard__empty-orders" id="recent-orders-panel">
-                <p class="tbs-dashboard__empty-text">
-                    You have no recent orders.
-                    <a asp-controller="Product" asp-action="List">Start shopping →</a>
-                </p>
-            </div>
+
+            @if (Model.HasNoOrders)
+            {
+                <div class="tbs-card tbs-dashboard__empty-orders">
+                    <p class="tbs-dashboard__empty-text">
+                        You haven't placed any orders yet.
+                        <a asp-controller="Product" asp-action="List">
+                            Start shopping →
+                        </a>
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="tbs-order-history__list">
+                    @foreach (WebApplication.Models.ViewModels.OrderViewModel order
+                        in Model.RecentOrders)
+                    {
+                        <a asp-controller="Order"
+                           asp-action="Detail"
+                           asp-route-orderId="@order.OrderId"
+                           class="tbs-order-row">
+
+                            <div class="tbs-order-row__number">
+                                <span class="tbs-order-row__label">Order</span>
+                                <span class="tbs-order-row__value">@order.OrderNumber</span>
+                            </div>
+
+                            <div class="tbs-order-row__date">
+                                <span class="tbs-order-row__label">Date</span>
+                                <span class="tbs-order-row__value">
+                                    @order.OrderDate.ToString("MMM d, yyyy")
+                                </span>
+                            </div>
+
+                            <div class="tbs-order-row__items">
+                                <span class="tbs-order-row__label">Items</span>
+                                <span class="tbs-order-row__value">
+                                    @order.ItemCount item@(order.ItemCount != 1 ? "s" : "")
+                                </span>
+                            </div>
+
+                            <div class="tbs-order-row__status">
+                                @await Html.PartialAsync(
+                                    "~/Views/Customer/Partials/_OrderStatusBadge.cshtml",
+                                    order.OrderStatus)
+                            </div>
+
+                            <div class="tbs-order-row__total">
+                                <span class="tbs-order-row__label">Total</span>
+                                <span class="tbs-order-row__value tbs-order-row__value--total">
+                                    @order.FormattedGrandTotal
+                                </span>
+                            </div>
+
+                            <div class="tbs-order-row__arrow" aria-hidden="true">›</div>
+                        </a>
+                    }
+                </div>
+            }
         </div>
 
-        @* Quick shop CTA *@
+        @* ==================== QUICK ACTIONS ==================== *@
         <div class="tbs-dashboard__cta">
-            <a asp-controller="Product" asp-action="List" class="btn tbs-btn-accent">
-                Browse Catalog
-            </a>
-            <a asp-controller="Cart" asp-action="ViewCart" class="btn tbs-btn-outline">
-                View Cart
-            </a>
+            <a asp-controller="Product" asp-action="List"
+               class="btn tbs-btn-accent">Browse Catalog</a>
+            <a asp-controller="Cart"    asp-action="ViewCart"
+               class="btn tbs-btn-outline">View Cart</a>
+            <a asp-controller="Support" asp-action="Create"
+               class="btn tbs-btn-outline">Get Support</a>
         </div>
 
     </div>

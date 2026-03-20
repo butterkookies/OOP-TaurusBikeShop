@@ -1,0 +1,59 @@
+@* WebApplication/Views/Customer/Partials/_ReviewForm.cshtml *@
+@* Model: ReviewViewModel — ProductId and OrderId must be pre-populated *@
+@model WebApplication.Models.ViewModels.ReviewViewModel
+
+<div class="tbs-review-form">
+    <h3 class="tbs-review-form__title">Write a Review</h3>
+
+    <form asp-action="Submit" asp-controller="Review"
+          method="post" id="review-form" novalidate>
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ProductId" />
+        <input type="hidden" asp-for="OrderId" />
+
+        @* Star rating picker *@
+        <div class="tbs-form-group">
+            <label class="tbs-label">Your Rating</label>
+            <div class="tbs-star-picker" role="radiogroup" aria-label="Select rating">
+                @for (int i = 5; i >= 1; i--)
+                {
+                    <input type="radio"
+                           name="Rating"
+                           id="star-@i"
+                           value="@i"
+                           class="tbs-star-picker__input"
+                           @(Model.Rating == i ? "checked" : "")
+                           required />
+                    <label for="star-@i"
+                           class="tbs-star-picker__label"
+                           title="@i star@(i != 1 ? "s" : "")"
+                           aria-label="@i star@(i != 1 ? "s" : "")">
+                        ★
+                    </label>
+                }
+            </div>
+            <span asp-validation-for="Rating" class="tbs-field-error"></span>
+        </div>
+
+        @* Comment *@
+        <div class="tbs-form-group">
+            <label asp-for="Comment" class="tbs-label">
+                Your Review
+                <span class="tbs-label__optional">(optional, min 10 characters)</span>
+            </label>
+            <textarea asp-for="Comment"
+                      class="tbs-input tbs-review-form__textarea"
+                      rows="4"
+                      placeholder="Share your experience with this product…"
+                      maxlength="1000"></textarea>
+            <div class="tbs-review-form__char-count">
+                <span id="review-char-count">0</span> / 1000
+            </div>
+            <span asp-validation-for="Comment" class="tbs-field-error"></span>
+        </div>
+
+        <button type="submit" class="btn tbs-btn-accent">
+            Submit Review
+        </button>
+    </form>
+</div>

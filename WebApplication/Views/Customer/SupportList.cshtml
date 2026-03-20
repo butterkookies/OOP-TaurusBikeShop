@@ -1,0 +1,57 @@
+@* WebApplication/Views/Customer/SupportList.cshtml *@
+@model IReadOnlyList<WebApplication.Models.ViewModels.SupportTicketViewModel>
+@{
+    ViewData["Title"] = "Support Tickets";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/support.css" asp-append-version="true" />
+}
+
+<div class="tbs-support-page">
+    <div class="container">
+
+        <div class="tbs-page-header">
+            <div>
+                <h1 class="tbs-page-header__title">Support Tickets</h1>
+                @if (Model.Any())
+                {
+                    <p class="tbs-page-header__subtitle">
+                        @Model.Count ticket@(Model.Count != 1 ? "s" : "")
+                    </p>
+                }
+            </div>
+            <a asp-controller="Support" asp-action="Create"
+               class="btn tbs-btn-accent">
+                + New Ticket
+            </a>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="tbs-support-list__empty">
+                <div class="tbs-support-list__empty-icon" aria-hidden="true">💬</div>
+                <h2>No support tickets</h2>
+                <p>
+                    Have a question or issue? Our team is happy to help.
+                </p>
+                <a asp-controller="Support" asp-action="Create"
+                   class="btn tbs-btn-accent">
+                    Open a Ticket
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="tbs-support-list">
+                @foreach (WebApplication.Models.ViewModels.SupportTicketViewModel ticket in Model)
+                {
+                    @await Html.PartialAsync(
+                        "~/Views/Customer/Partials/_SupportTicketCard.cshtml",
+                        ticket)
+                }
+            </div>
+        }
+
+    </div>
+</div>

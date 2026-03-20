@@ -1,0 +1,103 @@
+@* WebApplication/Views/Customer/SupportCreate.cshtml *@
+@model WebApplication.Models.ViewModels.SupportCreateViewModel
+@using WebApplication.Models.Entities
+@{
+    ViewData["Title"] = "New Support Ticket";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/support.css" asp-append-version="true" />
+}
+
+<div class="tbs-support-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-9 col-lg-7">
+
+                <ol class="tbs-breadcrumb">
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-controller="Support" asp-action="Index">Support</a></li>
+                    <li>New Ticket</li>
+                </ol>
+
+                <div class="tbs-page-header">
+                    <h1 class="tbs-page-header__title">New Support Ticket</h1>
+                    <p class="tbs-page-header__subtitle">
+                        Describe your issue and our team will respond shortly.
+                    </p>
+                </div>
+
+                <div class="tbs-card">
+                    <form asp-action="Create" asp-controller="Support"
+                          method="post" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="OrderId" />
+
+                        @if (Model.OrderId.HasValue)
+                        {
+                            <div class="tbs-support-create__order-ref">
+                                <span class="tbs-support-create__order-icon"
+                                      aria-hidden="true">📦</span>
+                                Regarding Order #@Model.OrderId
+                            </div>
+                        }
+
+                        <div class="tbs-form-group">
+                            <label asp-for="Category" class="tbs-label">Category</label>
+                            <select asp-for="Category" class="tbs-input tbs-select" required>
+                                <option value="">— Select a category —</option>
+                                <option value="@TicketCategories.DamagedItem">Damaged Item</option>
+                                <option value="@TicketCategories.WrongItem">Wrong Item Received</option>
+                                <option value="@TicketCategories.DeliveryIssue">Delivery Issue</option>
+                                <option value="@TicketCategories.PaymentIssue">Payment Issue</option>
+                                <option value="@TicketCategories.ProductInquiry">Product Inquiry</option>
+                                <option value="@TicketCategories.ReturnRefund">Return / Refund</option>
+                                <option value="@TicketCategories.General">General</option>
+                            </select>
+                            <span asp-validation-for="Category" class="tbs-field-error"></span>
+                        </div>
+
+                        <div class="tbs-form-group">
+                            <label asp-for="Subject" class="tbs-label">Subject</label>
+                            <input asp-for="Subject"
+                                   class="tbs-input"
+                                   placeholder="Brief summary of your issue"
+                                   maxlength="200" />
+                            <span asp-validation-for="Subject" class="tbs-field-error"></span>
+                        </div>
+
+                        <div class="tbs-form-group">
+                            <label asp-for="Message" class="tbs-label">Message</label>
+                            <textarea asp-for="Message"
+                                      class="tbs-input tbs-support-create__textarea"
+                                      rows="6"
+                                      placeholder="Describe your issue in detail. Include order numbers, product names, or any relevant information."
+                                      maxlength="2000"></textarea>
+                            <div class="tbs-support-create__char-count">
+                                <span id="msg-char-count">0</span> / 2000
+                            </div>
+                            <span asp-validation-for="Message" class="tbs-field-error"></span>
+                        </div>
+
+                        <div class="tbs-support-create__actions">
+                            <button type="submit" class="btn tbs-btn-accent">
+                                Submit Ticket
+                            </button>
+                            <a asp-controller="Support" asp-action="Index"
+                               class="btn tbs-btn-outline">
+                                Cancel
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="~/js/support.js" asp-append-version="true"></script>
+}
