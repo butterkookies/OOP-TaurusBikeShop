@@ -30,6 +30,14 @@
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
     --nav-h: 72px;
+
+    /* ---- GLASSMORPHISM TOKENS ---- */
+    --glass-bg:         rgba(22, 22, 22, 0.55);
+    --glass-bg-red:     rgba(26, 5, 5, 0.65);
+    --glass-bg-hover:   rgba(28, 8, 8, 0.72);
+    --glass-border:     rgba(255, 255, 255, 0.07);
+    --glass-blur:       12px;
+    --glass-shadow:     0 8px 32px rgba(0, 0, 0, 0.55);
 }
 
 /* ---- GOOGLE FONTS ---- */
@@ -628,8 +636,10 @@ textarea:focus,
 /* Category card */
 .cat-card {
     position: relative;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
     border-radius: 6px;
     padding: 40px 32px 36px;
     overflow: hidden;
@@ -652,22 +662,26 @@ textarea:focus,
 
 .cat-card:hover {
     border-color: var(--border-red);
-    background: var(--bg-card-hover);
+    background: var(--glass-bg-hover);
     transform: translateY(-4px);
-    box-shadow: 0 20px 48px #00000050, 0 0 0 1px #E1060020;
+    box-shadow: var(--glass-shadow), 0 0 0 1px rgba(225, 6, 0, 0.12);
 }
 
 .cat-card--featured {
     border-color: var(--border-red);
-    background: linear-gradient(160deg, #1a0505 0%, var(--bg-card) 60%);
+    background: var(--glass-bg-red);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
 }
 
 .cat-card--featured:hover {
-    box-shadow: 0 20px 48px #E1060025, 0 0 0 1px #E1060040;
+    box-shadow: 0 20px 48px rgba(225, 6, 0, 0.15), 0 0 0 1px rgba(225, 6, 0, 0.30);
 }
 
 .cat-card--all {
-    background: linear-gradient(160deg, #0d0d0d 0%, #161616 100%);
+    background: rgba(13, 13, 13, 0.50);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 /* Badge */
@@ -914,14 +928,16 @@ textarea:focus,
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 2px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--glass-border);
     border-radius: 6px;
     overflow: hidden;
 }
 
 .value-card {
     padding: 48px 32px;
-    background: var(--bg-card);
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-right: 1px solid var(--border);
     transition: background 0.3s;
     position: relative;
@@ -944,7 +960,7 @@ textarea:focus,
 }
 
 .value-card:hover {
-    background: var(--bg-card-hover);
+    background: var(--glass-bg-hover);
 }
 
 .value-card:hover::before {
@@ -1235,4 +1251,110 @@ textarea:focus,
     .cat-card__number {
         font-size: 48px;
     }
+}
+
+/* ============================================================
+   GLASS NAVBAR OVERRIDE — home page dark theme
+   ============================================================ */
+.tbs-header .tbs-navbar {
+    background: rgba(8, 8, 8, 0.82) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ============================================================
+   WHEEL BADGE SVG FIX
+   ============================================================ */
+.wheel-badge__sym {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    font-size: inherit;
+    color: inherit;
+    line-height: 1;
+}
+
+/* ============================================================
+   FEATURED SECTION — PRODUCT CARD DARK GLASS OVERRIDES
+   ============================================================ */
+.featured-section .tbs-product-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+}
+
+.featured-section .tbs-product-card:hover {
+    border-color: var(--border-red);
+    background: var(--glass-bg-hover);
+    box-shadow: var(--glass-shadow), 0 0 0 1px rgba(225, 6, 0, 0.15);
+}
+
+.featured-section .tbs-product-card__img-link {
+    background: rgba(18, 18, 18, 0.85);
+}
+
+.featured-section .tbs-product-card__img-placeholder {
+    background: rgba(18, 18, 18, 0.85);
+    color: var(--border);
+}
+
+.featured-section .tbs-product-card__brand {
+    color: var(--red);
+}
+
+.featured-section .tbs-product-card__name a {
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.featured-section .tbs-product-card__name a:hover {
+    color: var(--red);
+}
+
+.featured-section .tbs-product-card__footer {
+    border-top-color: var(--border);
+}
+
+.featured-section .tbs-product-card__price {
+    color: var(--white);
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+}
+
+.featured-section .tbs-product-card__cart-btn {
+    background: var(--red);
+    border-radius: 3px;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.featured-section .tbs-product-card__cart-btn:hover {
+    background: var(--red-hover);
+    box-shadow: 0 4px 16px var(--red-glow);
+    transform: none;
+}
+
+.featured-section .tbs-product-card__wishlist {
+    background: rgba(22, 22, 22, 0.85);
+    border-color: rgba(255, 255, 255, 0.10);
+    color: rgba(255, 255, 255, 0.40);
+}
+
+.featured-section .tbs-product-card__wishlist:hover,
+.featured-section .tbs-product-card__wishlist--active {
+    color: var(--red);
+    border-color: rgba(225, 6, 0, 0.35);
+    background: rgba(225, 6, 0, 0.10);
+}
+
+.featured-section .tbs-product-card__stock-badge--oos {
+    background: var(--red);
+}
+
+.featured-section .tbs-product-card__stock-badge--low {
+    background: #D97706;
 }
