@@ -422,6 +422,12 @@
     const otpDevHint  = document.getElementById('otpDevHint');
     let   countdown;
 
+    function formatTime(secs) {
+        var m = Math.floor(secs / 60);
+        var s = secs % 60;
+        return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
     function startCountdown(seconds) {
         clearInterval(countdown);
         sendOtpBtn.disabled = true;
@@ -430,18 +436,18 @@
         /* Reveal the OTP boxes the first time an OTP is sent */
         if (otpGroup) otpGroup.classList.add('otp-field-group--visible');
 
-        let remaining = seconds;
-        otpTimer.textContent = 'Resend in ' + remaining + 's';
+        var remaining = seconds;
+        otpTimer.textContent = 'Resend in ' + formatTime(remaining);
 
         countdown = setInterval(function () {
             remaining--;
             if (remaining <= 0) {
                 clearInterval(countdown);
-                otpTimer.textContent    = '';
+                otpTimer.textContent    = 'Code expired.';
                 resendOtp.style.display = 'inline';
                 sendOtpBtn.disabled     = false;
             } else {
-                otpTimer.textContent = 'Resend in ' + remaining + 's';
+                otpTimer.textContent = 'Resend in ' + formatTime(remaining);
             }
         }, 1000);
     }
@@ -475,7 +481,18 @@
                 sendOtpBtn.textContent = 'Send OTP';
                 if (data.success) {
                     startCountdown(60);
-                    if (otpDevHint) otpDevHint.style.display = 'none';
+                    if (otpDevHint) {
+                        if (data.devOtp) {
+                            var msg = data.warning
+                                ? '\u26a0\ufe0f Email failed — Dev OTP: ' + data.devOtp
+                                : '\uD83D\uDC68\u200D\uD83D\uDCBB Dev OTP: ' + data.devOtp;
+                            otpDevHint.textContent = msg;
+                            otpDevHint.style.display = 'block';
+                        } else {
+                            otpDevHint.textContent = '\u2705 OTP sent to ' + emailInput.value.trim();
+                            otpDevHint.style.display = 'block';
+                        }
+                    }
                 } else {
                     sendOtpBtn.disabled = false;
                     alert(data.message || 'Failed to send OTP email. Please try again.');

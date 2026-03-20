@@ -130,6 +130,9 @@ namespace WebApplication.Controllers
             HttpContext.Session.SetString(SessionOtpPhone,  phone);
             HttpContext.Session.SetString(SessionOtpExpiry, expiry);
 
+            var isDev = HttpContext.RequestServices
+                .GetRequiredService<IWebHostEnvironment>().IsDevelopment();
+
             try
             {
                 await _emailService.SendOtpAsync(email.Trim(), otp);
@@ -137,10 +140,17 @@ namespace WebApplication.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "[OTP] Failed to send email to {Email}", email);
-                return Json(new { success = false, message = "Failed to send OTP email. Please try again." });
+                // In dev, still succeed but return OTP so developer can test without email
+                if (isDev)
+                {
+                    _logger.LogWarning("[OTP] Email failed — dev fallback OTP: {Code}", otp);
+                    return Json(new { success = true, devOtp = otp, warning = "Email failed; use dev OTP below." });
+                }
+                return Json(new { success = false, message = "Failed to send OTP email. Check your email address and try again." });
             }
 
-            return Json(new { success = true });
+            // In dev, also expose OTP in the response for quick testing
+            return Json(new { success = true, devOtp = isDev ? otp : null });
         }
 
         // POST /Customer/Register
