@@ -447,7 +447,14 @@
     }
 
     function sendOtp() {
+        const emailInput = document.getElementById('email');
         const phoneInput = document.getElementById('contactNumber');
+
+        if (!emailInput || !emailInput.value.trim()) {
+            emailInput && emailInput.focus();
+            alert('Please enter your email address first.');
+            return;
+        }
         if (!phoneInput || !phoneInput.value.trim()) {
             phoneInput && phoneInput.focus();
             return;
@@ -455,6 +462,7 @@
 
         const token = document.querySelector('input[name="__RequestVerificationToken"]');
         const formData = new FormData();
+        formData.append('email',         emailInput.value.trim());
         formData.append('contactNumber', phoneInput.value.trim());
         if (token) formData.append('__RequestVerificationToken', token.value);
 
@@ -467,13 +475,10 @@
                 sendOtpBtn.textContent = 'Send OTP';
                 if (data.success) {
                     startCountdown(60);
-                    if (data.otp && otpDevHint) {
-                        otpDevHint.textContent = '[Dev] OTP: ' + data.otp;
-                        otpDevHint.style.display = 'block';
-                    }
+                    if (otpDevHint) otpDevHint.style.display = 'none';
                 } else {
                     sendOtpBtn.disabled = false;
-                    alert(data.message || 'Failed to send OTP. Please try again.');
+                    alert(data.message || 'Failed to send OTP email. Please try again.');
                 }
             })
             .catch(function () {

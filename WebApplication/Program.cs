@@ -27,6 +27,7 @@ builder.Services.AddScoped<ICartRepository,    CartRepository>();
 builder.Services.AddScoped<IOrderRepository,   OrderRepository>();
 
 // ── Services ─────────────────────────────────────────────────────────────────
+builder.Services.AddScoped<IEmailService,     EmailService>();
 builder.Services.AddScoped<IUserService,      UserService>();
 builder.Services.AddScoped<IProductService,   ProductService>();
 builder.Services.AddScoped<ICartService,      CartService>();

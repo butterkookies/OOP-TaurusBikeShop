@@ -10,6 +10,7 @@ namespace WebApplication.Controllers
         private readonly IProductService _productService;
         private readonly IOrderService   _orderService;
         private readonly IReviewService  _reviewService;
+        private readonly IEmailService   _emailService;
         private readonly ILogger<CustomerController> _logger;
 
         // Session key for logged-in user ID
@@ -23,12 +24,13 @@ namespace WebApplication.Controllers
 
         public CustomerController(IUserService userService, IProductService productService,
             IOrderService orderService, IReviewService reviewService,
-            ILogger<CustomerController> logger)
+            IEmailService emailService, ILogger<CustomerController> logger)
         {
             _userService    = userService;
             _productService = productService;
             _orderService   = orderService;
             _reviewService  = reviewService;
+            _emailService   = emailService;
             _logger         = logger;
         }
 
@@ -115,12 +117,12 @@ namespace WebApplication.Controllers
         // POST /Customer/SendOtp
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SendOtp([FromForm] string contactNumber)
+        public async Task<IActionResult> SendOtp([FromForm] string email, [FromForm] string contactNumber)
         {
-            if (string.IsNullOrWhiteSpace(contactNumber))
-                return Json(new { success = false, message = "Phone number is required." });
+            if (string.IsNullOrWhiteSpace(email))
+                return Json(new { success = false, message = "Email address is required." });
 
-            var phone  = contactNumber.Trim();
+            var phone  = contactNumber?.Trim() ?? string.Empty;
             var otp    = new Random().Next(100000, 999999).ToString();
             var expiry = DateTime.UtcNow.AddMinutes(5).Ticks.ToString();
 
@@ -128,14 +130,17 @@ namespace WebApplication.Controllers
             HttpContext.Session.SetString(SessionOtpPhone,  phone);
             HttpContext.Session.SetString(SessionOtpExpiry, expiry);
 
-            // In production, integrate an SMS gateway here.
-            // For dev: OTP is returned in the JSON response and logged to the console.
-            _logger.LogInformation("[OTP] Phone={Phone} Code={Code} (expires in 5 min)", phone, otp);
+            try
+            {
+                await _emailService.SendOtpAsync(email.Trim(), otp);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[OTP] Failed to send email to {Email}", email);
+                return Json(new { success = false, message = "Failed to send OTP email. Please try again." });
+            }
 
-            var isDev = HttpContext.RequestServices
-                .GetRequiredService<IWebHostEnvironment>().IsDevelopment();
-
-            return Json(new { success = true, otp = isDev ? otp : (string?)null });
+            return Json(new { success = true });
         }
 
         // POST /Customer/Register
