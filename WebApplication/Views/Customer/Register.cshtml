@@ -1,3 +1,4 @@
+@model WebApplication.Models.ViewModels.RegisterViewModel
 @{
     ViewData["Title"] = "Create Account";
     Layout = null;
@@ -115,6 +116,13 @@
                       class="register-form"
                       novalidate>
                     @Html.AntiForgeryToken()
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="form-error-box" role="alert">
+                            @Html.ValidationSummary(false, null, new { @class = "form-error-list" })
+                        </div>
+                    }
 
                     <!-- ============================================================
                          SECTION 1 — ACCOUNT INFORMATION
@@ -236,6 +244,8 @@
                                             id="resendOtp"
                                             style="display:none">Resend code</button>
                                 </div>
+                                <!-- Dev-only: shows OTP returned from server for testing -->
+                                <div id="otpDevHint" class="otp-dev-hint" style="display:none" aria-live="polite"></div>
                             </div>
 
                         </div>
@@ -409,6 +419,7 @@
     const otpTimer    = document.getElementById('otpTimer');
     const resendOtp   = document.getElementById('resendOtp');
     const otpGroup    = document.getElementById('otpFieldGroup');
+    const otpDevHint  = document.getElementById('otpDevHint');
     let   countdown;
 
     function startCountdown(seconds) {
@@ -435,19 +446,49 @@
         }, 1000);
     }
 
+    function sendOtp() {
+        const phoneInput = document.getElementById('contactNumber');
+        if (!phoneInput || !phoneInput.value.trim()) {
+            phoneInput && phoneInput.focus();
+            return;
+        }
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]');
+        const formData = new FormData();
+        formData.append('contactNumber', phoneInput.value.trim());
+        if (token) formData.append('__RequestVerificationToken', token.value);
+
+        sendOtpBtn.disabled = true;
+        sendOtpBtn.textContent = 'Sending…';
+
+        fetch('/Customer/SendOtp', { method: 'POST', body: formData })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                sendOtpBtn.textContent = 'Send OTP';
+                if (data.success) {
+                    startCountdown(60);
+                    if (data.otp && otpDevHint) {
+                        otpDevHint.textContent = '[Dev] OTP: ' + data.otp;
+                        otpDevHint.style.display = 'block';
+                    }
+                } else {
+                    sendOtpBtn.disabled = false;
+                    alert(data.message || 'Failed to send OTP. Please try again.');
+                }
+            })
+            .catch(function () {
+                sendOtpBtn.textContent = 'Send OTP';
+                sendOtpBtn.disabled = false;
+                alert('Network error. Please try again.');
+            });
+    }
+
     if (sendOtpBtn) {
-        sendOtpBtn.addEventListener('click', function () {
-            const phone = document.getElementById('contactNumber');
-            if (!phone || !phone.value.trim()) {
-                phone && phone.focus();
-                return;
-            }
-            startCountdown(60);
-        });
+        sendOtpBtn.addEventListener('click', sendOtp);
     }
 
     if (resendOtp) {
-        resendOtp.addEventListener('click', function () { startCountdown(60); });
+        resendOtp.addEventListener('click', sendOtp);
     }
 
     /* ── OTP box: auto-advance, backspace, paste ── */

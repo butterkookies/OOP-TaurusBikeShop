@@ -43,6 +43,7 @@ namespace WebApplication.BusinessLogic.Services
                 PhoneNumber = model.ContactNumber,
                 Address     = model.StreetAddress,
                 City        = model.City,
+                Province    = model.Province,
                 PostalCode  = model.PostalCode,
                 IsActive    = true,
                 CreatedAt   = DateTime.UtcNow
