@@ -22,11 +22,3 @@ Here's your ready-to-paste prompt:
 > - This is a one-time migration — confirm when done
 
 ---
-
-**This is a one-shot prompt** — run it once, then discard it. After this:
-
-- `project-context.md` at root → can be deleted or kept as backup
-- `.claude/context.md` → becomes your single source of truth going forward
-- All future updates use **Prompt 2** (the updater) only
-
-Want me to also update the master Word doc to include this migration prompt as a "Step 0 — First Time Setup" section?
