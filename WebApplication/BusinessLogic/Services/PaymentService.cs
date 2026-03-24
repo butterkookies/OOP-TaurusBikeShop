@@ -72,7 +72,7 @@ public sealed class PaymentService : IPaymentService
         try
         {
             // Upload screenshot to GCS
-            string folder = GetGCSFolder("payment-proofs", orderId);
+            string folder = GetGCSFolder(orderId);
             UploadResult upload = await _fileUpload.UploadPaymentProofAsync(
                 screenshot, folder, cancellationToken);
 
@@ -157,7 +157,7 @@ public sealed class PaymentService : IPaymentService
 
         try
         {
-            string folder = GetGCSFolder("payment-proofs", orderId);
+            string folder = GetGCSFolder(orderId);
             UploadResult upload = await _fileUpload.UploadPaymentProofAsync(
                 proofFile, folder, cancellationToken);
 
@@ -294,11 +294,11 @@ public sealed class PaymentService : IPaymentService
         return sub - order.DiscountAmount + order.ShippingFee;
     }
 
-    private string GetGCSFolder(string prefix, int orderId)
+    private string GetGCSFolder(int orderId)
     {
-        string bucket = _config.GetValue<string>(
-            "GoogleCloudStorage:Folders:PaymentProofs") ?? "payment-proofs";
-        return $"{bucket}/order-{orderId}";
+        string folder = _config.GetValue<string>(
+            "GoogleCloudStorage:PaymentProofFolder") ?? "payment-proofs";
+        return $"{folder}/order-{orderId}";
     }
 
     private async Task WriteSystemLogAsync(
