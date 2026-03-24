@@ -14,7 +14,8 @@ A two-application system for a bike shop business built as an OOP school project
 | AdminSystem | WPF .NET 4.8, Dapper | Staff/admin desktop app |
 
 Both apps share one database: **TaurusBikeShopDB** on Google Cloud SQL for SQL Server.
-Server IP: `35.221.161.150,1433`
+Instance: `taurus-bike-shop-sqlserver-2026`
+Server IP: `34.87.100.66,1433`
 
 ---
 

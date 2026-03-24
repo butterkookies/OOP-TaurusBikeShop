@@ -130,7 +130,7 @@ Files completed and pasted into project:
   Auth cookie config, GoogleCloudStorage section with BucketName/folders,
   Logging Warning level for production
 - appsettings.Development.json — real dev connection string
-  (Server=35.221.161.150,1433;Database=TaurusBikeShopDB;User Id=sqlserver;
+  (Server=34.87.100.66,1433;Database=TaurusBikeShopDB;User Id=sqlserver;
   Password=[RESET — new password set by developer];TrustServerCertificate=True;
   MultipleActiveResultSets=True;),
   SecurePolicy=None for local HTTP, EF Core SQL logging at Information level.
