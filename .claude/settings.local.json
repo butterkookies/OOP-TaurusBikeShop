@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" AdminSystem.csproj /p:Configuration=Debug)",
+      "Bash(\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"C:\\\\Users\\\\user\\\\Documents\\\\ANDREI_FILES\\\\PDM_FILES\\\\2ND YEAR\\\\2ND SEM\\\\OOP\\\\OOP-TaurusBikeShop\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem.csproj\" \"/p:Configuration=Debug\")",
+      "Bash(cmd /c '\"\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\"\" \"\"C:\\\\Users\\\\user\\\\Documents\\\\ANDREI_FILES\\\\PDM_FILES\\\\2ND YEAR\\\\2ND SEM\\\\OOP\\\\OOP-TaurusBikeShop\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem.csproj\"\" /p:Configuration=Debug > C:\\\\Users\\\\user\\\\build_output.txt 2>&1')",
+      "Read(//c/Users/user/**)",
+      "Bash(Select-Object -Last 60)",
+      "Bash(powershell -Command \"& ''C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe'' ''C:\\\\Users\\\\user\\\\Documents\\\\ANDREI_FILES\\\\PDM_FILES\\\\2ND YEAR\\\\2ND SEM\\\\OOP\\\\OOP-TaurusBikeShop\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem.csproj'' /p:Configuration=Debug /nologo 2>&1\")",
+      "Bash(where nuget:*)",
+      "Read(//c/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/NuGet/**)",
+      "Bash(powershell -Command \"& ''C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe'' ''C:\\\\Users\\\\user\\\\Documents\\\\ANDREI_FILES\\\\PDM_FILES\\\\2ND YEAR\\\\2ND SEM\\\\OOP\\\\OOP-TaurusBikeShop\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem.csproj'' /t:Restore /p:Configuration=Debug /nologo 2>&1\")",
+      "Bash(powershell -Command \"Invoke-WebRequest -Uri ''https://dist.nuget.org/win-x86-commandline/latest/nuget.exe'' -OutFile ''C:\\\\Users\\\\user\\\\nuget.exe'' -UseBasicParsing; Write-Output ''Downloaded''\")",
+      "Bash(powershell -Command \"& ''C:\\\\Users\\\\user\\\\nuget.exe'' restore ''C:\\\\Users\\\\user\\\\Documents\\\\ANDREI_FILES\\\\PDM_FILES\\\\2ND YEAR\\\\2ND SEM\\\\OOP\\\\OOP-TaurusBikeShop\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem.slnx'' -PackagesDirectory ''C:\\\\Users\\\\user\\\\Documents\\\\ANDREI_FILES\\\\PDM_FILES\\\\2ND YEAR\\\\2ND SEM\\\\OOP\\\\OOP-TaurusBikeShop\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem\\\\packages'' 2>&1\")",
+      "Bash(powershell -Command \"& ''C:\\\\Users\\\\user\\\\nuget.exe'' restore ''C:\\\\Users\\\\user\\\\Documents\\\\ANDREI_FILES\\\\PDM_FILES\\\\2ND YEAR\\\\2ND SEM\\\\OOP\\\\OOP-TaurusBikeShop\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem.csproj'' -PackagesDirectory ''C:\\\\Users\\\\user\\\\Documents\\\\ANDREI_FILES\\\\PDM_FILES\\\\2ND YEAR\\\\2ND SEM\\\\OOP\\\\OOP-TaurusBikeShop\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem\\\\packages'' 2>&1\")",
+      "Bash(Select-String -Pattern \"error|warning|succeeded|failed\" -CaseSensitive:$false)",
+      "Bash(powershell -Command \"Test-NetConnection -ComputerName 35.221.161.150 -Port 1433 -InformationLevel Quiet\")",
+      "Bash(powershell -Command \":*)",
+      "Bash(powershell -Command \"[System.Reflection.Assembly]::ReflectionOnlyLoadFrom\\(''C:\\\\Users\\\\user\\\\.nuget\\\\packages\\\\system.memory\\\\4.5.4\\\\lib\\\\net461\\\\System.Memory.dll''\\).GetName\\(\\) | Select Name, Version\")",
+      "Bash(find C:Usersuser.nugetpackages -name System.Runtime.CompilerServices.Unsafe.dll -path */net461/* -o -name System.Runtime.CompilerServices.Unsafe.dll -path */net45/*)",
+      "Bash(find C:Usersuser.nugetpackages -name System.Buffers.dll -path */net461/*)",
+      "Bash(head -3 find C:Usersuser.nugetpackages -name System.Numerics.Vectors.dll -path */net461/*)",
+      "Bash(BIN=\"C:\\\\Users\\\\user\\\\Documents\\\\ANDREI_FILES\\\\PDM_FILES\\\\2ND YEAR\\\\2ND SEM\\\\OOP\\\\OOP-TaurusBikeShop\\\\AdminSystem\\\\AdminSystem\\\\AdminSystem\\\\bin\\\\Debug\")",
+      "Bash(__NEW_LINE_cba54d1108a41439__ cp:*)",
+      "Bash(cp \"C:\\\\Users\\\\user\\\\.nuget\\\\packages\\\\system.runtime.compilerservices.unsafe\\\\6.0.0\\\\lib\\\\net461\\\\System.Runtime.CompilerServices.Unsafe.dll\" \"$BIN\\\\System.Runtime.CompilerServices.Unsafe.dll\")",
+      "Bash(cp \"C:\\\\Users\\\\user\\\\.nuget\\\\packages\\\\system.numerics.vectors\\\\4.5.0\\\\lib\\\\net46\\\\System.Numerics.Vectors.dll\" \"$BIN\\\\System.Numerics.Vectors.dll\")",
+      "Bash(for f:*)",
+      "Bash(do)",
+      "Bash(sed -i 's/using Microsoft\\\\.Data\\\\.SqlClient;/using System.Data.SqlClient;/g' \"$f\")",
+      "Bash(echo \"Updated: $f\")",
+      "Bash(done)",
+      "Bash(grep -rn \"admin\\\\|password\\\\|Admin123\\\\|Password\\\\|ADMIN_HASH\\\\|taurus\" 'C:\\\\Users\\\\user\\\\Documents\\\\ANDREI_FILES\\\\PDM_FILES\\\\2ND YEAR\\\\2ND SEM\\\\OOP\\\\OOP-TaurusBikeShop' --include=*.sql -i)"
+    ]
+  }
+}
