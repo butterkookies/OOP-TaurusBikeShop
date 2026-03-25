@@ -37,6 +37,7 @@ public interface IProductService
         int page,
         int pageSize,
         IReadOnlyCollection<int> wishlistProductIds,
+        bool featuredOnly = false,
         CancellationToken cancellationToken = default);
 
     /// <summary>

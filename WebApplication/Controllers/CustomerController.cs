@@ -131,10 +131,9 @@ public sealed class CustomerController : Controller
                 TempData[TempDataRegisterVm]    = serialisedVm;
                 TempData[TempDataRegisterEmail] = email;
 
-                RegisterViewModel returnVm = vm;
                 ViewBag.ShowOTPModal = true;
                 ViewBag.OTPEmail     = email;
-                return View("Register", returnVm);
+                return View("Register", vm);
             }
 
             await SignInUserAsync(result.Value!);

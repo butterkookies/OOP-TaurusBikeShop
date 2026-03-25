@@ -42,14 +42,16 @@ public sealed class ProductService : IProductService
         int page,
         int pageSize,
         IReadOnlyCollection<int> wishlistProductIds,
+        bool featuredOnly = false,
         CancellationToken cancellationToken = default)
     {
         IReadOnlyList<Product> products = await _productRepo.GetFilteredAsync(
             categoryId, brandId, minPrice, maxPrice, searchText,
-            page, pageSize, cancellationToken);
+            page, pageSize, featuredOnly, cancellationToken);
 
         int totalCount = await _productRepo.GetFilteredCountAsync(
-            categoryId, brandId, minPrice, maxPrice, searchText, cancellationToken);
+            categoryId, brandId, minPrice, maxPrice, searchText,
+            featuredOnly, cancellationToken);
 
         IReadOnlyList<ProductViewModel> viewModels = products
             .Select(p => MapToViewModel(p, wishlistProductIds))

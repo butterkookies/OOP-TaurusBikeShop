@@ -2,11 +2,8 @@
 
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using WebApplication.BusinessLogic.Interfaces;
-using WebApplication.DataAccess.Context;
 using WebApplication.Models;
-using WebApplication.Models.Entities;
 using WebApplication.Models.ViewModels;
 
 namespace WebApplication.Controllers;
@@ -19,18 +16,15 @@ namespace WebApplication.Controllers;
 public sealed class CartController : Controller
 {
     private readonly ICartService _cartService;
-    private readonly AppDbContext _context;
     private readonly ILogger<CartController> _logger;
 
     private const string GuestSessionCookieName = "tbs_guest";
 
     public CartController(
         ICartService cartService,
-        AppDbContext context,
         ILogger<CartController> logger)
     {
         _cartService = cartService ?? throw new ArgumentNullException(nameof(cartService));
-        _context     = context     ?? throw new ArgumentNullException(nameof(context));
         _logger      = logger      ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -177,8 +171,9 @@ public sealed class CartController : Controller
             int count = await _cartService.GetCartCountAsync(userId, guestId, cancellationToken);
             return Json(ApiResponse.Ok(new { count }));
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "GetCartCount failed; returning 0.");
             return Json(ApiResponse.Ok(new { count = 0 }));
         }
     }
@@ -212,24 +207,17 @@ public sealed class CartController : Controller
         int? existing = GetGuestSessionId();
         if (existing.HasValue) return existing;
 
-        GuestSession session = new()
-        {
-            SessionToken = Guid.NewGuid().ToString("N"),
-            ExpiresAt    = DateTime.UtcNow.AddDays(7),
-            CreatedAt    = DateTime.UtcNow
-        };
+        int guestSessionId = await _cartService.CreateGuestSessionAsync(cancellationToken);
 
-        await _context.GuestSessions.AddAsync(session, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-
-        Response.Cookies.Append(GuestSessionCookieName, session.GuestSessionId.ToString(),
+        Response.Cookies.Append(GuestSessionCookieName, guestSessionId.ToString(),
             new CookieOptions
             {
                 HttpOnly = true,
+                Secure   = true,
                 SameSite = SameSiteMode.Lax,
                 Expires  = DateTimeOffset.UtcNow.AddDays(7)
             });
 
-        return session.GuestSessionId;
+        return guestSessionId;
     }
 }

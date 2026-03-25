@@ -37,17 +37,19 @@ public sealed class WishlistController : Controller
     [HttpGet]
     public async Task<IActionResult> ViewWishlist(CancellationToken cancellationToken)
     {
+        int userId = GetCurrentUserId();
+
         try
         {
             WishlistViewModel vm =
-                await _wishlistService.GetWishlistAsync(GetCurrentUserId(), cancellationToken);
+                await _wishlistService.GetWishlistAsync(userId, cancellationToken);
 
             ViewData["Title"] = "My Wishlist";
             return View("~/Views/Customer/Wishlist.cshtml", vm);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error loading wishlist for user {UserId}.", GetCurrentUserId());
+            _logger.LogError(ex, "Error loading wishlist for user {UserId}.", userId);
             TempData["error"] = "Unable to load wishlist. Please try again.";
             return RedirectToAction("Index", "Home");
         }

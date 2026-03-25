@@ -39,11 +39,12 @@ public sealed class SupportController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
+        int userId = GetCurrentUserId();
+
         try
         {
             IReadOnlyList<SupportTicketViewModel> tickets =
-                await _supportService.GetByUserAsync(
-                    GetCurrentUserId(), cancellationToken);
+                await _supportService.GetByUserAsync(userId, cancellationToken);
 
             ViewData["Title"] = "Support Tickets";
             return View("~/Views/Customer/SupportList.cshtml", tickets);
@@ -51,7 +52,7 @@ public sealed class SupportController : Controller
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading support tickets for user {UserId}.",
-                GetCurrentUserId());
+                userId);
             TempData["error"] = "Unable to load support tickets.";
             return RedirectToAction("Dashboard", "Customer");
         }
