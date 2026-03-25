@@ -39,7 +39,7 @@ public sealed class PaymentController : Controller
     {
         try
         {
-            PaymentViewModel? vm = await _paymentService.GetPaymentViewModelAsync(
+            PaymentDetailDto? vm = await _paymentService.GetPaymentDetailAsync(
                 orderId, GetCurrentUserId(), cancellationToken);
 
             if (vm is null)
@@ -48,7 +48,7 @@ public sealed class PaymentController : Controller
                 return RedirectToAction("History", "Order");
             }
 
-            if (vm.AlreadySubmitted)
+            if (vm.HasExistingPayment)
             {
                 TempData["info"] = "Payment already submitted. Awaiting verification.";
                 return RedirectToAction("Detail", "Order", new { orderId });
@@ -83,7 +83,7 @@ public sealed class PaymentController : Controller
         {
             ServiceResult result = await _paymentService.SubmitGCashPaymentAsync(
                 orderId, GetCurrentUserId(),
-                gcashNumber, referenceNumber,
+                referenceNumber,
                 screenshotFile, cancellationToken);
 
             if (!result.IsSuccess)
@@ -122,7 +122,7 @@ public sealed class PaymentController : Controller
         {
             ServiceResult result = await _paymentService.SubmitBankTransferPaymentAsync(
                 orderId, GetCurrentUserId(),
-                depositorName, bpiReferenceNumber,
+                bpiReferenceNumber ?? string.Empty,
                 depositSlipFile, cancellationToken);
 
             if (!result.IsSuccess)

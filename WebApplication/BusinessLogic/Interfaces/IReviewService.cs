@@ -26,4 +26,14 @@ public interface IReviewService
     Task<ProductReviewsViewModel?> GetProductReviewsPageAsync(
         int productId, int page, int pageSize,
         CancellationToken cancellationToken = default);
+
+    /// <summary>Returns all reviews submitted by a specific user.</summary>
+    Task<IReadOnlyList<ProductReviewViewModel>> GetByUserAsync(
+        int userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Returns products in delivered orders that the user has not yet reviewed.</summary>
+    Task<IReadOnlyList<ReviewViewModel>> GetPendingReviewsAsync(
+        int userId,
+        CancellationToken cancellationToken = default);
 }
