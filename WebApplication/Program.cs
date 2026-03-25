@@ -95,17 +95,47 @@ builder.Services.AddAuthorization();
 // On Google Cloud infrastructure, ADC is resolved automatically.
 // For local development, set GOOGLE_APPLICATION_CREDENTIALS environment variable
 // to point to a service account JSON key file.
-builder.Services.AddSingleton<StorageClient>(_ => StorageClient.Create());
+// If credentials are missing, the app still starts — uploads will fail at runtime
+// with a clear error instead of crashing the entire application on startup.
 
-builder.Services.AddScoped<FileUploadHelper>(provider =>
+StorageClient? gcsClient = null;
+try
 {
-    StorageClient storageClient = provider.GetRequiredService<StorageClient>();
-    string bucketName = builder.Configuration
-        .GetValue<string>("GoogleCloudStorage:BucketName")
-        ?? throw new InvalidOperationException(
-            "GoogleCloudStorage:BucketName is not configured in appsettings.");
-    return new FileUploadHelper(storageClient, bucketName);
-});
+    gcsClient = StorageClient.Create();
+}
+catch (Exception ex) when (builder.Environment.IsDevelopment())
+{
+    // GCS credentials not configured locally — log and continue.
+    // File upload features (payment proofs, support attachments, product images)
+    // will be unavailable until GOOGLE_APPLICATION_CREDENTIALS is set.
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine($"[WARNING] Google Cloud Storage unavailable: {ex.Message}");
+    Console.WriteLine("[WARNING] File upload features will be disabled. Set GOOGLE_APPLICATION_CREDENTIALS to enable.");
+    Console.ResetColor();
+}
+
+if (gcsClient is not null)
+{
+    builder.Services.AddSingleton(gcsClient);
+
+    builder.Services.AddScoped<FileUploadHelper>(provider =>
+    {
+        StorageClient storageClient = provider.GetRequiredService<StorageClient>();
+        string bucketName = builder.Configuration
+            .GetValue<string>("GoogleCloudStorage:BucketName")
+            ?? throw new InvalidOperationException(
+                "GoogleCloudStorage:BucketName is not configured in appsettings.");
+        return new FileUploadHelper(storageClient, bucketName);
+    });
+}
+else
+{
+    // Register a null placeholder so DI doesn't throw when controllers
+    // that depend on FileUploadHelper are resolved. The helper itself is
+    // only called during actual file upload actions.
+    builder.Services.AddScoped<FileUploadHelper>(_ =>
+        null!);
+}
 
 // =============================================================================
 // REPOSITORIES

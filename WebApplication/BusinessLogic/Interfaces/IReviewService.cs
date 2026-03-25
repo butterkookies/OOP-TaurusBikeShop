@@ -19,11 +19,27 @@ public interface IReviewService
         int userId, int productId, int orderId, int rating, string? comment,
         CancellationToken cancellationToken = default);
 
+    Task<ServiceResult> SubmitReviewAsync(
+        int userId, ReviewViewModel vm,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<ReviewItemViewModel>> GetProductReviewsAsync(
         int productId, int page, int pageSize,
         CancellationToken cancellationToken = default);
 
     Task<ProductReviewsViewModel?> GetProductReviewsPageAsync(
+        int productId, int page, int pageSize,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ReviewViewModel>> GetByUserAsync(
+        int userId,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ReviewViewModel>> GetPendingReviewsAsync(
+        int userId,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ReviewViewModel>> GetByProductAsync(
         int productId, int page, int pageSize,
         CancellationToken cancellationToken = default);
 }

@@ -16,14 +16,14 @@ namespace WebApplication.BusinessLogic.Services;
 public sealed class SupportService : ISupportService
 {
     private readonly SupportRepository       _supportRepo;
-    private readonly FileUploadHelper        _fileUpload;
+    private readonly FileUploadHelper?       _fileUpload;
     private readonly ILogger<SupportService> _logger;
 
     public SupportService(
-        SupportRepository supportRepo, FileUploadHelper fileUpload, ILogger<SupportService> logger)
+        SupportRepository supportRepo, FileUploadHelper? fileUpload, ILogger<SupportService> logger)
     {
         _supportRepo = supportRepo ?? throw new ArgumentNullException(nameof(supportRepo));
-        _fileUpload  = fileUpload  ?? throw new ArgumentNullException(nameof(fileUpload));
+        _fileUpload  = fileUpload; // null when GCS credentials are not configured locally
         _logger      = logger      ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -190,6 +190,9 @@ public sealed class SupportService : ISupportService
 
             if (attachment is { Length: > 0 })
             {
+                if (_fileUpload is null)
+                    return ServiceResult<int>.Fail("File uploads are unavailable — Google Cloud Storage credentials are not configured.");
+
                 UploadResult upload = await _fileUpload.UploadSupportAttachmentAsync(
                     attachment, $"support-attachments/user-{userId}", cancellationToken);
                 attachmentUrl    = upload.ImageUrl;

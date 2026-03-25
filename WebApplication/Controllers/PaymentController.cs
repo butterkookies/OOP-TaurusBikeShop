@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication.BusinessLogic.Interfaces;
 using WebApplication.Models;
-using WebApplication.Models.ViewModels;
-
 namespace WebApplication.Controllers;
 
 /// <summary>
@@ -39,7 +37,7 @@ public sealed class PaymentController : Controller
     {
         try
         {
-            PaymentViewModel? vm = await _paymentService.GetPaymentViewModelAsync(
+            PaymentDetailDto? vm = await _paymentService.GetPaymentDetailAsync(
                 orderId, GetCurrentUserId(), cancellationToken);
 
             if (vm is null)
@@ -48,7 +46,7 @@ public sealed class PaymentController : Controller
                 return RedirectToAction("History", "Order");
             }
 
-            if (vm.AlreadySubmitted)
+            if (vm.HasExistingPayment)
             {
                 TempData["info"] = "Payment already submitted. Awaiting verification.";
                 return RedirectToAction("Detail", "Order", new { orderId });
@@ -74,7 +72,6 @@ public sealed class PaymentController : Controller
     [RequestSizeLimit(10 * 1024 * 1024)]
     public async Task<IActionResult> SubmitGCash(
         int orderId,
-        string gcashNumber,
         string referenceNumber,
         IFormFile screenshotFile,
         CancellationToken cancellationToken)
@@ -83,8 +80,7 @@ public sealed class PaymentController : Controller
         {
             ServiceResult result = await _paymentService.SubmitGCashPaymentAsync(
                 orderId, GetCurrentUserId(),
-                gcashNumber, referenceNumber,
-                screenshotFile, cancellationToken);
+                referenceNumber, screenshotFile, cancellationToken);
 
             if (!result.IsSuccess)
             {
@@ -113,8 +109,7 @@ public sealed class PaymentController : Controller
     [RequestSizeLimit(10 * 1024 * 1024)]
     public async Task<IActionResult> SubmitBankTransfer(
         int orderId,
-        string depositorName,
-        string? bpiReferenceNumber,
+        string bpiReferenceNumber,
         IFormFile depositSlipFile,
         CancellationToken cancellationToken)
     {
@@ -122,8 +117,7 @@ public sealed class PaymentController : Controller
         {
             ServiceResult result = await _paymentService.SubmitBankTransferPaymentAsync(
                 orderId, GetCurrentUserId(),
-                depositorName, bpiReferenceNumber,
-                depositSlipFile, cancellationToken);
+                bpiReferenceNumber, depositSlipFile, cancellationToken);
 
             if (!result.IsSuccess)
             {

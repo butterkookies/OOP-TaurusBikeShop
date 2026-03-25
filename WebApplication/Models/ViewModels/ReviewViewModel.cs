@@ -61,6 +61,14 @@ public sealed class ReviewViewModel
 
     /// <summary>Optional review comment text (max 1 000 chars). May be null on POST.</summary>
     public string? Comment { get; set; }
+
+    // ── Display fields for list views (Reviews.cshtml, _ReviewList.cshtml) ──
+
+    /// <summary>Formatted reviewer name for display in review lists.</summary>
+    public string ReviewerName { get; set; } = string.Empty;
+
+    /// <summary>UTC timestamp when the review was submitted. Used in review lists.</summary>
+    public DateTime CreatedAt { get; set; }
 }
 
 /// <summary>

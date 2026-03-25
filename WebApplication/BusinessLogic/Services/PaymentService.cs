@@ -19,7 +19,7 @@ public sealed class PaymentService : IPaymentService
     private readonly AppDbContext          _context;
     private readonly PaymentRepository     _paymentRepo;
     private readonly OrderRepository       _orderRepo;
-    private readonly FileUploadHelper      _fileUpload;
+    private readonly FileUploadHelper?     _fileUpload;
     private readonly INotificationService  _notifications;
     private readonly IConfiguration        _config;
     private readonly ILogger<PaymentService> _logger;
@@ -31,7 +31,7 @@ public sealed class PaymentService : IPaymentService
         AppDbContext         context,
         PaymentRepository    paymentRepo,
         OrderRepository      orderRepo,
-        FileUploadHelper     fileUpload,
+        FileUploadHelper?    fileUpload,
         INotificationService notifications,
         IConfiguration       config,
         ILogger<PaymentService> logger)
@@ -39,7 +39,7 @@ public sealed class PaymentService : IPaymentService
         _context       = context       ?? throw new ArgumentNullException(nameof(context));
         _paymentRepo   = paymentRepo   ?? throw new ArgumentNullException(nameof(paymentRepo));
         _orderRepo     = orderRepo     ?? throw new ArgumentNullException(nameof(orderRepo));
-        _fileUpload    = fileUpload    ?? throw new ArgumentNullException(nameof(fileUpload));
+        _fileUpload    = fileUpload; // null when GCS credentials are not configured locally
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         _config        = config        ?? throw new ArgumentNullException(nameof(config));
         _logger        = logger        ?? throw new ArgumentNullException(nameof(logger));
@@ -72,6 +72,9 @@ public sealed class PaymentService : IPaymentService
         try
         {
             // Upload screenshot to GCS
+            if (_fileUpload is null)
+                return ServiceResult.Fail("File uploads are unavailable — Google Cloud Storage credentials are not configured.");
+
             string folder = GetGCSFolder("payment-proofs", orderId);
             UploadResult upload = await _fileUpload.UploadPaymentProofAsync(
                 screenshot, folder, cancellationToken);
@@ -157,6 +160,9 @@ public sealed class PaymentService : IPaymentService
 
         try
         {
+            if (_fileUpload is null)
+                return ServiceResult.Fail("File uploads are unavailable — Google Cloud Storage credentials are not configured.");
+
             string folder = GetGCSFolder("payment-proofs", orderId);
             UploadResult upload = await _fileUpload.UploadPaymentProofAsync(
                 proofFile, folder, cancellationToken);

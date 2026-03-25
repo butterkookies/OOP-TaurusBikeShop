@@ -19,6 +19,10 @@ namespace WebApplication.Controllers;
 public sealed class CustomerController : Controller
 {
     private readonly IUserService _userService;
+    private readonly IOrderService _orderService;
+    private readonly IWishlistService _wishlistService;
+    private readonly IReviewService _reviewService;
+    private readonly ISupportService _supportService;
     private readonly ILogger<CustomerController> _logger;
 
     private const string TempDataRegisterVm  = "RegisterViewModel";
@@ -27,10 +31,18 @@ public sealed class CustomerController : Controller
     /// <inheritdoc/>
     public CustomerController(
         IUserService userService,
+        IOrderService orderService,
+        IWishlistService wishlistService,
+        IReviewService reviewService,
+        ISupportService supportService,
         ILogger<CustomerController> logger)
     {
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-        _logger      = logger      ?? throw new ArgumentNullException(nameof(logger));
+        _userService     = userService     ?? throw new ArgumentNullException(nameof(userService));
+        _orderService    = orderService    ?? throw new ArgumentNullException(nameof(orderService));
+        _wishlistService = wishlistService ?? throw new ArgumentNullException(nameof(wishlistService));
+        _reviewService   = reviewService   ?? throw new ArgumentNullException(nameof(reviewService));
+        _supportService  = supportService  ?? throw new ArgumentNullException(nameof(supportService));
+        _logger          = logger          ?? throw new ArgumentNullException(nameof(logger));
     }
 
     // =========================================================================
@@ -255,17 +267,49 @@ public sealed class CustomerController : Controller
     /// <summary>
     /// GET /Customer/Dashboard — customer dashboard with recent orders,
     /// wishlist count, and quick links. Requires authentication.
-    /// Full DashboardViewModel is populated in Step 21.
     /// </summary>
     [HttpGet]
     [Authorize]
-    public IActionResult Dashboard()
+    public async Task<IActionResult> Dashboard(CancellationToken cancellationToken)
     {
-        // DashboardViewModel will be fully wired in Step 21.
-        // For now, pass the user's name through ViewBag.
+        int userId = GetCurrentUserId();
+        string firstName = User.Identity?.Name?.Split(' ').FirstOrDefault() ?? "Customer";
+
+        // EF Core DbContext is not thread-safe, so queries must run sequentially.
+        (IReadOnlyList<OrderViewModel> recentOrders, int totalOrders) =
+            await _orderService.GetOrderHistoryAsync(userId, page: 1, pageSize: 5, cancellationToken);
+
+        int wishlistCount =
+            await _wishlistService.GetCountAsync(userId, cancellationToken);
+
+        IReadOnlyList<ReviewViewModel> pendingReviews =
+            await _reviewService.GetPendingReviewsAsync(userId, cancellationToken);
+
+        IReadOnlyList<SupportTicketViewModel> tickets =
+            await _supportService.GetByUserAsync(userId, cancellationToken);
+
+        int activeOrders = recentOrders
+            .Count(o => o.OrderStatus != "Delivered"
+                     && o.OrderStatus != "Cancelled"
+                     && o.OrderStatus != "Returned");
+
+        int openTickets = tickets
+            .Count(t => t.Status != "Resolved" && t.Status != "Closed");
+
+        DashboardViewModel vm = new()
+        {
+            FirstName          = firstName,
+            TotalOrders        = totalOrders,
+            ActiveOrders       = activeOrders,
+            WishlistCount      = wishlistCount,
+            PendingReviewCount = pendingReviews.Count,
+            OpenTicketCount    = openTickets,
+            RecentOrders       = recentOrders,
+            PendingReviews     = pendingReviews.Take(3).ToList().AsReadOnly()
+        };
+
         ViewData["Title"] = "My Dashboard";
-        ViewBag.CustomerName = User.Identity?.Name ?? "Customer";
-        return View();
+        return View(vm);
     }
 
     // =========================================================================
