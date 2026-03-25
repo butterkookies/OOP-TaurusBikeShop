@@ -78,8 +78,8 @@ features:
     last_updated: null
 
   - name: Homepage UI (Index.cshtml + Index.css)
-    status: in-progress
-    notes: Stripped to plain unstyled HTML on 2026-03-25; pending full redesign
+    status: done
+    notes: Full redesign on 2026-03-25 — hero, categories grid, featured picks, about, value props, CTA; Index.css ~300 lines with BEM classes and responsive breakpoints
     last_updated: 2026-03-25
 
   - name: Courier API Integration (Lalamove, LBC)
@@ -94,8 +94,8 @@ features:
 
 pages:
   - url: /
-    status: in-progress
-    notes: Stripped to plain HTML; CSS cleared; needs redesign
+    status: done
+    notes: Redesigned 2026-03-25 — hero, categories, featured, about, value props, CTA sections with full CSS
     last_updated: 2026-03-25
 
   - url: /Product/List
@@ -197,7 +197,7 @@ bugs:
 tasks:
   - description: Redesign Index.cshtml and Index.css from scratch (homepage is currently unstyled plain HTML)
     priority: high
-    status: planned
+    status: done
     last_updated: 2026-03-25
 
   - description: "Fix DeliveryStatusPollJob — replace HashSet<string>.Contains() with explicit || conditions using DeliveryStatuses constants"
