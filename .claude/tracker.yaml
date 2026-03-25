@@ -1,0 +1,236 @@
+project: Taurus Bike Shop (OOP-TaurusBikeShop)
+last_updated: 2026-03-25
+
+features:
+  - name: User Authentication (registration, login, OTP verification)
+    status: done
+    notes: Cookie-based auth, 30-min idle session, BCrypt work factor 12
+    last_updated: null
+
+  - name: Product Catalog (filtering, search, pagination)
+    status: done
+    notes: Category and brand filters, paginated list view
+    last_updated: null
+
+  - name: Shopping Cart (guest + authenticated)
+    status: done
+    notes: Guest sessions via GuestSession entity; merges on login
+    last_updated: null
+
+  - name: Wishlist
+    status: done
+    notes: none
+    last_updated: null
+
+  - name: Checkout Flow with Delivery Method Selection
+    status: done
+    notes: Lalamove and LBC options; PickupOrder for store pickup
+    last_updated: null
+
+  - name: GCash & BankTransfer Payment Submission
+    status: done
+    notes: Proof upload to GCS; PaymentController fixed 2026-03-25
+    last_updated: 2026-03-25
+
+  - name: Payment Verification (admin side)
+    status: done
+    notes: Admin verifies payment proof in AdminSystem
+    last_updated: null
+
+  - name: Order Creation with Inventory Locking
+    status: done
+    notes: InventoryLog Lock entries written at order creation; stock decremented on ProductVariant
+    last_updated: null
+
+  - name: Order History and Detail Views
+    status: done
+    notes: none
+    last_updated: null
+
+  - name: Product Reviews and Ratings
+    status: done
+    notes: Verified-purchase gating; ReviewController + ReviewService fixed 2026-03-25
+    last_updated: 2026-03-25
+
+  - name: Customer Support Tickets
+    status: done
+    notes: SupportCreate.cshtml fixed (Message -> Description) 2026-03-25
+    last_updated: 2026-03-25
+
+  - name: Supplier Management (Purchase Orders)
+    status: done
+    notes: SupplierList.cshtml fixed (Phone -> PhoneNumber) 2026-03-25
+    last_updated: 2026-03-25
+
+  - name: Voucher Application and Validation
+    status: done
+    notes: none
+    last_updated: null
+
+  - name: Background Jobs (5 hosted services)
+    status: done
+    notes: "InventorySyncJob, PendingOrderMonitorJob, PaymentTimeoutJob, StockMonitorJob, DeliveryStatusPollJob — all registered; DeliveryStatusPollJob has LINQ bug (see bugs)"
+    last_updated: null
+
+  - name: Google Cloud Storage File Uploads
+    status: done
+    notes: Product images, payment proofs, support attachments via FileUploadHelper
+    last_updated: null
+
+  - name: Homepage UI (Index.cshtml + Index.css)
+    status: in-progress
+    notes: Stripped to plain unstyled HTML on 2026-03-25; pending full redesign
+    last_updated: 2026-03-25
+
+  - name: Courier API Integration (Lalamove, LBC)
+    status: planned
+    notes: PollLalamoveAsync and PollLBCAsync return null — awaiting API client implementation
+    last_updated: null
+
+  - name: CI/CD Pipeline
+    status: planned
+    notes: No pipeline configured yet
+    last_updated: null
+
+pages:
+  - url: /
+    status: in-progress
+    notes: Stripped to plain HTML; CSS cleared; needs redesign
+    last_updated: 2026-03-25
+
+  - url: /Product/List
+    status: done
+    notes: Filtering by category, brand, and featured flag
+    last_updated: null
+
+  - url: /Product/Detail/{id}
+    status: done
+    notes: Reviews feed loaded via AJAX LoadMore endpoint
+    last_updated: null
+
+  - url: /Cart
+    status: done
+    notes: none
+    last_updated: null
+
+  - url: /Checkout
+    status: done
+    notes: Delivery method selection, voucher application
+    last_updated: null
+
+  - url: /Payment/Submit/{orderId}
+    status: done
+    notes: Fixed PaymentController on 2026-03-25
+    last_updated: 2026-03-25
+
+  - url: /Order/History
+    status: done
+    notes: none
+    last_updated: null
+
+  - url: /Order/Detail/{orderId}
+    status: done
+    notes: none
+    last_updated: null
+
+  - url: /Review/MyReviews
+    status: done
+    notes: Fixed ReviewController + Reviews.cshtml on 2026-03-25
+    last_updated: 2026-03-25
+
+  - url: /Review/LoadMore
+    status: done
+    notes: AJAX partial — fixed _ReviewList.cshtml on 2026-03-25
+    last_updated: 2026-03-25
+
+  - url: /Support
+    status: done
+    notes: none
+    last_updated: null
+
+  - url: /Support/Create
+    status: done
+    notes: Fixed SupportCreate.cshtml on 2026-03-25
+    last_updated: 2026-03-25
+
+  - url: /Account/Login
+    status: done
+    notes: none
+    last_updated: null
+
+  - url: /Account/Register
+    status: done
+    notes: OTP verification flow
+    last_updated: null
+
+  - url: /Supplier/List
+    status: done
+    notes: Fixed SupplierList.cshtml on 2026-03-25
+    last_updated: 2026-03-25
+
+bugs:
+  - description: "DeliveryStatusPollJob — HashSet<string>.Contains() in LINQ .Where() fails EF Core translation"
+    severity: high
+    status: open
+    last_updated: null
+
+  - description: "_Layout.cshtml — @await Html.PartialAsync(\"_NotificationAlert\") cannot resolve partial; needs full path ~/Views/Customer/Partials/_NotificationAlert.cshtml"
+    severity: high
+    status: open
+    last_updated: null
+
+  - description: "AppDbContext — Many decimal columns missing .HasPrecision(18, 2): CartItem.PriceAtAdd, Order.DiscountAmount/ShippingFee/SubTotal, OrderItem.UnitPrice, POS_Session.TotalSales, Payment.Amount, PriceHistory.NewPrice/OldPrice, Product.Price, ProductVariant.AdditionalPrice, PurchaseOrderItem.UnitPrice, Voucher.DiscountValue/MinimumOrderAmount, VoucherUsage.DiscountAmount"
+    severity: medium
+    status: open
+    last_updated: null
+
+  - description: "Courier API stubs — PollLalamoveAsync and PollLBCAsync return null; no real integration"
+    severity: medium
+    status: open
+    last_updated: null
+
+  - description: Background jobs attempt SystemLog write on startup; fails if dev IP not whitelisted in Cloud Console
+    severity: low
+    status: open
+    last_updated: null
+
+tasks:
+  - description: Redesign Index.cshtml and Index.css from scratch (homepage is currently unstyled plain HTML)
+    priority: high
+    status: planned
+    last_updated: 2026-03-25
+
+  - description: "Fix DeliveryStatusPollJob — replace HashSet<string>.Contains() with explicit || conditions using DeliveryStatuses constants"
+    priority: high
+    status: planned
+    last_updated: null
+
+  - description: "Fix _Layout.cshtml partial path — change _NotificationAlert to full ~/Views/Customer/Partials/_NotificationAlert.cshtml"
+    priority: high
+    status: planned
+    last_updated: null
+
+  - description: Add .HasPrecision(18, 2) to all decimal properties in AppDbContext.OnModelCreating
+    priority: medium
+    status: planned
+    last_updated: null
+
+  - description: Set session cookie SecurePolicy to Always for production deployment
+    priority: medium
+    status: planned
+    last_updated: null
+
+  - description: Implement Lalamove API client in DeliveryService.PollLalamoveAsync
+    priority: low
+    status: planned
+    last_updated: null
+
+  - description: Implement LBC API client in DeliveryService.PollLBCAsync
+    priority: low
+    status: planned
+    last_updated: null
+
+  - description: Set up CI/CD pipeline
+    priority: low
+    status: planned
+    last_updated: null
