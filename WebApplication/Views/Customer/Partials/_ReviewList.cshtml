@@ -1,8 +1,8 @@
 @* WebApplication/Views/Customer/Partials/_ReviewList.cshtml *@
-@* Model: IReadOnlyList<ReviewViewModel> — rendered by LoadMore AJAX *@
-@model IReadOnlyList<WebApplication.Models.ViewModels.ReviewViewModel>
+@* Model: IReadOnlyList<ReviewItemViewModel> — rendered by LoadMore AJAX *@
+@model IReadOnlyList<WebApplication.Models.ViewModels.ReviewItemViewModel>
 
-@foreach (WebApplication.Models.ViewModels.ReviewViewModel review in Model)
+@foreach (WebApplication.Models.ViewModels.ReviewItemViewModel review in Model)
 {
     <div class="tbs-review-card">
         <div class="tbs-review-card__header">
@@ -12,17 +12,14 @@
                     <span class="tbs-star @(i <= review.Rating ? "tbs-star--filled" : "")">★</span>
                 }
             </div>
-            @if (review.IsVerifiedPurchase)
-            {
-                <span class="tbs-review-card__verified">✓ Verified Purchase</span>
-            }
+            <span class="tbs-review-card__verified">✓ Verified Purchase</span>
         </div>
         @if (!string.IsNullOrWhiteSpace(review.Comment))
         {
             <p class="tbs-review-card__comment">@review.Comment</p>
         }
         <div class="tbs-review-card__meta">
-            <strong>@review.ReviewerName</strong>
+            <strong>@review.UserName</strong>
             <span>@review.CreatedAt</span>
         </div>
     </div>

@@ -116,6 +116,58 @@ public sealed class ReviewService : IReviewService
         }).ToList().AsReadOnly();
     }
 
+    public async Task<IReadOnlyList<ProductReviewViewModel>> GetByUserAsync(
+        int userId, CancellationToken cancellationToken = default)
+    {
+        List<Review> reviews = await _context.Reviews
+            .AsNoTracking()
+            .Include(r => r.Product)
+            .Where(r => r.UserId == userId)
+            .OrderByDescending(r => r.CreatedAt)
+            .ToListAsync(cancellationToken);
+
+        return reviews.Select(r => new ProductReviewViewModel
+        {
+            ReviewId           = r.ReviewId,
+            ProductId          = r.ProductId,
+            ProductName        = r.Product?.Name ?? string.Empty,
+            OrderId            = r.OrderId,
+            Rating             = r.Rating,
+            Comment            = r.Comment,
+            IsVerifiedPurchase = r.IsVerifiedPurchase,
+            ReviewerName       = string.Empty,
+            CreatedAt          = r.CreatedAt.ToString("MMMM d, yyyy")
+        }).ToList().AsReadOnly();
+    }
+
+    public async Task<IReadOnlyList<ReviewViewModel>> GetPendingReviewsAsync(
+        int userId, CancellationToken cancellationToken = default)
+    {
+        List<int> reviewedProductIds = await _context.Reviews
+            .AsNoTracking()
+            .Where(r => r.UserId == userId)
+            .Select(r => r.ProductId)
+            .ToListAsync(cancellationToken);
+
+        List<ReviewViewModel> pending = await _context.OrderItems
+            .AsNoTracking()
+            .Include(oi => oi.Order)
+            .Include(oi => oi.Product)
+            .Where(oi => oi.Order.UserId == userId
+                      && oi.Order.OrderStatus == OrderStatuses.Delivered
+                      && !reviewedProductIds.Contains(oi.ProductId))
+            .Select(oi => new ReviewViewModel
+            {
+                ProductId   = oi.ProductId,
+                OrderId     = oi.OrderId,
+                ProductName = oi.Product.Name
+            })
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        return pending.AsReadOnly();
+    }
+
     public async Task<ProductReviewsViewModel?> GetProductReviewsPageAsync(
         int productId, int page, int pageSize, CancellationToken cancellationToken = default)
     {

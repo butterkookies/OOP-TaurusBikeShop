@@ -43,7 +43,7 @@ public sealed class ReviewController : Controller
 
         try
         {
-            IReadOnlyList<ReviewViewModel> submitted =
+            IReadOnlyList<ProductReviewViewModel> submitted =
                 await _reviewService.GetByUserAsync(userId, cancellationToken);
 
             IReadOnlyList<ReviewViewModel> pending =
@@ -88,7 +88,8 @@ public sealed class ReviewController : Controller
         try
         {
             ServiceResult result =
-                await _reviewService.SubmitReviewAsync(userId, vm, cancellationToken);
+                await _reviewService.SubmitReviewAsync(
+                    userId, vm.ProductId, vm.OrderId, vm.Rating, vm.Comment, cancellationToken);
 
             TempData[result.IsSuccess ? "success" : "error"] =
                 result.IsSuccess
@@ -123,8 +124,8 @@ public sealed class ReviewController : Controller
     {
         try
         {
-            IReadOnlyList<ReviewViewModel> reviews =
-                await _reviewService.GetByProductAsync(productId, page, 5, cancellationToken);
+            IReadOnlyList<ReviewItemViewModel> reviews =
+                await _reviewService.GetProductReviewsAsync(productId, page, 5, cancellationToken);
 
             return PartialView(
                 "~/Views/Customer/Partials/_ReviewList.cshtml", reviews);
