@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication.BusinessLogic.Interfaces;
 using WebApplication.Models;
+using WebApplication.Models.ViewModels;
+
 namespace WebApplication.Controllers;
 
 /// <summary>
@@ -72,6 +74,7 @@ public sealed class PaymentController : Controller
     [RequestSizeLimit(10 * 1024 * 1024)]
     public async Task<IActionResult> SubmitGCash(
         int orderId,
+        string gcashNumber,
         string referenceNumber,
         IFormFile screenshotFile,
         CancellationToken cancellationToken)
@@ -80,7 +83,8 @@ public sealed class PaymentController : Controller
         {
             ServiceResult result = await _paymentService.SubmitGCashPaymentAsync(
                 orderId, GetCurrentUserId(),
-                referenceNumber, screenshotFile, cancellationToken);
+                referenceNumber,
+                screenshotFile, cancellationToken);
 
             if (!result.IsSuccess)
             {
@@ -109,7 +113,8 @@ public sealed class PaymentController : Controller
     [RequestSizeLimit(10 * 1024 * 1024)]
     public async Task<IActionResult> SubmitBankTransfer(
         int orderId,
-        string bpiReferenceNumber,
+        string depositorName,
+        string? bpiReferenceNumber,
         IFormFile depositSlipFile,
         CancellationToken cancellationToken)
     {
@@ -117,7 +122,8 @@ public sealed class PaymentController : Controller
         {
             ServiceResult result = await _paymentService.SubmitBankTransferPaymentAsync(
                 orderId, GetCurrentUserId(),
-                bpiReferenceNumber, depositSlipFile, cancellationToken);
+                bpiReferenceNumber ?? string.Empty,
+                depositSlipFile, cancellationToken);
 
             if (!result.IsSuccess)
             {

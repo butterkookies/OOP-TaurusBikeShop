@@ -62,13 +62,6 @@ public sealed class ReviewService : IReviewService
         };
     }
 
-    public Task<ServiceResult> SubmitReviewAsync(
-        int userId, ReviewViewModel vm,
-        CancellationToken cancellationToken = default)
-    {
-        return SubmitReviewAsync(userId, vm.ProductId, vm.OrderId, vm.Rating, vm.Comment, cancellationToken);
-    }
-
     public async Task<ServiceResult> SubmitReviewAsync(
         int userId, int productId, int orderId, int rating, string? comment,
         CancellationToken cancellationToken = default)
@@ -123,84 +116,56 @@ public sealed class ReviewService : IReviewService
         }).ToList().AsReadOnly();
     }
 
-    public async Task<IReadOnlyList<ReviewViewModel>> GetByUserAsync(
+    public async Task<IReadOnlyList<ProductReviewViewModel>> GetByUserAsync(
         int userId, CancellationToken cancellationToken = default)
     {
-        IReadOnlyList<Review> reviews = await _context.Reviews
+        List<Review> reviews = await _context.Reviews
             .AsNoTracking()
-            .Include(r => r.User)
             .Include(r => r.Product)
             .Where(r => r.UserId == userId)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync(cancellationToken);
 
-        return reviews.Select(r => new ReviewViewModel
+        return reviews.Select(r => new ProductReviewViewModel
         {
-            ProductId      = r.ProductId,
-            OrderId        = r.OrderId,
-            ProductName    = r.Product?.Name ?? "Product",
-            Rating         = r.Rating,
-            Comment        = r.Comment,
-            ReviewerName   = r.User?.FirstName ?? "You",
-            CreatedAt      = r.CreatedAt,
-            IsVerifiedPurchase = r.IsVerifiedPurchase
+            ReviewId           = r.ReviewId,
+            ProductId          = r.ProductId,
+            ProductName        = r.Product?.Name ?? string.Empty,
+            OrderId            = r.OrderId,
+            Rating             = r.Rating,
+            Comment            = r.Comment,
+            IsVerifiedPurchase = r.IsVerifiedPurchase,
+            ReviewerName       = string.Empty,
+            CreatedAt          = r.CreatedAt.ToString("MMMM d, yyyy")
         }).ToList().AsReadOnly();
     }
 
     public async Task<IReadOnlyList<ReviewViewModel>> GetPendingReviewsAsync(
         int userId, CancellationToken cancellationToken = default)
     {
-        // Find products from delivered orders that the user hasn't reviewed yet
-        List<OrderItem> deliveredItems = await _context.OrderItems
-            .AsNoTracking()
-            .Include(oi => oi.Product)
-            .Include(oi => oi.Order)
-            .Where(oi => oi.Order.UserId == userId
-                      && oi.Order.OrderStatus == OrderStatuses.Delivered)
-            .ToListAsync(cancellationToken);
-
-        HashSet<int> reviewedProductIds = (await _context.Reviews
+        List<int> reviewedProductIds = await _context.Reviews
             .AsNoTracking()
             .Where(r => r.UserId == userId)
             .Select(r => r.ProductId)
-            .ToListAsync(cancellationToken))
-            .ToHashSet();
+            .ToListAsync(cancellationToken);
 
-        return deliveredItems
-            .Where(oi => !reviewedProductIds.Contains(oi.ProductId))
-            .GroupBy(oi => oi.ProductId)
-            .Select(g =>
+        List<ReviewViewModel> pending = await _context.OrderItems
+            .AsNoTracking()
+            .Include(oi => oi.Order)
+            .Include(oi => oi.Product)
+            .Where(oi => oi.Order.UserId == userId
+                      && oi.Order.OrderStatus == OrderStatuses.Delivered
+                      && !reviewedProductIds.Contains(oi.ProductId))
+            .Select(oi => new ReviewViewModel
             {
-                OrderItem first = g.First();
-                return new ReviewViewModel
-                {
-                    ProductId          = first.ProductId,
-                    OrderId            = first.OrderId,
-                    ProductName        = first.Product?.Name ?? "Product",
-                    IsVerifiedPurchase = true
-                };
+                ProductId   = oi.ProductId,
+                OrderId     = oi.OrderId,
+                ProductName = oi.Product.Name
             })
-            .ToList()
-            .AsReadOnly();
-    }
+            .Distinct()
+            .ToListAsync(cancellationToken);
 
-    public async Task<IReadOnlyList<ReviewViewModel>> GetByProductAsync(
-        int productId, int page, int pageSize,
-        CancellationToken cancellationToken = default)
-    {
-        IReadOnlyList<Review> reviews =
-            await _reviewRepo.GetByProductAsync(productId, page, pageSize, cancellationToken);
-
-        return reviews.Select(r => new ReviewViewModel
-        {
-            ProductId          = r.ProductId,
-            OrderId            = r.OrderId,
-            Rating             = r.Rating,
-            Comment            = r.Comment,
-            ReviewerName       = r.User?.FirstName ?? "Customer",
-            CreatedAt          = r.CreatedAt,
-            IsVerifiedPurchase = r.IsVerifiedPurchase
-        }).ToList().AsReadOnly();
+        return pending.AsReadOnly();
     }
 
     public async Task<ProductReviewsViewModel?> GetProductReviewsPageAsync(

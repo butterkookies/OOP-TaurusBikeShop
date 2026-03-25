@@ -13,3 +13,4 @@ node_modules/
 *.db
 *.log
 .claude/
+!.claude/tracker.yaml

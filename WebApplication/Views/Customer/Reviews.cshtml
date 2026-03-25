@@ -2,8 +2,8 @@
 @* Customer's own review history + pending reviews *@
 @{
     ViewData["Title"] = "My Reviews";
-    var submitted = ViewBag.Submitted as IReadOnlyList<WebApplication.Models.ViewModels.ReviewViewModel>
-        ?? new List<WebApplication.Models.ViewModels.ReviewViewModel>();
+    var submitted = ViewBag.Submitted as IReadOnlyList<WebApplication.Models.ViewModels.ProductReviewViewModel>
+        ?? new List<WebApplication.Models.ViewModels.ProductReviewViewModel>();
     var pending   = ViewBag.Pending   as IReadOnlyList<WebApplication.Models.ViewModels.ReviewViewModel>
         ?? new List<WebApplication.Models.ViewModels.ReviewViewModel>();
 }
