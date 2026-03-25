@@ -171,18 +171,21 @@ pages:
 bugs:
   - description: "DeliveryStatusPollJob — HashSet<string>.Contains() in LINQ .Where() fails EF Core translation"
     severity: high
-    status: open
-    last_updated: null
+    status: fixed
+    last_updated: 2026-03-26
+    notes: Already uses explicit || conditions with DeliveryStatuses constants in current code
 
   - description: "_Layout.cshtml — @await Html.PartialAsync(\"_NotificationAlert\") cannot resolve partial; needs full path ~/Views/Customer/Partials/_NotificationAlert.cshtml"
     severity: high
-    status: open
-    last_updated: null
+    status: fixed
+    last_updated: 2026-03-26
+    notes: Full path ~/Views/Customer/Partials/_NotificationAlert.cshtml already in place at line 23
 
   - description: "AppDbContext — Many decimal columns missing .HasPrecision(18, 2): CartItem.PriceAtAdd, Order.DiscountAmount/ShippingFee/SubTotal, OrderItem.UnitPrice, POS_Session.TotalSales, Payment.Amount, PriceHistory.NewPrice/OldPrice, Product.Price, ProductVariant.AdditionalPrice, PurchaseOrderItem.UnitPrice, Voucher.DiscountValue/MinimumOrderAmount, VoucherUsage.DiscountAmount"
     severity: medium
-    status: open
-    last_updated: null
+    status: fixed
+    last_updated: 2026-03-26
+    notes: All 11 decimal properties already have HasPrecision(18, 2) in OnModelCreating
 
   - description: "Courier API stubs — PollLalamoveAsync and PollLBCAsync return null; no real integration"
     severity: medium
@@ -202,18 +205,18 @@ tasks:
 
   - description: "Fix DeliveryStatusPollJob — replace HashSet<string>.Contains() with explicit || conditions using DeliveryStatuses constants"
     priority: high
-    status: planned
-    last_updated: null
+    status: done
+    last_updated: 2026-03-26
 
   - description: "Fix _Layout.cshtml partial path — change _NotificationAlert to full ~/Views/Customer/Partials/_NotificationAlert.cshtml"
     priority: high
-    status: planned
-    last_updated: null
+    status: done
+    last_updated: 2026-03-26
 
   - description: Add .HasPrecision(18, 2) to all decimal properties in AppDbContext.OnModelCreating
     priority: medium
-    status: planned
-    last_updated: null
+    status: done
+    last_updated: 2026-03-26
 
   - description: Set session cookie SecurePolicy to Always for production deployment
     priority: medium

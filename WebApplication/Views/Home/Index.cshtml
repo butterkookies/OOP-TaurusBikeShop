@@ -5,87 +5,201 @@
 }
 
 @section Styles {
+    @* Brand fonts — Bebas Neue (display) + DM Sans (body) *@
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap"
+          rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            important: true,
+            theme: {
+                extend: {
+                    colors: {
+                        primary:  '#0A0A0A',   /* matte black — page bg       */
+                        surface:  '#111111',   /* cards, panels               */
+                        border:   '#1E1E1E',   /* dividers, outlines          */
+                        text:     '#F0F0F0',   /* primary text                */
+                        muted:    '#6B6B6B',   /* secondary text, labels      */
+                        crimson: {
+                            DEFAULT: '#DC143C', /* accent — hits hard, use sparingly */
+                            dark:    '#9B0E2A', /* hover / depth               */
+                        },
+                    },
+                    fontFamily: {
+                        display: ['"Bebas Neue"', 'sans-serif'],  /* bold condensed headlines */
+                        body:    ['"DM Sans"', 'sans-serif'],     /* clean UI / body text     */
+                        stats:   ['Oswald', 'sans-serif'],        /* numeric data / specs     */
+                    },
+                    maxWidth: {
+                        page: '1280px',
+                    },
+                    borderRadius: {
+                        brand: '4px',   /* sharp — BRAND.md max 8px */
+                        card:  '6px',
+                    },
+                    letterSpacing: {
+                        label: '0.1em',
+                    },
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="~/css/Index.css" asp-append-version="true" />
 }
 
-@* HERO *@
-<section id="hero">
-    <div class="home-container">
-        <p class="hero__eyebrow">Philippines' Premier Bike Shop</p>
-        <h1 class="hero__title">Built for the <span>Ride.</span></h1>
-        <p class="hero__sub">
+@* ── HERO ─────────────────────────────────────────────────────── *@
+<section id="hero" class="relative overflow-hidden bg-primary text-text py-28 md:py-36 text-center">
+
+    <span class="hero-bg-text" aria-hidden="true">TAURUS</span>
+
+    <div class="max-w-page mx-auto px-6 relative z-10">
+
+        <p class="hero-anim hero-anim-d0 inline-block text-[0.72rem] font-body font-semibold
+                  tracking-[0.14em] uppercase text-crimson mb-5">
+            Philippines' Premier Bike Shop
+        </p>
+
+        <h1 class="hero-anim hero-anim-d1 font-display leading-[0.95] tracking-tight text-text
+                   mb-6 mx-auto text-[clamp(4rem,11vw,8rem)] max-w-[820px]">
+            Built for the <span class="text-crimson">Ride.</span>
+        </h1>
+
+        <p class="hero-anim hero-anim-d2 font-body text-muted leading-relaxed mb-10
+                  mx-auto text-[1rem] max-w-[480px]">
             Premium bicycles and components — from trail shredders to road racers.
             Delivered via Lalamove and LBC nationwide.
         </p>
-        <div class="hero__actions">
-            <a asp-controller="Product" asp-action="List" class="hero__btn-primary">Shop Now</a>
-            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="UNIT" class="hero__btn-outline">View Complete Bikes</a>
+
+        <div class="hero-anim hero-anim-d3 flex flex-wrap gap-3 justify-center mb-20">
+            <a asp-controller="Product" asp-action="List"
+               class="btn-glow inline-flex items-center bg-crimson hover:bg-crimson-dark text-white
+                      font-body font-semibold uppercase tracking-label rounded-brand
+                      px-10 py-3.5 text-sm transition-all duration-200 hover:-translate-y-0.5">
+                Shop Now
+            </a>
+            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="UNIT"
+               class="inline-flex items-center text-text border border-white/20 hover:border-crimson
+                      hover:text-crimson font-body font-semibold uppercase tracking-label
+                      rounded-brand px-10 py-3.5 text-sm transition-all duration-200">
+                View Complete Bikes
+            </a>
         </div>
-        <div class="hero__stats">
-            <div class="hero__stat">
-                <strong>148</strong>
-                <span>Products</span>
+
+        <div class="hero-anim hero-anim-d4 flex flex-wrap justify-center gap-14
+                    pt-8 border-t border-[#1E1E1E] max-w-[420px] mx-auto">
+            <div class="text-center">
+                <strong class="block font-stats text-[2.2rem] font-bold leading-none text-text">148</strong>
+                <span class="block font-body text-[0.7rem] uppercase tracking-label text-muted mt-1">Products</span>
             </div>
-            <div class="hero__stat">
-                <strong>43</strong>
-                <span>Brands</span>
+            <div class="text-center">
+                <strong class="block font-stats text-[2.2rem] font-bold leading-none text-text">43</strong>
+                <span class="block font-body text-[0.7rem] uppercase tracking-label text-muted mt-1">Brands</span>
             </div>
-            <div class="hero__stat">
-                <strong>13</strong>
-                <span>Categories</span>
+            <div class="text-center">
+                <strong class="block font-stats text-[2.2rem] font-bold leading-none text-text">13</strong>
+                <span class="block font-body text-[0.7rem] uppercase tracking-label text-muted mt-1">Categories</span>
             </div>
+        </div>
+
+    </div>
+</section>
+
+@* ── CATEGORIES ───────────────────────────────────────────────── *@
+<section id="categories" class="bg-primary py-24">
+    <div class="max-w-page mx-auto px-6">
+        <div class="flex items-baseline justify-between mb-10">
+            <h2 class="font-display text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight text-text m-0">
+                Shop by Category
+            </h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+
+            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="UNIT"
+               class="card-hover group block bg-surface border border-[#1E1E1E] rounded-card p-6
+                      transition-all duration-200 hover:-translate-y-1">
+                <h3 class="font-display text-xl leading-none text-text group-hover:text-crimson
+                           transition-colors duration-200 mb-2">Complete Bikes</h3>
+                <p class="font-body text-sm text-muted leading-relaxed m-0">
+                    Fully assembled MTB, gravel, and CX builds ready to ride.
+                </p>
+            </a>
+
+            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="FRAME"
+               class="card-hover group block bg-surface border border-[#1E1E1E] rounded-card p-6
+                      transition-all duration-200 hover:-translate-y-1">
+                <h3 class="font-display text-xl leading-none text-text group-hover:text-crimson
+                           transition-colors duration-200 mb-2">Frames</h3>
+                <p class="font-body text-sm text-muted leading-relaxed m-0">
+                    Alloy and carbon framesets for MTB, gravel, and trail builds.
+                </p>
+            </a>
+
+            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="FORK"
+               class="card-hover group block bg-surface border border-[#1E1E1E] rounded-card p-6
+                      transition-all duration-200 hover:-translate-y-1">
+                <h3 class="font-display text-xl leading-none text-text group-hover:text-crimson
+                           transition-colors duration-200 mb-2">Forks</h3>
+                <p class="font-body text-sm text-muted leading-relaxed m-0">
+                    Air and coil suspension forks — 100mm to 140mm travel.
+                </p>
+            </a>
+
+            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="UPGKIT"
+               class="card-hover group block bg-surface border border-[#1E1E1E] rounded-card p-6
+                      transition-all duration-200 hover:-translate-y-1">
+                <h3 class="font-display text-xl leading-none text-text group-hover:text-crimson
+                           transition-colors duration-200 mb-2">Upgrade Kits</h3>
+                <p class="font-body text-sm text-muted leading-relaxed m-0">
+                    Complete 9–12 speed drivetrain bundles — drop-in upgrades.
+                </p>
+            </a>
+
+            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="TIRE"
+               class="card-hover group block bg-surface border border-[#1E1E1E] rounded-card p-6
+                      transition-all duration-200 hover:-translate-y-1">
+                <h3 class="font-display text-xl leading-none text-text group-hover:text-crimson
+                           transition-colors duration-200 mb-2">Tires &amp; Tubes</h3>
+                <p class="font-body text-sm text-muted leading-relaxed m-0">
+                    MTB, gravel, and BMX tires plus tubes for all wheel sizes.
+                </p>
+            </a>
+
+            <a asp-controller="Product" asp-action="List"
+               class="card-hover group block bg-surface border border-[#1E1E1E] rounded-card p-6
+                      transition-all duration-200 hover:-translate-y-1">
+                <h3 class="font-display text-xl leading-none text-text group-hover:text-crimson
+                           transition-colors duration-200 mb-2">All Categories</h3>
+                <p class="font-body text-sm text-muted leading-relaxed m-0">
+                    Hubs, handlebars, saddles, chains, rims, grips, pedals, and more.
+                </p>
+            </a>
+
         </div>
     </div>
 </section>
 
-@* CATEGORIES *@
-<section id="categories">
-    <div class="home-container">
-        <div class="section-header">
-            <h2 class="section-title">Shop by Category</h2>
-        </div>
-        <div class="categories__grid">
-            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="UNIT" class="category-card">
-                <h3>Complete Bikes</h3>
-                <p>Fully assembled MTB, gravel, and CX builds ready to ride.</p>
-            </a>
-            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="FRAME" class="category-card">
-                <h3>Frames</h3>
-                <p>Alloy and carbon framesets for MTB, gravel, and trail builds.</p>
-            </a>
-            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="FORK" class="category-card">
-                <h3>Forks</h3>
-                <p>Air and coil suspension forks — 100mm to 140mm travel.</p>
-            </a>
-            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="UPGKIT" class="category-card">
-                <h3>Upgrade Kits</h3>
-                <p>Complete 9–12 speed drivetrain bundles — drop-in upgrades.</p>
-            </a>
-            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="TIRE" class="category-card">
-                <h3>Tires &amp; Tubes</h3>
-                <p>MTB, gravel, and BMX tires plus tubes for all wheel sizes.</p>
-            </a>
-            <a asp-controller="Product" asp-action="List" class="category-card">
-                <h3>All Categories</h3>
-                <p>Hubs, handlebars, saddles, chains, rims, grips, pedals, and more.</p>
-            </a>
-        </div>
-    </div>
-</section>
-
-@* FEATURED PRODUCTS *@
+@* ── FEATURED PRODUCTS ────────────────────────────────────────── *@
 @if (Model != null && Model.Any())
 {
-    <section id="featured">
-        <div class="home-container">
-            <div class="section-header">
-                <h2 class="section-title">Featured Picks</h2>
-                <a asp-controller="Product" asp-action="List" asp-route-featured="true" class="section-link">View all &rarr;</a>
+    <section id="featured" class="bg-surface py-24">
+        <div class="max-w-page mx-auto px-6">
+            <div class="flex items-baseline justify-between mb-10">
+                <h2 class="font-display text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight text-text m-0">
+                    Featured Picks
+                </h2>
+                <a asp-controller="Product" asp-action="List" asp-route-featured="true"
+                   class="font-body text-sm font-semibold uppercase tracking-label
+                          text-muted hover:text-crimson whitespace-nowrap transition-colors duration-200">
+                    View all &rarr;
+                </a>
             </div>
-            <div class="row g-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @foreach (WebApplication.Models.ViewModels.ProductViewModel product in Model)
                 {
-                    <div class="col-6 col-md-4 col-lg-3">
+                    <div>
                         @await Html.PartialAsync("~/Views/Customer/Partials/_ProductCard.cshtml", product)
                     </div>
                 }
@@ -94,100 +208,164 @@
     </section>
 }
 
-@* ABOUT *@
-<section id="about">
-    <div class="home-container">
-        <div class="about__inner">
-            <div class="about__text">
-                <p class="about__eyebrow">Our Story</p>
-                <h2 class="about__title">Built Different.<br />Built Philippine.</h2>
-                <p class="about__body">
+@* ── ABOUT ────────────────────────────────────────────────────── *@
+<section id="about" class="bg-primary py-24 md:py-32">
+    <div class="max-w-page mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+
+            <div>
+                <p class="font-body text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-crimson mb-4">
+                    Our Story
+                </p>
+                <h2 class="font-display leading-[0.95] tracking-tight text-text mb-6
+                           text-[clamp(2.4rem,4.5vw,3.5rem)]">
+                    Built Different.<br />Built Philippine.
+                </h2>
+                <p class="font-body text-muted leading-[1.75] text-base mb-8 max-w-[480px]">
                     Taurus Bike Shop was founded by riders, for riders.
                     We carry the finest international and local brands —
                     from Shimano and Maxxis to Pinewood and Sagmit —
                     and deliver them to your door anywhere in the Philippines.
                 </p>
-                <a asp-controller="Product" asp-action="List" class="about__cta">Explore the Shop</a>
+                <a asp-controller="Product" asp-action="List"
+                   class="btn-glow inline-flex items-center bg-crimson hover:bg-crimson-dark text-white
+                          font-body font-semibold uppercase tracking-label rounded-brand
+                          px-8 py-3 text-sm transition-all duration-200 hover:-translate-y-0.5">
+                    Explore the Shop
+                </a>
             </div>
-            <div class="about__stats">
-                <div class="about__stat">
-                    <strong>148</strong>
-                    <span>Products in Stock</span>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-surface border border-[#1E1E1E] rounded-card p-6
+                            hover:border-crimson/40 transition-colors duration-200">
+                    <strong class="block font-stats text-[2.6rem] font-bold text-crimson leading-none">148</strong>
+                    <span class="block font-body text-[0.75rem] text-muted mt-2 uppercase tracking-label">
+                        Products in Stock
+                    </span>
                 </div>
-                <div class="about__stat">
-                    <strong>43</strong>
-                    <span>Premium Brands</span>
+                <div class="bg-surface border border-[#1E1E1E] rounded-card p-6
+                            hover:border-crimson/40 transition-colors duration-200">
+                    <strong class="block font-stats text-[2.6rem] font-bold text-crimson leading-none">43</strong>
+                    <span class="block font-body text-[0.75rem] text-muted mt-2 uppercase tracking-label">
+                        Premium Brands
+                    </span>
                 </div>
-                <div class="about__stat">
-                    <strong>13</strong>
-                    <span>Categories</span>
+                <div class="bg-surface border border-[#1E1E1E] rounded-card p-6
+                            hover:border-crimson/40 transition-colors duration-200">
+                    <strong class="block font-stats text-[2.6rem] font-bold text-crimson leading-none">13</strong>
+                    <span class="block font-body text-[0.75rem] text-muted mt-2 uppercase tracking-label">
+                        Categories
+                    </span>
                 </div>
-                <div class="about__stat">
-                    <strong>PH</strong>
-                    <span>Nationwide Delivery</span>
+                <div class="bg-surface border border-[#1E1E1E] rounded-card p-6
+                            hover:border-crimson/40 transition-colors duration-200">
+                    <strong class="block font-stats text-[2.6rem] font-bold text-crimson leading-none">PH</strong>
+                    <span class="block font-body text-[0.75rem] text-muted mt-2 uppercase tracking-label">
+                        Nationwide Delivery
+                    </span>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
 
-@* VALUE PROPS *@
-<section id="why-us">
-    <div class="home-container">
-        <h2 class="section-title" style="text-align:center">The Taurus Advantage</h2>
-        <div class="why-us__grid">
-            <div class="why-us__card">
-                <div class="why-us__icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+@* ── VALUE PROPS ──────────────────────────────────────────────── *@
+<section id="why-us" class="bg-surface py-24">
+    <div class="max-w-page mx-auto px-6">
+        <h2 class="font-display text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight text-text
+                   text-center mb-12">
+            The Taurus Advantage
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            <div class="card-hover bg-primary border border-[#1E1E1E] rounded-card p-6
+                        transition-all duration-200 hover:-translate-y-1">
+                <div class="w-10 h-10 rounded-brand flex items-center justify-center mb-5
+                            bg-crimson/[0.12] text-crimson flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
                         <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
                     </svg>
                 </div>
-                <h5>Premium Quality</h5>
-                <p>Curated brands trusted by serious riders — from trail shredders to race builds.</p>
+                <h5 class="font-display text-[1.15rem] leading-none text-text mb-2">Premium Quality</h5>
+                <p class="font-body text-sm text-muted leading-relaxed m-0">
+                    Curated brands trusted by serious riders — from trail shredders to race builds.
+                </p>
             </div>
-            <div class="why-us__card">
-                <div class="why-us__icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+
+            <div class="card-hover bg-primary border border-[#1E1E1E] rounded-card p-6
+                        transition-all duration-200 hover:-translate-y-1">
+                <div class="w-10 h-10 rounded-brand flex items-center justify-center mb-5
+                            bg-crimson/[0.12] text-crimson flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
                     </svg>
                 </div>
-                <h5>Nationwide Delivery</h5>
-                <p>Lalamove and LBC delivery across every island in the Philippines.</p>
+                <h5 class="font-display text-[1.15rem] leading-none text-text mb-2">Nationwide Delivery</h5>
+                <p class="font-body text-sm text-muted leading-relaxed m-0">
+                    Lalamove and LBC delivery across every island in the Philippines.
+                </p>
             </div>
-            <div class="why-us__card">
-                <div class="why-us__icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+
+            <div class="card-hover bg-primary border border-[#1E1E1E] rounded-card p-6
+                        transition-all duration-200 hover:-translate-y-1">
+                <div class="w-10 h-10 rounded-brand flex items-center justify-center mb-5
+                            bg-crimson/[0.12] text-crimson flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2z"/>
                     </svg>
                 </div>
-                <h5>Secure Payment</h5>
-                <p>GCash and bank transfer — fast, safe, and hassle-free checkout.</p>
+                <h5 class="font-display text-[1.15rem] leading-none text-text mb-2">Secure Payment</h5>
+                <p class="font-body text-sm text-muted leading-relaxed m-0">
+                    GCash and bank transfer — fast, safe, and hassle-free checkout.
+                </p>
             </div>
-            <div class="why-us__card">
-                <div class="why-us__icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+
+            <div class="card-hover bg-primary border border-[#1E1E1E] rounded-card p-6
+                        transition-all duration-200 hover:-translate-y-1">
+                <div class="w-10 h-10 rounded-brand flex items-center justify-center mb-5
+                            bg-crimson/[0.12] text-crimson flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5z"/>
                     </svg>
                 </div>
-                <h5>Store Pickup</h5>
-                <p>Walk in or pick up your online order at our shop at your convenience.</p>
+                <h5 class="font-display text-[1.15rem] leading-none text-text mb-2">Store Pickup</h5>
+                <p class="font-body text-sm text-muted leading-relaxed m-0">
+                    Walk in or pick up your online order at our shop at your convenience.
+                </p>
             </div>
+
         </div>
     </div>
 </section>
 
-@* CTA *@
-<section id="cta">
-    <div class="home-container">
-        <h2 class="cta__title">Find Your Perfect Build</h2>
-        <p class="cta__sub">
+@* ── CTA ──────────────────────────────────────────────────────── *@
+<section id="cta" class="bg-crimson py-24 text-center">
+    <div class="max-w-page mx-auto px-6">
+        <h2 class="font-display text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.95] tracking-tight
+                   text-white mb-4">
+            Find Your Perfect Build
+        </h2>
+        <p class="font-body text-white/75 text-base max-w-[460px] mx-auto mb-10 leading-relaxed">
             Create a free account to save your wishlist, track your order, and get access to exclusive deals.
-            Already a member? <a asp-controller="Account" asp-action="Login">Sign in</a>.
+            Already a member?
+            <a asp-controller="Account" asp-action="Login"
+               class="text-white font-semibold">Sign in</a>.
         </p>
-        <div class="cta__actions">
-            <a asp-controller="Account" asp-action="Register" class="cta__btn-dark">Create Account</a>
-            <a asp-controller="Product" asp-action="List" class="cta__btn-ghost">Browse Without Account</a>
+        <div class="flex flex-wrap gap-3 justify-center">
+            <a asp-controller="Account" asp-action="Register"
+               class="inline-flex items-center bg-primary hover:bg-[#111111] text-text
+                      font-body font-semibold uppercase tracking-label rounded-brand
+                      px-10 py-3.5 text-sm transition-colors duration-200 border border-[#1E1E1E]">
+                Create Account
+            </a>
+            <a asp-controller="Product" asp-action="List"
+               class="inline-flex items-center bg-transparent hover:bg-white/10 text-white
+                      border border-white/35 hover:border-white/70 font-body font-semibold
+                      uppercase tracking-label rounded-brand px-10 py-3.5 text-sm transition-all duration-200">
+                Browse Without Account
+            </a>
         </div>
     </div>
 </section>
