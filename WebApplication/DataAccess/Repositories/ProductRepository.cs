@@ -46,6 +46,7 @@ public sealed class ProductRepository : Repository<Product>
         string? searchText,
         int page,
         int pageSize,
+        bool featuredOnly = false,
         CancellationToken cancellationToken = default)
     {
         IQueryable<Product> query = Context.Products
@@ -55,6 +56,9 @@ public sealed class ProductRepository : Repository<Product>
             .Include(p => p.Images.Where(i => i.IsPrimary))
             .Include(p => p.Variants.Where(v => v.IsActive))
             .Where(p => p.IsActive && p.Category.IsActive);
+
+        if (featuredOnly)
+            query = query.Where(p => p.IsFeatured);
 
         if (categoryId.HasValue)
             query = query.Where(p => p.CategoryId == categoryId.Value);
@@ -95,10 +99,14 @@ public sealed class ProductRepository : Repository<Product>
         decimal? minPrice,
         decimal? maxPrice,
         string? searchText,
+        bool featuredOnly = false,
         CancellationToken cancellationToken = default)
     {
         IQueryable<Product> query = Context.Products
             .Where(p => p.IsActive && p.Category.IsActive);
+
+        if (featuredOnly)
+            query = query.Where(p => p.IsFeatured);
 
         if (categoryId.HasValue)
             query = query.Where(p => p.CategoryId == categoryId.Value);

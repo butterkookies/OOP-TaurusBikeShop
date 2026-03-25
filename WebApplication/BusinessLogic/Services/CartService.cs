@@ -271,6 +271,22 @@ public sealed class CartService : ICartService
         return await _cartRepo.GetCartItemCountAsync(cart.CartId, cancellationToken);
     }
 
+    /// <inheritdoc/>
+    public async Task<int> CreateGuestSessionAsync(
+        CancellationToken cancellationToken = default)
+    {
+        GuestSession session = new()
+        {
+            SessionToken = Guid.NewGuid().ToString("N"),
+            ExpiresAt    = DateTime.UtcNow.AddDays(7),
+            CreatedAt    = DateTime.UtcNow
+        };
+
+        await _cartRepo.Context.GuestSessions.AddAsync(session, cancellationToken);
+        await _cartRepo.Context.SaveChangesAsync(cancellationToken);
+        return session.GuestSessionId;
+    }
+
     // =========================================================================
     // Private mapping
     // =========================================================================

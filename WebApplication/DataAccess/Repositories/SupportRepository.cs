@@ -64,6 +64,27 @@ public sealed class SupportRepository : Repository<SupportTicket>
     }
 
     /// <summary>
+    /// Adds a customer reply to a support ticket and updates the ticket's
+    /// <c>UpdatedAt</c> timestamp.
+    /// </summary>
+    public async Task AddReplyAsync(
+        SupportTicketReply reply,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(reply);
+
+        await Context.Set<SupportTicketReply>().AddAsync(reply, cancellationToken);
+
+        SupportTicket? ticket = await Context.SupportTickets
+            .FirstOrDefaultAsync(t => t.TicketId == reply.TicketId, cancellationToken);
+
+        if (ticket is not null)
+            ticket.UpdatedAt = DateTime.UtcNow;
+
+        await Context.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
     /// Inserts a new support ticket and returns it with its generated
     /// <c>TicketId</c> populated. Used by <c>SupportService.CreateTicketAsync</c>.
     /// </summary>

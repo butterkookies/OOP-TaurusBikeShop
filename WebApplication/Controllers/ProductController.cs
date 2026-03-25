@@ -69,7 +69,7 @@ public sealed class ProductController : Controller
         int? userId = GetCurrentUserId();
         if (userId.HasValue)
         {
-            wishlistIds = (IReadOnlyCollection<int>)
+            wishlistIds =
                 await _wishlistService.GetProductIdsAsync(userId.Value, cancellationToken);
         }
 
@@ -78,7 +78,7 @@ public sealed class ProductController : Controller
             (IReadOnlyList<ProductViewModel> products, int totalCount) =
                 await _productService.GetFilteredAsync(
                     categoryId, brandId, minPrice, maxPrice, search,
-                    page, DefaultPageSize, wishlistIds, cancellationToken);
+                    page, DefaultPageSize, wishlistIds, featured, cancellationToken);
 
             IReadOnlyList<Brand> brands =
                 await _brandService.GetAllActiveBrandsAsync(cancellationToken);
@@ -99,6 +99,7 @@ public sealed class ProductController : Controller
             ViewBag.MinPrice        = minPrice;
             ViewBag.MaxPrice        = maxPrice;
             ViewBag.Search          = search;
+            ViewBag.Featured        = featured;
 
             return View("~/Views/Customer/ProductCatalog.cshtml", products);
         }

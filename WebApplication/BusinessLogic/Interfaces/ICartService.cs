@@ -109,4 +109,12 @@ public interface ICartService
         int? userId,
         int? guestSessionId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Creates a new guest session with a unique token and 7-day expiry.
+    /// Returns the generated <c>GuestSessionId</c> for cookie storage.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task<int> CreateGuestSessionAsync(
+        CancellationToken cancellationToken = default);
 }
