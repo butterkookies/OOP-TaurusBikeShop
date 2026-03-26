@@ -1,8 +1,12 @@
-/* WebApplication/wwwroot/css/footer.css */
+/* WebApplication/wwwroot/css/footer.css
+   Updated: replaced dead --tbs-* vars with taurus-glass.css tokens */
 
 .tbs-footer {
-    background-color: var(--tbs-primary);
-    color: var(--tbs-gray-200);
+    background: rgba(8, 6, 16, 0.88);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    color: var(--color-text-secondary);
     padding: 4rem 0 0;
     margin-top: auto;
 }
@@ -21,41 +25,44 @@
 }
 .tbs-footer__brand-mark {
     font-size: 1.5rem;
-    color: var(--tbs-accent);
+    color: var(--color-primary);
     line-height: 1;
 }
 .tbs-footer__brand-name {
-    font-family: var(--tbs-font-display);
+    font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
     font-size: 1.375rem;
     font-weight: 700;
     letter-spacing: 0.1em;
-    color: var(--tbs-white);
+    color: var(--color-text);
 }
 .tbs-footer__tagline {
+    font-family: 'DM Sans', sans-serif;
     font-size: 0.875rem;
     line-height: 1.7;
-    color: var(--tbs-gray-400);
+    color: var(--color-text-secondary);
     margin-bottom: 0.75rem;
     max-width: 300px;
 }
 .tbs-footer__address {
+    font-family: 'DM Sans', sans-serif;
     font-size: 0.8rem;
-    color: var(--tbs-gray-400);
+    color: var(--color-muted);
     margin: 0;
 }
 .tbs-footer__courier-note {
+    font-family: 'DM Sans', sans-serif;
     font-size: 0.8rem;
-    color: var(--tbs-gray-400);
+    color: var(--color-muted);
 }
 
 /* Link columns */
 .tbs-footer__heading {
-    font-family: var(--tbs-font-display);
-    font-size: 0.75rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--tbs-white);
+    color: var(--color-text);
     margin-bottom: 1rem;
 }
 
@@ -68,13 +75,15 @@
     gap: 0.6rem;
 }
 .tbs-footer__links a {
+    font-family: 'DM Sans', sans-serif;
     font-size: 0.875rem;
-    color: var(--tbs-gray-400);
+    color: var(--color-text-secondary);
     text-decoration: none;
-    transition: color var(--tbs-transition);
+    transition: color 0.2s ease-out;
 }
 .tbs-footer__links a:hover {
-    color: var(--tbs-accent);
+    color: var(--color-primary);
+    text-decoration: none;
 }
 
 /* Bottom bar */
@@ -82,12 +91,14 @@
     padding-bottom: 1.5rem;
 }
 .tbs-footer__divider {
-    border-color: rgba(255,255,255,0.08);
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
     margin: 0 0 1.25rem;
 }
 .tbs-footer__copyright {
+    font-family: 'DM Sans', sans-serif;
     font-size: 0.8rem;
-    color: var(--tbs-gray-600);
+    color: var(--color-muted);
     margin: 0;
     text-align: center;
 }

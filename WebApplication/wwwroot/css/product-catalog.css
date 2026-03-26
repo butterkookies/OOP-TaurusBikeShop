@@ -1,188 +1,422 @@
-/* WebApplication/wwwroot/css/product-catalog.css */
+/* WebApplication/wwwroot/css/product-catalog.css
+   Taurus Brand v2.0 — Glassmorphism catalog layout.
+   All tokens from taurus-glass.css :root.              */
 
-.tbs-catalog-page {
-    padding: 2.5rem 0 4rem;
+/* ── Page wrapper ──────────────────────────────────────────── */
+
+.cat-page {
+    padding: 48px 0 80px;
+    min-height: calc(100vh - 64px);
 }
 
-.tbs-catalog__header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+.cat-container {
+    max-width: 1320px;
+    margin-inline: auto;
+    padding-inline: 24px;
 }
-.tbs-catalog__title {
-    font-size: 2rem;
+
+
+/* ── Page header ───────────────────────────────────────────── */
+
+.cat-header {
+    margin-bottom: 36px;
+}
+
+.cat-title {
+    font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+    font-size: clamp(2.4rem, 5vw, 3.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    margin: 0 0 6px;
+}
+
+.cat-subtitle {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    color: var(--color-muted);
     margin: 0;
 }
-.tbs-catalog__count {
-    font-size: 0.875rem;
-    color: var(--tbs-gray-400);
-    margin: 0;
-}
 
-/* Two-column layout */
-.tbs-catalog__layout {
+
+/* ── Two-column layout ─────────────────────────────────────── */
+
+.cat-layout {
     display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 2rem;
+    grid-template-columns: 256px 1fr;
+    gap: 24px;
     align-items: start;
 }
 
-/* Sidebar */
-.tbs-catalog__sidebar {
-    background: var(--tbs-white);
-    border: 1px solid var(--tbs-gray-100);
-    border-radius: var(--tbs-card-radius);
-    padding: 1.5rem;
+
+/* ── Sidebar ───────────────────────────────────────────────── */
+
+.cat-sidebar {
+    /* glass-t1 from taurus-glass.css supplies the backdrop-filter */
+    background: rgba(13, 13, 26, 0.82) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: var(--radius-card);
+    padding: 20px;
     position: sticky;
-    top: 88px;
+    top: 80px;
     max-height: calc(100vh - 108px);
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(220, 20, 60, 0.35) transparent;
 }
 
-/* Filter groups */
-.tbs-filter-group {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--tbs-gray-100);
+.cat-sidebar__heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    margin: 0 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
-.tbs-filter-group:last-child {
+
+
+/* ── Filter groups ─────────────────────────────────────────── */
+
+.cat-filter-group {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cat-filter-group:last-child {
     border-bottom: none;
     margin-bottom: 0;
     padding-bottom: 0;
 }
-.tbs-filter-group__label {
-    font-family: var(--tbs-font-display);
-    font-size: 0.75rem;
+
+.cat-filter-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--tbs-gray-800);
-    margin-bottom: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 10px;
+    display: block;
 }
 
-/* Filter list */
-.tbs-filter-list {
+
+/* ── Search ────────────────────────────────────────────────── */
+
+.cat-search-wrap {
+    position: relative;
+}
+
+.cat-search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-muted);
+    pointer-events: none;
+}
+
+.cat-search-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: var(--radius-input);
+    color: var(--color-text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 9px 12px 9px 34px;
+    outline: none;
+    transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.cat-search-input::placeholder {
+    color: var(--color-muted);
+}
+
+.cat-search-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.15);
+}
+
+
+/* ── Filter pills ──────────────────────────────────────────── */
+
+.cat-filter-list {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 3px;
     max-height: 220px;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(220, 20, 60, 0.3) transparent;
 }
-.tbs-filter-radio {
+
+.cat-filter-radio {
     position: absolute;
     opacity: 0;
     width: 0;
     height: 0;
-}
-.tbs-filter-check {
-    display: flex;
-    align-items: center;
-    padding: 0.4rem 0.6rem;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    color: var(--tbs-gray-600);
-    cursor: pointer;
-    transition: background-color var(--tbs-transition), color var(--tbs-transition);
-}
-.tbs-filter-check:hover,
-.tbs-filter-check--active {
-    background: var(--tbs-gray-50);
-    color: var(--tbs-accent);
+    pointer-events: none;
 }
 
-/* Price range */
-.tbs-price-range {
+.cat-filter-pill {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background 0.18s ease-out, color 0.18s ease-out, border-color 0.18s ease-out;
+    user-select: none;
 }
-.tbs-price-range__input {
+
+.cat-filter-pill:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text);
+}
+
+.cat-filter-pill--active {
+    background: rgba(220, 20, 60, 0.14);
+    border-color: rgba(220, 20, 60, 0.40);
+    color: var(--color-text);
+}
+
+
+/* ── Price range ───────────────────────────────────────────── */
+
+.cat-price-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cat-price-input {
     flex: 1;
     min-width: 0;
-    padding: 0.5rem 0.6rem;
-    font-size: 0.875rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: var(--radius-input);
+    color: var(--color-text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+    -webkit-appearance: none;
+    appearance: none;
 }
-.tbs-price-range__sep {
-    color: var(--tbs-gray-400);
+
+.cat-price-input::placeholder {
+    color: var(--color-muted);
+}
+
+.cat-price-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.15);
+}
+
+.cat-price-sep {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--color-muted);
     flex-shrink: 0;
 }
 
-/* Main content */
-.tbs-catalog__main {
+/* Remove number input arrows */
+.cat-price-input::-webkit-inner-spin-button,
+.cat-price-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.cat-price-input[type=number] { -moz-appearance: textfield; }
+
+
+/* ── Filter action buttons ─────────────────────────────────── */
+
+.cat-filter-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Override tg-btn width for sidebar full-width */
+.cat-apply-btn,
+.cat-clear-btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 12px;
+    padding: 10px 16px;
+}
+
+
+/* ── Sort bar ──────────────────────────────────────────────── */
+
+.cat-main {
     min-width: 0;
 }
 
-.tbs-catalog__sort-bar {
+.cat-sort-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1.25rem;
-}
-.tbs-catalog__showing {
-    font-size: 0.8125rem;
-    color: var(--tbs-gray-400);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-/* Empty state */
-.tbs-catalog__empty {
+.cat-showing {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+}
+
+
+/* ── Product grid ──────────────────────────────────────────── */
+
+.cat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+
+/* ── Empty state ───────────────────────────────────────────── */
+
+.cat-empty {
     text-align: center;
-    padding: 4rem 2rem;
-}
-.tbs-catalog__empty-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-.tbs-catalog__empty-text {
-    color: var(--tbs-gray-400);
-    margin-bottom: 1.5rem;
+    padding: 64px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
 }
 
-/* Pagination */
-.tbs-pagination {
+.cat-empty__icon {
+    color: var(--color-muted);
+    margin-bottom: 4px;
+}
+
+.cat-empty__title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.cat-empty__text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+
+/* ── Pagination ────────────────────────────────────────────── */
+
+.cat-pagination {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.375rem;
-    margin-top: 2.5rem;
+    gap: 6px;
+    margin-top: 40px;
+    flex-wrap: wrap;
 }
-.tbs-pagination__btn {
+
+.cat-page-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 36px;
-    height: 36px;
-    padding: 0 0.5rem;
-    border: 1.5px solid var(--tbs-gray-200);
-    border-radius: 6px;
-    font-size: 0.875rem;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 8px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: var(--radius-btn);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
     font-weight: 600;
-    color: var(--tbs-gray-600);
+    color: var(--color-text-secondary);
     text-decoration: none;
-    transition: border-color var(--tbs-transition), color var(--tbs-transition), background-color var(--tbs-transition);
-}
-.tbs-pagination__btn:hover {
-    border-color: var(--tbs-accent);
-    color: var(--tbs-accent);
-}
-.tbs-pagination__btn--active {
-    background: var(--tbs-accent);
-    border-color: var(--tbs-accent);
-    color: var(--tbs-white);
+    transition: all 0.2s ease-out;
+    cursor: pointer;
 }
 
-/* Responsive */
-@media (max-width: 767.98px) {
-    .tbs-catalog__layout {
+.cat-page-btn:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(220, 20, 60, 0.40);
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.cat-page-btn--active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #ffffff;
+}
+
+.cat-page-btn--active:hover {
+    background: var(--color-red-dark);
+    border-color: var(--color-red-dark);
+    color: #ffffff;
+}
+
+
+/* ── Responsive ────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+    .cat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .cat-layout {
         grid-template-columns: 1fr;
     }
-    .tbs-catalog__sidebar {
+
+    .cat-sidebar {
         position: static;
         max-height: none;
+    }
+
+    .cat-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .cat-page {
+        padding: 32px 0 56px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cat-grid {
+        grid-template-columns: 1fr;
     }
 }

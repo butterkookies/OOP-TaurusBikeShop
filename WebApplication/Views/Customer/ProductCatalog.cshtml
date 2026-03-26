@@ -18,54 +18,79 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/product-catalog.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/product-card.css"    asp-append-version="true" />
+    <style>
+        /* Wallpaper background — matches homepage */
+        body {
+            background-color: #0D0D1A;
+            background-image:
+                linear-gradient(rgba(8, 6, 18, 0.68), rgba(8, 6, 18, 0.68)),
+                url('/mobile wallpaper.png');
+            background-size: cover;
+            background-position: center top;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+    </style>
 }
 
-@* Hidden CSRF token for AJAX calls on this page *@
+@* Hidden CSRF token for AJAX calls *@
 @Html.AntiForgeryToken()
 
-<div class="tbs-catalog-page">
-    <div class="container">
+<div class="cat-page">
+    <div class="cat-container">
 
-        @* Page header *@
-        <div class="tbs-catalog__header">
-            <h1 class="tbs-catalog__title">Product Catalog</h1>
-            <p class="tbs-catalog__count">
-                @totalCount product@(totalCount != 1 ? "s" : "") found
-            </p>
+        @* ── Page header ─────────────────────────────────────── *@
+        <div class="cat-header tg-reveal">
+            <div>
+                <h1 class="cat-title">Product Catalog</h1>
+                <p class="cat-subtitle">
+                    @totalCount product@(totalCount != 1 ? "s" : "") available
+                </p>
+            </div>
         </div>
 
-        <div class="tbs-catalog__layout">
+        <div class="cat-layout">
 
-            @* ======================== FILTER SIDEBAR ======================== *@
-            <aside class="tbs-catalog__sidebar" id="filter-sidebar" aria-label="Product filters">
+            @* ══════════════════════════════════════════════════
+               FILTER SIDEBAR
+               ══════════════════════════════════════════════════ *@
+            <aside class="cat-sidebar glass-t1" id="filter-sidebar" aria-label="Product filters">
+
+                <p class="cat-sidebar__heading">Filters</p>
 
                 @* Search *@
-                <div class="tbs-filter-group">
-                    <label class="tbs-filter-group__label" for="search-input">Search</label>
-                    <input type="text"
-                           id="search-input"
-                           class="tbs-input"
-                           placeholder="Search products…"
-                           value="@search" />
+                <div class="cat-filter-group">
+                    <label class="cat-filter-label" for="search-input">Search</label>
+                    <div class="cat-search-wrap">
+                        <svg class="cat-search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                             fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
+                        </svg>
+                        <input type="text"
+                               id="search-input"
+                               class="cat-search-input"
+                               placeholder="Search products…"
+                               value="@search" />
+                    </div>
                 </div>
 
                 @* Categories *@
-                <div class="tbs-filter-group">
-                    <div class="tbs-filter-group__label">Category</div>
-                    <ul class="tbs-filter-list" id="category-list">
+                <div class="cat-filter-group">
+                    <div class="cat-filter-label">Category</div>
+                    <ul class="cat-filter-list" id="category-list">
                         <li>
-                            <label class="tbs-filter-check @(catId == null ? "tbs-filter-check--active" : "")">
+                            <label class="cat-filter-pill @(catId == null ? "cat-filter-pill--active" : "")">
                                 <input type="radio" name="categoryId" value=""
-                                       @(catId == null ? "checked" : "") class="tbs-filter-radio" />
+                                       @(catId == null ? "checked" : "") class="cat-filter-radio" />
                                 All Categories
                             </label>
                         </li>
                         @foreach (Category cat in categories)
                         {
                             <li>
-                                <label class="tbs-filter-check @(catId == cat.CategoryId ? "tbs-filter-check--active" : "")">
+                                <label class="cat-filter-pill @(catId == cat.CategoryId ? "cat-filter-pill--active" : "")">
                                     <input type="radio" name="categoryId" value="@cat.CategoryId"
-                                           @(catId == cat.CategoryId ? "checked" : "") class="tbs-filter-radio" />
+                                           @(catId == cat.CategoryId ? "checked" : "") class="cat-filter-radio" />
                                     @cat.Name
                                 </label>
                             </li>
@@ -76,22 +101,22 @@
                 @* Brands *@
                 @if (brands.Any())
                 {
-                    <div class="tbs-filter-group">
-                        <div class="tbs-filter-group__label">Brand</div>
-                        <ul class="tbs-filter-list" id="brand-list">
+                    <div class="cat-filter-group">
+                        <div class="cat-filter-label">Brand</div>
+                        <ul class="cat-filter-list" id="brand-list">
                             <li>
-                                <label class="tbs-filter-check @(brandId == null ? "tbs-filter-check--active" : "")">
+                                <label class="cat-filter-pill @(brandId == null ? "cat-filter-pill--active" : "")">
                                     <input type="radio" name="brandId" value=""
-                                           @(brandId == null ? "checked" : "") class="tbs-filter-radio" />
+                                           @(brandId == null ? "checked" : "") class="cat-filter-radio" />
                                     All Brands
                                 </label>
                             </li>
                             @foreach (Brand brand in brands)
                             {
                                 <li>
-                                    <label class="tbs-filter-check @(brandId == brand.BrandId ? "tbs-filter-check--active" : "")">
+                                    <label class="cat-filter-pill @(brandId == brand.BrandId ? "cat-filter-pill--active" : "")">
                                         <input type="radio" name="brandId" value="@brand.BrandId"
-                                               @(brandId == brand.BrandId ? "checked" : "") class="tbs-filter-radio" />
+                                               @(brandId == brand.BrandId ? "checked" : "") class="cat-filter-radio" />
                                         @brand.BrandName
                                     </label>
                                 </li>
@@ -101,108 +126,117 @@
                 }
 
                 @* Price range *@
-                <div class="tbs-filter-group">
-                    <div class="tbs-filter-group__label">Price Range (₱)</div>
-                    <div class="tbs-price-range">
-                        <input type="number" id="min-price" class="tbs-input tbs-price-range__input"
+                <div class="cat-filter-group">
+                    <div class="cat-filter-label">Price Range (₱)</div>
+                    <div class="cat-price-range">
+                        <input type="number" id="min-price" class="cat-price-input"
                                placeholder="Min" value="@minPrice" min="0" step="100" />
-                        <span class="tbs-price-range__sep">—</span>
-                        <input type="number" id="max-price" class="tbs-input tbs-price-range__input"
+                        <span class="cat-price-sep">—</span>
+                        <input type="number" id="max-price" class="cat-price-input"
                                placeholder="Max" value="@maxPrice" min="0" step="100" />
                     </div>
                 </div>
 
-                @* Apply / Clear *@
-                <button type="button" class="btn tbs-btn-accent tbs-btn-full mt-2" id="apply-filters-btn">
-                    Apply Filters
-                </button>
-                <a asp-action="List" asp-controller="Product"
-                   class="btn tbs-btn-outline tbs-btn-full mt-2">
-                    Clear All
-                </a>
+                @* Actions *@
+                <div class="cat-filter-actions">
+                    <button type="button" class="tg-btn btn-primary cat-apply-btn" id="apply-filters-btn">
+                        Apply Filters
+                    </button>
+                    <a asp-action="List" asp-controller="Product"
+                       class="tg-btn btn-ghost cat-clear-btn">
+                        Clear All
+                    </a>
+                </div>
 
             </aside>
 
-            @* ======================== PRODUCT GRID ======================== *@
-            <div class="tbs-catalog__main">
+            @* ══════════════════════════════════════════════════
+               PRODUCT GRID
+               ══════════════════════════════════════════════════ *@
+            <div class="cat-main">
 
-                @* Sort bar *@
-                <div class="tbs-catalog__sort-bar">
-                    <span class="tbs-catalog__showing">
-                        Showing @((currentPage - 1) * 12 + 1)–@(Math.Min(currentPage * 12, totalCount))
-                        of @totalCount
+                @* Sort / results bar *@
+                <div class="cat-sort-bar tg-reveal">
+                    <span class="cat-showing">
+                        @if (Model.Any())
+                        {
+                            <text>Showing @((currentPage - 1) * 12 + 1)–@(Math.Min(currentPage * 12, totalCount)) of @totalCount</text>
+                        }
+                        else
+                        {
+                            <text>No results</text>
+                        }
                     </span>
                 </div>
 
-                @* Grid *@
+                @* Empty state *@
                 @if (!Model.Any())
                 {
-                    <div class="tbs-catalog__empty">
-                        <div class="tbs-catalog__empty-icon" aria-hidden="true">🔍</div>
-                        <p class="tbs-catalog__empty-text">No products found matching your filters.</p>
-                        <a asp-action="List" asp-controller="Product" class="btn tbs-btn-accent">
+                    <div class="cat-empty glass-card">
+                        <div class="cat-empty__icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
+                                 fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
+                            </svg>
+                        </div>
+                        <h3 class="cat-empty__title">No products found</h3>
+                        <p class="cat-empty__text">Try adjusting your filters or search term.</p>
+                        <a asp-action="List" asp-controller="Product" class="tg-btn btn-primary">
                             Clear Filters
                         </a>
                     </div>
                 }
                 else
                 {
-                    <div class="row g-3" id="product-grid">
+                    <div class="cat-grid tg-reveal" id="product-grid">
                         @foreach (WebApplication.Models.ViewModels.ProductViewModel product in Model)
                         {
-                            <div class="col-6 col-lg-4">
-                                @await Html.PartialAsync("~/Views/Customer/Partials/_ProductCard.cshtml", product)
-                            </div>
+                            @await Html.PartialAsync("~/Views/Customer/Partials/_ProductCard.cshtml", product)
                         }
                     </div>
 
                     @* Pagination *@
                     @if (totalPages > 1)
                     {
-                        <nav class="tbs-pagination" aria-label="Product pages">
+                        <nav class="cat-pagination tg-reveal" aria-label="Product pages">
                             @if (currentPage > 1)
                             {
-                                <a class="tbs-pagination__btn"
+                                <a class="cat-page-btn"
                                    asp-action="List" asp-controller="Product"
                                    asp-route-page="@(currentPage - 1)"
                                    asp-route-categoryId="@catId"
                                    asp-route-brandId="@brandId"
                                    asp-route-search="@search"
-                                   aria-label="Previous page">
-                                    &lsaquo;
-                                </a>
+                                   aria-label="Previous page">&#8249;</a>
                             }
 
                             @for (int p = Math.Max(1, currentPage - 2);
                                   p <= Math.Min(totalPages, currentPage + 2); p++)
                             {
-                                <a class="tbs-pagination__btn @(p == currentPage ? "tbs-pagination__btn--active" : "")"
+                                <a class="cat-page-btn @(p == currentPage ? "cat-page-btn--active" : "")"
                                    asp-action="List" asp-controller="Product"
                                    asp-route-page="@p"
                                    asp-route-categoryId="@catId"
                                    asp-route-brandId="@brandId"
                                    asp-route-search="@search"
                                    aria-label="Page @p"
-                                   aria-current="@(p == currentPage ? "page" : null)">
-                                    @p
-                                </a>
+                                   aria-current="@(p == currentPage ? "page" : null)">@p</a>
                             }
 
                             @if (currentPage < totalPages)
                             {
-                                <a class="tbs-pagination__btn"
+                                <a class="cat-page-btn"
                                    asp-action="List" asp-controller="Product"
                                    asp-route-page="@(currentPage + 1)"
                                    asp-route-categoryId="@catId"
                                    asp-route-brandId="@brandId"
                                    asp-route-search="@search"
-                                   aria-label="Next page">
-                                    &rsaquo;
-                                </a>
+                                   aria-label="Next page">&#8250;</a>
                             }
                         </nav>
                     }
                 }
+
             </div>
         </div>
     </div>

@@ -1,0 +1,1120 @@
+/*
+ * taurus-glass.css
+ * Taurus Bike Shop — Complete Glassmorphism Design System
+ * Brand v2.0 — Deep gradient background, glass surfaces, crimson accents
+ * Font stack: Bebas Neue / Barlow Condensed / DM Sans / Oswald
+ *
+ * USAGE: Import this file BEFORE all other page-specific CSS.
+ * Add the Google Fonts link to _Layout.cshtml <head> (see bottom of file for JS).
+ */
+
+/* ─────────────────────────────────────────────────────────────
+   GOOGLE FONTS IMPORT
+   ───────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Oswald:wght@400;500;600&display=swap');
+
+
+/* ─────────────────────────────────────────────────────────────
+   CSS CUSTOM PROPERTIES — DESIGN TOKENS
+   ───────────────────────────────────────────────────────────── */
+:root {
+
+  /* --- Backgrounds --- */
+  --color-bg:           #0D0D1A;
+  --color-bg-start:     #0D0D1A;
+  --color-bg-mid:       #12101F;
+  --color-bg-end:       #0A0A14;
+  --color-bg-gradient:  linear-gradient(135deg, #12101F 0%, #0D0D1A 60%, #0f0a18 100%);
+
+  /* --- Glass Surface System --- */
+  --glass-bg:           rgba(255, 255, 255, 0.06);
+  --glass-bg-hover:     rgba(255, 255, 255, 0.10);
+  --glass-bg-active:    rgba(220, 20, 60, 0.12);
+  --glass-border:       rgba(255, 255, 255, 0.10);
+  --glass-border-hover: rgba(220, 20, 60, 0.50);
+  --glass-blur:         blur(16px) saturate(180%);
+  --glass-shadow:       0 8px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --glass-shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 24px rgba(220, 20, 60, 0.15);
+
+  /* Glass tiers */
+  --glass-t1-bg:        rgba(255, 255, 255, 0.05);
+  --glass-t1-blur:      blur(12px);
+  --glass-t2-bg:        rgba(255, 255, 255, 0.07);
+  --glass-t2-blur:      blur(16px) saturate(180%);
+  --glass-t3-bg:        rgba(255, 255, 255, 0.10);
+  --glass-t3-blur:      blur(20px) saturate(190%);
+  --glass-t4-bg:        rgba(255, 255, 255, 0.13);
+  --glass-t4-blur:      blur(28px) saturate(200%);
+
+  /* --- Brand Crimson --- */
+  --color-primary:      #DC143C;
+  --color-red-dark:     #9B0E2A;
+  --color-red-glow:     rgba(220, 20, 60, 0.15);
+  --color-red-glow-md:  rgba(220, 20, 60, 0.25);
+
+  /* --- Text --- */
+  --color-text:            #F0F0F0;
+  --color-text-secondary:  rgba(240, 240, 240, 0.65);
+  --color-muted:           rgba(240, 240, 240, 0.35);
+
+  /* --- Semantic States --- */
+  --color-success:      rgba(34, 197, 94, 0.80);
+  --color-warning:      rgba(251, 191, 36, 0.80);
+  --color-danger:       #DC143C;
+
+  /* --- Borders & Dividers --- */
+  --color-border:       rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.15);
+
+  /* --- Typography --- */
+  --font-display:       'Bebas Neue', 'Barlow Condensed', sans-serif;
+  --font-condensed:     'Barlow Condensed', 'Bebas Neue', sans-serif;
+  --font-card:          'Rajdhani', sans-serif;
+  --font-body:          'DM Sans', 'Outfit', sans-serif;
+  --font-accent:        'Oswald', 'Teko', sans-serif;
+
+  /* --- Spacing (8px grid) --- */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-10: 80px;
+  --space-15: 120px;
+
+  /* --- Border Radius --- */
+  --radius-btn:    4px;
+  --radius-input:  6px;
+  --radius-card:   12px;
+  --radius-modal:  16px;
+  --radius-pill:   999px;
+
+  /* --- Transitions --- */
+  --transition-fast:  all 0.2s ease-out;
+  --transition-base:  all 0.25s ease-out;
+  --transition-slow:  all 0.4s ease-out;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   KEYFRAME ANIMATIONS
+   ───────────────────────────────────────────────────────────── */
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(220, 20, 60, 0.40); }
+  50%       { box-shadow: 0 0 28px rgba(220, 20, 60, 0.70); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes crimsonFlash {
+  0%   { border-top-color: transparent; }
+  100% { border-top-color: var(--color-primary); }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   BASE — BODY & PAGE BACKGROUND
+   ───────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--color-text);
+  background: radial-gradient(ellipse at 20% 20%, #1a1035 0%, #0d0d1a 45%, #0a0a14 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Atmospheric depth orbs — applied via .tg-bg wrapper */
+.tg-bg {
+  position: relative;
+  isolation: isolate;
+}
+.tg-bg::before,
+.tg-bg::after {
+  content: '';
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+  filter: blur(100px);
+}
+.tg-bg::before {
+  /* Crimson glow — bottom-left */
+  width: 600px;
+  height: 600px;
+  left: -100px;
+  bottom: -100px;
+  background: radial-gradient(circle, rgba(220, 20, 60, 0.18) 0%, transparent 70%);
+}
+.tg-bg::after {
+  /* Violet orb — top-right */
+  width: 500px;
+  height: 500px;
+  right: -80px;
+  top: -80px;
+  background: radial-gradient(circle, rgba(120, 40, 200, 0.12) 0%, transparent 65%);
+}
+
+/* Content above orbs */
+.tg-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+ * BUG FIX: navbar header must stack above <main> and <footer>.
+ * All .tg-bg direct children get z-index:1 above. Since <main> comes
+ * after <header> in DOM order, it would paint over the navbar's
+ * Bootstrap dropdown at the same z-index level.
+ * Giving the header z-index:3 puts it in its own stacking context
+ * above <main> (z-index:1), so dropdowns are never obscured.
+ */
+.tg-bg > header,
+body > header,
+.tbs-header {
+  position: relative;
+  z-index: 3;
+}
+
+/* Standalone background helper */
+.tg-page-bg {
+  background:
+    radial-gradient(ellipse at 15% 80%, rgba(220, 20, 60, 0.20) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 15%, rgba(80, 30, 150, 0.15) 0%, transparent 45%),
+    linear-gradient(135deg, #12101F 0%, #0D0D1A 60%, #0a0a14 100%);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   GLASS CARD SYSTEM — ELEVATION TIERS
+   ───────────────────────────────────────────────────────────── */
+
+/* Tier 1 — Base Glass: sidebars, nav backgrounds */
+.glass-t1 {
+  background: var(--glass-t1-bg);
+  backdrop-filter: var(--glass-t1-blur);
+  -webkit-backdrop-filter: var(--glass-t1-blur);
+  border: 1px solid var(--glass-border);
+}
+
+/* Tier 2 — Card Glass: product cards, panels (DEFAULT CARD) */
+.glass-card,
+.glass-t2 {
+  background: var(--glass-t2-bg);
+  backdrop-filter: var(--glass-t2-blur);
+  -webkit-backdrop-filter: var(--glass-t2-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--glass-shadow);
+  transition: var(--transition-base);
+}
+
+.glass-card:hover,
+.glass-t2:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--glass-shadow-hover);
+  transform: translateY(-4px);
+}
+
+/* Tier 3 — Elevated Glass: modals, dropdowns, tooltips */
+.glass-t3,
+.glass-modal,
+.glass-dropdown {
+  background: var(--glass-t3-bg);
+  backdrop-filter: var(--glass-t3-blur);
+  -webkit-backdrop-filter: var(--glass-t3-blur);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-modal);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55), 0 2px 12px rgba(0, 0, 0, 0.35);
+  transition: var(--transition-base);
+}
+
+/* Tier 4 — Overlay Glass: drawers, full-screen overlays */
+.glass-t4,
+.glass-overlay,
+.glass-drawer {
+  background: var(--glass-t4-bg);
+  backdrop-filter: var(--glass-t4-blur);
+  -webkit-backdrop-filter: var(--glass-t4-blur);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65), 0 4px 16px rgba(0, 0, 0, 0.40);
+}
+
+/* Card with crimson hover border variant */
+.glass-card--crimson-hover:hover {
+  border-top: 2px solid var(--color-primary);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-4px);
+}
+
+/* Active / selected card state */
+.glass-card--active,
+.glass-card.active {
+  background: var(--glass-bg-active);
+  border-color: rgba(220, 20, 60, 0.40);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 16px rgba(220, 20, 60, 0.12);
+}
+
+/* Backdrop-filter fallback for unsupported browsers */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-card, .glass-t1, .glass-t2, .glass-t3, .glass-t4,
+  .glass-modal, .glass-dropdown, .glass-overlay, .glass-drawer {
+    background: rgba(13, 13, 26, 0.92);
+  }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   NAVBAR
+   ───────────────────────────────────────────────────────────── */
+
+.navbar,
+.tg-navbar {
+  background: rgba(13, 13, 26, 0.75);
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: background 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+/* JS adds .scrolled when scrollY > 20 */
+.navbar.scrolled,
+.tg-navbar.scrolled {
+  background: rgba(13, 13, 26, 0.92);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.50);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.navbar-brand,
+.tg-navbar-brand {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--color-text);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navbar-brand .brand-accent,
+.tg-navbar-brand .brand-accent {
+  color: var(--color-primary);
+}
+
+.navbar-nav .nav-link,
+.tg-navbar-nav .nav-link,
+.tg-nav-link {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-bottom: 2px solid transparent;
+  transition: var(--transition-fast);
+}
+
+.navbar-nav .nav-link:hover,
+.tg-nav-link:hover {
+  color: var(--color-text);
+  border-bottom-color: rgba(255, 255, 255, 0.25);
+}
+
+.navbar-nav .nav-link.active,
+.tg-nav-link.active,
+.tg-nav-link--active {
+  color: var(--color-text);
+  border-bottom-color: var(--color-primary);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   SIDEBAR (Admin / Dashboard)
+   ───────────────────────────────────────────────────────────── */
+
+.tg-sidebar {
+  background: rgba(13, 13, 26, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  width: 240px;
+  min-height: 100vh;
+  transition: var(--transition-base);
+}
+
+.tg-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 12px 20px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: var(--transition-fast);
+}
+
+.tg-sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text);
+}
+
+.tg-sidebar-item.active,
+.tg-sidebar-item--active {
+  background: rgba(220, 20, 60, 0.15);
+  border-left-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   BUTTONS
+   ───────────────────────────────────────────────────────────── */
+
+/* Shared base */
+.btn,
+.tg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  padding: 12px 28px;
+  border-radius: var(--radius-btn);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: var(--transition-base);
+  line-height: 1;
+}
+
+/* Primary — Solid crimson */
+.btn-primary,
+.tg-btn--primary {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border: 1px solid transparent;
+}
+
+.btn-primary:hover,
+.tg-btn--primary:hover {
+  background: var(--color-red-dark);
+  box-shadow: 0 0 20px rgba(220, 20, 60, 0.50);
+  color: #FFFFFF;
+}
+
+.btn-primary:focus-visible,
+.tg-btn--primary:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(220, 20, 60, 0.20);
+}
+
+.btn-primary:hover,
+.tg-btn--primary:hover {
+  animation: glowPulse 1.4s ease-in-out infinite;
+}
+
+/* Secondary — Glass crimson tint */
+.btn-secondary,
+.tg-btn--secondary {
+  background: rgba(220, 20, 60, 0.10);
+  color: var(--color-primary);
+  border: 1px solid rgba(220, 20, 60, 0.40);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.btn-secondary:hover,
+.tg-btn--secondary:hover {
+  background: rgba(220, 20, 60, 0.20);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Ghost — Transparent outline */
+.btn-ghost,
+.tg-btn--ghost {
+  background: transparent;
+  color: rgba(240, 240, 240, 0.80);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+}
+
+.btn-ghost:hover,
+.tg-btn--ghost:hover {
+  border-color: rgba(255, 255, 255, 0.50);
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Danger */
+.btn-danger,
+.tg-btn--danger {
+  background: rgba(220, 20, 60, 0.90);
+  color: #FFFFFF;
+  border: 1px solid transparent;
+}
+
+.btn-danger:hover,
+.tg-btn--danger:hover {
+  background: var(--color-primary);
+  box-shadow: 0 0 16px rgba(220, 20, 60, 0.45);
+  color: #FFFFFF;
+}
+
+/* Size modifiers */
+.btn-sm,
+.tg-btn--sm {
+  font-size: 11px;
+  padding: 8px 18px;
+  letter-spacing: 0.08em;
+}
+
+.btn-lg,
+.tg-btn--lg {
+  font-size: 14px;
+  padding: 16px 40px;
+  letter-spacing: 0.12em;
+}
+
+/* Disabled state */
+.btn:disabled,
+.tg-btn:disabled {
+  opacity: 0.40;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   FORM INPUTS & SELECTS
+   ───────────────────────────────────────────────────────────── */
+
+.form-control,
+.tg-input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: var(--radius-input);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 10px 14px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-control:focus,
+.tg-input:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.15);
+}
+
+.form-control::placeholder,
+.tg-input::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-muted);
+}
+
+select option {
+  background: #12101F;
+  color: var(--color-text);
+}
+
+/* Form label */
+.form-label,
+.tg-label,
+label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+
+/* Form group */
+.form-group,
+.tg-form-group {
+  margin-bottom: 20px;
+}
+
+/* Input error state */
+.form-control.is-invalid,
+.tg-input--error {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.10);
+}
+
+.form-text,
+.tg-input-hint {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-top: 4px;
+}
+
+/* Checkbox & Radio glass style */
+.tg-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.tg-check input[type="checkbox"],
+.tg-check input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   BADGES
+   ───────────────────────────────────────────────────────────── */
+
+.badge,
+.tg-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 3px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Solid crimson (default) */
+.badge,
+.tg-badge,
+.tg-badge--solid {
+  background: var(--color-primary);
+  color: #FFFFFF;
+}
+
+/* Outline */
+.badge-outline,
+.tg-badge--outline {
+  background: transparent;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Glass tint */
+.badge-glass,
+.tg-badge--glass {
+  background: rgba(220, 20, 60, 0.18);
+  border: 1px solid rgba(220, 20, 60, 0.35);
+  color: var(--color-text);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Success */
+.badge-success,
+.tg-badge--success {
+  background: rgba(34, 197, 94, 0.20);
+  border: 1px solid rgba(34, 197, 94, 0.40);
+  color: rgba(74, 222, 128, 1);
+}
+
+/* Warning */
+.badge-warning,
+.tg-badge--warning {
+  background: rgba(251, 191, 36, 0.18);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  color: rgba(253, 224, 71, 1);
+}
+
+/* Muted / neutral */
+.badge-muted,
+.tg-badge--muted {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--color-text-secondary);
+}
+
+/* NEW / SALE / LIMITED — product-specific */
+.badge-new  { background: #DC143C; color: #FFF; }
+.badge-sale { background: rgba(220, 20, 60, 0.85); color: #FFF; }
+.badge-limited {
+  background: transparent;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   TABLE (Admin / Data Views)
+   ───────────────────────────────────────────────────────────── */
+
+.table-wrapper,
+.tg-table-wrapper {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  width: 100%;
+}
+
+.tg-table,
+.table-wrapper table,
+table.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+}
+
+.tg-table thead,
+.table-wrapper table thead,
+table.table thead {
+  background: rgba(220, 20, 60, 0.12);
+}
+
+.tg-table thead th,
+.table-wrapper table thead th,
+table.table thead th {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: rgba(240, 240, 240, 0.55);
+  padding: 14px 16px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tg-table tbody td,
+.table-wrapper table tbody td,
+table.table tbody td {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+  transition: background 0.15s ease-out;
+}
+
+.tg-table tbody tr:hover td,
+.table-wrapper table tbody tr:hover td,
+table.table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tg-table tbody tr:last-child td,
+.table-wrapper table tbody tr:last-child td,
+table.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Responsive scroll wrapper */
+.tg-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Column helpers */
+.tg-table .col-price,
+.tg-table .col-stat {
+  font-family: var(--font-accent);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   PILL TABS (Category / Filter)
+   ───────────────────────────────────────────────────────────── */
+
+.pill-tabs,
+.tg-pill-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.pill-tab,
+.tg-pill-tab {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: var(--radius-pill);
+  padding: 8px 20px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.pill-tab:hover,
+.tg-pill-tab:hover,
+.pill-tab.active,
+.tg-pill-tab.active,
+.tg-pill-tab--active {
+  background: rgba(220, 20, 60, 0.18);
+  border-color: rgba(220, 20, 60, 0.50);
+  color: var(--color-text);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   STAT / KPI CARDS
+   ───────────────────────────────────────────────────────────── */
+
+.stat-card,
+.tg-stat-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  transition: var(--transition-base);
+}
+
+.stat-card:hover,
+.tg-stat-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(220, 20, 60, 0.30);
+  box-shadow: var(--glass-shadow-hover);
+}
+
+.stat-value,
+.tg-stat-value {
+  font-family: var(--font-accent);
+  font-size: 36px;
+  font-weight: 500;
+  color: var(--color-text);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.stat-value--crimson,
+.tg-stat-value--primary {
+  color: var(--color-primary);
+}
+
+.stat-label,
+.tg-stat-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(240, 240, 240, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.stat-change,
+.tg-stat-change {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-change--up  { color: rgba(74, 222, 128, 0.90); }
+.stat-change--down { color: var(--color-primary); }
+
+
+/* ─────────────────────────────────────────────────────────────
+   SECTION REVEAL ANIMATION
+   ───────────────────────────────────────────────────────────── */
+
+.section-enter,
+.tg-fade-up {
+  animation: fadeUp 0.4s ease-out forwards;
+}
+
+.tg-fade-up--d1 { animation-delay: 0.05s; }
+.tg-fade-up--d2 { animation-delay: 0.10s; }
+.tg-fade-up--d3 { animation-delay: 0.15s; }
+.tg-fade-up--d4 { animation-delay: 0.20s; }
+.tg-fade-up--d5 { animation-delay: 0.25s; }
+.tg-fade-up--d6 { animation-delay: 0.30s; }
+
+/* Scroll-triggered reveals — JS adds .tg-visible */
+.tg-reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+.tg-reveal.tg-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   TYPOGRAPHY HELPERS
+   ───────────────────────────────────────────────────────────── */
+
+.tg-display {
+  font-family: var(--font-display);
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+.tg-display--hero  { font-size: clamp(72px, 10vw, 140px); }
+.tg-display--section { font-size: clamp(36px, 5vw, 56px); font-family: var(--font-condensed); font-weight: 700; }
+.tg-display--card  { font-size: 20px; font-family: var(--font-card); font-weight: 700; letter-spacing: 0; }
+
+.tg-price {
+  font-family: var(--font-accent);
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.tg-price--lg { font-size: 28px; }
+.tg-price--md { font-size: 22px; }
+.tg-price--sm { font-size: 16px; }
+
+.tg-label-ui {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--color-text-secondary);
+}
+
+.tg-text-muted  { color: var(--color-muted); }
+.tg-text-secondary { color: var(--color-text-secondary); }
+.tg-text-primary   { color: var(--color-primary); }
+
+/* Outlined headline word — visual texture */
+.tg-outline-text {
+  -webkit-text-stroke: 1px rgba(240, 240, 240, 0.80);
+  color: transparent;
+}
+
+.tg-outline-text--crimson {
+  -webkit-text-stroke: 1px var(--color-primary);
+  color: transparent;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   DIVIDERS
+   ───────────────────────────────────────────────────────────── */
+
+.tg-divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-4) 0;
+}
+
+.tg-divider--strong {
+  border-top-color: var(--color-border-strong);
+}
+
+.tg-divider--crimson {
+  border-top: 1px solid rgba(220, 20, 60, 0.30);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   LAYOUT UTILITIES
+   ───────────────────────────────────────────────────────────── */
+
+.tg-container {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+.tg-section {
+  padding-block: var(--space-10);
+}
+
+.tg-section--lg {
+  padding-block: var(--space-15);
+}
+
+.tg-grid-cards {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.tg-grid-cards--tight {
+  gap: 12px;
+}
+
+.tg-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tg-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   SCROLLBAR STYLING
+   ───────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(13, 13, 26, 0.80);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(220, 20, 60, 0.45);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(220, 20, 60, 0.70);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   SELECTION COLOR
+   ───────────────────────────────────────────────────────────── */
+
+::selection {
+  background: rgba(220, 20, 60, 0.30);
+  color: var(--color-text);
+}
+
+
+/*
+ * ─────────────────────────────────────────────────────────────
+ * SCROLL JS SNIPPET — paste into site.js or _Layout.cshtml
+ * ─────────────────────────────────────────────────────────────
+ *
+ * // Navbar glass opacity on scroll
+ * (function () {
+ *   const navbar = document.querySelector('.navbar, .tg-navbar');
+ *   if (navbar) {
+ *     window.addEventListener('scroll', function () {
+ *       navbar.classList.toggle('scrolled', window.scrollY > 20);
+ *     }, { passive: true });
+ *   }
+ *
+ *   // Scroll-triggered fade-up reveals
+ *   const reveals = document.querySelectorAll('.tg-reveal');
+ *   if (reveals.length) {
+ *     const io = new IntersectionObserver(function (entries) {
+ *       entries.forEach(function (entry) {
+ *         if (entry.isIntersecting) {
+ *           entry.target.classList.add('tg-visible');
+ *           io.unobserve(entry.target);
+ *         }
+ *       });
+ *     }, { threshold: 0.12 });
+ *     reveals.forEach(function (el) { io.observe(el); });
+ *   }
+ * })();
+ *
+ * ─────────────────────────────────────────────────────────────
+ */

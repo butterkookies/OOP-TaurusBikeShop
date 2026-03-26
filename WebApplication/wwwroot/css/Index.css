@@ -1,23 +1,101 @@
 /* ============================================================
    TAURUS BIKE SHOP — Homepage (Index.css)
-   Brand: matte black #0A0A0A · crimson #DC143C · Bebas Neue
-   Minimal complement to Tailwind — handles atmosphere,
-   animations, and Bootstrap link overrides.
+   Brand v2.0 — Glassmorphism system
+   Complements taurus-glass.css (loaded first).
+   All tokens via CSS vars from taurus-glass.css :root.
    ============================================================ */
 
-/* ── Brand tokens (reference; Tailwind config is the source of truth) ── */
-:root {
-    --tbs-bg:        #0A0A0A;
-    --tbs-surface:   #111111;
-    --tbs-border:    #1E1E1E;
-    --tbs-text:      #F0F0F0;
-    --tbs-muted:     #6B6B6B;
-    --tbs-crimson:   #DC143C;
-    --tbs-crimson-d: #9B0E2A;
-    --tbs-glow:      rgba(220, 20, 60, 0.15);
+
+/* ── Shared layout helpers ─────────────────────────────────── */
+
+.idx-container {
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: 24px;
 }
 
-/* ── Hero: crimson radial glow from beneath ─────────────────── */
+.idx-section {
+    padding-block: 80px;
+}
+
+.idx-section--lg {
+    padding-block: 120px;
+}
+
+.idx-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.idx-section-title {
+    font-family: 'Barlow Condensed', 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.idx-section-title--center {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 48px;
+}
+
+.idx-view-all-link {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s ease-out;
+}
+
+.idx-view-all-link:hover {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.idx-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-primary);
+    margin: 0 0 16px;
+}
+
+.idx-crimson {
+    color: var(--color-primary);
+}
+
+
+/* ── HERO ──────────────────────────────────────────────────── */
+
+#hero,
+.idx-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: 128px 100px;
+    text-align: center;
+    /* Section gets the most dramatic gradient from BRAND.md */
+    background:
+        radial-gradient(ellipse at 15% 80%, rgba(220, 20, 60, 0.20) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 15%, rgba(80, 30, 150, 0.15) 0%, transparent 45%),
+        transparent;
+}
+
+/* Crimson radial glow from beneath — BRAND.md spec */
 #hero::before {
     content: '';
     position: absolute;
@@ -31,28 +109,26 @@
     z-index: 0;
 }
 
-/* ── Hero: grain + speed-line texture overlay ───────────────── */
+/* Grain + diagonal speed-line texture overlay */
 #hero::after {
     content: '';
     position: absolute;
     inset: 0;
-    /* Fine grain noise */
     background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E"),
-        /* Subtle diagonal speed lines */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E"),
         repeating-linear-gradient(
             -55deg,
             transparent,
             transparent 48px,
-            rgba(255, 255, 255, 0.012) 48px,
-            rgba(255, 255, 255, 0.012) 49px
+            rgba(255, 255, 255, 0.006) 48px,
+            rgba(255, 255, 255, 0.006) 49px
         );
     background-size: 300px 300px, auto;
     pointer-events: none;
     z-index: 0;
 }
 
-/* ── Hero: oversized typographic watermark ──────────────────── */
+/* Oversized typographic watermark — stays behind all content */
 .hero-bg-text {
     position: absolute;
     inset: 0;
@@ -61,7 +137,6 @@
     justify-content: center;
     font-family: 'Bebas Neue', sans-serif;
     font-size: clamp(9rem, 24vw, 20rem);
-    font-weight: 400; /* Bebas Neue is single-weight */
     color: rgba(220, 20, 60, 0.04);
     letter-spacing: 0.04em;
     pointer-events: none;
@@ -71,16 +146,433 @@
     overflow: hidden;
 }
 
+.idx-hero__inner {
+    position: relative;
+    z-index: 1;
+}
+
+.idx-hero__eyebrow {
+    display: inline-block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-primary);
+    margin-bottom: 20px;
+}
+
+.idx-hero__headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 11vw, 8.5rem);
+    line-height: 0.93;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    margin: 0 auto 24px;
+    max-width: 840px;
+}
+
+.idx-hero__sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+    line-height: 1.65;
+    max-width: 480px;
+    margin: 0 auto 40px;
+}
+
+.idx-hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 64px;
+}
+
+/* Stats row */
+.idx-hero__stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 48px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    max-width: 440px;
+    margin-inline: auto;
+}
+
+.idx-hero__stat {
+    text-align: center;
+}
+
+.idx-hero__stat-value {
+    display: block;
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.25rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--color-text);
+}
+
+.idx-hero__stat-label {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    color: var(--color-muted);
+    margin-top: 4px;
+}
+
+
+/* ── CATEGORIES ────────────────────────────────────────────── */
+
+.idx-category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.idx-category-card {
+    display: block;
+    padding: 24px;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    /* glass-card class handles the base glass + hover; extend below */
+}
+
+.idx-category-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--color-primary);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease-out;
+}
+
+.idx-category-card:hover::before {
+    transform: scaleX(1);
+}
+
+.idx-category-card:hover {
+    text-decoration: none;
+}
+
+.idx-category-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    background: rgba(220, 20, 60, 0.12);
+    color: var(--color-primary);
+    margin-bottom: 20px;
+    flex-shrink: 0;
+    transition: background 0.2s ease-out;
+}
+
+.idx-category-card:hover .idx-category-card__icon {
+    background: rgba(220, 20, 60, 0.22);
+}
+
+.idx-category-card__title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--color-text);
+    margin: 0 0 8px;
+    transition: color 0.2s ease-out;
+}
+
+.idx-category-card:hover .idx-category-card__title {
+    color: var(--color-primary);
+}
+
+.idx-category-card__desc {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0 0 16px;
+}
+
+.idx-category-card__arrow {
+    font-size: 14px;
+    color: var(--color-muted);
+    transition: color 0.2s ease-out, transform 0.2s ease-out;
+    display: inline-block;
+}
+
+.idx-category-card:hover .idx-category-card__arrow {
+    color: var(--color-primary);
+    transform: translateX(4px);
+}
+
+/* "All Categories" card — slightly dimmer, special hover */
+.idx-category-card--all {
+    border-style: dashed;
+    border-color: rgba(255, 255, 255, 0.07);
+}
+
+.idx-category-card--all:hover {
+    border-style: solid;
+}
+
+
+/* ── FEATURED PRODUCTS ─────────────────────────────────────── */
+
+.idx-featured {
+    /* Glass band — slightly more opaque so it reads as a lifted layer over the wallpaper */
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-top:    1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.idx-product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+
+/* ── ABOUT ─────────────────────────────────────────────────── */
+
+.idx-about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+
+.idx-about__copy {
+    /* editorial left column */
+}
+
+.idx-about__headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    margin: 0 0 24px;
+}
+
+.idx-about__body {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    line-height: 1.75;
+    margin: 0 0 32px;
+    max-width: 480px;
+}
+
+.idx-stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Extend tg-stat-card with a crimson top-border flash */
+.idx-stat-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.idx-stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--color-primary);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease-out;
+}
+
+.idx-stat-card:hover::after {
+    transform: scaleX(1);
+}
+
+
+/* ── VALUE PROPS (WHY US) ───────────────────────────────────── */
+
+.idx-value-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.idx-value-card {
+    padding: 24px;
+}
+
+.idx-value-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    background: rgba(220, 20, 60, 0.12);
+    color: var(--color-primary);
+    margin-bottom: 20px;
+    flex-shrink: 0;
+    transition: background 0.2s ease-out;
+}
+
+.idx-value-card:hover .idx-value-icon {
+    background: rgba(220, 20, 60, 0.22);
+}
+
+.idx-value-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    color: var(--color-text);
+    margin: 0 0 10px;
+}
+
+.idx-value-desc {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+
+/* ── CTA ───────────────────────────────────────────────────── */
+
+.idx-cta-section {
+    padding-block: 80px;
+}
+
+.idx-cta-panel {
+    /* glass-t3 handles the frosted glass base */
+    position: relative;
+    overflow: hidden;
+    padding: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
+}
+
+/* Ambient crimson glow inside the CTA panel */
+.idx-cta-glow {
+    position: absolute;
+    width: 480px;
+    height: 480px;
+    left: -120px;
+    bottom: -180px;
+    background: radial-gradient(circle, rgba(220, 20, 60, 0.20) 0%, transparent 65%);
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.idx-cta-content {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+}
+
+.idx-cta-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    margin: 0 0 20px;
+}
+
+.idx-cta-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin: 0 0 32px;
+    max-width: 420px;
+}
+
+.idx-cta-inline-link {
+    color: var(--color-text);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease-out;
+}
+
+.idx-cta-inline-link:hover {
+    color: var(--color-primary);
+}
+
+.idx-cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* Decorative stat column — right side of CTA panel */
+.idx-cta-stat-col {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.idx-cta-stat {
+    text-align: center;
+    padding: 24px 40px;
+}
+
+.idx-cta-stat__value {
+    display: block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    line-height: 1;
+    color: var(--color-primary);
+}
+
+.idx-cta-stat__label {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-muted);
+    margin-top: 4px;
+}
+
+.idx-cta-stat-divider {
+    width: 32px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+
 /* ── Entrance animations — 40px Y offset per BRAND.md ──────── */
+
 @keyframes tbs-fade-up {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 .hero-anim {
@@ -97,7 +589,9 @@
     .hero-anim { animation: none; opacity: 1; }
 }
 
-/* ── CTA button — crimson glow pulse on hover ───────────────── */
+
+/* ── CTA button glow pulse ─────────────────────────────────── */
+
 @keyframes tbs-glow-pulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(220, 20, 60, 0); }
     50%       { box-shadow: 0 0 20px 6px rgba(220, 20, 60, 0.28); }
@@ -107,19 +601,9 @@
     animation: tbs-glow-pulse 1.4s ease-in-out infinite;
 }
 
-/* ── Tight dark elevation for card hover ────────────────────── */
-/* Used alongside Tailwind's hover:-translate-y-1.
-   BRAND.md: tight dark shadows only, no floaty shadows.        */
-.card-hover:hover {
-    box-shadow:
-        0 0 0 1px var(--tbs-crimson),
-        0 12px 28px rgba(0, 0, 0, 0.55);
-}
 
 /* ── Bootstrap anchor override ───────────────────────────────── */
-/* Bootstrap 5 sets `text-decoration: underline` on <a>.
-   Tailwind's `important: true` overrides color but decoration
-   can still win on first paint without this explicit reset.     */
+/* Bootstrap 5 sets text-decoration: underline on <a> */
 #hero a,
 #categories a,
 #featured a,
@@ -136,17 +620,89 @@
 #cta a:hover {
     text-decoration: none;
 }
-
-/* Exception: inline sign-in link inside CTA prose keeps underline */
-#cta p a {
+/* Exception: inline sign-in link keeps its underline */
+.idx-cta-inline-link,
+.idx-cta-inline-link:hover {
     text-decoration: underline;
-    text-underline-offset: 3px;
 }
 
-/* ── Mobile tweaks ───────────────────────────────────────────── */
-@media (max-width: 767px) {
-    #hero {
-        padding-top: 5rem;
-        padding-bottom: 4rem;
+
+/* ── Responsive ──────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+    .idx-value-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .idx-product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .idx-about-grid {
+        gap: 48px;
+    }
+}
+
+@media (max-width: 768px) {
+    .idx-hero {
+        padding-block: 80px 64px;
+    }
+
+    .idx-section {
+        padding-block: 56px;
+    }
+
+    .idx-section--lg {
+        padding-block: 72px;
+    }
+
+    .idx-category-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .idx-product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .idx-about-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .idx-value-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .idx-cta-panel {
+        flex-direction: column;
+        padding: 40px 32px;
+    }
+
+    .idx-cta-stat-col {
+        flex-direction: row;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .idx-cta-stat-divider {
+        width: 1px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .idx-category-grid,
+    .idx-product-grid,
+    .idx-value-grid,
+    .idx-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .idx-hero__stats {
+        gap: 24px;
+    }
+
+    .idx-cta-stat-col {
+        display: none; /* hide decorative column on small screens */
     }
 }
