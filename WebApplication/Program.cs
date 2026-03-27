@@ -22,9 +22,9 @@ builder.Services.Configure<HostOptions>(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    string connectionString = builder.Configuration.GetConnectionString("TaurusBikeShopDB")
+    string connectionString = builder.Configuration.GetConnectionString("Taurus-bike-shop-sqlserver-2026")
         ?? throw new InvalidOperationException(
-            "Connection string 'TaurusBikeShopDB' not found in configuration. " +
+            "Connection string 'Taurus-bike-shop-sqlserver-2026' not found in configuration. " +
             "Ensure appsettings.Development.json is present and excluded from source control.");
 
     options.UseSqlServer(connectionString, sqlOptions =>

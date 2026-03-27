@@ -61,11 +61,14 @@ public sealed class CartService : ICartService
         }
         else
         {
+            // Prefer any in-stock active variant; fall back to any active variant so
+            // the stock check below can return a meaningful "Insufficient stock" message.
             ProductVariant? defaultVariant = await _cartRepo.Context.ProductVariants
                 .AsNoTracking()
-                .FirstOrDefaultAsync(
-                    v => v.ProductId == productId && v.IsActive,
-                    cancellationToken);
+                .Where(v => v.ProductId == productId && v.IsActive)
+                .OrderByDescending(v => v.StockQuantity > 0)
+                .ThenBy(v => v.ProductVariantId)
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (defaultVariant is null)
                 return ServiceResult.Fail("This product is not available.");
@@ -134,7 +137,6 @@ public sealed class CartService : ICartService
         cart.LastUpdatedAt = DateTime.UtcNow;
         await _cartRepo.Context.SaveChangesAsync(cancellationToken);
 
-        int count = await _cartRepo.GetCartItemCountAsync(cart.CartId, cancellationToken);
         return ServiceResult.Ok();
     }
 
@@ -143,6 +145,7 @@ public sealed class CartService : ICartService
         int cartItemId,
         int newQty,
         int? ownerUserId,
+        int? guestSessionId,
         CancellationToken cancellationToken = default)
     {
         if (newQty < 1)
@@ -152,9 +155,12 @@ public sealed class CartService : ICartService
         if (item is null)
             return ServiceResult.Fail("Cart item not found.");
 
-        // Ownership check
+        // Ownership check — authenticated user OR verified guest session
         Cart? cart = await _cartRepo.GetByIdAsync(item.CartId, cancellationToken);
-        if (cart is null || (ownerUserId.HasValue && cart.UserId != ownerUserId))
+        bool isOwner = ownerUserId.HasValue
+            ? cart?.UserId == ownerUserId
+            : guestSessionId.HasValue && cart?.GuestSessionId == guestSessionId;
+        if (cart is null || !isOwner)
             return ServiceResult.Fail("Unauthorised.");
 
         if (item.ProductVariantId.HasValue)
@@ -176,6 +182,7 @@ public sealed class CartService : ICartService
     public async Task<ServiceResult> RemoveItemAsync(
         int cartItemId,
         int? ownerUserId,
+        int? guestSessionId,
         CancellationToken cancellationToken = default)
     {
         CartItem? item = await _cartRepo.GetCartItemAsync(cartItemId, cancellationToken);
@@ -183,7 +190,10 @@ public sealed class CartService : ICartService
             return ServiceResult.Fail("Cart item not found.");
 
         Cart? cart = await _cartRepo.GetByIdAsync(item.CartId, cancellationToken);
-        if (cart is null || (ownerUserId.HasValue && cart.UserId != ownerUserId))
+        bool isOwner = ownerUserId.HasValue
+            ? cart?.UserId == ownerUserId
+            : guestSessionId.HasValue && cart?.GuestSessionId == guestSessionId;
+        if (cart is null || !isOwner)
             return ServiceResult.Fail("Unauthorised.");
 
         _cartRepo.Context.CartItems.Remove(item);

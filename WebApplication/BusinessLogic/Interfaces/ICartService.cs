@@ -62,17 +62,20 @@ public interface ICartService
         int cartItemId,
         int newQty,
         int? ownerUserId,
+        int? guestSessionId,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Removes a specific item from the cart.
     /// </summary>
     /// <param name="cartItemId">The cart item to remove.</param>
-    /// <param name="ownerUserId">Used to verify ownership.</param>
+    /// <param name="ownerUserId">Used to verify ownership for authenticated users.</param>
+    /// <param name="guestSessionId">Used to verify ownership for guest users.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     Task<ServiceResult> RemoveItemAsync(
         int cartItemId,
         int? ownerUserId,
+        int? guestSessionId,
         CancellationToken cancellationToken = default);
 
     /// <summary>

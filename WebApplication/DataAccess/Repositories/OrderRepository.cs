@@ -58,6 +58,7 @@ public sealed class OrderRepository : Repository<Order>
             .AsNoTracking()
             .Include(o => o.Items)
                 .ThenInclude(oi => oi.Product)
+                    .ThenInclude(p => p!.Images)
             .Include(o => o.Items)
                 .ThenInclude(oi => oi.Variant)
             .Include(o => o.Payments)

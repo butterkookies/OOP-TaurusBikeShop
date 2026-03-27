@@ -4,6 +4,8 @@
    ============================================================ */
 
 // ── CSRF-aware fetch ─────────────────────────────────────────
+// Usage: fetchWithCSRF(url, dataObject) — serialises dataObject as JSON body.
+// Returns a Promise that resolves to the parsed JSON response.
 function fetchWithCSRF(url, data) {
     var token = document.querySelector('input[name="__RequestVerificationToken"]');
     var headers = { 'Content-Type': 'application/json' };
@@ -17,6 +19,23 @@ function fetchWithCSRF(url, data) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.json();
     });
+}
+
+// ── Parse JSON response (pass-through — fetchWithCSRF already parses) ────────
+function parseJsonResponse(data) {
+    return Promise.resolve(data);
+}
+
+// ── Toast notification via #notificationAlert ─────────────────────────────────
+// type: 'success' | 'error'
+function showToast(type, message) {
+    var box = document.getElementById('notificationAlert');
+    var msg = document.getElementById('alertMessage');
+    if (!box || !msg) return;
+    msg.textContent = message;
+    box.style.background = type === 'success' ? '#2e7d32' : '#d32f2f';
+    box.style.display = 'flex';
+    setTimeout(function () { box.style.display = 'none'; }, 4000);
 }
 
 // ── Currency formatter ───────────────────────────────────────

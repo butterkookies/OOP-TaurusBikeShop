@@ -40,11 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearVoucherError();
 
         try {
-            const response = await fetchWithCSRF('/Voucher/Validate', {
-                method: 'POST',
-                body: JSON.stringify({ code })
-            });
-            const data = await parseJsonResponse(response);
+            const data = await fetchWithCSRF('/Voucher/Validate', { code });
 
             if (!data.success) {
                 showVoucherError(data.message ?? 'Invalid voucher code.');
@@ -67,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     removeBtn?.addEventListener('click', async () => {
         try {
-            await fetchWithCSRF('/Voucher/Remove', { method: 'POST', body: '{}' });
+            await fetchWithCSRF('/Voucher/Remove', {});
         } catch { /* non-fatal */ }
 
         clearAppliedVoucher();

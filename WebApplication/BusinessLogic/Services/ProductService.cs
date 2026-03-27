@@ -116,7 +116,8 @@ public sealed class ProductService : IProductService
             Reviews            = reviews.Select(MapReviewToViewModel).ToList().AsReadOnly(),
             AverageRating      = avgRating,
             ReviewCount        = reviewCount,
-            SelectedVariantId  = product.Variants.FirstOrDefault(v => v.IsActive)?.ProductVariantId,
+            SelectedVariantId  = (product.Variants.FirstOrDefault(v => v.IsActive && v.StockQuantity > 0)
+                               ?? product.Variants.FirstOrDefault(v => v.IsActive))?.ProductVariantId,
             IsInWishlist       = isInWishlist,
             CanReview          = canReview
         };

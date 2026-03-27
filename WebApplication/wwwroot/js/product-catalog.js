@@ -61,18 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!productId) return;
 
         try {
-            const response = await fetchWithCSRF('/Wishlist/Toggle', {
-                method: 'POST',
-                body: JSON.stringify({ productId: parseInt(productId, 10) })
-            });
-            const data = await parseJsonResponse(response);
+            const data = await fetchWithCSRF('/Wishlist/Toggle',
+                { productId: parseInt(productId, 10) });
 
             if (!data.success) {
-                if (response.status === 401) {
-                    window.location.href = '/Customer/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
-                } else {
-                    showAlert('error', data.message ?? 'Unable to update wishlist.');
-                }
+                showToast('error', data.message ?? 'Unable to update wishlist.');
                 return;
             }
 
@@ -90,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
         } catch {
-            showAlert('error', 'Unable to update wishlist. Please try again.');
+            showToast('error', 'Unable to update wishlist. Please try again.');
         }
     });
 
@@ -108,20 +101,18 @@ document.addEventListener('DOMContentLoaded', () => {
         cartBtn.disabled = true;
 
         try {
-            const response = await fetchWithCSRF('/Cart/AddToCart', {
-                method: 'POST',
-                body: JSON.stringify({ productId: parseInt(productId, 10), qty: 1 })
-            });
-            const data = await parseJsonResponse(response);
+            const data = await fetchWithCSRF('/Cart/AddToCart',
+                { productId: parseInt(productId, 10), qty: 1 });
 
             if (data.success) {
-                showAlert('success', 'Added to cart!');
+                const count = data.data?.cartCount ?? '';
+                showToast('success', count ? `Added to cart! (${count} item${count !== 1 ? 's' : ''} in cart)` : 'Added to cart!');
                 refreshCartBadge();
             } else {
-                showAlert('error', data.message ?? 'Could not add to cart.');
+                showToast('error', data.message ?? 'Could not add to cart.');
             }
         } catch {
-            showAlert('error', 'Could not add to cart. Please try again.');
+            showToast('error', 'Could not add to cart. Please try again.');
         } finally {
             cartBtn.disabled = false;
         }
@@ -169,24 +160,21 @@ document.addEventListener('DOMContentLoaded', () => {
             addToCartBtn.textContent = 'Adding…';
 
             try {
-                const response = await fetchWithCSRF('/Cart/AddToCart', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        productId: parseInt(productId, 10),
-                        variantId: variantId ? parseInt(variantId, 10) : null,
-                        qty
-                    })
+                const data = await fetchWithCSRF('/Cart/AddToCart', {
+                    productId: parseInt(productId, 10),
+                    variantId: variantId ? parseInt(variantId, 10) : null,
+                    qty
                 });
-                const data = await parseJsonResponse(response);
 
                 if (data.success) {
-                    showAlert('success', 'Added to cart!');
+                    const count = data.data?.cartCount ?? '';
+                    showToast('success', count ? `Added to cart! (${count} item${count !== 1 ? 's' : ''} in cart)` : 'Added to cart!');
                     refreshCartBadge();
                 } else {
-                    showAlert('error', data.message ?? 'Could not add to cart.');
+                    showToast('error', data.message ?? 'Could not add to cart.');
                 }
             } catch {
-                showAlert('error', 'Could not add to cart. Please try again.');
+                showToast('error', 'Could not add to cart. Please try again.');
             } finally {
                 addToCartBtn.disabled = false;
                 addToCartBtn.textContent = 'Add to Cart';

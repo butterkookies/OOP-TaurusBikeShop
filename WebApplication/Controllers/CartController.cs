@@ -54,12 +54,12 @@ public sealed class CartController : Controller
     // AJAX POST /Cart/AddToCart
     // =========================================================================
 
+    public sealed record AddToCartRequest(int ProductId, int? VariantId, int Qty = 1);
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddToCart(
-        int productId,
-        int? variantId,
-        int qty = 1,
+        [FromBody] AddToCartRequest req,
         CancellationToken cancellationToken = default)
     {
         try
@@ -68,7 +68,7 @@ public sealed class CartController : Controller
             int? guestId = userId.HasValue ? null : await EnsureGuestSessionAsync(cancellationToken);
 
             ServiceResult result = await _cartService.AddItemAsync(
-                userId, guestId, productId, variantId, qty, cancellationToken);
+                userId, guestId, req.ProductId, req.VariantId, req.Qty, cancellationToken);
 
             if (!result.IsSuccess)
                 return Json(ApiResponse.Fail(result.Error!));
@@ -78,7 +78,7 @@ public sealed class CartController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "AddToCart failed for product {ProductId}.", productId);
+            _logger.LogError(ex, "AddToCart failed for product {ProductId}.", req.ProductId);
             return Json(ApiResponse.Fail("Unable to add item. Please try again."));
         }
     }
@@ -87,17 +87,21 @@ public sealed class CartController : Controller
     // AJAX POST /Cart/UpdateQuantity
     // =========================================================================
 
+    public sealed record UpdateQuantityRequest(int CartItemId, int Qty);
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateQuantity(
-        int cartItemId,
-        int qty,
+        [FromBody] UpdateQuantityRequest req,
         CancellationToken cancellationToken = default)
     {
+        int cartItemId = req.CartItemId;
+        int qty        = req.Qty;
         try
         {
+            (int? ownerUserId, int? ownerGuestId) = GetCartOwner();
             ServiceResult result = await _cartService.UpdateQuantityAsync(
-                cartItemId, qty, GetCurrentUserId(), cancellationToken);
+                cartItemId, qty, ownerUserId, ownerGuestId, cancellationToken);
 
             if (!result.IsSuccess)
                 return Json(ApiResponse.Fail(result.Error!));
@@ -126,16 +130,20 @@ public sealed class CartController : Controller
     // AJAX POST /Cart/RemoveFromCart
     // =========================================================================
 
+    public sealed record RemoveFromCartRequest(int CartItemId);
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RemoveFromCart(
-        int cartItemId,
+        [FromBody] RemoveFromCartRequest req,
         CancellationToken cancellationToken = default)
     {
+        int cartItemId = req.CartItemId;
         try
         {
+            (int? ownerUserId, int? ownerGuestId) = GetCartOwner();
             ServiceResult result = await _cartService.RemoveItemAsync(
-                cartItemId, GetCurrentUserId(), cancellationToken);
+                cartItemId, ownerUserId, ownerGuestId, cancellationToken);
 
             if (!result.IsSuccess)
                 return Json(ApiResponse.Fail(result.Error!));

@@ -1,57 +1,63 @@
 /* ============================================================
-   CHECKOUT.JS — Delivery selection, address management
+   CHECKOUT.JS — Delivery selection, address highlight, spinner
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ── Delivery method cards ──────────────────────────────
-    document.querySelectorAll('.delivery-card').forEach(function (card) {
-        card.addEventListener('click', function () {
-            document.querySelectorAll('.delivery-card')
-                .forEach(function (c) { c.classList.remove('selected'); });
-            card.classList.add('selected');
-            var radio = card.querySelector('input[type="radio"]');
-            if (radio) radio.checked = true;
-
-            // Show/hide address fields based on method
-            var method = radio ? radio.value : '';
-            var addrSection = document.getElementById('deliveryAddressSection');
-            var pickupSection = document.getElementById('pickupInfoSection');
-
-            if (addrSection) addrSection.style.display =
-                method === 'Pickup' ? 'none' : 'block';
-            if (pickupSection) pickupSection.style.display =
-                method === 'Pickup' ? 'block' : 'none';
+    // ── Delivery method options ────────────────────────────
+    document.querySelectorAll('.tbs-delivery-option').forEach(function (label) {
+        label.addEventListener('click', function () {
+            document.querySelectorAll('.tbs-delivery-option')
+                .forEach(function (l) { l.classList.remove('tbs-delivery-option--selected'); });
+            label.classList.add('tbs-delivery-option--selected');
         });
     });
 
-    // ── Payment method cards ───────────────────────────────
-    document.querySelectorAll('.payment-method-card').forEach(function (card) {
-        card.addEventListener('click', function () {
-            document.querySelectorAll('.payment-method-card')
-                .forEach(function (c) { c.classList.remove('selected'); });
-            card.classList.add('selected');
-            var radio = card.querySelector('input[type="radio"]');
-            if (radio) radio.checked = true;
+    // ── Payment method options ─────────────────────────────
+    document.querySelectorAll('.tbs-payment-option').forEach(function (label) {
+        label.addEventListener('click', function () {
+            document.querySelectorAll('.tbs-payment-option')
+                .forEach(function (l) { l.classList.remove('tbs-payment-option--selected'); });
+            label.classList.add('tbs-payment-option--selected');
         });
     });
 
-    // ── Place order button ─────────────────────────────────
-    var placeOrderBtn = document.getElementById('placeOrderBtn');
-    if (placeOrderBtn) {
-        placeOrderBtn.addEventListener('click', function (e) {
-            var form = document.getElementById('checkoutForm');
-            if (!form) return;
+    // ── Address option highlight ───────────────────────────
+    document.querySelectorAll('.tbs-address-option').forEach(function (label) {
+        label.addEventListener('click', function () {
+            document.querySelectorAll('.tbs-address-option')
+                .forEach(function (l) { l.classList.remove('tbs-address-option--selected'); });
+            label.classList.add('tbs-address-option--selected');
+        });
+    });
 
-            var selected = form.querySelector('input[name="DeliveryMethod"]:checked');
-            if (!selected) {
+    // ── Form submit — validate then allow submit ───────────
+    // IMPORTANT: listen on the FORM submit event, not the button click event.
+    // Disabling a submit button inside a click handler cancels form submission
+    // in Chromium-based browsers before the request is sent.
+    var form = document.getElementById('checkout-form');
+    var placeOrderBtn = document.getElementById('place-order-btn');
+
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            var deliverySelected = form.querySelector('input[name="DeliveryMethod"]:checked');
+            if (!deliverySelected) {
                 e.preventDefault();
-                showAlert('#checkoutMessages', 'Please select a delivery method.', 'warning');
+                showToast('error', 'Please select a delivery method.');
                 return;
             }
 
-            showSpinner(placeOrderBtn);
-            // Form submits normally — spinner shows while page loads
+            var paymentSelected = form.querySelector('input[name="PaymentMethod"]:checked');
+            if (!paymentSelected) {
+                e.preventDefault();
+                showToast('error', 'Please select a payment method.');
+                return;
+            }
+
+            // Form is valid and will submit — show spinner to prevent double-click.
+            // Spinner is shown AFTER submission is confirmed (inside submit event,
+            // not click event) so the browser has already committed to sending the request.
+            if (placeOrderBtn) showSpinner(placeOrderBtn);
         });
     }
 });
