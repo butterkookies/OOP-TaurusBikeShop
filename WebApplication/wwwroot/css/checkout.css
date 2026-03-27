@@ -71,7 +71,7 @@
 .tbs-address-option--selected,
 .tbs-address-option:has(input:checked) {
     border-color: var(--tbs-accent);
-    background: rgba(255,107,0,0.04);
+    background: rgba(220, 20, 60, 0.04);
 }
 .tbs-address-option__radio {
     margin-top: 3px;
@@ -134,7 +134,7 @@
 .tbs-delivery-option:has(input:checked),
 .tbs-payment-option:has(input:checked) {
     border-color: var(--tbs-accent);
-    background: rgba(255,107,0,0.04);
+    background: rgba(220, 20, 60, 0.04);
 }
 .tbs-delivery-option__radio,
 .tbs-payment-option__radio {

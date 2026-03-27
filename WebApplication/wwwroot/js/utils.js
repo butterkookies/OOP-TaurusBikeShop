@@ -27,15 +27,29 @@ function parseJsonResponse(data) {
 }
 
 // ── Toast notification via #notificationAlert ─────────────────────────────────
-// type: 'success' | 'error'
+// type: 'error' | 'success' | 'info' | 'warning'
+// Colour is controlled by CSS via [data-toast-type] on the element.
 function showToast(type, message) {
     var box = document.getElementById('notificationAlert');
     var msg = document.getElementById('alertMessage');
     if (!box || !msg) return;
+
+    var validTypes = ['error', 'success', 'info', 'warning'];
+    box.dataset.toastType = validTypes.indexOf(type) !== -1 ? type : 'error';
     msg.textContent = message;
-    box.style.background = type === 'success' ? '#2e7d32' : '#d32f2f';
-    box.style.display = 'flex';
-    setTimeout(function () { box.style.display = 'none'; }, 4000);
+
+    // Clear any pending auto-hide from a previous toast
+    if (box._toastTimeout) {
+        clearTimeout(box._toastTimeout);
+        box._toastTimeout = null;
+    }
+
+    box.style.background = '';   // let CSS handle colour via data-toast-type
+    box.style.display    = 'flex';
+
+    box._toastTimeout = setTimeout(function () {
+        box.style.display = 'none';
+    }, 4500);
 }
 
 // ── Currency formatter ───────────────────────────────────────

@@ -1,10 +1,13 @@
 /* ============================================================
-   LAYOUT — Navbar, sidebar, footer
+   LAYOUT — Navbar, footer wrapper, notification dropdown
    ============================================================ */
 
 /* ── Navbar ──────────────────────────────────────────────── */
 .navbar-taurus {
-    background: var(--primary);
+    background: rgba(8, 6, 18, 0.85);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     padding: 0 1.5rem;
     height: 60px;
     display: flex;
@@ -13,7 +16,7 @@
     position: sticky;
     top: 0;
     z-index: 900;
-    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.40);
 }
 .navbar-brand {
     display: flex;
@@ -23,17 +26,20 @@
     color: #fff;
     font-size: 1.15rem;
     font-weight: 800;
-    letter-spacing: .04em;
+    letter-spacing: .05em;
     flex-shrink: 0;
+    font-family: 'Barlow Condensed', 'Bebas Neue', sans-serif;
+    text-transform: uppercase;
 }
 .navbar-brand-icon {
     width: 34px; height: 34px;
     background: var(--accent);
-    border-radius: 8px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.1rem;
+    box-shadow: 0 0 16px rgba(220, 20, 60, 0.40);
 }
 .navbar-nav {
     display: flex;
@@ -49,16 +55,17 @@
     gap: .4rem;
     padding: .4rem .85rem;
     border-radius: 6px;
-    color: rgba(255,255,255,.7);
+    color: rgba(240, 240, 240, 0.65);
     font-size: .92rem;
     font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
     transition: background var(--transition), color var(--transition);
     text-decoration: none;
     white-space: nowrap;
 }
 .nav-link-taurus:hover,
 .nav-link-taurus.active {
-    background: rgba(255,255,255,.1);
+    background: rgba(255, 255, 255, 0.08);
     color: #fff;
     text-decoration: none;
 }
@@ -89,6 +96,7 @@
     justify-content: center;
     padding: 0 4px;
     line-height: 1;
+    box-shadow: 0 0 8px rgba(220, 20, 60, 0.55);
 }
 
 /* Notification bell */
@@ -99,25 +107,32 @@
     width: 10px; height: 10px;
     background: var(--danger);
     border-radius: 50%;
-    border: 2px solid var(--primary);
+    border: 2px solid rgba(8, 6, 18, 0.90);
 }
 
-/* ── Footer ──────────────────────────────────────────────── */
+/* ── Footer (thin wrapper — full styles in footer.css) ───── */
 .footer-taurus {
-    background: var(--primary);
-    color: rgba(255,255,255,.6);
+    background: rgba(8, 6, 16, 0.88);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    color: rgba(240, 240, 240, 0.55);
     padding: 2rem 1.5rem 1.25rem;
     margin-top: auto;
     font-size: .88rem;
+    font-family: 'DM Sans', sans-serif;
 }
 .footer-brand {
-    font-size: 1.05rem;
+    font-family: 'Barlow Condensed', 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
     font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
     color: #fff;
     margin-bottom: .5rem;
 }
 .footer-bottom {
-    border-top: 1px solid rgba(255,255,255,.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
     padding-top: 1rem;
     margin-top: 1.5rem;
     display: flex;
@@ -125,6 +140,7 @@
     flex-wrap: wrap;
     gap: .5rem;
     font-size: .82rem;
+    color: rgba(240, 240, 240, 0.40);
 }
 
 /* ── Page wrapper ────────────────────────────────────────── */
@@ -141,16 +157,18 @@
     width: 100%;
 }
 
-/* ── Notification alert dropdown ─────────────────────────── */
+/* ── Notification dropdown ───────────────────────────────── */
 .notif-dropdown {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
     width: 320px;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: rgba(18, 14, 32, 0.92);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.10);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.60);
     z-index: 950;
     overflow: hidden;
     display: none;
@@ -159,7 +177,8 @@
 .notif-dropdown-header {
     padding: .85rem 1rem;
     font-weight: 700;
-    font-size: .93rem;
+    font-size: .9rem;
+    color: var(--text);
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
@@ -175,7 +194,7 @@
 }
 .notif-item:hover { background: var(--bg); }
 .notif-item:last-child { border-bottom: none; }
-.notif-item.unread { background: #FFF7ED; }
+.notif-item.unread { background: rgba(220, 20, 60, 0.08); }
 .notif-item-time {
     font-size: .78rem;
     color: var(--text-muted);

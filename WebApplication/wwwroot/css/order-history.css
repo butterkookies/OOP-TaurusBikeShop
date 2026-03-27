@@ -1,82 +1,90 @@
-/* File: wwwroot/css/order-history.css */
+/* ============================================================
+   ORDER HISTORY PAGE — legacy classes
+   (Primary styles are in dashboard.css + site.css)
+   ============================================================ */
 
 .orderhistory-page {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
     padding: 20px;
-    background: #fff5f5;
-    min-height: 90vh;
-    color: #1a1a1a;
+    color: rgba(240, 240, 240, 0.92);
 }
 
 .orderhistory-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 24px;
 }
 
 .orderhistory-header h1 {
-    color: #d32f2f;
+    font-family: 'Barlow Condensed', 'Bebas Neue', sans-serif;
+    color: #DC143C;
     font-size: 2rem;
-    font-weight: bold;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
 }
 
 .btn-home {
     text-decoration: none;
-    color: #d32f2f;
-    font-weight: bold;
-    transition: all 0.3s ease;
+    color: #DC143C;
+    font-weight: 700;
+    transition: color .2s ease;
 }
-
-.btn-home:hover {
-    color: #a71d1d;
-}
+.btn-home:hover { color: #B0102E; text-decoration: none; }
 
 .orderhistory-table {
     width: 100%;
     border-collapse: collapse;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.40);
 }
 
-.orderhistory-table th, .orderhistory-table td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #eee;
+.orderhistory-table th,
+.orderhistory-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     text-align: left;
+    font-size: .92rem;
 }
 
 .orderhistory-table th {
-    background: #d32f2f;
-    color: #fff;
+    background: rgba(220, 20, 60, 0.15);
+    color: rgba(240, 240, 240, 0.92);
     text-transform: uppercase;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .06em;
 }
 
-.orderhistory-table tr:hover {
-    background: #fff0f0;
+.orderhistory-table tr:hover td {
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .btn-view {
-    background: #d32f2f;
+    background: #DC143C;
     color: #fff;
     border: none;
-    padding: 6px 12px;
+    padding: 6px 14px;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    font-size: .85rem;
+    font-weight: 600;
+    font-family: inherit;
+    transition: background .2s ease, box-shadow .2s ease;
 }
-
 .btn-view:hover {
-    background: #b71c1c;
+    background: #B0102E;
+    box-shadow: 0 2px 8px rgba(220, 20, 60, 0.40);
 }
 
-@media (max-width: 768px){
-    .orderhistory-table th, .orderhistory-table td {
-        padding: 8px 10px;
-        font-size: 0.9rem;
-    }
-    .btn-view {
-        padding: 5px 10px;
-    }
+@media (max-width: 768px) {
+    .orderhistory-table th,
+    .orderhistory-table td { padding: 8px 10px; font-size: .88rem; }
+    .btn-view { padding: 5px 10px; }
 }

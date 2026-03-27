@@ -103,144 +103,188 @@ public sealed class OrderService : IOrderService
                 return ServiceResult<int>.Fail("Selected address not found.");
         }
 
-        await using IDbContextTransaction tx =
-            await _context.Database.BeginTransactionAsync(cancellationToken);
+        // Declared outside the strategy lambda so they are accessible for the
+        // post-commit notification (step 11) and the return value.
+        Order  order       = null!;
+        string orderNumber = string.Empty;
 
+        // SqlServerRetryingExecutionStrategy (EnableRetryOnFailure) forbids
+        // SaveChangesAsync inside a manually-opened transaction unless every
+        // SaveChanges call is wrapped in CreateExecutionStrategy().ExecuteAsync().
+        IExecutionStrategy strategy = _context.Database.CreateExecutionStrategy();
         try
         {
-            // ── 1. Create immutable address snapshot ──────────────────────
-            if (shippingAddress != null)
+            await strategy.ExecuteAsync(async () =>
             {
-                Address snapshot = new()
+                await using IDbContextTransaction tx =
+                    await _context.Database.BeginTransactionAsync(cancellationToken);
+
+                // ── 1. Create immutable address snapshot ──────────────────────
+                if (shippingAddress != null)
                 {
-                    UserId     = userId,
-                    Label      = shippingAddress.Label,
-                    Street     = shippingAddress.Street,
-                    City       = shippingAddress.City,
-                    PostalCode = shippingAddress.PostalCode,
-                    Province   = shippingAddress.Province,
-                    Country    = shippingAddress.Country,
-                    IsDefault  = false,
-                    IsSnapshot = true,
-                    CreatedAt  = DateTime.UtcNow
+                    Address snapshot = new()
+                    {
+                        UserId     = userId,
+                        Label      = shippingAddress.Label,
+                        Street     = shippingAddress.Street,
+                        City       = shippingAddress.City,
+                        PostalCode = shippingAddress.PostalCode,
+                        Province   = shippingAddress.Province,
+                        Country    = shippingAddress.Country,
+                        IsDefault  = false,
+                        IsSnapshot = true,
+                        CreatedAt  = DateTime.UtcNow
+                    };
+                    await _context.Addresses.AddAsync(snapshot, cancellationToken);
+                    await _context.SaveChangesAsync(cancellationToken);
+                    snapshotAddressId = snapshot.AddressId;
+                }
+
+                // ── 2. Generate order number ───────────────────────────────────
+                orderNumber = await GenerateOrderNumberAsync(cancellationToken);
+
+                // ── 3. Calculate totals ────────────────────────────────────────
+                decimal subTotal = cart.Items.Sum(i => i.PriceAtAdd * i.Quantity);
+                decimal shippingFee = vm.DeliveryMethod switch
+                {
+                    "Lalamove" => CheckoutViewModel.LalamoveFee,
+                    "LBC"      => CheckoutViewModel.LBCFee,
+                    _          => CheckoutViewModel.PickupFee
                 };
-                await _context.Addresses.AddAsync(snapshot, cancellationToken);
+
+                // ── 4. Create Order row ────────────────────────────────────────
+                order = new()
+                {
+                    UserId            = userId,
+                    OrderNumber       = orderNumber,
+                    OrderStatus       = OrderStatuses.Pending,
+                    OrderDate         = DateTime.UtcNow,
+                    ShippingAddressId = snapshotAddressId,
+                    SubTotal          = subTotal,
+                    ShippingFee       = shippingFee,
+                    DiscountAmount    = vm.DiscountAmount,
+                    IsWalkIn          = false,
+                    CreatedAt         = DateTime.UtcNow
+                };
+                await _context.Orders.AddAsync(order, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
-                snapshotAddressId = snapshot.AddressId;
-            }
 
-            // ── 2. Generate order number ───────────────────────────────────
-            string orderNumber = await GenerateOrderNumberAsync(cancellationToken);
-
-            // ── 3. Calculate totals ────────────────────────────────────────
-            decimal subTotal = cart.Items.Sum(i => i.PriceAtAdd * i.Quantity);
-            decimal shippingFee = vm.DeliveryMethod switch
-            {
-                "Lalamove" => CheckoutViewModel.LalamoveFee,
-                "LBC"      => CheckoutViewModel.LBCFee,
-                _          => CheckoutViewModel.PickupFee
-            };
-
-            // ── 4. Create Order row ────────────────────────────────────────
-            Order order = new()
-            {
-                UserId            = userId,
-                OrderNumber       = orderNumber,
-                OrderStatus       = OrderStatuses.Pending,
-                OrderDate         = DateTime.UtcNow,
-                ShippingAddressId = snapshotAddressId,
-                ShippingFee       = shippingFee,
-                DiscountAmount    = vm.DiscountAmount,
-                IsWalkIn          = false,
-                CreatedAt         = DateTime.UtcNow
-            };
-            await _context.Orders.AddAsync(order, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            // ── 5. Create OrderItems ──────────────────────────────────────
-            foreach (CartItem cartItem in cart.Items)
-            {
-                OrderItem orderItem = new()
+                // ── 5. Create OrderItems ──────────────────────────────────────
+                foreach (CartItem cartItem in cart.Items)
                 {
-                    OrderId          = order.OrderId,
-                    ProductId        = cartItem.ProductId,
-                    ProductVariantId = cartItem.ProductVariantId,
-                    Quantity         = cartItem.Quantity,
-                    UnitPrice        = cartItem.PriceAtAdd
-                };
-                await _context.OrderItems.AddAsync(orderItem, cancellationToken);
-            }
-            await _context.SaveChangesAsync(cancellationToken);
-
-            // ── 6. Lock inventory (InventoryLog Lock per variant) ─────────
-            foreach (CartItem cartItem in cart.Items)
-            {
-                if (cartItem.ProductVariantId is null) continue;
-
-                ProductVariant variant = (await _context.ProductVariants
-                    .FirstAsync(v => v.ProductVariantId == cartItem.ProductVariantId,
-                        cancellationToken))!;
-
-                variant.StockQuantity -= cartItem.Quantity;
-
-                InventoryLog lockLog = new()
-                {
-                    ProductId        = cartItem.ProductId,
-                    ProductVariantId = cartItem.ProductVariantId,
-                    OrderId          = order.OrderId,
-                    ChangeQuantity   = -cartItem.Quantity,
-                    ChangeType       = InventoryChangeTypes.Lock,
-                    ChangedByUserId  = userId,
-                    Notes            = $"Stock locked for Order #{orderNumber}",
-                    CreatedAt        = DateTime.UtcNow
-                };
-                await _context.InventoryLogs.AddAsync(lockLog, cancellationToken);
-            }
-            await _context.SaveChangesAsync(cancellationToken);
-
-            // ── 7. Create PickupOrder if in-store pickup ───────────────────
-            if (vm.DeliveryMethod == "Pickup")
-            {
-                // PickupReadyAt and PickupExpiresAt are set by AdminSystem when the
-                // order is marked ReadyForPickup (PickupExpiresAt = PickupReadyAt + 3 days).
-                // Do NOT set PickupExpiresAt here — the expiry window must start when
-                // the customer is actually notified, not at order placement.
-                PickupOrder pickup = new()
-                {
-                    PickupOrderId = order.OrderId,
-                    OrderId       = order.OrderId
-                };
-                await _context.PickupOrders.AddAsync(pickup, cancellationToken);
+                    OrderItem orderItem = new()
+                    {
+                        OrderId          = order.OrderId,
+                        ProductId        = cartItem.ProductId,
+                        ProductVariantId = cartItem.ProductVariantId,
+                        Quantity         = cartItem.Quantity,
+                        UnitPrice        = cartItem.PriceAtAdd
+                    };
+                    await _context.OrderItems.AddAsync(orderItem, cancellationToken);
+                }
                 await _context.SaveChangesAsync(cancellationToken);
-            }
 
-            // ── 8. Redeem voucher if applied ───────────────────────────────
-            if (!string.IsNullOrWhiteSpace(vm.VoucherCode) && vm.DiscountAmount > 0)
+                // ── 6. Lock inventory (InventoryLog Lock per variant) ─────────
+                foreach (CartItem cartItem in cart.Items)
+                {
+                    if (cartItem.ProductVariantId is null) continue;
+
+                    ProductVariant variant = (await _context.ProductVariants
+                        .FirstAsync(v => v.ProductVariantId == cartItem.ProductVariantId,
+                            cancellationToken))!;
+
+                    variant.StockQuantity -= cartItem.Quantity;
+
+                    InventoryLog lockLog = new()
+                    {
+                        ProductId        = cartItem.ProductId,
+                        ProductVariantId = cartItem.ProductVariantId,
+                        OrderId          = order.OrderId,
+                        ChangeQuantity   = -cartItem.Quantity,
+                        ChangeType       = InventoryChangeTypes.Lock,
+                        ChangedByUserId  = userId,
+                        Notes            = $"Stock locked for Order #{orderNumber}",
+                        CreatedAt        = DateTime.UtcNow
+                    };
+                    await _context.InventoryLogs.AddAsync(lockLog, cancellationToken);
+                }
+                await _context.SaveChangesAsync(cancellationToken);
+
+                // ── 7. Create PickupOrder if in-store pickup ───────────────────
+                if (vm.DeliveryMethod == "Pickup")
+                {
+                    // PickupReadyAt and PickupExpiresAt are set by AdminSystem when the
+                    // order is marked ReadyForPickup (PickupExpiresAt = PickupReadyAt + 3 days).
+                    // Do NOT set PickupExpiresAt here — the expiry window must start when
+                    // the customer is actually notified, not at order placement.
+                    PickupOrder pickup = new()
+                    {
+                        PickupOrderId = order.OrderId,
+                        OrderId       = order.OrderId
+                    };
+                    await _context.PickupOrders.AddAsync(pickup, cancellationToken);
+                    await _context.SaveChangesAsync(cancellationToken);
+                }
+
+                // ── 8. Redeem voucher if applied ───────────────────────────────
+                if (!string.IsNullOrWhiteSpace(vm.VoucherCode) && vm.DiscountAmount > 0)
+                {
+                    await _voucherService.RedeemAsync(
+                        vm.VoucherCode, userId, order.OrderId,
+                        vm.DiscountAmount, cancellationToken);
+                }
+
+                // ── 9. Clear cart — delete all items and mark cart checked out ─
+                _context.CartItems.RemoveRange(cart.Items);
+                cart.IsCheckedOut  = true;
+                cart.LastUpdatedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync(cancellationToken);
+
+                // ── 10. SystemLog ──────────────────────────────────────────────
+                SystemLog sysLog = new()
+                {
+                    UserId    = userId,
+                    EventType = SystemLogEvents.OrderStatusChange,
+                    EventDescription =$"Order #{orderNumber} created with status Pending.",
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _context.SystemLogs.AddAsync(sysLog, cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
+
+                await tx.CommitAsync(cancellationToken);
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "CreateOrderAsync failed for user {UserId}.", userId);
+
+            // Log rollback to SystemLog (best-effort — outside failed transaction).
+            // Clear tracked entities first so only the error log is saved,
+            // not any half-built entities (e.g. snapshot Address) left in the
+            // change tracker after the rolled-back transaction.
+            try
             {
-                await _voucherService.RedeemAsync(
-                    vm.VoucherCode, userId, order.OrderId,
-                    vm.DiscountAmount, cancellationToken);
+                _context.ChangeTracker.Clear();
+                SystemLog errLog = new()
+                {
+                    UserId    = userId,
+                    EventType = SystemLogEvents.BackgroundJobError,
+                    EventDescription =$"Order creation rolled back: {ex.Message}",
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _context.SystemLogs.AddAsync(errLog, CancellationToken.None);
+                await _context.SaveChangesAsync(CancellationToken.None);
             }
+            catch { /* best-effort */ }
 
-            // ── 9. Clear cart ──────────────────────────────────────────────
-            cart.IsCheckedOut  = true;
-            cart.LastUpdatedAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync(cancellationToken);
+            return ServiceResult<int>.Fail("Unable to place order. Please try again.");
+        }
 
-            // ── 10. SystemLog ──────────────────────────────────────────────
-            SystemLog sysLog = new()
-            {
-                UserId    = userId,
-                EventType = SystemLogEvents.OrderStatusChange,
-                EventDescription =$"Order #{orderNumber} created with status Pending.",
-                CreatedAt = DateTime.UtcNow
-            };
-            await _context.SystemLogs.AddAsync(sysLog, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            await tx.CommitAsync(cancellationToken);
-
-            // ── 11. Queue notification (outside transaction — non-critical) ─
+        // ── 11. Queue notification (outside transaction — non-critical) ────
+        // Runs after CommitAsync so a notification failure never rolls back
+        // the committed order.
+        try
+        {
             User? user = await _context.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
@@ -257,31 +301,16 @@ public sealed class OrderService : IOrderService
                     orderId:   order.OrderId,
                     cancellationToken: cancellationToken);
             }
-
-            return ServiceResult<int>.Ok(order.OrderId);
         }
-        catch (Exception ex)
+        catch (Exception notifEx)
         {
-            await tx.RollbackAsync(cancellationToken);
-            _logger.LogError(ex, "CreateOrderAsync failed for user {UserId}.", userId);
-
-            // Log rollback to SystemLog (best-effort — outside failed transaction)
-            try
-            {
-                SystemLog errLog = new()
-                {
-                    UserId    = userId,
-                    EventType = SystemLogEvents.BackgroundJobError,
-                    EventDescription =$"Order creation rolled back: {ex.Message}",
-                    CreatedAt = DateTime.UtcNow
-                };
-                await _context.SystemLogs.AddAsync(errLog, CancellationToken.None);
-                await _context.SaveChangesAsync(CancellationToken.None);
-            }
-            catch { /* best-effort */ }
-
-            return ServiceResult<int>.Fail("Unable to place order. Please try again.");
+            _logger.LogWarning(notifEx,
+                "Failed to queue OrderConfirmation notification for order {OrderId}. " +
+                "Order was committed successfully — notification failure is non-critical.",
+                order.OrderId);
         }
+
+        return ServiceResult<int>.Ok(order.OrderId);
     }
 
     // =========================================================================
@@ -341,64 +370,67 @@ public sealed class OrderService : IOrderService
                 "This order can no longer be cancelled. " +
                 "Please contact support if you need assistance.");
 
-        await using IDbContextTransaction tx =
-            await _context.Database.BeginTransactionAsync(cancellationToken);
-
+        IExecutionStrategy strategy = _context.Database.CreateExecutionStrategy();
         try
         {
-            // Load order WITH change-tracking so the status update is persisted.
-            // GetOrderWithDetailsAsync uses AsNoTracking — setting a property on
-            // that entity would be silently discarded by SaveChangesAsync.
-            Order trackedOrder = await _context.Orders
-                .FirstOrDefaultAsync(o => o.OrderId == orderId, cancellationToken)
-                ?? throw new InvalidOperationException(
-                    $"Order {orderId} not found for status update.");
-
-            // Unlock inventory — InventoryLog Unlock entry per item
-            foreach (OrderItem item in order.Items)
+            await strategy.ExecuteAsync(async () =>
             {
-                if (item.ProductVariantId is null) continue;
+                await using IDbContextTransaction tx =
+                    await _context.Database.BeginTransactionAsync(cancellationToken);
 
-                ProductVariant? variant = await _context.ProductVariants
-                    .FirstOrDefaultAsync(
-                        v => v.ProductVariantId == item.ProductVariantId,
-                        cancellationToken);
+                // Load order WITH change-tracking so the status update is persisted.
+                // GetOrderWithDetailsAsync uses AsNoTracking — setting a property on
+                // that entity would be silently discarded by SaveChangesAsync.
+                Order trackedOrder = await _context.Orders
+                    .FirstOrDefaultAsync(o => o.OrderId == orderId, cancellationToken)
+                    ?? throw new InvalidOperationException(
+                        $"Order {orderId} not found for status update.");
 
-                if (variant != null)
-                    variant.StockQuantity += item.Quantity;
-
-                InventoryLog unlockLog = new()
+                // Unlock inventory — InventoryLog Unlock entry per item
+                foreach (OrderItem item in order.Items)
                 {
-                    ProductId        = item.ProductId,
-                    ProductVariantId = item.ProductVariantId,
-                    OrderId          = order.OrderId,
-                    ChangeQuantity   = item.Quantity,
-                    ChangeType       = InventoryChangeTypes.Unlock,
-                    ChangedByUserId  = userId,
-                    Notes            = $"Stock unlocked — Order #{order.OrderNumber} cancelled by customer.",
+                    if (item.ProductVariantId is null) continue;
+
+                    ProductVariant? variant = await _context.ProductVariants
+                        .FirstOrDefaultAsync(
+                            v => v.ProductVariantId == item.ProductVariantId,
+                            cancellationToken);
+
+                    if (variant != null)
+                        variant.StockQuantity += item.Quantity;
+
+                    InventoryLog unlockLog = new()
+                    {
+                        ProductId        = item.ProductId,
+                        ProductVariantId = item.ProductVariantId,
+                        OrderId          = order.OrderId,
+                        ChangeQuantity   = item.Quantity,
+                        ChangeType       = InventoryChangeTypes.Unlock,
+                        ChangedByUserId  = userId,
+                        Notes            = $"Stock unlocked — Order #{order.OrderNumber} cancelled by customer.",
+                        CreatedAt        = DateTime.UtcNow
+                    };
+                    await _context.InventoryLogs.AddAsync(unlockLog, cancellationToken);
+                }
+
+                trackedOrder.OrderStatus = OrderStatuses.Cancelled;
+
+                SystemLog sysLog = new()
+                {
+                    UserId           = userId,
+                    EventType        = SystemLogEvents.OrderStatusChange,
+                    EventDescription = $"Order #{order.OrderNumber} cancelled by customer.",
                     CreatedAt        = DateTime.UtcNow
                 };
-                await _context.InventoryLogs.AddAsync(unlockLog, cancellationToken);
-            }
-
-            trackedOrder.OrderStatus = OrderStatuses.Cancelled;
-
-            SystemLog sysLog = new()
-            {
-                UserId           = userId,
-                EventType        = SystemLogEvents.OrderStatusChange,
-                EventDescription = $"Order #{order.OrderNumber} cancelled by customer.",
-                CreatedAt        = DateTime.UtcNow
-            };
-            await _context.SystemLogs.AddAsync(sysLog, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
-            await tx.CommitAsync(cancellationToken);
+                await _context.SystemLogs.AddAsync(sysLog, cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
+                await tx.CommitAsync(cancellationToken);
+            });
 
             return ServiceResult.Ok();
         }
         catch (Exception ex)
         {
-            await tx.RollbackAsync(cancellationToken);
             _logger.LogError(ex, "CancelOrderAsync failed for order {OrderId}.", orderId);
             return ServiceResult.Fail("Unable to cancel order. Please try again.");
         }
@@ -436,78 +468,90 @@ public sealed class OrderService : IOrderService
                 "Only orders that are out for delivery can be confirmed. " +
                 "Please contact support if you believe this is an error.");
 
-        await using IDbContextTransaction tx =
-            await _context.Database.BeginTransactionAsync(cancellationToken);
-
+        IExecutionStrategy strategy = _context.Database.CreateExecutionStrategy();
         try
         {
-            // Load order WITH change-tracking for the status update.
-            Order trackedOrder = await _context.Orders
-                .FirstOrDefaultAsync(o => o.OrderId == orderId, cancellationToken)
-                ?? throw new InvalidOperationException(
-                    $"Order {orderId} not found for status update.");
-
-            trackedOrder.OrderStatus = OrderStatuses.Delivered;
-
-            // ── Inventory: Unlock + Sale pair per line item ────────────────
-            // Lock was applied at order creation (StockQuantity was already
-            // decremented then). This pair restores it in the ledger (Unlock)
-            // and immediately re-consumes it as a confirmed sale (Sale).
-            // Net StockQuantity change = 0. Audit trail: Lock → Unlock → Sale.
-            foreach (OrderItem item in order.Items)
+            await strategy.ExecuteAsync(async () =>
             {
-                if (item.ProductVariantId is null) continue;
+                await using IDbContextTransaction tx =
+                    await _context.Database.BeginTransactionAsync(cancellationToken);
 
-                ProductVariant? variant = await _context.ProductVariants
-                    .FirstOrDefaultAsync(
-                        v => v.ProductVariantId == item.ProductVariantId,
-                        cancellationToken);
+                // Load order WITH change-tracking for the status update.
+                Order trackedOrder = await _context.Orders
+                    .FirstOrDefaultAsync(o => o.OrderId == orderId, cancellationToken)
+                    ?? throw new InvalidOperationException(
+                        $"Order {orderId} not found for status update.");
 
-                if (variant is null) continue;
+                trackedOrder.OrderStatus = OrderStatuses.Delivered;
 
-                // Unlock: reverse the reservation (+qty)
-                variant.StockQuantity += item.Quantity;
-                await _context.InventoryLogs.AddAsync(new InventoryLog
+                // ── Inventory: Unlock + Sale pair per line item ────────────────
+                // Lock was applied at order creation (StockQuantity was already
+                // decremented then). This pair restores it in the ledger (Unlock)
+                // and immediately re-consumes it as a confirmed sale (Sale).
+                // Net StockQuantity change = 0. Audit trail: Lock → Unlock → Sale.
+                foreach (OrderItem item in order.Items)
                 {
-                    ProductId        = item.ProductId,
-                    ProductVariantId = item.ProductVariantId,
-                    OrderId          = orderId,
-                    ChangeQuantity   = item.Quantity,
-                    ChangeType       = InventoryChangeTypes.Unlock,
-                    ChangedByUserId  = userId,
-                    Notes            = $"Lock released — Order #{order.OrderNumber} confirmed delivered.",
-                    CreatedAt        = DateTime.UtcNow
+                    if (item.ProductVariantId is null) continue;
+
+                    ProductVariant? variant = await _context.ProductVariants
+                        .FirstOrDefaultAsync(
+                            v => v.ProductVariantId == item.ProductVariantId,
+                            cancellationToken);
+
+                    if (variant is null) continue;
+
+                    // Unlock: reverse the reservation (+qty)
+                    variant.StockQuantity += item.Quantity;
+                    await _context.InventoryLogs.AddAsync(new InventoryLog
+                    {
+                        ProductId        = item.ProductId,
+                        ProductVariantId = item.ProductVariantId,
+                        OrderId          = orderId,
+                        ChangeQuantity   = item.Quantity,
+                        ChangeType       = InventoryChangeTypes.Unlock,
+                        ChangedByUserId  = userId,
+                        Notes            = $"Lock released — Order #{order.OrderNumber} confirmed delivered.",
+                        CreatedAt        = DateTime.UtcNow
+                    }, cancellationToken);
+
+                    // Sale: record actual consumption (-qty) — net change = 0
+                    variant.StockQuantity -= item.Quantity;
+                    await _context.InventoryLogs.AddAsync(new InventoryLog
+                    {
+                        ProductId        = item.ProductId,
+                        ProductVariantId = item.ProductVariantId,
+                        OrderId          = orderId,
+                        ChangeQuantity   = -item.Quantity,
+                        ChangeType       = InventoryChangeTypes.Sale,
+                        ChangedByUserId  = userId,
+                        Notes            = $"Sale finalised — Order #{order.OrderNumber} delivered to customer.",
+                        CreatedAt        = DateTime.UtcNow
+                    }, cancellationToken);
+                }
+
+                await _context.SystemLogs.AddAsync(new SystemLog
+                {
+                    UserId           = userId,
+                    EventType        = SystemLogEvents.OrderStatusChange,
+                    EventDescription =
+                        $"Order #{order.OrderNumber} confirmed delivered by customer. " +
+                        $"Status: {OrderStatuses.Shipped} → {OrderStatuses.Delivered}.",
+                    CreatedAt = DateTime.UtcNow
                 }, cancellationToken);
 
-                // Sale: record actual consumption (-qty) — net change = 0
-                variant.StockQuantity -= item.Quantity;
-                await _context.InventoryLogs.AddAsync(new InventoryLog
-                {
-                    ProductId        = item.ProductId,
-                    ProductVariantId = item.ProductVariantId,
-                    OrderId          = orderId,
-                    ChangeQuantity   = -item.Quantity,
-                    ChangeType       = InventoryChangeTypes.Sale,
-                    ChangedByUserId  = userId,
-                    Notes            = $"Sale finalised — Order #{order.OrderNumber} delivered to customer.",
-                    CreatedAt        = DateTime.UtcNow
-                }, cancellationToken);
-            }
+                await _context.SaveChangesAsync(cancellationToken);
+                await tx.CommitAsync(cancellationToken);
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "ConfirmDeliveryAsync failed for order {OrderId}.", orderId);
+            return ServiceResult.Fail("Unable to confirm delivery. Please try again.");
+        }
 
-            await _context.SystemLogs.AddAsync(new SystemLog
-            {
-                UserId           = userId,
-                EventType        = SystemLogEvents.OrderStatusChange,
-                EventDescription =
-                    $"Order #{order.OrderNumber} confirmed delivered by customer. " +
-                    $"Status: {OrderStatuses.Shipped} → {OrderStatuses.Delivered}.",
-                CreatedAt = DateTime.UtcNow
-            }, cancellationToken);
-
-            await _context.SaveChangesAsync(cancellationToken);
-            await tx.CommitAsync(cancellationToken);
-
-            // ── Queue notification outside transaction (non-critical) ──────
+        // ── Queue notification outside transaction (non-critical) ──────
+        try
+        {
             User? user = await _context.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
@@ -529,15 +573,16 @@ public sealed class OrderService : IOrderService
                     orderId:           orderId,
                     cancellationToken: cancellationToken);
             }
-
-            return ServiceResult.Ok();
         }
-        catch (Exception ex)
+        catch (Exception notifEx)
         {
-            await tx.RollbackAsync(cancellationToken);
-            _logger.LogError(ex, "ConfirmDeliveryAsync failed for order {OrderId}.", orderId);
-            return ServiceResult.Fail("Unable to confirm delivery. Please try again.");
+            _logger.LogWarning(notifEx,
+                "Failed to queue DeliveryConfirmation notification for order {OrderId}. " +
+                "Order was committed successfully — notification failure is non-critical.",
+                orderId);
         }
+
+        return ServiceResult.Ok();
     }
 
     // =========================================================================

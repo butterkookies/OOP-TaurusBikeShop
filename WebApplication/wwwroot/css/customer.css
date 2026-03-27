@@ -94,7 +94,7 @@
     color: var(--tbs-accent);
 }
 .tbs-sidebar__nav a.active {
-    background-color: rgba(255,107,0,0.08);
+    background-color: rgba(220, 20, 60, 0.12);
 }
 
 /* =============================================================================
@@ -197,8 +197,8 @@
 }
 .tbs-badge--pending     { background: var(--tbs-warning-light);  color: var(--tbs-warning); }
 .tbs-badge--processing  { background: var(--tbs-info-light);     color: var(--tbs-info); }
-.tbs-badge--shipped     { background: #EDE9FE;                   color: #7C3AED; }
+.tbs-badge--shipped     { background: rgba(167, 139, 250, 0.18); color: #A78BFA; }
 .tbs-badge--delivered   { background: var(--tbs-success-light);  color: var(--tbs-success); }
 .tbs-badge--cancelled   { background: var(--tbs-error-light);    color: var(--tbs-error); }
-.tbs-badge--onhold      { background: #FFF7ED;                   color: #EA580C; }
-.tbs-badge--pickup      { background: #F0FDF4;                   color: #15803D; }
+.tbs-badge--onhold      { background: rgba(148, 163, 184, 0.18); color: #94A3B8; }
+.tbs-badge--pickup      { background: var(--tbs-success-light);  color: var(--tbs-success); }

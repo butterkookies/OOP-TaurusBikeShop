@@ -1,75 +1,85 @@
-/* File: wwwroot/css/confirmation-modal.css */
+/* ============================================================
+   CONFIRMATION MODAL (generic action-confirm dialog)
+   ============================================================ */
 
 .confirmation-modal {
     display: none;
     position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
+    z-index: 1060;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
     justify-content: center;
     align-items: center;
+    padding: 1rem;
 }
 
 .modal-content {
-    background: #fff;
+    background: rgba(18, 14, 32, 0.94);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 16px;
-    padding: 30px 20px;
+    padding: 32px 24px;
     width: 90%;
-    max-width: 400px;
+    max-width: 420px;
     text-align: center;
     position: relative;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    font-family: 'Segoe UI', sans-serif;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65);
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    color: rgba(240, 240, 240, 0.92);
 }
 
 .modal-content h2 {
-    color: #d32f2f;
-    font-size: 1.8rem;
-    margin-bottom: 15px;
+    font-family: 'Barlow Condensed', 'Bebas Neue', sans-serif;
+    color: #DC143C;
+    font-size: 1.75rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
 }
 
 .modal-content p {
-    margin-bottom: 25px;
-    font-size: 1rem;
-    color: #1a1a1a;
+    margin-bottom: 24px;
+    font-size: .97rem;
+    color: rgba(240, 240, 240, 0.75);
+    line-height: 1.6;
 }
 
 .modal-actions button {
-    padding: 12px 25px;
-    font-size: 1rem;
-    font-weight: bold;
+    padding: 11px 28px;
+    font-size: .97rem;
+    font-weight: 700;
+    font-family: inherit;
     border-radius: 8px;
     border: none;
-    background: #d32f2f;
+    background: #DC143C;
     color: #fff;
     cursor: pointer;
-    transition: all 0.3s ease;
+    letter-spacing: .02em;
+    transition: background .2s ease-out, box-shadow .2s ease-out;
 }
 
 .modal-actions button:hover {
-    background: #b71c1c;
+    background: #B0102E;
+    box-shadow: 0 4px 16px rgba(220, 20, 60, 0.40);
 }
 
 .close-btn {
     position: absolute;
-    top: 12px;
-    right: 15px;
-    font-size: 1.5rem;
-    color: #d32f2f;
+    top: 14px; right: 16px;
+    font-size: 1.4rem;
+    color: rgba(240, 240, 240, 0.40);
     cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
+    font-weight: 400;
+    transition: color .15s ease;
+    line-height: 1;
+    background: none;
+    border: none;
+    padding: 0;
 }
 
-.close-btn:hover {
-    color: #b71c1c;
-}
+.close-btn:hover { color: rgba(240, 240, 240, 0.90); }
 
-@media (max-width: 480px){
-    .modal-content {
-        padding: 20px 15px;
-    }
+@media (max-width: 480px) {
+    .modal-content { padding: 24px 16px; }
 }

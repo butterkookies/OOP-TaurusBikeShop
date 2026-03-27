@@ -95,6 +95,59 @@
   --transition-fast:  all 0.2s ease-out;
   --transition-base:  all 0.25s ease-out;
   --transition-slow:  all 0.4s ease-out;
+
+  /* ─────────────────────────────────────────────────────────────
+     --tbs-* COMPATIBILITY TOKENS
+     Used by auth.css, customer.css, checkout.css, profile.css,
+     payment.css, cart-item.css, review.css, support.css, etc.
+     All values mapped to the dark glass design system above.
+     ───────────────────────────────────────────────────────────── */
+
+  /* Surfaces — glass tiers */
+  --tbs-white:          rgba(255, 255, 255, 0.07);
+  --tbs-gray-50:        rgba(255, 255, 255, 0.04);
+
+  /* Borders */
+  --tbs-gray-100:       rgba(255, 255, 255, 0.10);
+  --tbs-gray-200:       rgba(255, 255, 255, 0.16);
+
+  /* Text — light on dark */
+  --tbs-gray-400:       rgba(240, 240, 240, 0.45);   /* muted / placeholder */
+  --tbs-gray-600:       rgba(240, 240, 240, 0.68);   /* secondary text */
+  --tbs-gray-800:       rgba(240, 240, 240, 0.92);   /* primary text */
+  --tbs-primary:        #F0F0F0;                     /* headings */
+
+  /* Brand */
+  --tbs-accent:         #DC143C;
+  --tbs-accent-dark:    #9B0E2A;
+  --tbs-accent-light:   rgba(220, 20, 60, 0.14);
+
+  /* Semantic states */
+  --tbs-error:          #F87171;
+  --tbs-error-light:    rgba(248, 113, 113, 0.14);
+  --tbs-success:        #4ADE80;
+  --tbs-success-light:  rgba(74, 222, 128, 0.14);
+  --tbs-warning:        #FBBF24;
+  --tbs-warning-light:  rgba(251, 191, 36, 0.14);
+  --tbs-info:           #60A5FA;
+  --tbs-info-light:     rgba(96, 165, 250, 0.14);
+
+  /* Typography */
+  --tbs-font-display:   'Bebas Neue', 'Barlow Condensed', sans-serif;
+  --tbs-font-body:      'DM Sans', system-ui, sans-serif;
+  --tbs-font-mono:      'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Shape */
+  --tbs-btn-radius:     4px;
+  --tbs-card-radius:    12px;
+
+  /* Shadows */
+  --tbs-shadow-sm:      0 2px 8px rgba(0, 0, 0, 0.35);
+  --tbs-shadow-md:      0 4px 16px rgba(0, 0, 0, 0.45);
+  --tbs-shadow-lg:      0 8px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.30);
+
+  /* Timing */
+  --tbs-transition:     0.2s ease-out;
 }
 
 

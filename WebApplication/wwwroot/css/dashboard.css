@@ -58,7 +58,7 @@
     text-decoration: none;
 }
 .sidebar-link.active {
-    background: #FFF7ED;
+    background: rgba(220, 20, 60, 0.12);
     color: var(--accent);
     border-left-color: var(--accent);
     font-weight: 600;
@@ -181,8 +181,8 @@
     border: 1px solid var(--border);
 }
 .reply-bubble.admin {
-    background: #FFF7ED;
-    border-color: rgba(224,90,0,.2);
+    background: rgba(220, 20, 60, 0.10);
+    border-color: rgba(220, 20, 60, 0.25);
     align-self: flex-end;
 }
 .reply-meta {

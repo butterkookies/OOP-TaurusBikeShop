@@ -186,7 +186,7 @@
 .tbs-file-drop:hover,
 .tbs-file-drop--active {
     border-color: var(--tbs-accent);
-    background: rgba(255,107,0,0.03);
+    background: rgba(220, 20, 60, 0.03);
 }
 .tbs-file-drop__input {
     position: absolute;

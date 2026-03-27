@@ -1,43 +1,88 @@
-/* File: wwwroot/css/notificationalert.css */
+/* ============================================================
+   NOTIFICATION ALERT — Toast component
+   Driven by showToast(type, message) in utils.js.
+   Supports: error | success | info | warning
+   ============================================================ */
 
+/* ── Base toast ──────────────────────────────────────────── */
 .notification-alert {
     display: none;
     position: fixed;
-    top: 20px;
+    top: 80px;       /* clears the 60px navbar + breathing room */
     right: 20px;
-    background: #d32f2f;
-    color: #fff;
-    padding: 15px 20px;
-    border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-    font-family: 'Segoe UI', sans-serif;
-    align-items: center;
-    z-index: 1000;
-    min-width: 250px;
+    z-index: 1100;
+
+    /* Glass surface */
+    background: rgba(18, 14, 32, 0.92);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 3px solid var(--accent, #DC143C);  /* type accent stripe */
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35);
+
+    /* Layout */
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    min-width: 280px;
+    max-width: 360px;
+
+    /* Typography */
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    font-size: .9rem;
+    color: rgba(240, 240, 240, 0.92);
+    line-height: 1.5;
+
+    /* Slide-in animation */
+    animation: toastSlideIn .25s ease-out both;
 }
 
+/* ── Type variants (set via data-toast-type attribute) ───── */
+.notification-alert[data-toast-type="error"]   { border-left-color: #F87171; }
+.notification-alert[data-toast-type="success"] { border-left-color: #4ADE80; }
+.notification-alert[data-toast-type="info"]    { border-left-color: #60A5FA; }
+.notification-alert[data-toast-type="warning"] { border-left-color: #FBBF24; }
+
+/* ── Message ─────────────────────────────────────────────── */
 .notification-alert p {
     margin: 0;
-    font-weight: bold;
+    flex: 1;
+    font-weight: 500;
+    word-break: break-word;
 }
 
+/* ── Close button ────────────────────────────────────────── */
 .close-alert {
-    margin-left: 15px;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 2px 4px;
     cursor: pointer;
-    font-weight: bold;
-    font-size: 1.2rem;
-    transition: all 0.3s ease;
+    font-weight: 400;
+    font-size: 1.15rem;
+    line-height: 1;
+    color: rgba(240, 240, 240, 0.50);
+    transition: color .15s ease;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+}
+.close-alert:hover { color: rgba(240, 240, 240, 0.92); }
+
+/* ── Slide-in keyframe ───────────────────────────────────── */
+@keyframes toastSlideIn {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
-.close-alert:hover {
-    color: #ffb3b3;
-}
-
+/* ── Mobile ──────────────────────────────────────────────── */
 @media (max-width: 480px) {
     .notification-alert {
-        right: 10px;
-        left: 10px;
-        padding: 12px 15px;
-        font-size: 0.95rem;
+        top: auto;
+        bottom: 16px;
+        right: 12px;
+        left: 12px;
+        max-width: none;
     }
 }

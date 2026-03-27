@@ -12,7 +12,7 @@
 }
 .tbs-address-card--default {
     border-color: var(--tbs-accent);
-    background: rgba(255,107,0,0.03);
+    background: rgba(220, 20, 60, 0.03);
 }
 
 .tbs-address-card__default-badge {

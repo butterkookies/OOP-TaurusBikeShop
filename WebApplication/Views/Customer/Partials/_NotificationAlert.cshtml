@@ -1,5 +1,12 @@
 @* WebApplication/Views/Customer/Partials/_NotificationAlert.cshtml *@
-@* No model — this is a pure client-side alert container driven by showAlert() in utils.js *@
+@* Alert container driven by showToast() in utils.js.
+   Also reads TempData["error"] / TempData["success"] / TempData["info"]
+   set by server-side redirects and fires showToast() on DOMContentLoaded. *@
+@{
+    string? toastError   = TempData["error"]   as string;
+    string? toastSuccess = TempData["success"] as string;
+    string? toastInfo    = TempData["info"]    as string;
+}
 
 <div class="notification-alert" id="notificationAlert" style="display:none">
     <span class="close-alert" id="closeAlert">&times;</span>
@@ -16,3 +23,28 @@
         }
     })();
 </script>
+
+@if (!string.IsNullOrEmpty(toastError))
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            showToast('error', '@Html.Raw(toastError!.Replace("\\", "\\\\").Replace("'", "\\'"))');
+        });
+    </script>
+}
+@if (!string.IsNullOrEmpty(toastSuccess))
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            showToast('success', '@Html.Raw(toastSuccess!.Replace("\\", "\\\\").Replace("'", "\\'"))');
+        });
+    </script>
+}
+@if (!string.IsNullOrEmpty(toastInfo))
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            showToast('info', '@Html.Raw(toastInfo!.Replace("\\", "\\\\").Replace("'", "\\'"))');
+        });
+    </script>
+}

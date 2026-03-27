@@ -67,7 +67,7 @@
 }
 .tbs-otp-modal__code-input:focus {
     border-color: var(--tbs-accent);
-    box-shadow: 0 0 0 3px rgba(255,107,0,0.12);
+    box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.18);
     background: var(--tbs-white);
 }
 .tbs-otp-modal__code-input::placeholder {
