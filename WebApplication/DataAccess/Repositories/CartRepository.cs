@@ -35,6 +35,7 @@ public sealed class CartRepository : Repository<Cart>
         IQueryable<Cart> query = Context.Carts
             .Include(c => c.Items)
                 .ThenInclude(ci => ci.Product)
+                    .ThenInclude(p => p!.Images)
             .Include(c => c.Items)
                 .ThenInclude(ci => ci.Variant)
             .Where(c => !c.IsCheckedOut);

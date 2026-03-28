@@ -34,6 +34,8 @@ public sealed class OrderRepository : Repository<Order>
     {
         return await Context.Orders
             .AsNoTracking()
+            .Include(o => o.Items)
+            .Include(o => o.PickupOrder)
             .Where(o => o.UserId == userId)
             .OrderByDescending(o => o.OrderDate)
             .Skip((pageNum - 1) * pageSize)
