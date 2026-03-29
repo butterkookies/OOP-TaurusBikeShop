@@ -164,11 +164,13 @@
    CONTENT CARDS
    ============================================================================= */
 .tbs-card {
-    background: var(--tbs-white);
-    border: 1px solid var(--tbs-gray-100);
-    border-radius: var(--tbs-card-radius);
+    background: var(--glass-t2-bg);
+    backdrop-filter: var(--glass-t2-blur);
+    -webkit-backdrop-filter: var(--glass-t2-blur);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
     padding: 1.5rem;
-    box-shadow: var(--tbs-shadow-sm);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 .tbs-card__title {
     font-size: 1rem;

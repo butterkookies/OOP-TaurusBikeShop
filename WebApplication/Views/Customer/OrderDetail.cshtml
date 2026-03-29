@@ -10,6 +10,18 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/order.css" asp-append-version="true" />
+    <style>
+        body {
+            background-color: #0D0D1A;
+            background-image:
+                linear-gradient(rgba(8, 6, 18, 0.68), rgba(8, 6, 18, 0.68)),
+                url('/mobile wallpaper.png');
+            background-size: cover;
+            background-position: center top;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+    </style>
 }
 
 @Html.AntiForgeryToken()
@@ -33,6 +45,20 @@
                 @await Html.PartialAsync(
                     "~/Views/Customer/Partials/_OrderStatusBadge.cshtml",
                     Model.OrderStatus)
+
+                @if (Model.IsDeliveryConfirmable)
+                {
+                    <form asp-action="ConfirmDelivery" asp-controller="Order"
+                          method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="orderId" value="@Model.OrderId" />
+                        <button type="submit"
+                                class="tbs-order-detail__confirm-btn"
+                                onclick="return confirm('Confirm that you have received this order?')">
+                            Confirm Delivery
+                        </button>
+                    </form>
+                }
 
                 @if (Model.IsCancellable)
                 {

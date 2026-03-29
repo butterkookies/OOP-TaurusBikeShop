@@ -23,11 +23,11 @@ info: Microsoft.Hosting.Lifetime[0]
 info: Microsoft.Hosting.Lifetime[0]
       Content root path: C:\Users\user\Documents\ANDREI_FILES\PDM_FILES\2ND YEAR\2ND SEM\OOP\OOP-TaurusBikeShop\WebApplication
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (57ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      Executed DbCommand (58ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
       SELECT COUNT(*)
       FROM [ProductVariant] AS [p]
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (52ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32), @p4='?' (DbType = DateTime2), @p5='?' (Size = 1000), @p6='?' (Size = 100), @p7='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      Executed DbCommand (53ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32), @p4='?' (DbType = DateTime2), @p5='?' (Size = 1000), @p6='?' (Size = 100), @p7='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
       SET IMPLICIT_TRANSACTIONS OFF;
       SET NOCOUNT ON;
       MERGE [SystemLog] USING (
@@ -38,7 +38,7 @@ info: Microsoft.EntityFrameworkCore.Database.Command[20101]
       VALUES (i.[CreatedAt], i.[EventDescription], i.[EventType], i.[UserId])
       OUTPUT INSERTED.[SystemLogId], i._Position;
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (40ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      Executed DbCommand (41ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
       SET IMPLICIT_TRANSACTIONS OFF;
       SET NOCOUNT ON;
       INSERT INTO [SystemLog] ([CreatedAt], [EventDescription], [EventType], [UserId])
@@ -52,19 +52,12 @@ info: Microsoft.EntityFrameworkCore.Database.Command[20101]
       OUTPUT INSERTED.[SystemLogId]
       VALUES (@p0, @p1, @p2, @p3);
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (38ms) [Parameters=[@__staleThreshold_0='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      Executed DbCommand (39ms) [Parameters=[@__staleThreshold_0='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
       SELECT [o].[OrderId], [o].[OrderNumber]
       FROM [Order] AS [o]
       WHERE [o].[OrderStatus] = N'Pending' AND [o].[OrderDate] < @__staleThreshold_0
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (41ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SET IMPLICIT_TRANSACTIONS OFF;
-      SET NOCOUNT ON;
-      INSERT INTO [SystemLog] ([CreatedAt], [EventDescription], [EventType], [UserId])
-      OUTPUT INSERTED.[SystemLogId]
-      VALUES (@p0, @p1, @p2, @p3);
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (38ms) [Parameters=[@__now_0='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      Executed DbCommand (39ms) [Parameters=[@__now_0='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
       SELECT [o].[OrderId], [o].[ContactPhone], [o].[CreatedAt], [o].[DeliveryInstructions], [o].[DiscountAmount], [o].[IsWalkIn], [o].[OrderDate], [o].[OrderNumber], [o].[OrderStatus], [o].[ShippingAddressId], [o].[ShippingFee], [o].[SubTotal], [o].[UserId], [u].[UserId], [p0].[PaymentId], [p0].[Amount], [p0].[CreatedAt], [p0].[OrderId], [p0].[PaymentDate], [p0].[PaymentMethod], [p0].[PaymentStage], [p0].[PaymentStatus], [u].[CreatedAt], [u].[DefaultAddressId], [u].[Email], [u].[FirstName], [u].[IsActive], [u].[IsWalkIn], [u].[LastLoginAt], [u].[LastName], [u].[PasswordHash], [u].[PhoneNumber]
       FROM [Order] AS [o]
       INNER JOIN [User] AS [u] ON [o].[UserId] = [u].[UserId]
@@ -76,7 +69,7 @@ info: Microsoft.EntityFrameworkCore.Database.Command[20101]
           WHERE [o].[OrderId] = [p].[OrderId] AND [p].[PaymentStatus] = N'VerificationPending' AND [p].[PaymentMethod] = N'BankTransfer' AND [b].[PaymentId] IS NOT NULL AND [b].[VerificationDeadline] IS NOT NULL AND [b].[VerificationDeadline] < @__now_0)
       ORDER BY [o].[OrderId], [u].[UserId]
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (40ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      Executed DbCommand (41ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
       SET IMPLICIT_TRANSACTIONS OFF;
       SET NOCOUNT ON;
       INSERT INTO [SystemLog] ([CreatedAt], [EventDescription], [EventType], [UserId])
@@ -90,22 +83,27 @@ info: Microsoft.EntityFrameworkCore.Database.Command[20101]
       OUTPUT INSERTED.[SystemLogId]
       VALUES (@p0, @p1, @p2, @p3);
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (42ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      Executed DbCommand (41ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
       SET IMPLICIT_TRANSACTIONS OFF;
       SET NOCOUNT ON;
       INSERT INTO [SystemLog] ([CreatedAt], [EventDescription], [EventType], [UserId])
       OUTPUT INSERTED.[SystemLogId]
       VALUES (@p0, @p1, @p2, @p3);
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/ - - -
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      Executed DbCommand (44ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [SystemLog] ([CreatedAt], [EventDescription], [EventType], [UserId])
+      OUTPUT INSERTED.[SystemLogId]
+      VALUES (@p0, @p1, @p2, @p3);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (40ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
       SELECT [p].[ProductVariantId], [p].[VariantName], [p].[StockQuantity], [p].[ReorderThreshold], [p].[ProductId], [p0].[Name] AS [ProductName]
       FROM [ProductVariant] AS [p]
       INNER JOIN [Product] AS [p0] ON [p].[ProductId] = [p0].[ProductId]
       WHERE [p].[IsActive] = CAST(1 AS bit) AND [p0].[IsActive] = CAST(1 AS bit) AND [p].[StockQuantity] < [p].[ReorderThreshold]
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (38ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      Executed DbCommand (39ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
       SELECT [d].[DeliveryId], [d].[ActualDeliveryTime], [d].[Courier], [d].[CreatedAt], [d].[DelayedUntil], [d].[DeliveryStatus], [d].[EstimatedDeliveryTime], [d].[IsDelayed], [d].[OrderId], [l].[DeliveryId], [l].[BookingRef], [l].[DriverName], [l].[DriverPhone], [l0].[DeliveryId], [l0].[TrackingNumber], [o].[OrderId], [o].[ContactPhone], [o].[CreatedAt], [o].[DeliveryInstructions], [o].[DiscountAmount], [o].[IsWalkIn], [o].[OrderDate], [o].[OrderNumber], [o].[OrderStatus], [o].[ShippingAddressId], [o].[ShippingFee], [o].[SubTotal], [o].[UserId], [u].[UserId], [u].[CreatedAt], [u].[DefaultAddressId], [u].[Email], [u].[FirstName], [u].[IsActive], [u].[IsWalkIn], [u].[LastLoginAt], [u].[LastName], [u].[PasswordHash], [u].[PhoneNumber]
       FROM [Delivery] AS [d]
       LEFT JOIN [LalamoveDelivery] AS [l] ON [d].[DeliveryId] = [l].[DeliveryId]
@@ -113,8 +111,10 @@ info: Microsoft.EntityFrameworkCore.Database.Command[20101]
       INNER JOIN [Order] AS [o] ON [d].[OrderId] = [o].[OrderId]
       INNER JOIN [User] AS [u] ON [o].[UserId] = [u].[UserId]
       WHERE [d].[DeliveryStatus] IN (N'PickedUp', N'InTransit')
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 GET https://localhost:7177/ - - -
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      Executed DbCommand (40ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
       SELECT [u].[UserId], [u].[Email], [u].[FirstName]
       FROM [User] AS [u]
       WHERE [u].[IsActive] = CAST(1 AS bit) AND [u].[IsWalkIn] = CAST(0 AS bit) AND [u].[Email] IS NOT NULL AND EXISTS (
@@ -122,28 +122,28 @@ info: Microsoft.EntityFrameworkCore.Database.Command[20101]
           FROM [UserRole] AS [u0]
           INNER JOIN [Role] AS [r] ON [u0].[RoleId] = [r].[RoleId]
           WHERE [u].[UserId] = [u0].[UserId] AND [r].[RoleName] IN (N'Admin', N'Manager'))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (43ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [SystemLog] ([CreatedAt], [EventDescription], [EventType], [UserId])
+      OUTPUT INSERTED.[SystemLogId]
+      VALUES (@p0, @p1, @p2, @p3);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (46ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [SystemLog] ([CreatedAt], [EventDescription], [EventType], [UserId])
+      OUTPUT INSERTED.[SystemLogId]
+      VALUES (@p0, @p1, @p2, @p3);
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
       Executing endpoint 'WebApplication.Controllers.HomeController.Index (WebApplication)'
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (41ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SET IMPLICIT_TRANSACTIONS OFF;
-      SET NOCOUNT ON;
-      INSERT INTO [SystemLog] ([CreatedAt], [EventDescription], [EventType], [UserId])
-      OUTPUT INSERTED.[SystemLogId]
-      VALUES (@p0, @p1, @p2, @p3);
 info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[102]
       Route matched with {action = "Index", controller = "Home"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index(System.Threading.CancellationToken) on controller WebApplication.Controllers.HomeController (WebApplication).
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (42ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 1000), @p2='?' (Size = 100), @p3='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SET IMPLICIT_TRANSACTIONS OFF;
-      SET NOCOUNT ON;
-      INSERT INTO [SystemLog] ([CreatedAt], [EventDescription], [EventType], [UserId])
-      OUTPUT INSERTED.[SystemLogId]
-      VALUES (@p0, @p1, @p2, @p3);
 warn: Microsoft.EntityFrameworkCore.Query[20504]
       Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (42ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      Executed DbCommand (43ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
       SELECT [t].[ProductId], [t].[AdditionalSpecs], [t].[AxleStandard], [t].[BoostCompatible], [t].[BrakeType], [t].[BrandId], [t].[CategoryId], [t].[Color], [t].[CreatedAt], [t].[Currency], [t].[Description], [t].[IsActive], [t].[IsFeatured], [t].[Material], [t].[Name], [t].[Price], [t].[SKU], [t].[ShortDescription], [t].[SpeedCompatibility], [t].[SuspensionTravel], [t].[TubelessReady], [t].[UpdatedAt], [t].[WheelSize], [b].[BrandId], [b].[BrandName], [b].[Country], [b].[CreatedAt], [b].[Description], [b].[IsActive], [b].[Website], [t].[CategoryId0], [t].[CategoryCode], [t].[Description0], [t].[DisplayOrder], [t].[IsActive0], [t].[Name0], [t].[ParentCategoryId], [t0].[ProductImageId], [t0].[AltText], [t0].[CreatedAt], [t0].[DisplayOrder], [t0].[FileSizeBytes], [t0].[Height], [t0].[ImageType], [t0].[ImageUrl], [t0].[IsPrimary], [t0].[MimeType], [t0].[ProductId], [t0].[StorageBucket], [t0].[StoragePath], [t0].[UploadedByUserId], [t0].[Width], [t1].[ProductVariantId], [t1].[AdditionalPrice], [t1].[CreatedAt], [t1].[IsActive], [t1].[ProductId], [t1].[ReorderThreshold], [t1].[SKU], [t1].[StockQuantity], [t1].[UpdatedAt], [t1].[VariantName]
       FROM (
           SELECT TOP(@__p_0) [p].[ProductId], [p].[AdditionalSpecs], [p].[AxleStandard], [p].[BoostCompatible], [p].[BrakeType], [p].[BrandId], [p].[CategoryId], [p].[Color], [p].[CreatedAt], [p].[Currency], [p].[Description], [p].[IsActive], [p].[IsFeatured], [p].[Material], [p].[Name], [p].[Price], [p].[SKU], [p].[ShortDescription], [p].[SpeedCompatibility], [p].[SuspensionTravel], [p].[TubelessReady], [p].[UpdatedAt], [p].[WheelSize], [c].[CategoryId] AS [CategoryId0], [c].[CategoryCode], [c].[Description] AS [Description0], [c].[DisplayOrder], [c].[IsActive] AS [IsActive0], [c].[Name] AS [Name0], [c].[ParentCategoryId]
@@ -167,455 +167,384 @@ info: Microsoft.EntityFrameworkCore.Database.Command[20101]
 info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[1]
       Executing ViewResult, running view Index.
 info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[4]
-      Executed ViewResult - view Index executed in 91.3063ms.
+      Executed ViewResult - view Index executed in 159.3151ms.
 info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[105]
-      Executed action WebApplication.Controllers.HomeController.Index (WebApplication) in 224.369ms
+      Executed action WebApplication.Controllers.HomeController.Index (WebApplication) in 310.1006ms
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
       Executed endpoint 'WebApplication.Controllers.HomeController.Index (WebApplication)'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/ - 200 - text/html;+charset=utf-8 357.2983ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/_vs/browserLink - - -
+      Request finished HTTP/2 GET https://localhost:7177/ - 200 - text/html;+charset=utf-8 450.6439ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - - -
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/js/utils.js?v=PJY_en0XxkP56mrnr6ZbGvTqx2viJahwP4o_qPEjvag - - -
+      Request starting HTTP/2 GET https://localhost:7177/_vs/browserLink - - -
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - 200 14933 application/javascript;+charset=utf-8 7.9219ms
-info: Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware[6]
-      The file /js/utils.js was not modified
+      Request finished HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - 200 14933 application/javascript;+charset=utf-8 8.7247ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/js/utils.js?v=PJY_en0XxkP56mrnr6ZbGvTqx2viJahwP4o_qPEjvag - 304 - text/javascript 14.1892ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/_vs/browserLink - 200 - text/javascript;+charset=UTF-8 35.8155ms
+      Request finished HTTP/2 GET https://localhost:7177/_vs/browserLink - 200 - text/javascript;+charset=UTF-8 43.1169ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/Product/List - - -
+      Request starting HTTP/2 GET https://localhost:7177/Cart/GetCartCount - - -
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 GET https://localhost:7177/antiforgery/token - - -
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'WebApplication.Controllers.ProductController.List (WebApplication)'
+      Executing endpoint 'WebApplication.Controllers.CartController.GetCartCount (WebApplication)'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 GET https://localhost:7177/antiforgery/token - 404 0 - 10.1369ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[16]
+      Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7177/antiforgery/token, Response status code: 404
 info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[102]
-      Route matched with {action = "List", controller = "Product"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] List(System.Nullable`1[System.Int32], System.Nullable`1[System.Int32], System.Nullable`1[System.Decimal], System.Nullable`1[System.Decimal], System.String, System.String, Boolean, Int32, System.Threading.CancellationToken) on controller WebApplication.Controllers.ProductController (WebApplication).
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT [w].[ProductId]
-      FROM [Wishlist] AS [w]
-      WHERE [w].[UserId] = @__userId_0
+      Route matched with {action = "GetCartCount", controller = "Cart"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetCartCount(System.Threading.CancellationToken) on controller WebApplication.Controllers.CartController (WebApplication).
 warn: Microsoft.EntityFrameworkCore.Query[20504]
       Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (42ms) [Parameters=[@__p_0='?' (DbType = Int32), @__p_1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT [t].[ProductId], [t].[AdditionalSpecs], [t].[AxleStandard], [t].[BoostCompatible], [t].[BrakeType], [t].[BrandId], [t].[CategoryId], [t].[Color], [t].[CreatedAt], [t].[Currency], [t].[Description], [t].[IsActive], [t].[IsFeatured], [t].[Material], [t].[Name], [t].[Price], [t].[SKU], [t].[ShortDescription], [t].[SpeedCompatibility], [t].[SuspensionTravel], [t].[TubelessReady], [t].[UpdatedAt], [t].[WheelSize], [b].[BrandId], [b].[BrandName], [b].[Country], [b].[CreatedAt], [b].[Description], [b].[IsActive], [b].[Website], [t].[CategoryId0], [t].[CategoryCode], [t].[Description0], [t].[DisplayOrder], [t].[IsActive0], [t].[Name0], [t].[ParentCategoryId], [t0].[ProductImageId], [t0].[AltText], [t0].[CreatedAt], [t0].[DisplayOrder], [t0].[FileSizeBytes], [t0].[Height], [t0].[ImageType], [t0].[ImageUrl], [t0].[IsPrimary], [t0].[MimeType], [t0].[ProductId], [t0].[StorageBucket], [t0].[StoragePath], [t0].[UploadedByUserId], [t0].[Width], [t1].[ProductVariantId], [t1].[AdditionalPrice], [t1].[CreatedAt], [t1].[IsActive], [t1].[ProductId], [t1].[ReorderThreshold], [t1].[SKU], [t1].[StockQuantity], [t1].[UpdatedAt], [t1].[VariantName]
+      Executed DbCommand (41ms) [Parameters=[@__userId_Value_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[CartId], [t].[CreatedAt], [t].[GuestSessionId], [t].[IsCheckedOut], [t].[LastUpdatedAt], [t].[UserId], [t0].[CartItemId], [t0].[AddedAt], [t0].[CartId], [t0].[PriceAtAdd], [t0].[ProductId], [t0].[ProductVariantId], [t0].[Quantity], [t0].[ProductId0], [t0].[AdditionalSpecs], [t0].[AxleStandard], [t0].[BoostCompatible], [t0].[BrakeType], [t0].[BrandId], [t0].[CategoryId], [t0].[Color], [t0].[CreatedAt], [t0].[Currency], [t0].[Description], [t0].[IsActive], [t0].[IsFeatured], [t0].[Material], [t0].[Name], [t0].[Price], [t0].[SKU], [t0].[ShortDescription], [t0].[SpeedCompatibility], [t0].[SuspensionTravel], [t0].[TubelessReady], [t0].[UpdatedAt], [t0].[WheelSize], [t0].[ProductVariantId0], [t0].[ProductImageId], [t0].[AltText], [t0].[CreatedAt0], [t0].[DisplayOrder], [t0].[FileSizeBytes], [t0].[Height], [t0].[ImageType], [t0].[ImageUrl], [t0].[IsPrimary], [t0].[MimeType], [t0].[ProductId1], [t0].[StorageBucket], [t0].[StoragePath], [t0].[UploadedByUserId], [t0].[Width], [t0].[AdditionalPrice], [t0].[CreatedAt1], [t0].[IsActive0], [t0].[ProductId2], [t0].[ReorderThreshold], [t0].[SKU0], [t0].[StockQuantity], [t0].[UpdatedAt0], [t0].[VariantName]
       FROM (
-          SELECT [p].[ProductId], [p].[AdditionalSpecs], [p].[AxleStandard], [p].[BoostCompatible], [p].[BrakeType], [p].[BrandId], [p].[CategoryId], [p].[Color], [p].[CreatedAt], [p].[Currency], [p].[Description], [p].[IsActive], [p].[IsFeatured], [p].[Material], [p].[Name], [p].[Price], [p].[SKU], [p].[ShortDescription], [p].[SpeedCompatibility], [p].[SuspensionTravel], [p].[TubelessReady], [p].[UpdatedAt], [p].[WheelSize], [c].[CategoryId] AS [CategoryId0], [c].[CategoryCode], [c].[Description] AS [Description0], [c].[DisplayOrder], [c].[IsActive] AS [IsActive0], [c].[Name] AS [Name0], [c].[ParentCategoryId]
-          FROM [Product] AS [p]
-          INNER JOIN [Category] AS [c] ON [p].[CategoryId] = [c].[CategoryId]
-          WHERE [p].[IsActive] = CAST(1 AS bit) AND [c].[IsActive] = CAST(1 AS bit)
-          ORDER BY [p].[IsFeatured] DESC, [p].[Name]
-          OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+          SELECT TOP(1) [c].[CartId], [c].[CreatedAt], [c].[GuestSessionId], [c].[IsCheckedOut], [c].[LastUpdatedAt], [c].[UserId]
+          FROM [Cart] AS [c]
+          WHERE [c].[IsCheckedOut] = CAST(0 AS bit) AND [c].[UserId] = @__userId_Value_0
       ) AS [t]
-      LEFT JOIN [Brand] AS [b] ON [t].[BrandId] = [b].[BrandId]
       LEFT JOIN (
-          SELECT [p0].[ProductImageId], [p0].[AltText], [p0].[CreatedAt], [p0].[DisplayOrder], [p0].[FileSizeBytes], [p0].[Height], [p0].[ImageType], [p0].[ImageUrl], [p0].[IsPrimary], [p0].[MimeType], [p0].[ProductId], [p0].[StorageBucket], [p0].[StoragePath], [p0].[UploadedByUserId], [p0].[Width]
-          FROM [ProductImage] AS [p0]
-          WHERE [p0].[IsPrimary] = CAST(1 AS bit)
-      ) AS [t0] ON [t].[ProductId] = [t0].[ProductId]
-      LEFT JOIN (
-          SELECT [p1].[ProductVariantId], [p1].[AdditionalPrice], [p1].[CreatedAt], [p1].[IsActive], [p1].[ProductId], [p1].[ReorderThreshold], [p1].[SKU], [p1].[StockQuantity], [p1].[UpdatedAt], [p1].[VariantName]
-          FROM [ProductVariant] AS [p1]
-          WHERE [p1].[IsActive] = CAST(1 AS bit)
-      ) AS [t1] ON [t].[ProductId] = [t1].[ProductId]
-      ORDER BY [t].[IsFeatured] DESC, [t].[Name], [t].[ProductId], [t].[CategoryId0], [b].[BrandId], [t0].[ProductImageId]
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT COUNT(*)
-      FROM [Product] AS [p]
-      INNER JOIN [Category] AS [c] ON [p].[CategoryId] = [c].[CategoryId]
-      WHERE [p].[IsActive] = CAST(1 AS bit) AND [c].[IsActive] = CAST(1 AS bit)
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (40ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT [b].[BrandId], [b].[BrandName], [b].[Country], [b].[CreatedAt], [b].[Description], [b].[IsActive], [b].[Website]
-      FROM [Brand] AS [b]
-      WHERE [b].[IsActive] = CAST(1 AS bit)
-      ORDER BY [b].[BrandName]
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (40ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT [c].[CategoryId], [c].[CategoryCode], [c].[Description], [c].[DisplayOrder], [c].[IsActive], [c].[Name], [c].[ParentCategoryId]
-      FROM [Category] AS [c]
-      WHERE [c].[IsActive] = CAST(1 AS bit)
-      ORDER BY [c].[DisplayOrder], [c].[Name]
-info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[1]
-      Executing ViewResult, running view ~/Views/Customer/ProductCatalog.cshtml.
-info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[4]
-      Executed ViewResult - view ~/Views/Customer/ProductCatalog.cshtml executed in 67.9757ms.
+          SELECT [c0].[CartItemId], [c0].[AddedAt], [c0].[CartId], [c0].[PriceAtAdd], [c0].[ProductId], [c0].[ProductVariantId], [c0].[Quantity], [p].[ProductId] AS [ProductId0], [p].[AdditionalSpecs], [p].[AxleStandard], [p].[BoostCompatible], [p].[BrakeType], [p].[BrandId], [p].[CategoryId], [p].[Color], [p].[CreatedAt], [p].[Currency], [p].[Description], [p].[IsActive], [p].[IsFeatured], [p].[Material], [p].[Name], [p].[Price], [p].[SKU], [p].[ShortDescription], [p].[SpeedCompatibility], [p].[SuspensionTravel], [p].[TubelessReady], [p].[UpdatedAt], [p].[WheelSize], [p0].[ProductVariantId] AS [ProductVariantId0], [p1].[ProductImageId], [p1].[AltText], [p1].[CreatedAt] AS [CreatedAt0], [p1].[DisplayOrder], [p1].[FileSizeBytes], [p1].[Height], [p1].[ImageType], [p1].[ImageUrl], [p1].[IsPrimary], [p1].[MimeType], [p1].[ProductId] AS [ProductId1], [p1].[StorageBucket], [p1].[StoragePath], [p1].[UploadedByUserId], [p1].[Width], [p0].[AdditionalPrice], [p0].[CreatedAt] AS [CreatedAt1], [p0].[IsActive] AS [IsActive0], [p0].[ProductId] AS [ProductId2], [p0].[ReorderThreshold], [p0].[SKU] AS [SKU0], [p0].[StockQuantity], [p0].[UpdatedAt] AS [UpdatedAt0], [p0].[VariantName]
+          FROM [CartItem] AS [c0]
+          INNER JOIN [Product] AS [p] ON [c0].[ProductId] = [p].[ProductId]
+          LEFT JOIN [ProductVariant] AS [p0] ON [c0].[ProductVariantId] = [p0].[ProductVariantId]
+          LEFT JOIN [ProductImage] AS [p1] ON [p].[ProductId] = [p1].[ProductId]
+      ) AS [t0] ON [t].[CartId] = [t0].[CartId]
+      ORDER BY [t].[CartId], [t0].[CartItemId], [t0].[ProductId0], [t0].[ProductVariantId0]
+info: Microsoft.AspNetCore.Mvc.Infrastructure.SystemTextJsonResultExecutor[1]
+      Executing JsonResult, writing value of type 'WebApplication.Models.ApiResponse'.
 info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[105]
-      Executed action WebApplication.Controllers.ProductController.List (WebApplication) in 378.4612ms
+      Executed action WebApplication.Controllers.CartController.GetCartCount (WebApplication) in 142.9257ms
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'WebApplication.Controllers.ProductController.List (WebApplication)'
+      Executed endpoint 'WebApplication.Controllers.CartController.GetCartCount (WebApplication)'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/Product/List - 200 - text/html;+charset=utf-8 396.3657ms
+      Request finished HTTP/2 GET https://localhost:7177/Cart/GetCartCount - 200 - application/json;+charset=utf-8 168.1937ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/js/product-catalog.js?v=TFX8YvR0lavNs8fWkM-6ibjGbhZ42Wu5SBKic3arjt8 - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/_vs/browserLink - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - 200 14933 application/javascript;+charset=utf-8 4.9766ms
-info: Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware[2]
-      Sending file. Request path: '/js/product-catalog.js'. Physical path: 'C:\Users\user\Documents\ANDREI_FILES\PDM_FILES\2ND YEAR\2ND SEM\OOP\OOP-TaurusBikeShop\WebApplication\wwwroot\js\product-catalog.js'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/_vs/browserLink - 200 - text/javascript;+charset=UTF-8 22.9923ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/js/product-catalog.js?v=TFX8YvR0lavNs8fWkM-6ibjGbhZ42Wu5SBKic3arjt8 - 200 12429 text/javascript 25.4186ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/Product/Detail/1 - - -
+      Request starting HTTP/2 GET https://localhost:7177/Order/History - - -
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'WebApplication.Controllers.ProductController.Detail (WebApplication)'
+      Executing endpoint 'WebApplication.Controllers.OrderController.History (WebApplication)'
 info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[102]
-      Route matched with {action = "Detail", controller = "Product"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Detail(Int32, System.Threading.CancellationToken) on controller WebApplication.Controllers.ProductController (WebApplication).
-warn: Microsoft.EntityFrameworkCore.Query[20504]
-      Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+      Route matched with {action = "History", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] History(Int32, System.Threading.CancellationToken) on controller WebApplication.Controllers.OrderController (WebApplication).
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (40ms) [Parameters=[@__productId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT [t].[ProductId], [t].[AdditionalSpecs], [t].[AxleStandard], [t].[BoostCompatible], [t].[BrakeType], [t].[BrandId], [t].[CategoryId], [t].[Color], [t].[CreatedAt], [t].[Currency], [t].[Description], [t].[IsActive], [t].[IsFeatured], [t].[Material], [t].[Name], [t].[Price], [t].[SKU], [t].[ShortDescription], [t].[SpeedCompatibility], [t].[SuspensionTravel], [t].[TubelessReady], [t].[UpdatedAt], [t].[WheelSize], [t].[BrandId0], [t].[BrandName], [t].[Country], [t].[CreatedAt0], [t].[Description0], [t].[IsActive0], [t].[Website], [t].[CategoryId0], [t].[CategoryCode], [t].[Description1], [t].[DisplayOrder], [t].[IsActive1], [t].[Name0], [t].[ParentCategoryId], [t0].[ProductVariantId], [t0].[AdditionalPrice], [t0].[CreatedAt], [t0].[IsActive], [t0].[ProductId], [t0].[ReorderThreshold], [t0].[SKU], [t0].[StockQuantity], [t0].[UpdatedAt], [t0].[VariantName], [p1].[ProductImageId], [p1].[AltText], [p1].[CreatedAt], [p1].[DisplayOrder], [p1].[FileSizeBytes], [p1].[Height], [p1].[ImageType], [p1].[ImageUrl], [p1].[IsPrimary], [p1].[MimeType], [p1].[ProductId], [p1].[StorageBucket], [p1].[StoragePath], [p1].[UploadedByUserId], [p1].[Width], [t1].[PriceHistoryId], [t1].[ChangedAt], [t1].[ChangedByUserId], [t1].[NewPrice], [t1].[Notes], [t1].[OldPrice], [t1].[ProductId]
+      Executed DbCommand (41ms) [Parameters=[@__userId_0='?' (DbType = Int32), @__p_1='?' (DbType = Int32), @__p_2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[OrderId], [t].[ContactPhone], [t].[CreatedAt], [t].[DeliveryInstructions], [t].[DiscountAmount], [t].[IsWalkIn], [t].[OrderDate], [t].[OrderNumber], [t].[OrderStatus], [t].[ShippingAddressId], [t].[ShippingFee], [t].[SubTotal], [t].[UserId], [p].[PickupOrderId], [o0].[OrderItemId], [o0].[OrderId], [o0].[ProductId], [o0].[ProductVariantId], [o0].[Quantity], [o0].[UnitPrice], [p].[OrderId], [p].[PickupConfirmedAt], [p].[PickupExpiresAt], [p].[PickupReadyAt]
       FROM (
-          SELECT TOP(1) [p].[ProductId], [p].[AdditionalSpecs], [p].[AxleStandard], [p].[BoostCompatible], [p].[BrakeType], [p].[BrandId], [p].[CategoryId], [p].[Color], [p].[CreatedAt], [p].[Currency], [p].[Description], [p].[IsActive], [p].[IsFeatured], [p].[Material], [p].[Name], [p].[Price], [p].[SKU], [p].[ShortDescription], [p].[SpeedCompatibility], [p].[SuspensionTravel], [p].[TubelessReady], [p].[UpdatedAt], [p].[WheelSize], [b].[BrandId] AS [BrandId0], [b].[BrandName], [b].[Country], [b].[CreatedAt] AS [CreatedAt0], [b].[Description] AS [Description0], [b].[IsActive] AS [IsActive0], [b].[Website], [c].[CategoryId] AS [CategoryId0], [c].[CategoryCode], [c].[Description] AS [Description1], [c].[DisplayOrder], [c].[IsActive] AS [IsActive1], [c].[Name] AS [Name0], [c].[ParentCategoryId]
-          FROM [Product] AS [p]
-          LEFT JOIN [Brand] AS [b] ON [p].[BrandId] = [b].[BrandId]
-          INNER JOIN [Category] AS [c] ON [p].[CategoryId] = [c].[CategoryId]
-          WHERE [p].[ProductId] = @__productId_0 AND [p].[IsActive] = CAST(1 AS bit)
-      ) AS [t]
-      LEFT JOIN (
-          SELECT [p0].[ProductVariantId], [p0].[AdditionalPrice], [p0].[CreatedAt], [p0].[IsActive], [p0].[ProductId], [p0].[ReorderThreshold], [p0].[SKU], [p0].[StockQuantity], [p0].[UpdatedAt], [p0].[VariantName]
-          FROM [ProductVariant] AS [p0]
-          WHERE [p0].[IsActive] = CAST(1 AS bit)
-      ) AS [t0] ON [t].[ProductId] = [t0].[ProductId]
-      LEFT JOIN [ProductImage] AS [p1] ON [t].[ProductId] = [p1].[ProductId]
-      LEFT JOIN (
-          SELECT [t2].[PriceHistoryId], [t2].[ChangedAt], [t2].[ChangedByUserId], [t2].[NewPrice], [t2].[Notes], [t2].[OldPrice], [t2].[ProductId]
-          FROM (
-              SELECT [p2].[PriceHistoryId], [p2].[ChangedAt], [p2].[ChangedByUserId], [p2].[NewPrice], [p2].[Notes], [p2].[OldPrice], [p2].[ProductId], ROW_NUMBER() OVER(PARTITION BY [p2].[ProductId] ORDER BY [p2].[ChangedAt] DESC) AS [row]
-              FROM [PriceHistory] AS [p2]
-          ) AS [t2]
-          WHERE [t2].[row] <= 10
-      ) AS [t1] ON [t].[ProductId] = [t1].[ProductId]
-      ORDER BY [t].[ProductId], [t].[BrandId0], [t].[CategoryId0], [t0].[ProductVariantId], [p1].[IsPrimary] DESC, [p1].[DisplayOrder], [p1].[ProductImageId], [t1].[ProductId], [t1].[ChangedAt] DESC
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[@__productId_0='?' (DbType = Int32), @__p_1='?' (DbType = Int32), @__p_2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT [t].[ReviewId], [t].[Comment], [t].[CreatedAt], [t].[IsVerifiedPurchase], [t].[OrderId], [t].[ProductId], [t].[Rating], [t].[UserId], [u].[UserId], [u].[CreatedAt], [u].[DefaultAddressId], [u].[Email], [u].[FirstName], [u].[IsActive], [u].[IsWalkIn], [u].[LastLoginAt], [u].[LastName], [u].[PasswordHash], [u].[PhoneNumber]
-      FROM (
-          SELECT [r].[ReviewId], [r].[Comment], [r].[CreatedAt], [r].[IsVerifiedPurchase], [r].[OrderId], [r].[ProductId], [r].[Rating], [r].[UserId]
-          FROM [Review] AS [r]
-          WHERE [r].[ProductId] = @__productId_0
-          ORDER BY [r].[CreatedAt] DESC
+          SELECT [o].[OrderId], [o].[ContactPhone], [o].[CreatedAt], [o].[DeliveryInstructions], [o].[DiscountAmount], [o].[IsWalkIn], [o].[OrderDate], [o].[OrderNumber], [o].[OrderStatus], [o].[ShippingAddressId], [o].[ShippingFee], [o].[SubTotal], [o].[UserId]
+          FROM [Order] AS [o]
+          WHERE [o].[UserId] = @__userId_0
+          ORDER BY [o].[OrderDate] DESC
           OFFSET @__p_1 ROWS FETCH NEXT @__p_2 ROWS ONLY
       ) AS [t]
-      INNER JOIN [User] AS [u] ON [t].[UserId] = [u].[UserId]
-      ORDER BY [t].[CreatedAt] DESC
+      LEFT JOIN [PickupOrder] AS [p] ON [t].[OrderId] = [p].[PickupOrderId]
+      LEFT JOIN [OrderItem] AS [o0] ON [t].[OrderId] = [o0].[OrderId]
+      ORDER BY [t].[OrderDate] DESC, [t].[OrderId], [p].[PickupOrderId]
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[@__productId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT CASE
-          WHEN EXISTS (
-              SELECT 1
-              FROM [Review] AS [r]
-              WHERE [r].[ProductId] = @__productId_0) THEN CAST(1 AS bit)
-          ELSE CAST(0 AS bit)
-      END
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[@__productId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      Executed DbCommand (40ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
       SELECT COUNT(*)
-      FROM [Review] AS [r]
-      WHERE [r].[ProductId] = @__productId_0
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (38ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT [w].[ProductId]
-      FROM [Wishlist] AS [w]
-      WHERE [w].[UserId] = @__userId_0
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[@__productId_0='?' (DbType = Int32), @__userId_1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT CASE
-          WHEN EXISTS (
-              SELECT 1
-              FROM [OrderItem] AS [o]
-              INNER JOIN [Order] AS [o0] ON [o].[OrderId] = [o0].[OrderId]
-              WHERE [o].[ProductId] = @__productId_0 AND [o0].[UserId] = @__userId_1 AND [o0].[OrderStatus] = N'Delivered') THEN CAST(1 AS bit)
-          ELSE CAST(0 AS bit)
-      END
+      FROM [Order] AS [o]
+      WHERE [o].[UserId] = @__userId_0
 info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[1]
-      Executing ViewResult, running view ~/Views/Customer/ProductDetails.cshtml.
+      Executing ViewResult, running view ~/Views/Customer/OrderHistory.cshtml.
 info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[4]
-      Executed ViewResult - view ~/Views/Customer/ProductDetails.cshtml executed in 21.0773ms.
+      Executed ViewResult - view ~/Views/Customer/OrderHistory.cshtml executed in 49.8038ms.
 info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[105]
-      Executed action WebApplication.Controllers.ProductController.Detail (WebApplication) in 343.6053ms
+      Executed action WebApplication.Controllers.OrderController.History (WebApplication) in 204.4582ms
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'WebApplication.Controllers.ProductController.Detail (WebApplication)'
+      Executed endpoint 'WebApplication.Controllers.OrderController.History (WebApplication)'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/Product/Detail/1 - 200 - text/html;+charset=utf-8 359.6609ms
+      Request finished HTTP/2 GET https://localhost:7177/Order/History - 200 - text/html;+charset=utf-8 228.1469ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 GET https://localhost:7177/css/order-history.css?v=2n7g4eTIUUTnHlVstyFQOqbr_Bv8EsFPkzVsrx-6fjE - - -
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - 200 14933 application/javascript;+charset=utf-8 2.5780ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 GET https://localhost:7177/css/order.css?v=s-lDXNuzMLAt-bV_bwRWpIOixhE_eEWxyTy2rXw5CKw - - -
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
       Request starting HTTP/2 GET https://localhost:7177/_vs/browserLink - - -
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/_vs/browserLink - 200 - text/javascript;+charset=UTF-8 12.3302ms
+      Request finished HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - 200 14933 application/javascript;+charset=utf-8 8.9160ms
+info: Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware[6]
+      The file /css/order-history.css was not modified
+info: Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware[6]
+      The file /css/order.css was not modified
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 GET https://localhost:7177/css/order.css?v=s-lDXNuzMLAt-bV_bwRWpIOixhE_eEWxyTy2rXw5CKw - 304 - text/css 26.1416ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 GET https://localhost:7177/css/order-history.css?v=2n7g4eTIUUTnHlVstyFQOqbr_Bv8EsFPkzVsrx-6fjE - 304 - text/css 26.1505ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 GET https://localhost:7177/_vs/browserLink - 200 - text/javascript;+charset=UTF-8 34.4749ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/Cart/ViewCart - - -
+      Request starting HTTP/2 GET https://localhost:7177/antiforgery/token - - -
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 GET https://localhost:7177/Cart/GetCartCount - - -
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 GET https://localhost:7177/antiforgery/token - 404 0 - 5.8048ms
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'WebApplication.Controllers.CartController.ViewCart (WebApplication)'
+      Executing endpoint 'WebApplication.Controllers.CartController.GetCartCount (WebApplication)'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[16]
+      Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7177/antiforgery/token, Response status code: 404
 info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[102]
-      Route matched with {action = "ViewCart", controller = "Cart"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] ViewCart(System.Threading.CancellationToken) on controller WebApplication.Controllers.CartController (WebApplication).
+      Route matched with {action = "GetCartCount", controller = "Cart"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetCartCount(System.Threading.CancellationToken) on controller WebApplication.Controllers.CartController (WebApplication).
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (40ms) [Parameters=[@__userId_Value_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT [t].[CartId], [t].[CreatedAt], [t].[GuestSessionId], [t].[IsCheckedOut], [t].[LastUpdatedAt], [t].[UserId], [t0].[CartItemId], [t0].[AddedAt], [t0].[CartId], [t0].[PriceAtAdd], [t0].[ProductId], [t0].[ProductVariantId], [t0].[Quantity], [t0].[ProductId0], [t0].[AdditionalSpecs], [t0].[AxleStandard], [t0].[BoostCompatible], [t0].[BrakeType], [t0].[BrandId], [t0].[CategoryId], [t0].[Color], [t0].[CreatedAt], [t0].[Currency], [t0].[Description], [t0].[IsActive], [t0].[IsFeatured], [t0].[Material], [t0].[Name], [t0].[Price], [t0].[SKU], [t0].[ShortDescription], [t0].[SpeedCompatibility], [t0].[SuspensionTravel], [t0].[TubelessReady], [t0].[UpdatedAt], [t0].[WheelSize], [t0].[ProductVariantId0], [t0].[AdditionalPrice], [t0].[CreatedAt0], [t0].[IsActive0], [t0].[ProductId1], [t0].[ReorderThreshold], [t0].[SKU0], [t0].[StockQuantity], [t0].[UpdatedAt0], [t0].[VariantName]
+      Executed DbCommand (41ms) [Parameters=[@__userId_Value_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[CartId], [t].[CreatedAt], [t].[GuestSessionId], [t].[IsCheckedOut], [t].[LastUpdatedAt], [t].[UserId], [t0].[CartItemId], [t0].[AddedAt], [t0].[CartId], [t0].[PriceAtAdd], [t0].[ProductId], [t0].[ProductVariantId], [t0].[Quantity], [t0].[ProductId0], [t0].[AdditionalSpecs], [t0].[AxleStandard], [t0].[BoostCompatible], [t0].[BrakeType], [t0].[BrandId], [t0].[CategoryId], [t0].[Color], [t0].[CreatedAt], [t0].[Currency], [t0].[Description], [t0].[IsActive], [t0].[IsFeatured], [t0].[Material], [t0].[Name], [t0].[Price], [t0].[SKU], [t0].[ShortDescription], [t0].[SpeedCompatibility], [t0].[SuspensionTravel], [t0].[TubelessReady], [t0].[UpdatedAt], [t0].[WheelSize], [t0].[ProductVariantId0], [t0].[ProductImageId], [t0].[AltText], [t0].[CreatedAt0], [t0].[DisplayOrder], [t0].[FileSizeBytes], [t0].[Height], [t0].[ImageType], [t0].[ImageUrl], [t0].[IsPrimary], [t0].[MimeType], [t0].[ProductId1], [t0].[StorageBucket], [t0].[StoragePath], [t0].[UploadedByUserId], [t0].[Width], [t0].[AdditionalPrice], [t0].[CreatedAt1], [t0].[IsActive0], [t0].[ProductId2], [t0].[ReorderThreshold], [t0].[SKU0], [t0].[StockQuantity], [t0].[UpdatedAt0], [t0].[VariantName]
       FROM (
           SELECT TOP(1) [c].[CartId], [c].[CreatedAt], [c].[GuestSessionId], [c].[IsCheckedOut], [c].[LastUpdatedAt], [c].[UserId]
           FROM [Cart] AS [c]
           WHERE [c].[IsCheckedOut] = CAST(0 AS bit) AND [c].[UserId] = @__userId_Value_0
       ) AS [t]
       LEFT JOIN (
-          SELECT [c0].[CartItemId], [c0].[AddedAt], [c0].[CartId], [c0].[PriceAtAdd], [c0].[ProductId], [c0].[ProductVariantId], [c0].[Quantity], [p].[ProductId] AS [ProductId0], [p].[AdditionalSpecs], [p].[AxleStandard], [p].[BoostCompatible], [p].[BrakeType], [p].[BrandId], [p].[CategoryId], [p].[Color], [p].[CreatedAt], [p].[Currency], [p].[Description], [p].[IsActive], [p].[IsFeatured], [p].[Material], [p].[Name], [p].[Price], [p].[SKU], [p].[ShortDescription], [p].[SpeedCompatibility], [p].[SuspensionTravel], [p].[TubelessReady], [p].[UpdatedAt], [p].[WheelSize], [p0].[ProductVariantId] AS [ProductVariantId0], [p0].[AdditionalPrice], [p0].[CreatedAt] AS [CreatedAt0], [p0].[IsActive] AS [IsActive0], [p0].[ProductId] AS [ProductId1], [p0].[ReorderThreshold], [p0].[SKU] AS [SKU0], [p0].[StockQuantity], [p0].[UpdatedAt] AS [UpdatedAt0], [p0].[VariantName]
+          SELECT [c0].[CartItemId], [c0].[AddedAt], [c0].[CartId], [c0].[PriceAtAdd], [c0].[ProductId], [c0].[ProductVariantId], [c0].[Quantity], [p].[ProductId] AS [ProductId0], [p].[AdditionalSpecs], [p].[AxleStandard], [p].[BoostCompatible], [p].[BrakeType], [p].[BrandId], [p].[CategoryId], [p].[Color], [p].[CreatedAt], [p].[Currency], [p].[Description], [p].[IsActive], [p].[IsFeatured], [p].[Material], [p].[Name], [p].[Price], [p].[SKU], [p].[ShortDescription], [p].[SpeedCompatibility], [p].[SuspensionTravel], [p].[TubelessReady], [p].[UpdatedAt], [p].[WheelSize], [p0].[ProductVariantId] AS [ProductVariantId0], [p1].[ProductImageId], [p1].[AltText], [p1].[CreatedAt] AS [CreatedAt0], [p1].[DisplayOrder], [p1].[FileSizeBytes], [p1].[Height], [p1].[ImageType], [p1].[ImageUrl], [p1].[IsPrimary], [p1].[MimeType], [p1].[ProductId] AS [ProductId1], [p1].[StorageBucket], [p1].[StoragePath], [p1].[UploadedByUserId], [p1].[Width], [p0].[AdditionalPrice], [p0].[CreatedAt] AS [CreatedAt1], [p0].[IsActive] AS [IsActive0], [p0].[ProductId] AS [ProductId2], [p0].[ReorderThreshold], [p0].[SKU] AS [SKU0], [p0].[StockQuantity], [p0].[UpdatedAt] AS [UpdatedAt0], [p0].[VariantName]
           FROM [CartItem] AS [c0]
           INNER JOIN [Product] AS [p] ON [c0].[ProductId] = [p].[ProductId]
           LEFT JOIN [ProductVariant] AS [p0] ON [c0].[ProductVariantId] = [p0].[ProductVariantId]
+          LEFT JOIN [ProductImage] AS [p1] ON [p].[ProductId] = [p1].[ProductId]
       ) AS [t0] ON [t].[CartId] = [t0].[CartId]
-      ORDER BY [t].[CartId], [t0].[CartItemId], [t0].[ProductId0]
-info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[1]
-      Executing ViewResult, running view ~/Views/Customer/Cart.cshtml.
-info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[4]
-      Executed ViewResult - view ~/Views/Customer/Cart.cshtml executed in 13.2388ms.
+      ORDER BY [t].[CartId], [t0].[CartItemId], [t0].[ProductId0], [t0].[ProductVariantId0]
+info: Microsoft.AspNetCore.Mvc.Infrastructure.SystemTextJsonResultExecutor[1]
+      Executing JsonResult, writing value of type 'WebApplication.Models.ApiResponse'.
 info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[105]
-      Executed action WebApplication.Controllers.CartController.ViewCart (WebApplication) in 138.7822ms
+      Executed action WebApplication.Controllers.CartController.GetCartCount (WebApplication) in 52.1349ms
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'WebApplication.Controllers.CartController.ViewCart (WebApplication)'
+      Executed endpoint 'WebApplication.Controllers.CartController.GetCartCount (WebApplication)'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/Cart/ViewCart - 200 - text/html;+charset=utf-8 151.2325ms
+      Request finished HTTP/2 GET https://localhost:7177/Cart/GetCartCount - 200 - application/json;+charset=utf-8 70.7858ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/js/cart.js?v=yIg23H1FKM0UzNcBXE2Foozx6IF9rxa56VYYjTKs0CU - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - - -
-info: Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware[6]
-      The file /js/cart.js was not modified
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/js/cart.js?v=yIg23H1FKM0UzNcBXE2Foozx6IF9rxa56VYYjTKs0CU - 304 - text/javascript 4.2288ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - 200 14933 application/javascript;+charset=utf-8 6.3996ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/_vs/browserLink - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/_vs/browserLink - 200 - text/javascript;+charset=UTF-8 17.7073ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/Checkout - - -
+      Request starting HTTP/2 GET https://localhost:7177/Order/Detail?orderId=8 - - -
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'WebApplication.Controllers.CheckoutController.Index (WebApplication)'
+      Executing endpoint 'WebApplication.Controllers.OrderController.Detail (WebApplication)'
 info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[102]
-      Route matched with {action = "Index", controller = "Checkout"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index(System.Threading.CancellationToken) on controller WebApplication.Controllers.CheckoutController (WebApplication).
+      Route matched with {action = "Detail", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Detail(Int32, System.Threading.CancellationToken) on controller WebApplication.Controllers.OrderController (WebApplication).
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[@__userId_Value_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT [t].[CartId], [t].[CreatedAt], [t].[GuestSessionId], [t].[IsCheckedOut], [t].[LastUpdatedAt], [t].[UserId], [t0].[CartItemId], [t0].[AddedAt], [t0].[CartId], [t0].[PriceAtAdd], [t0].[ProductId], [t0].[ProductVariantId], [t0].[Quantity], [t0].[ProductId0], [t0].[AdditionalSpecs], [t0].[AxleStandard], [t0].[BoostCompatible], [t0].[BrakeType], [t0].[BrandId], [t0].[CategoryId], [t0].[Color], [t0].[CreatedAt], [t0].[Currency], [t0].[Description], [t0].[IsActive], [t0].[IsFeatured], [t0].[Material], [t0].[Name], [t0].[Price], [t0].[SKU], [t0].[ShortDescription], [t0].[SpeedCompatibility], [t0].[SuspensionTravel], [t0].[TubelessReady], [t0].[UpdatedAt], [t0].[WheelSize], [t0].[ProductVariantId0], [t0].[AdditionalPrice], [t0].[CreatedAt0], [t0].[IsActive0], [t0].[ProductId1], [t0].[ReorderThreshold], [t0].[SKU0], [t0].[StockQuantity], [t0].[UpdatedAt0], [t0].[VariantName]
+      Executed DbCommand (40ms) [Parameters=[@__orderId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [o].[OrderId], [o].[ContactPhone], [o].[CreatedAt], [o].[DeliveryInstructions], [o].[DiscountAmount], [o].[IsWalkIn], [o].[OrderDate], [o].[OrderNumber], [o].[OrderStatus], [o].[ShippingAddressId], [o].[ShippingFee], [o].[SubTotal], [o].[UserId], [p].[PickupOrderId], [a].[AddressId], [p].[OrderId], [p].[PickupConfirmedAt], [p].[PickupExpiresAt], [p].[PickupReadyAt], [a].[City], [a].[Country], [a].[CreatedAt], [a].[IsDefault], [a].[IsSnapshot], [a].[Label], [a].[PostalCode], [a].[Province], [a].[Street], [a].[UserId]
+      FROM [Order] AS [o]
+      LEFT JOIN [PickupOrder] AS [p] ON [o].[OrderId] = [p].[PickupOrderId]
+      LEFT JOIN [Address] AS [a] ON [o].[ShippingAddressId] = [a].[AddressId]
+      WHERE [o].[OrderId] = @__orderId_0
+      ORDER BY [o].[OrderId], [p].[PickupOrderId], [a].[AddressId]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (41ms) [Parameters=[@__orderId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [t0].[OrderItemId], [t0].[OrderId], [t0].[ProductId], [t0].[ProductVariantId], [t0].[Quantity], [t0].[UnitPrice], [t0].[ProductId0], [t0].[AdditionalSpecs], [t0].[AxleStandard], [t0].[BoostCompatible], [t0].[BrakeType], [t0].[BrandId], [t0].[CategoryId], [t0].[Color], [t0].[CreatedAt], [t0].[Currency], [t0].[Description], [t0].[IsActive], [t0].[IsFeatured], [t0].[Material], [t0].[Name], [t0].[Price], [t0].[SKU], [t0].[ShortDescription], [t0].[SpeedCompatibility], [t0].[SuspensionTravel], [t0].[TubelessReady], [t0].[UpdatedAt], [t0].[WheelSize], [t].[OrderId], [t].[PickupOrderId], [t].[AddressId], [t0].[ProductVariantId0], [t0].[AdditionalPrice], [t0].[CreatedAt0], [t0].[IsActive0], [t0].[ProductId1], [t0].[ReorderThreshold], [t0].[SKU0], [t0].[StockQuantity], [t0].[UpdatedAt0], [t0].[VariantName]
       FROM (
-          SELECT TOP(1) [c].[CartId], [c].[CreatedAt], [c].[GuestSessionId], [c].[IsCheckedOut], [c].[LastUpdatedAt], [c].[UserId]
-          FROM [Cart] AS [c]
-          WHERE [c].[IsCheckedOut] = CAST(0 AS bit) AND [c].[UserId] = @__userId_Value_0
+          SELECT TOP(1) [o].[OrderId], [p].[PickupOrderId], [a].[AddressId]
+          FROM [Order] AS [o]
+          LEFT JOIN [PickupOrder] AS [p] ON [o].[OrderId] = [p].[PickupOrderId]
+          LEFT JOIN [Address] AS [a] ON [o].[ShippingAddressId] = [a].[AddressId]
+          WHERE [o].[OrderId] = @__orderId_0
       ) AS [t]
-      LEFT JOIN (
-          SELECT [c0].[CartItemId], [c0].[AddedAt], [c0].[CartId], [c0].[PriceAtAdd], [c0].[ProductId], [c0].[ProductVariantId], [c0].[Quantity], [p].[ProductId] AS [ProductId0], [p].[AdditionalSpecs], [p].[AxleStandard], [p].[BoostCompatible], [p].[BrakeType], [p].[BrandId], [p].[CategoryId], [p].[Color], [p].[CreatedAt], [p].[Currency], [p].[Description], [p].[IsActive], [p].[IsFeatured], [p].[Material], [p].[Name], [p].[Price], [p].[SKU], [p].[ShortDescription], [p].[SpeedCompatibility], [p].[SuspensionTravel], [p].[TubelessReady], [p].[UpdatedAt], [p].[WheelSize], [p0].[ProductVariantId] AS [ProductVariantId0], [p0].[AdditionalPrice], [p0].[CreatedAt] AS [CreatedAt0], [p0].[IsActive] AS [IsActive0], [p0].[ProductId] AS [ProductId1], [p0].[ReorderThreshold], [p0].[SKU] AS [SKU0], [p0].[StockQuantity], [p0].[UpdatedAt] AS [UpdatedAt0], [p0].[VariantName]
-          FROM [CartItem] AS [c0]
-          INNER JOIN [Product] AS [p] ON [c0].[ProductId] = [p].[ProductId]
-          LEFT JOIN [ProductVariant] AS [p0] ON [c0].[ProductVariantId] = [p0].[ProductVariantId]
-      ) AS [t0] ON [t].[CartId] = [t0].[CartId]
-      ORDER BY [t].[CartId], [t0].[CartItemId], [t0].[ProductId0]
+      INNER JOIN (
+          SELECT [o0].[OrderItemId], [o0].[OrderId], [o0].[ProductId], [o0].[ProductVariantId], [o0].[Quantity], [o0].[UnitPrice], [p0].[ProductId] AS [ProductId0], [p0].[AdditionalSpecs], [p0].[AxleStandard], [p0].[BoostCompatible], [p0].[BrakeType], [p0].[BrandId], [p0].[CategoryId], [p0].[Color], [p0].[CreatedAt], [p0].[Currency], [p0].[Description], [p0].[IsActive], [p0].[IsFeatured], [p0].[Material], [p0].[Name], [p0].[Price], [p0].[SKU], [p0].[ShortDescription], [p0].[SpeedCompatibility], [p0].[SuspensionTravel], [p0].[TubelessReady], [p0].[UpdatedAt], [p0].[WheelSize], [p1].[ProductVariantId] AS [ProductVariantId0], [p1].[AdditionalPrice], [p1].[CreatedAt] AS [CreatedAt0], [p1].[IsActive] AS [IsActive0], [p1].[ProductId] AS [ProductId1], [p1].[ReorderThreshold], [p1].[SKU] AS [SKU0], [p1].[StockQuantity], [p1].[UpdatedAt] AS [UpdatedAt0], [p1].[VariantName]
+          FROM [OrderItem] AS [o0]
+          INNER JOIN [Product] AS [p0] ON [o0].[ProductId] = [p0].[ProductId]
+          LEFT JOIN [ProductVariant] AS [p1] ON [o0].[ProductVariantId] = [p1].[ProductVariantId]
+      ) AS [t0] ON [t].[OrderId] = [t0].[OrderId]
+      ORDER BY [t].[OrderId], [t].[PickupOrderId], [t].[AddressId], [t0].[OrderItemId], [t0].[ProductId0], [t0].[ProductVariantId0]
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT [t].[UserId], [t].[CreatedAt], [t].[DefaultAddressId], [t].[Email], [t].[FirstName], [t].[IsActive], [t].[IsWalkIn], [t].[LastLoginAt], [t].[LastName], [t].[PasswordHash], [t].[PhoneNumber], [t0].[AddressId], [t0].[City], [t0].[Country], [t0].[CreatedAt], [t0].[IsDefault], [t0].[IsSnapshot], [t0].[Label], [t0].[PostalCode], [t0].[Province], [t0].[Street], [t0].[UserId]
+      Executed DbCommand (40ms) [Parameters=[@__orderId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [p2].[ProductImageId], [p2].[AltText], [p2].[CreatedAt], [p2].[DisplayOrder], [p2].[FileSizeBytes], [p2].[Height], [p2].[ImageType], [p2].[ImageUrl], [p2].[IsPrimary], [p2].[MimeType], [p2].[ProductId], [p2].[StorageBucket], [p2].[StoragePath], [p2].[UploadedByUserId], [p2].[Width], [t].[OrderId], [t].[PickupOrderId], [t].[AddressId], [t0].[OrderItemId], [t0].[ProductId0], [t0].[ProductVariantId0]
       FROM (
-          SELECT TOP(1) [u].[UserId], [u].[CreatedAt], [u].[DefaultAddressId], [u].[Email], [u].[FirstName], [u].[IsActive], [u].[IsWalkIn], [u].[LastLoginAt], [u].[LastName], [u].[PasswordHash], [u].[PhoneNumber]
-          FROM [User] AS [u]
-          WHERE [u].[UserId] = @__userId_0
+          SELECT TOP(1) [o].[OrderId], [p].[PickupOrderId], [a].[AddressId]
+          FROM [Order] AS [o]
+          LEFT JOIN [PickupOrder] AS [p] ON [o].[OrderId] = [p].[PickupOrderId]
+          LEFT JOIN [Address] AS [a] ON [o].[ShippingAddressId] = [a].[AddressId]
+          WHERE [o].[OrderId] = @__orderId_0
       ) AS [t]
-      LEFT JOIN (
-          SELECT [a].[AddressId], [a].[City], [a].[Country], [a].[CreatedAt], [a].[IsDefault], [a].[IsSnapshot], [a].[Label], [a].[PostalCode], [a].[Province], [a].[Street], [a].[UserId]
-          FROM [Address] AS [a]
-          WHERE [a].[IsSnapshot] = CAST(0 AS bit)
-      ) AS [t0] ON [t].[UserId] = [t0].[UserId]
-      ORDER BY [t].[UserId]
-info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[1]
-      Executing ViewResult, running view ~/Views/Customer/Checkout.cshtml.
-info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[4]
-      Executed ViewResult - view ~/Views/Customer/Checkout.cshtml executed in 23.3945ms.
-info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[105]
-      Executed action WebApplication.Controllers.CheckoutController.Index (WebApplication) in 123.773ms
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'WebApplication.Controllers.CheckoutController.Index (WebApplication)'
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/Checkout - 200 - text/html;+charset=utf-8 139.8726ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/js/voucher.js?v=wWm0Ol5SnfGgjCIlYY_5cXy9J9yXbRnVBtlC56bV14E - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/js/checkout.js?v=cFjb0K4KSTPnEHg0G_Sxi-QvKSipB8UHYjFchGqL61Y - - -
-info: Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware[6]
-      The file /js/voucher.js was not modified
-info: Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware[6]
-      The file /js/checkout.js was not modified
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/js/voucher.js?v=wWm0Ol5SnfGgjCIlYY_5cXy9J9yXbRnVBtlC56bV14E - 304 - text/javascript 6.8848ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - 200 14933 application/javascript;+charset=utf-8 7.3445ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/_vs/browserLink - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/js/checkout.js?v=cFjb0K4KSTPnEHg0G_Sxi-QvKSipB8UHYjFchGqL61Y - 304 - text/javascript 8.8654ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/_vs/browserLink - 200 - text/javascript;+charset=UTF-8 15.1948ms
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT COUNT(*)
-      FROM [ProductVariant] AS [p]
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 POST https://localhost:7177/Checkout/PlaceOrder - application/x-www-form-urlencoded 319
-info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'WebApplication.Controllers.CheckoutController.PlaceOrder (WebApplication)'
-info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[102]
-      Route matched with {action = "PlaceOrder", controller = "Checkout"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] PlaceOrder(WebApplication.Models.ViewModels.CheckoutViewModel, System.Threading.CancellationToken) on controller WebApplication.Controllers.CheckoutController (WebApplication).
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (40ms) [Parameters=[@__userId_Value_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT [t].[CartId], [t].[CreatedAt], [t].[GuestSessionId], [t].[IsCheckedOut], [t].[LastUpdatedAt], [t].[UserId], [t0].[CartItemId], [t0].[AddedAt], [t0].[CartId], [t0].[PriceAtAdd], [t0].[ProductId], [t0].[ProductVariantId], [t0].[Quantity], [t0].[ProductId0], [t0].[AdditionalSpecs], [t0].[AxleStandard], [t0].[BoostCompatible], [t0].[BrakeType], [t0].[BrandId], [t0].[CategoryId], [t0].[Color], [t0].[CreatedAt], [t0].[Currency], [t0].[Description], [t0].[IsActive], [t0].[IsFeatured], [t0].[Material], [t0].[Name], [t0].[Price], [t0].[SKU], [t0].[ShortDescription], [t0].[SpeedCompatibility], [t0].[SuspensionTravel], [t0].[TubelessReady], [t0].[UpdatedAt], [t0].[WheelSize], [t0].[ProductVariantId0], [t0].[AdditionalPrice], [t0].[CreatedAt0], [t0].[IsActive0], [t0].[ProductId1], [t0].[ReorderThreshold], [t0].[SKU0], [t0].[StockQuantity], [t0].[UpdatedAt0], [t0].[VariantName]
+      INNER JOIN (
+          SELECT [o0].[OrderItemId], [o0].[OrderId], [p0].[ProductId] AS [ProductId0], [p1].[ProductVariantId] AS [ProductVariantId0]
+          FROM [OrderItem] AS [o0]
+          INNER JOIN [Product] AS [p0] ON [o0].[ProductId] = [p0].[ProductId]
+          LEFT JOIN [ProductVariant] AS [p1] ON [o0].[ProductVariantId] = [p1].[ProductVariantId]
+      ) AS [t0] ON [t].[OrderId] = [t0].[OrderId]
+      INNER JOIN [ProductImage] AS [p2] ON [t0].[ProductId0] = [p2].[ProductId]
+      ORDER BY [t].[OrderId], [t].[PickupOrderId], [t].[AddressId], [t0].[OrderItemId], [t0].[ProductId0], [t0].[ProductVariantId0]
+fail: Microsoft.EntityFrameworkCore.Database.Command[20102]
+      Failed executing DbCommand (45ms) [Parameters=[@__orderId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [t0].[PaymentId], [t0].[Amount], [t0].[CreatedAt], [t0].[OrderId], [t0].[PaymentDate], [t0].[PaymentMethod], [t0].[PaymentStage], [t0].[PaymentStatus], [t0].[PaymentId0], [t0].[GcashTransactionId], [t0].[ScreenshotUrl], [t0].[StorageBucket], [t0].[StoragePath], [t0].[SubmittedAt], [t0].[PaymentId1], [t0].[BpiReferenceNumber], [t0].[ProofStorageBucket], [t0].[ProofStoragePath], [t0].[ProofUrl], [t0].[SubmittedAt0], [t0].[VerificationDeadline], [t0].[VerificationNotes], [t0].[VerifiedAt], [t0].[VerifiedByUserId], [t].[OrderId], [t].[PickupOrderId], [t].[AddressId]
       FROM (
-          SELECT TOP(1) [c].[CartId], [c].[CreatedAt], [c].[GuestSessionId], [c].[IsCheckedOut], [c].[LastUpdatedAt], [c].[UserId]
-          FROM [Cart] AS [c]
-          WHERE [c].[IsCheckedOut] = CAST(0 AS bit) AND [c].[UserId] = @__userId_Value_0
+          SELECT TOP(1) [o].[OrderId], [p].[PickupOrderId], [a].[AddressId]
+          FROM [Order] AS [o]
+          LEFT JOIN [PickupOrder] AS [p] ON [o].[OrderId] = [p].[PickupOrderId]
+          LEFT JOIN [Address] AS [a] ON [o].[ShippingAddressId] = [a].[AddressId]
+          WHERE [o].[OrderId] = @__orderId_0
       ) AS [t]
-      LEFT JOIN (
-          SELECT [c0].[CartItemId], [c0].[AddedAt], [c0].[CartId], [c0].[PriceAtAdd], [c0].[ProductId], [c0].[ProductVariantId], [c0].[Quantity], [p].[ProductId] AS [ProductId0], [p].[AdditionalSpecs], [p].[AxleStandard], [p].[BoostCompatible], [p].[BrakeType], [p].[BrandId], [p].[CategoryId], [p].[Color], [p].[CreatedAt], [p].[Currency], [p].[Description], [p].[IsActive], [p].[IsFeatured], [p].[Material], [p].[Name], [p].[Price], [p].[SKU], [p].[ShortDescription], [p].[SpeedCompatibility], [p].[SuspensionTravel], [p].[TubelessReady], [p].[UpdatedAt], [p].[WheelSize], [p0].[ProductVariantId] AS [ProductVariantId0], [p0].[AdditionalPrice], [p0].[CreatedAt] AS [CreatedAt0], [p0].[IsActive] AS [IsActive0], [p0].[ProductId] AS [ProductId1], [p0].[ReorderThreshold], [p0].[SKU] AS [SKU0], [p0].[StockQuantity], [p0].[UpdatedAt] AS [UpdatedAt0], [p0].[VariantName]
-          FROM [CartItem] AS [c0]
-          INNER JOIN [Product] AS [p] ON [c0].[ProductId] = [p].[ProductId]
-          LEFT JOIN [ProductVariant] AS [p0] ON [c0].[ProductVariantId] = [p0].[ProductVariantId]
-      ) AS [t0] ON [t].[CartId] = [t0].[CartId]
-      ORDER BY [t].[CartId], [t0].[CartItemId], [t0].[ProductId0]
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[@__item_ProductVariantId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT TOP(1) [p].[ProductVariantId], [p].[AdditionalPrice], [p].[CreatedAt], [p].[IsActive], [p].[ProductId], [p].[ReorderThreshold], [p].[SKU], [p].[StockQuantity], [p].[UpdatedAt], [p].[VariantName]
-      FROM [ProductVariant] AS [p]
-      WHERE [p].[ProductVariantId] = @__item_ProductVariantId_0
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[@__vm_SelectedAddressId_0='?' (DbType = Int32), @__userId_1='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT TOP(1) [a].[AddressId], [a].[City], [a].[Country], [a].[CreatedAt], [a].[IsDefault], [a].[IsSnapshot], [a].[Label], [a].[PostalCode], [a].[Province], [a].[Street], [a].[UserId]
-      FROM [Address] AS [a]
-      WHERE [a].[AddressId] = @__vm_SelectedAddressId_0 AND [a].[UserId] = @__userId_1 AND [a].[IsSnapshot] = CAST(0 AS bit)
-fail: Microsoft.EntityFrameworkCore.Update[10000]
-      An exception occurred in the database while saving changes for context type 'WebApplication.DataAccess.Context.AppDbContext'.
-      System.InvalidOperationException: The configured execution strategy 'SqlServerRetryingExecutionStrategy' does not support user-initiated transactions. Use the execution strategy returned by 'DbContext.Database.CreateExecutionStrategy()' to execute all the operations in the transaction as a retriable unit.
-         at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.OnFirstExecution()
+      INNER JOIN (
+          SELECT [p0].[PaymentId], [p0].[Amount], [p0].[CreatedAt], [p0].[OrderId], [p0].[PaymentDate], [p0].[PaymentMethod], [p0].[PaymentStage], [p0].[PaymentStatus], [g].[PaymentId] AS [PaymentId0], [g].[GcashTransactionId], [g].[ScreenshotUrl], [g].[StorageBucket], [g].[StoragePath], [g].[SubmittedAt], [b].[PaymentId] AS [PaymentId1], [b].[BpiReferenceNumber], [b].[ProofStorageBucket], [b].[ProofStoragePath], [b].[ProofUrl], [b].[SubmittedAt] AS [SubmittedAt0], [b].[VerificationDeadline], [b].[VerificationNotes], [b].[VerifiedAt], [b].[VerifiedByUserId]
+          FROM [Payment] AS [p0]
+          LEFT JOIN [GCashPayment] AS [g] ON [p0].[PaymentId] = [g].[PaymentId]
+          LEFT JOIN [BankTransferPayment] AS [b] ON [p0].[PaymentId] = [b].[PaymentId]
+      ) AS [t0] ON [t].[OrderId] = [t0].[OrderId]
+      ORDER BY [t].[OrderId], [t].[PickupOrderId], [t].[AddressId]
+fail: Microsoft.EntityFrameworkCore.Query[10100]
+      An exception occurred while iterating over the results of a query for context type 'WebApplication.DataAccess.Context.AppDbContext'.
+      Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid column name 'ScreenshotUrl'.
+      Invalid column name 'StorageBucket'.
+      Invalid column name 'StoragePath'.
+      Invalid column name 'SubmittedAt'.
+      Invalid column name 'SubmittedAt'.
+         at Microsoft.Data.SqlClient.SqlCommand.<>c.<ExecuteDbDataReaderAsync>b__209_0(Task`1 result)
+         at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+      --- End of stack trace from previous location ---
+         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+         at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+      --- End of stack trace from previous location ---
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Query.RelationalShapedQueryCompilingExpressionVisitor.ShaperProcessingExpressionVisitor.<PopulateSplitIncludeCollectionAsync>g__InitializeReaderAsync|26_0[TIncludingEntity,TIncludedEntity](RelationalQueryContext queryContext, RelationalCommandCache relationalCommandCache, IReadOnlyList`1 readerColumns, Boolean detailedErrorsEnabled, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.<>c__DisplayClass30_0`2.<<ExecuteAsync>b__0>d.MoveNext()
+      --- End of stack trace from previous location ---
+         at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.ExecuteImplementationAsync[TState,TResult](Func`4 operation, Func`4 verifySucceeded, TState state, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.ExecuteImplementationAsync[TState,TResult](Func`4 operation, Func`4 verifySucceeded, TState state, CancellationToken cancellationToken)
          at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
-      System.InvalidOperationException: The configured execution strategy 'SqlServerRetryingExecutionStrategy' does not support user-initiated transactions. Use the execution strategy returned by 'DbContext.Database.CreateExecutionStrategy()' to execute all the operations in the transaction as a retriable unit.
-         at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.OnFirstExecution()
+         at Microsoft.EntityFrameworkCore.Query.RelationalShapedQueryCompilingExpressionVisitor.ShaperProcessingExpressionVisitor.PopulateSplitIncludeCollectionAsync[TIncludingEntity,TIncludedEntity](Int32 collectionId, RelationalQueryContext queryContext, IExecutionStrategy executionStrategy, RelationalCommandCache relationalCommandCache, IReadOnlyList`1 readerColumns, Boolean detailedErrorsEnabled, SplitQueryResultCoordinator resultCoordinator, Func`3 childIdentifier, IReadOnlyList`1 identifierValueComparers, Func`5 innerShaper, Func`4 relatedDataLoaders, INavigationBase inverseNavigation, Action`2 fixup, Boolean trackingQuery)
+         at Microsoft.EntityFrameworkCore.Query.RelationalShapedQueryCompilingExpressionVisitor.ShaperProcessingExpressionVisitor.TaskAwaiter(Func`1[] taskFactories)
+         at Microsoft.EntityFrameworkCore.Query.Internal.SplitQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+      ClientConnectionId:63940e9a-af67-4747-9a68-1e5da59e69fb
+      Error Number:207,State:1,Class:16
+      Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid column name 'ScreenshotUrl'.
+      Invalid column name 'StorageBucket'.
+      Invalid column name 'StoragePath'.
+      Invalid column name 'SubmittedAt'.
+      Invalid column name 'SubmittedAt'.
+         at Microsoft.Data.SqlClient.SqlCommand.<>c.<ExecuteDbDataReaderAsync>b__209_0(Task`1 result)
+         at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+      --- End of stack trace from previous location ---
+         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+         at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+      --- End of stack trace from previous location ---
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Query.RelationalShapedQueryCompilingExpressionVisitor.ShaperProcessingExpressionVisitor.<PopulateSplitIncludeCollectionAsync>g__InitializeReaderAsync|26_0[TIncludingEntity,TIncludedEntity](RelationalQueryContext queryContext, RelationalCommandCache relationalCommandCache, IReadOnlyList`1 readerColumns, Boolean detailedErrorsEnabled, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.<>c__DisplayClass30_0`2.<<ExecuteAsync>b__0>d.MoveNext()
+      --- End of stack trace from previous location ---
+         at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.ExecuteImplementationAsync[TState,TResult](Func`4 operation, Func`4 verifySucceeded, TState state, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.ExecuteImplementationAsync[TState,TResult](Func`4 operation, Func`4 verifySucceeded, TState state, CancellationToken cancellationToken)
          at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
-fail: WebApplication.BusinessLogic.Services.OrderService[0]
-      CreateOrderAsync failed for user 3.
-      System.InvalidOperationException: The configured execution strategy 'SqlServerRetryingExecutionStrategy' does not support user-initiated transactions. Use the execution strategy returned by 'DbContext.Database.CreateExecutionStrategy()' to execute all the operations in the transaction as a retriable unit.
-         at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.OnFirstExecution()
+         at Microsoft.EntityFrameworkCore.Query.RelationalShapedQueryCompilingExpressionVisitor.ShaperProcessingExpressionVisitor.PopulateSplitIncludeCollectionAsync[TIncludingEntity,TIncludedEntity](Int32 collectionId, RelationalQueryContext queryContext, IExecutionStrategy executionStrategy, RelationalCommandCache relationalCommandCache, IReadOnlyList`1 readerColumns, Boolean detailedErrorsEnabled, SplitQueryResultCoordinator resultCoordinator, Func`3 childIdentifier, IReadOnlyList`1 identifierValueComparers, Func`5 innerShaper, Func`4 relatedDataLoaders, INavigationBase inverseNavigation, Action`2 fixup, Boolean trackingQuery)
+         at Microsoft.EntityFrameworkCore.Query.RelationalShapedQueryCompilingExpressionVisitor.ShaperProcessingExpressionVisitor.TaskAwaiter(Func`1[] taskFactories)
+         at Microsoft.EntityFrameworkCore.Query.Internal.SplitQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+      ClientConnectionId:63940e9a-af67-4747-9a68-1e5da59e69fb
+      Error Number:207,State:1,Class:16
+fail: WebApplication.Controllers.OrderController[0]
+      Error loading order detail for order 8.
+      Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid column name 'ScreenshotUrl'.
+      Invalid column name 'StorageBucket'.
+      Invalid column name 'StoragePath'.
+      Invalid column name 'SubmittedAt'.
+      Invalid column name 'SubmittedAt'.
+         at Microsoft.Data.SqlClient.SqlCommand.<>c.<ExecuteDbDataReaderAsync>b__209_0(Task`1 result)
+         at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+      --- End of stack trace from previous location ---
+         at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+         at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+      --- End of stack trace from previous location ---
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Query.RelationalShapedQueryCompilingExpressionVisitor.ShaperProcessingExpressionVisitor.<PopulateSplitIncludeCollectionAsync>g__InitializeReaderAsync|26_0[TIncludingEntity,TIncludedEntity](RelationalQueryContext queryContext, RelationalCommandCache relationalCommandCache, IReadOnlyList`1 readerColumns, Boolean detailedErrorsEnabled, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.<>c__DisplayClass30_0`2.<<ExecuteAsync>b__0>d.MoveNext()
+      --- End of stack trace from previous location ---
+         at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.ExecuteImplementationAsync[TState,TResult](Func`4 operation, Func`4 verifySucceeded, TState state, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.ExecuteImplementationAsync[TState,TResult](Func`4 operation, Func`4 verifySucceeded, TState state, CancellationToken cancellationToken)
          at Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
-         at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
-         at WebApplication.BusinessLogic.Services.OrderService.CreateOrderAsync(Int32 userId, CheckoutViewModel vm, CancellationToken cancellationToken) in C:\Users\user\Documents\ANDREI_FILES\PDM_FILES\2ND YEAR\2ND SEM\OOP\OOP-TaurusBikeShop\WebApplication\BusinessLogic\Services\OrderService.cs:line 133
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (40ms) [Parameters=[@p0='?' (Size = 100), @p1='?' (Size = 100), @p2='?' (DbType = DateTime2), @p3='?' (DbType = Boolean), @p4='?' (DbType = Boolean), @p5='?' (Size = 50), @p6='?' (Size = 20), @p7='?' (Size = 100), @p8='?' (Size = 500), @p9='?' (DbType = Int32), @p10='?' (DbType = DateTime2), @p11='?' (Size = 1000), @p12='?' (Size = 100), @p13='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SET NOCOUNT ON;
-      INSERT INTO [Address] ([City], [Country], [CreatedAt], [IsDefault], [IsSnapshot], [Label], [PostalCode], [Province], [Street], [UserId])
-      OUTPUT INSERTED.[AddressId]
-      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9);
-      INSERT INTO [SystemLog] ([CreatedAt], [EventDescription], [EventType], [UserId])
-      OUTPUT INSERTED.[SystemLogId]
-      VALUES (@p10, @p11, @p12, @p13);
+         at Microsoft.EntityFrameworkCore.Query.RelationalShapedQueryCompilingExpressionVisitor.ShaperProcessingExpressionVisitor.PopulateSplitIncludeCollectionAsync[TIncludingEntity,TIncludedEntity](Int32 collectionId, RelationalQueryContext queryContext, IExecutionStrategy executionStrategy, RelationalCommandCache relationalCommandCache, IReadOnlyList`1 readerColumns, Boolean detailedErrorsEnabled, SplitQueryResultCoordinator resultCoordinator, Func`3 childIdentifier, IReadOnlyList`1 identifierValueComparers, Func`5 innerShaper, Func`4 relatedDataLoaders, INavigationBase inverseNavigation, Action`2 fixup, Boolean trackingQuery)
+         at Microsoft.EntityFrameworkCore.Query.RelationalShapedQueryCompilingExpressionVisitor.ShaperProcessingExpressionVisitor.TaskAwaiter(Func`1[] taskFactories)
+         at Microsoft.EntityFrameworkCore.Query.Internal.SplitQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+         at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+         at Microsoft.EntityFrameworkCore.Query.ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync[TSource](IAsyncEnumerable`1 asyncEnumerable, CancellationToken cancellationToken)
+         at WebApplication.DataAccess.Repositories.OrderRepository.GetOrderWithDetailsAsync(Int32 orderId, CancellationToken cancellationToken) in C:\Users\user\Documents\ANDREI_FILES\PDM_FILES\2ND YEAR\2ND SEM\OOP\OOP-TaurusBikeShop\WebApplication\DataAccess\Repositories\OrderRepository.cs:line 59
+         at WebApplication.BusinessLogic.Services.OrderService.BuildOrderViewModelAsync(Int32 orderId, Int32 userId, CancellationToken cancellationToken) in C:\Users\user\Documents\ANDREI_FILES\PDM_FILES\2ND YEAR\2ND SEM\OOP\OOP-TaurusBikeShop\WebApplication\BusinessLogic\Services\OrderService.cs:line 597
+         at WebApplication.BusinessLogic.Services.OrderService.GetOrderDetailAsync(Int32 orderId, Int32 userId, CancellationToken cancellationToken) in C:\Users\user\Documents\ANDREI_FILES\PDM_FILES\2ND YEAR\2ND SEM\OOP\OOP-TaurusBikeShop\WebApplication\BusinessLogic\Services\OrderService.cs:line 351
+         at WebApplication.Controllers.OrderController.Detail(Int32 orderId, CancellationToken cancellationToken) in C:\Users\user\Documents\ANDREI_FILES\PDM_FILES\2ND YEAR\2ND SEM\OOP\OOP-TaurusBikeShop\WebApplication\Controllers\OrderController.cs:line 109
+      ClientConnectionId:63940e9a-af67-4747-9a68-1e5da59e69fb
+      Error Number:207,State:1,Class:16
 info: Microsoft.AspNetCore.Mvc.RedirectToActionResult[1]
-      Executing RedirectResult, redirecting to /Checkout.
+      Executing RedirectResult, redirecting to /Order/History.
 info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[105]
-      Executed action WebApplication.Controllers.CheckoutController.PlaceOrder (WebApplication) in 463.1009ms
+      Executed action WebApplication.Controllers.OrderController.Detail (WebApplication) in 448.917ms
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'WebApplication.Controllers.CheckoutController.PlaceOrder (WebApplication)'
+      Executed endpoint 'WebApplication.Controllers.OrderController.Detail (WebApplication)'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 POST https://localhost:7177/Checkout/PlaceOrder - 302 - - 496.0409ms
+      Request finished HTTP/2 GET https://localhost:7177/Order/Detail?orderId=8 - 302 - - 469.4710ms
 info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/Checkout - - -
+      Request starting HTTP/2 GET https://localhost:7177/Order/History - - -
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
-      Executing endpoint 'WebApplication.Controllers.CheckoutController.Index (WebApplication)'
+      Executing endpoint 'WebApplication.Controllers.OrderController.History (WebApplication)'
 info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[102]
-      Route matched with {action = "Index", controller = "Checkout"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index(System.Threading.CancellationToken) on controller WebApplication.Controllers.CheckoutController (WebApplication).
+      Route matched with {action = "History", controller = "Order"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] History(Int32, System.Threading.CancellationToken) on controller WebApplication.Controllers.OrderController (WebApplication).
 info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (40ms) [Parameters=[@__userId_Value_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT [t].[CartId], [t].[CreatedAt], [t].[GuestSessionId], [t].[IsCheckedOut], [t].[LastUpdatedAt], [t].[UserId], [t0].[CartItemId], [t0].[AddedAt], [t0].[CartId], [t0].[PriceAtAdd], [t0].[ProductId], [t0].[ProductVariantId], [t0].[Quantity], [t0].[ProductId0], [t0].[AdditionalSpecs], [t0].[AxleStandard], [t0].[BoostCompatible], [t0].[BrakeType], [t0].[BrandId], [t0].[CategoryId], [t0].[Color], [t0].[CreatedAt], [t0].[Currency], [t0].[Description], [t0].[IsActive], [t0].[IsFeatured], [t0].[Material], [t0].[Name], [t0].[Price], [t0].[SKU], [t0].[ShortDescription], [t0].[SpeedCompatibility], [t0].[SuspensionTravel], [t0].[TubelessReady], [t0].[UpdatedAt], [t0].[WheelSize], [t0].[ProductVariantId0], [t0].[AdditionalPrice], [t0].[CreatedAt0], [t0].[IsActive0], [t0].[ProductId1], [t0].[ReorderThreshold], [t0].[SKU0], [t0].[StockQuantity], [t0].[UpdatedAt0], [t0].[VariantName]
+      Executed DbCommand (42ms) [Parameters=[@__userId_0='?' (DbType = Int32), @__p_1='?' (DbType = Int32), @__p_2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[OrderId], [t].[ContactPhone], [t].[CreatedAt], [t].[DeliveryInstructions], [t].[DiscountAmount], [t].[IsWalkIn], [t].[OrderDate], [t].[OrderNumber], [t].[OrderStatus], [t].[ShippingAddressId], [t].[ShippingFee], [t].[SubTotal], [t].[UserId], [p].[PickupOrderId], [o0].[OrderItemId], [o0].[OrderId], [o0].[ProductId], [o0].[ProductVariantId], [o0].[Quantity], [o0].[UnitPrice], [p].[OrderId], [p].[PickupConfirmedAt], [p].[PickupExpiresAt], [p].[PickupReadyAt]
+      FROM (
+          SELECT [o].[OrderId], [o].[ContactPhone], [o].[CreatedAt], [o].[DeliveryInstructions], [o].[DiscountAmount], [o].[IsWalkIn], [o].[OrderDate], [o].[OrderNumber], [o].[OrderStatus], [o].[ShippingAddressId], [o].[ShippingFee], [o].[SubTotal], [o].[UserId]
+          FROM [Order] AS [o]
+          WHERE [o].[UserId] = @__userId_0
+          ORDER BY [o].[OrderDate] DESC
+          OFFSET @__p_1 ROWS FETCH NEXT @__p_2 ROWS ONLY
+      ) AS [t]
+      LEFT JOIN [PickupOrder] AS [p] ON [t].[OrderId] = [p].[PickupOrderId]
+      LEFT JOIN [OrderItem] AS [o0] ON [t].[OrderId] = [o0].[OrderId]
+      ORDER BY [t].[OrderDate] DESC, [t].[OrderId], [p].[PickupOrderId]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (40ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Order] AS [o]
+      WHERE [o].[UserId] = @__userId_0
+info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[1]
+      Executing ViewResult, running view ~/Views/Customer/OrderHistory.cshtml.
+info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[4]
+      Executed ViewResult - view ~/Views/Customer/OrderHistory.cshtml executed in 9.6422ms.
+info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[105]
+      Executed action WebApplication.Controllers.OrderController.History (WebApplication) in 105.3216ms
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'WebApplication.Controllers.OrderController.History (WebApplication)'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 GET https://localhost:7177/Order/History - 200 - text/html;+charset=utf-8 116.8953ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 GET https://localhost:7177/_vs/browserLink - - -
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - - -
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - 200 14933 application/javascript;+charset=utf-8 4.1053ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 GET https://localhost:7177/_vs/browserLink - 200 - text/javascript;+charset=UTF-8 16.0660ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 GET https://localhost:7177/antiforgery/token - - -
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 GET https://localhost:7177/Cart/GetCartCount - - -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'WebApplication.Controllers.CartController.GetCartCount (WebApplication)'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 GET https://localhost:7177/antiforgery/token - 404 0 - 5.0532ms
+info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[102]
+      Route matched with {action = "GetCartCount", controller = "Cart"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetCartCount(System.Threading.CancellationToken) on controller WebApplication.Controllers.CartController (WebApplication).
+info: Microsoft.AspNetCore.Hosting.Diagnostics[16]
+      Request reached the end of the middleware pipeline without being handled by application code. Request path: GET https://localhost:7177/antiforgery/token, Response status code: 404
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (41ms) [Parameters=[@__userId_Value_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[CartId], [t].[CreatedAt], [t].[GuestSessionId], [t].[IsCheckedOut], [t].[LastUpdatedAt], [t].[UserId], [t0].[CartItemId], [t0].[AddedAt], [t0].[CartId], [t0].[PriceAtAdd], [t0].[ProductId], [t0].[ProductVariantId], [t0].[Quantity], [t0].[ProductId0], [t0].[AdditionalSpecs], [t0].[AxleStandard], [t0].[BoostCompatible], [t0].[BrakeType], [t0].[BrandId], [t0].[CategoryId], [t0].[Color], [t0].[CreatedAt], [t0].[Currency], [t0].[Description], [t0].[IsActive], [t0].[IsFeatured], [t0].[Material], [t0].[Name], [t0].[Price], [t0].[SKU], [t0].[ShortDescription], [t0].[SpeedCompatibility], [t0].[SuspensionTravel], [t0].[TubelessReady], [t0].[UpdatedAt], [t0].[WheelSize], [t0].[ProductVariantId0], [t0].[ProductImageId], [t0].[AltText], [t0].[CreatedAt0], [t0].[DisplayOrder], [t0].[FileSizeBytes], [t0].[Height], [t0].[ImageType], [t0].[ImageUrl], [t0].[IsPrimary], [t0].[MimeType], [t0].[ProductId1], [t0].[StorageBucket], [t0].[StoragePath], [t0].[UploadedByUserId], [t0].[Width], [t0].[AdditionalPrice], [t0].[CreatedAt1], [t0].[IsActive0], [t0].[ProductId2], [t0].[ReorderThreshold], [t0].[SKU0], [t0].[StockQuantity], [t0].[UpdatedAt0], [t0].[VariantName]
       FROM (
           SELECT TOP(1) [c].[CartId], [c].[CreatedAt], [c].[GuestSessionId], [c].[IsCheckedOut], [c].[LastUpdatedAt], [c].[UserId]
           FROM [Cart] AS [c]
           WHERE [c].[IsCheckedOut] = CAST(0 AS bit) AND [c].[UserId] = @__userId_Value_0
       ) AS [t]
       LEFT JOIN (
-          SELECT [c0].[CartItemId], [c0].[AddedAt], [c0].[CartId], [c0].[PriceAtAdd], [c0].[ProductId], [c0].[ProductVariantId], [c0].[Quantity], [p].[ProductId] AS [ProductId0], [p].[AdditionalSpecs], [p].[AxleStandard], [p].[BoostCompatible], [p].[BrakeType], [p].[BrandId], [p].[CategoryId], [p].[Color], [p].[CreatedAt], [p].[Currency], [p].[Description], [p].[IsActive], [p].[IsFeatured], [p].[Material], [p].[Name], [p].[Price], [p].[SKU], [p].[ShortDescription], [p].[SpeedCompatibility], [p].[SuspensionTravel], [p].[TubelessReady], [p].[UpdatedAt], [p].[WheelSize], [p0].[ProductVariantId] AS [ProductVariantId0], [p0].[AdditionalPrice], [p0].[CreatedAt] AS [CreatedAt0], [p0].[IsActive] AS [IsActive0], [p0].[ProductId] AS [ProductId1], [p0].[ReorderThreshold], [p0].[SKU] AS [SKU0], [p0].[StockQuantity], [p0].[UpdatedAt] AS [UpdatedAt0], [p0].[VariantName]
+          SELECT [c0].[CartItemId], [c0].[AddedAt], [c0].[CartId], [c0].[PriceAtAdd], [c0].[ProductId], [c0].[ProductVariantId], [c0].[Quantity], [p].[ProductId] AS [ProductId0], [p].[AdditionalSpecs], [p].[AxleStandard], [p].[BoostCompatible], [p].[BrakeType], [p].[BrandId], [p].[CategoryId], [p].[Color], [p].[CreatedAt], [p].[Currency], [p].[Description], [p].[IsActive], [p].[IsFeatured], [p].[Material], [p].[Name], [p].[Price], [p].[SKU], [p].[ShortDescription], [p].[SpeedCompatibility], [p].[SuspensionTravel], [p].[TubelessReady], [p].[UpdatedAt], [p].[WheelSize], [p0].[ProductVariantId] AS [ProductVariantId0], [p1].[ProductImageId], [p1].[AltText], [p1].[CreatedAt] AS [CreatedAt0], [p1].[DisplayOrder], [p1].[FileSizeBytes], [p1].[Height], [p1].[ImageType], [p1].[ImageUrl], [p1].[IsPrimary], [p1].[MimeType], [p1].[ProductId] AS [ProductId1], [p1].[StorageBucket], [p1].[StoragePath], [p1].[UploadedByUserId], [p1].[Width], [p0].[AdditionalPrice], [p0].[CreatedAt] AS [CreatedAt1], [p0].[IsActive] AS [IsActive0], [p0].[ProductId] AS [ProductId2], [p0].[ReorderThreshold], [p0].[SKU] AS [SKU0], [p0].[StockQuantity], [p0].[UpdatedAt] AS [UpdatedAt0], [p0].[VariantName]
           FROM [CartItem] AS [c0]
           INNER JOIN [Product] AS [p] ON [c0].[ProductId] = [p].[ProductId]
           LEFT JOIN [ProductVariant] AS [p0] ON [c0].[ProductVariantId] = [p0].[ProductVariantId]
+          LEFT JOIN [ProductImage] AS [p1] ON [p].[ProductId] = [p1].[ProductId]
       ) AS [t0] ON [t].[CartId] = [t0].[CartId]
-      ORDER BY [t].[CartId], [t0].[CartItemId], [t0].[ProductId0]
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
-      SELECT [t].[UserId], [t].[CreatedAt], [t].[DefaultAddressId], [t].[Email], [t].[FirstName], [t].[IsActive], [t].[IsWalkIn], [t].[LastLoginAt], [t].[LastName], [t].[PasswordHash], [t].[PhoneNumber], [t0].[AddressId], [t0].[City], [t0].[Country], [t0].[CreatedAt], [t0].[IsDefault], [t0].[IsSnapshot], [t0].[Label], [t0].[PostalCode], [t0].[Province], [t0].[Street], [t0].[UserId]
-      FROM (
-          SELECT TOP(1) [u].[UserId], [u].[CreatedAt], [u].[DefaultAddressId], [u].[Email], [u].[FirstName], [u].[IsActive], [u].[IsWalkIn], [u].[LastLoginAt], [u].[LastName], [u].[PasswordHash], [u].[PhoneNumber]
-          FROM [User] AS [u]
-          WHERE [u].[UserId] = @__userId_0
-      ) AS [t]
-      LEFT JOIN (
-          SELECT [a].[AddressId], [a].[City], [a].[Country], [a].[CreatedAt], [a].[IsDefault], [a].[IsSnapshot], [a].[Label], [a].[PostalCode], [a].[Province], [a].[Street], [a].[UserId]
-          FROM [Address] AS [a]
-          WHERE [a].[IsSnapshot] = CAST(0 AS bit)
-      ) AS [t0] ON [t].[UserId] = [t0].[UserId]
-      ORDER BY [t].[UserId]
-info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[1]
-      Executing ViewResult, running view ~/Views/Customer/Checkout.cshtml.
-info: Microsoft.AspNetCore.Mvc.ViewFeatures.ViewResultExecutor[4]
-      Executed ViewResult - view ~/Views/Customer/Checkout.cshtml executed in 5.9223ms.
+      ORDER BY [t].[CartId], [t0].[CartItemId], [t0].[ProductId0], [t0].[ProductVariantId0]
+info: Microsoft.AspNetCore.Mvc.Infrastructure.SystemTextJsonResultExecutor[1]
+      Executing JsonResult, writing value of type 'WebApplication.Models.ApiResponse'.
 info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[105]
-      Executed action WebApplication.Controllers.CheckoutController.Index (WebApplication) in 93.7293ms
+      Executed action WebApplication.Controllers.CartController.GetCartCount (WebApplication) in 52.5827ms
 info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
-      Executed endpoint 'WebApplication.Controllers.CheckoutController.Index (WebApplication)'
+      Executed endpoint 'WebApplication.Controllers.CartController.GetCartCount (WebApplication)'
 info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/Checkout - 200 - text/html;+charset=utf-8 103.8933ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/_vs/browserLink - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
-      Request starting HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - - -
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/_framework/aspnetcore-browser-refresh.js - 200 14933 application/javascript;+charset=utf-8 3.5905ms
-info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
-      Request finished HTTP/2 GET https://localhost:7177/_vs/browserLink - 200 - text/javascript;+charset=UTF-8 12.7264ms
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT COUNT(*)
-      FROM [ProductVariant] AS [p]
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT COUNT(*)
-      FROM [ProductVariant] AS [p]
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT COUNT(*)
-      FROM [ProductVariant] AS [p]
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT COUNT(*)
-      FROM [ProductVariant] AS [p]
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (38ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT COUNT(*)
-      FROM [ProductVariant] AS [p]
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT COUNT(*)
-      FROM [ProductVariant] AS [p]
-info: Microsoft.EntityFrameworkCore.Database.Command[20101]
-      Executed DbCommand (39ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
-      SELECT COUNT(*)
-      FROM [ProductVariant] AS [p]
+      Request finished HTTP/2 GET https://localhost:7177/Cart/GetCartCount - 200 - application/json;+charset=utf-8 65.7086ms
+info: M

@@ -121,7 +121,7 @@ public sealed class OrderController : Controller
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading order detail for order {OrderId}.", orderId);
-            TempData["error"] = "Unable to load order details.";
+            TempData["error"] = $"[DEBUG] {ex.GetType().Name}: {ex.Message} | InnerException: {ex.InnerException?.Message}";
             return RedirectToAction(nameof(History));
         }
     }

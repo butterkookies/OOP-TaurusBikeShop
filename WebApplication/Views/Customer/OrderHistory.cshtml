@@ -10,13 +10,26 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/order.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/order-history.css" asp-append-version="true" />
+    <style>
+        body {
+            background-color: #0D0D1A;
+            background-image:
+                linear-gradient(rgba(8, 6, 18, 0.68), rgba(8, 6, 18, 0.68)),
+                url('/mobile wallpaper.png');
+            background-size: cover;
+            background-position: center top;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+    </style>
 }
 
 <div class="tbs-order-history-page">
     <div class="container">
 
-        <div class="tbs-page-header">
+        <div class="tbs-page-header oh-anim oh-anim-d0">
             <div>
+                <p class="tbs-orders-eyebrow">Order History</p>
                 <h1 class="tbs-page-header__title">My Orders</h1>
                 <p class="tbs-page-header__subtitle">
                     @totalCount order@(totalCount != 1 ? "s" : "") total
@@ -26,7 +39,7 @@
 
         @if (!Model.Any())
         {
-            <div class="tbs-order-history__empty">
+            <div class="tbs-order-history__empty oh-anim oh-anim-d1">
                 <div class="tbs-order-history__empty-icon" aria-hidden="true">📦</div>
                 <h2>No orders yet</h2>
                 <p>Your order history will appear here once you make a purchase.</p>
@@ -36,7 +49,7 @@
         }
         else
         {
-            <div class="tbs-order-history__list">
+            <div class="tbs-order-history__list oh-anim oh-anim-d1">
                 @foreach (var order in Model)
                 {
                     <a asp-controller="Order" asp-action="Detail"

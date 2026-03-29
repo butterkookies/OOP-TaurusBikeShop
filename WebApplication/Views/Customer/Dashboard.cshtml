@@ -8,140 +8,230 @@
     <link rel="stylesheet" href="~/css/customer.css"  asp-append-version="true" />
     <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/order.css"     asp-append-version="true" />
+    <style>
+        body {
+            background-color: #0D0D1A;
+            background-image:
+                linear-gradient(rgba(8, 6, 18, 0.68), rgba(8, 6, 18, 0.68)),
+                url('/mobile wallpaper.png');
+            background-size: cover;
+            background-position: center top;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+    </style>
 }
 
 <div class="tbs-customer-page">
     <div class="container">
 
-        @* Page header *@
-        <div class="tbs-page-header">
-            <div>
-                <h1 class="tbs-page-header__title">
-                    Welcome back, @Model.FirstName
-                </h1>
-                <p class="tbs-page-header__subtitle">
-                    Here's what's happening with your account
-                </p>
+        @* ── Page header ──────────────────────────────────────── *@
+        <div class="tbs-dash-header dash-anim dash-anim-d0">
+            <div class="tbs-dash-header__copy">
+                <p class="tbs-dash-header__eyebrow">Account Overview</p>
+                <h1 class="tbs-dash-header__title">Welcome back, @Model.FirstName</h1>
+                <p class="tbs-dash-header__sub">Here's what's happening with your account.</p>
             </div>
         </div>
 
-        @* ==================== STAT CARDS ==================== *@
-        <div class="row g-3 tbs-dashboard__stats">
+        @* ── Stat cards ───────────────────────────────────────── *@
+        <div class="tbs-dash-stats dash-anim dash-anim-d1">
 
-            <div class="col-6 col-md-3">
-                <a asp-controller="Order" asp-action="History"
-                   class="tbs-stat-card">
-                    <div class="tbs-stat-card__icon" aria-hidden="true">📦</div>
-                    <div class="tbs-stat-card__body">
-                        <div class="tbs-stat-card__number">@Model.TotalOrders</div>
-                        <div class="tbs-stat-card__label">Total Orders</div>
-                        @if (Model.ActiveOrders > 0)
-                        {
-                            <div class="tbs-stat-card__hint">
-                                @Model.ActiveOrders active
-                            </div>
-                        }
-                    </div>
-                    <div class="tbs-stat-card__arrow" aria-hidden="true">›</div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a asp-controller="Wishlist" asp-action="ViewWishlist"
-                   class="tbs-stat-card">
-                    <div class="tbs-stat-card__icon" aria-hidden="true">❤️</div>
-                    <div class="tbs-stat-card__body">
-                        <div class="tbs-stat-card__number">@Model.WishlistCount</div>
-                        <div class="tbs-stat-card__label">Wishlist</div>
-                        <div class="tbs-stat-card__hint">Saved items</div>
-                    </div>
-                    <div class="tbs-stat-card__arrow" aria-hidden="true">›</div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a asp-controller="Review" asp-action="MyReviews"
-                   class="tbs-stat-card @(Model.HasPendingReviews ? "tbs-stat-card--highlight" : "")">
-                    <div class="tbs-stat-card__icon" aria-hidden="true">⭐</div>
-                    <div class="tbs-stat-card__body">
-                        <div class="tbs-stat-card__number">@Model.PendingReviewCount</div>
-                        <div class="tbs-stat-card__label">Pending Reviews</div>
-                        <div class="tbs-stat-card__hint">
-                            @(Model.HasPendingReviews ? "Ready to review" : "All caught up")
+            <a asp-controller="Order" asp-action="History" class="tbs-stat-card">
+                <div class="tbs-stat-card__icon-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/>
+                        <path d="M16.5 9.4 7.55 4.24"/>
+                        <polyline points="3.29 7 12 12 20.71 7"/>
+                        <line x1="12" y1="22" x2="12" y2="12"/>
+                        <circle cx="18.5" cy="15.5" r="2.5"/>
+                        <path d="M20.27 17.27 22 19"/>
+                    </svg>
+                </div>
+                <div class="tbs-stat-card__body">
+                    <div class="tbs-stat-card__number">@Model.TotalOrders</div>
+                    <div class="tbs-stat-card__label">Total Orders</div>
+                    @if (Model.ActiveOrders > 0)
+                    {
+                        <div class="tbs-stat-card__hint tbs-stat-card__hint--active">
+                            @Model.ActiveOrders active
                         </div>
-                    </div>
-                    <div class="tbs-stat-card__arrow" aria-hidden="true">›</div>
-                </a>
-            </div>
+                    }
+                    else
+                    {
+                        <div class="tbs-stat-card__hint">No active orders</div>
+                    }
+                </div>
+                <div class="tbs-stat-card__chevron" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </div>
+            </a>
 
-            <div class="col-6 col-md-3">
-                <a asp-controller="Support" asp-action="Index"
-                   class="tbs-stat-card @(Model.HasOpenTickets ? "tbs-stat-card--highlight" : "")">
-                    <div class="tbs-stat-card__icon" aria-hidden="true">💬</div>
-                    <div class="tbs-stat-card__body">
-                        <div class="tbs-stat-card__number">@Model.OpenTicketCount</div>
-                        <div class="tbs-stat-card__label">Open Tickets</div>
-                        <div class="tbs-stat-card__hint">
-                            @(Model.HasOpenTickets ? "Awaiting response" : "No open issues")
-                        </div>
+            <a asp-controller="Wishlist" asp-action="ViewWishlist" class="tbs-stat-card">
+                <div class="tbs-stat-card__icon-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06
+                                 a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78
+                                 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                </div>
+                <div class="tbs-stat-card__body">
+                    <div class="tbs-stat-card__number">@Model.WishlistCount</div>
+                    <div class="tbs-stat-card__label">Wishlist</div>
+                    <div class="tbs-stat-card__hint">Saved items</div>
+                </div>
+                <div class="tbs-stat-card__chevron" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </div>
+            </a>
+
+            <a asp-controller="Review" asp-action="MyReviews"
+               class="tbs-stat-card @(Model.HasPendingReviews ? "tbs-stat-card--alert" : "")">
+                <div class="tbs-stat-card__icon-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14
+                                         18.18 21.02 12 17.77 5.82 21.02
+                                         7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                </div>
+                <div class="tbs-stat-card__body">
+                    <div class="tbs-stat-card__number">@Model.PendingReviewCount</div>
+                    <div class="tbs-stat-card__label">Pending Reviews</div>
+                    <div class="tbs-stat-card__hint @(Model.HasPendingReviews ? "tbs-stat-card__hint--active" : "")">
+                        @(Model.HasPendingReviews ? "Ready to review" : "All caught up")
                     </div>
-                    <div class="tbs-stat-card__arrow" aria-hidden="true">›</div>
-                </a>
-            </div>
+                </div>
+                <div class="tbs-stat-card__chevron" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </div>
+            </a>
+
+            <a asp-controller="Support" asp-action="Index"
+               class="tbs-stat-card @(Model.HasOpenTickets ? "tbs-stat-card--alert" : "")">
+                <div class="tbs-stat-card__icon-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14
+                                 a2 2 0 0 1 2 2z"/>
+                    </svg>
+                </div>
+                <div class="tbs-stat-card__body">
+                    <div class="tbs-stat-card__number">@Model.OpenTicketCount</div>
+                    <div class="tbs-stat-card__label">Open Tickets</div>
+                    <div class="tbs-stat-card__hint @(Model.HasOpenTickets ? "tbs-stat-card__hint--active" : "")">
+                        @(Model.HasOpenTickets ? "Awaiting response" : "No open issues")
+                    </div>
+                </div>
+                <div class="tbs-stat-card__chevron" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </div>
+            </a>
 
         </div>
 
-        @* ==================== PENDING REVIEWS PROMPT ==================== *@
+        @* ── Pending reviews prompt ───────────────────────────── *@
         @if (Model.HasPendingReviews)
         {
-            <div class="tbs-dashboard__review-prompt">
-                <div class="tbs-dashboard__review-prompt-text">
-                    <span aria-hidden="true">⭐</span>
-                    You have <strong>@Model.PendingReviewCount</strong>
-                    product@(Model.PendingReviewCount != 1 ? "s" : "") to review
+            <div class="tbs-review-prompt dash-anim dash-anim-d2">
+                <div class="tbs-review-prompt__indicator" aria-hidden="true"></div>
+                <div class="tbs-review-prompt__body">
+                    <p class="tbs-review-prompt__heading">
+                        You have <strong>@Model.PendingReviewCount</strong>
+                        product@(Model.PendingReviewCount != 1 ? "s" : "") awaiting review
+                    </p>
+                    <div class="tbs-review-prompt__chips">
+                        @foreach (WebApplication.Models.ViewModels.ReviewViewModel item
+                            in Model.PendingReviews)
+                        {
+                            <a asp-controller="Product"
+                               asp-action="Detail"
+                               asp-route-id="@item.ProductId"
+                               asp-fragment="reviews-section"
+                               class="tbs-review-chip">
+                                @item.ProductName
+                            </a>
+                        }
+                        @if (Model.PendingReviewCount > 3)
+                        {
+                            <a asp-controller="Review" asp-action="MyReviews"
+                               class="tbs-review-chip tbs-review-chip--more">
+                                +@(Model.PendingReviewCount - 3) more
+                            </a>
+                        }
+                    </div>
                 </div>
-                <div class="tbs-dashboard__review-prompt-items">
-                    @foreach (WebApplication.Models.ViewModels.ReviewViewModel item
-                        in Model.PendingReviews)
-                    {
-                        <a asp-controller="Product"
-                           asp-action="Detail"
-                           asp-route-id="@item.ProductId"
-                           asp-fragment="reviews-section"
-                           class="tbs-dashboard__review-item">
-                            @item.ProductName
-                        </a>
-                    }
-                    @if (Model.PendingReviewCount > 3)
-                    {
-                        <a asp-controller="Review" asp-action="MyReviews"
-                           class="tbs-dashboard__review-item tbs-dashboard__review-item--more">
-                            +@(Model.PendingReviewCount - 3) more →
-                        </a>
-                    }
-                </div>
+                <a asp-controller="Review" asp-action="MyReviews"
+                   class="tbs-review-prompt__cta">
+                    Write Reviews
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
             </div>
         }
 
-        @* ==================== RECENT ORDERS ==================== *@
-        <div class="tbs-dashboard__section">
-            <div class="tbs-section-header">
-                <h2 class="tbs-section-title">Recent Orders</h2>
+        @* ── Recent orders ────────────────────────────────────── *@
+        <div class="tbs-dash-section dash-anim dash-anim-d3">
+            <div class="tbs-dash-section__header">
+                <h2 class="tbs-dash-section__title">Recent Orders</h2>
                 <a asp-controller="Order" asp-action="History"
-                   class="tbs-section-link">
-                    View all &rarr;
+                   class="tbs-dash-section__link">
+                    View all
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
                 </a>
             </div>
 
             @if (Model.HasNoOrders)
             {
-                <div class="tbs-card tbs-dashboard__empty-orders">
-                    <p class="tbs-dashboard__empty-text">
-                        You haven't placed any orders yet.
-                        <a asp-controller="Product" asp-action="List">
-                            Start shopping →
-                        </a>
-                    </p>
+                <div class="tbs-dash-empty">
+                    <div class="tbs-dash-empty__icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72
+                                     a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                    </div>
+                    <p class="tbs-dash-empty__text">You haven't placed any orders yet.</p>
+                    <a asp-controller="Product" asp-action="List"
+                       class="tbs-btn-accent">Browse Catalog</a>
                 </div>
             }
             else
@@ -187,21 +277,96 @@
                                 </span>
                             </div>
 
-                            <div class="tbs-order-row__arrow" aria-hidden="true">›</div>
+                            <div class="tbs-order-row__arrow" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2.5" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <polyline points="9 18 15 12 9 6"/>
+                                </svg>
+                            </div>
                         </a>
                     }
                 </div>
             }
         </div>
 
-        @* ==================== QUICK ACTIONS ==================== *@
-        <div class="tbs-dashboard__cta">
-            <a asp-controller="Product" asp-action="List"
-               class="btn tbs-btn-accent">Browse Catalog</a>
-            <a asp-controller="Cart"    asp-action="ViewCart"
-               class="btn tbs-btn-outline">View Cart</a>
-            <a asp-controller="Support" asp-action="Create"
-               class="btn tbs-btn-outline">Get Support</a>
+        @* ── Quick actions ────────────────────────────────────── *@
+        <div class="tbs-quick-actions dash-anim dash-anim-d4">
+            <div class="tbs-quick-actions__header">
+                <h2 class="tbs-dash-section__title">Quick Actions</h2>
+            </div>
+            <div class="tbs-quick-actions__row">
+                <a asp-controller="Product" asp-action="List"
+                   class="tbs-action-tile">
+                    <div class="tbs-action-tile__icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                    <div class="tbs-action-tile__copy">
+                        <span class="tbs-action-tile__label">Browse Catalog</span>
+                        <span class="tbs-action-tile__desc">Explore all products</span>
+                    </div>
+                    <svg class="tbs-action-tile__arrow" xmlns="http://www.w3.org/2000/svg"
+                         width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
+
+                <a asp-controller="Cart" asp-action="ViewCart"
+                   class="tbs-action-tile">
+                    <div class="tbs-action-tile__icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72
+                                     a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                    </div>
+                    <div class="tbs-action-tile__copy">
+                        <span class="tbs-action-tile__label">View Cart</span>
+                        <span class="tbs-action-tile__desc">Review items before checkout</span>
+                    </div>
+                    <svg class="tbs-action-tile__arrow" xmlns="http://www.w3.org/2000/svg"
+                         width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
+
+                <a asp-controller="Support" asp-action="Create"
+                   class="tbs-action-tile">
+                    <div class="tbs-action-tile__icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                    <div class="tbs-action-tile__copy">
+                        <span class="tbs-action-tile__label">Get Support</span>
+                        <span class="tbs-action-tile__desc">Open a support ticket</span>
+                    </div>
+                    <svg class="tbs-action-tile__arrow" xmlns="http://www.w3.org/2000/svg"
+                         width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </a>
+            </div>
         </div>
 
     </div>

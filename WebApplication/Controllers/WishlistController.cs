@@ -92,12 +92,15 @@ public sealed class WishlistController : Controller
     // AJAX POST /Wishlist/Remove
     // =========================================================================
 
+    public sealed record RemoveRequest(int ProductId);
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Remove(
-        int productId,
+        [FromBody] RemoveRequest req,
         CancellationToken cancellationToken = default)
     {
+        int productId = req?.ProductId ?? 0;
         try
         {
             ServiceResult result = await _wishlistService
@@ -118,13 +121,16 @@ public sealed class WishlistController : Controller
     // AJAX POST /Wishlist/MoveToCart
     // =========================================================================
 
+    public sealed record MoveToCartRequest(int ProductId);
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> MoveToCart(
-        int productId,
+        [FromBody] MoveToCartRequest req,
         CancellationToken cancellationToken = default)
     {
         int userId = GetCurrentUserId();
+        int productId = req?.ProductId ?? 0;
 
         try
         {

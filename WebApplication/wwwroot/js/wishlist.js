@@ -23,11 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetchWithCSRF('/Wishlist/Remove', {
-                method: 'POST',
-                body: JSON.stringify({ productId: parseInt(productId, 10) })
-            });
-            const data = await parseJsonResponse(response);
+            const data = await fetchWithCSRF('/Wishlist/Remove',
+                { productId: parseInt(productId, 10) });
 
             if (!data.success) {
                 showAlert('error', data.message ?? 'Could not remove item.');
@@ -66,11 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
         moveBtn.textContent = 'Moving…';
 
         try {
-            const response = await fetchWithCSRF('/Wishlist/MoveToCart', {
-                method: 'POST',
-                body: JSON.stringify({ productId: parseInt(productId, 10) })
-            });
-            const data = await parseJsonResponse(response);
+            const data = await fetchWithCSRF('/Wishlist/MoveToCart',
+                { productId: parseInt(productId, 10) });
 
             if (!data.success) {
                 showAlert('error', data.message ?? 'Could not move to cart.');
