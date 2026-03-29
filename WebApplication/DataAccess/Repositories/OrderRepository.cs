@@ -58,6 +58,7 @@ public sealed class OrderRepository : Repository<Order>
     {
         return await Context.Orders
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(o => o.Items)
                 .ThenInclude(oi => oi.Product)
                     .ThenInclude(p => p!.Images)

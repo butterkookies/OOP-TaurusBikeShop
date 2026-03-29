@@ -116,6 +116,28 @@ function updateCartBadge(count) {
     badge.style.display = count > 0 ? 'flex' : 'none';
 }
 
+// ── Debounce ─────────────────────────────────────────────────
+function debounce(fn, delay) {
+    var timer;
+    return function () {
+        var args = arguments, ctx = this;
+        clearTimeout(timer);
+        timer = setTimeout(function () { fn.apply(ctx, args); }, delay);
+    };
+}
+
+// ── Throttle ─────────────────────────────────────────────────
+function throttle(fn, limit) {
+    var lastCall = 0;
+    return function () {
+        var now = Date.now();
+        if (now - lastCall >= limit) {
+            lastCall = now;
+            fn.apply(this, arguments);
+        }
+    };
+}
+
 // ── Dismissible alerts auto-bind ─────────────────────────────
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.alert-close').forEach(function (btn) {

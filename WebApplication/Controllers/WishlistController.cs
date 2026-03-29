@@ -59,12 +59,15 @@ public sealed class WishlistController : Controller
     // AJAX POST /Wishlist/Toggle
     // =========================================================================
 
+    public sealed record ToggleRequest(int ProductId);
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Toggle(
-        int productId,
+        [FromBody] ToggleRequest req,
         CancellationToken cancellationToken = default)
     {
+        int productId = req?.ProductId ?? 0;
         try
         {
             ServiceResult<bool> result = await _wishlistService

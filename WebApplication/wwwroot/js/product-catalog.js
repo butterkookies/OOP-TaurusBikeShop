@@ -17,6 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
         applyBtn.addEventListener('click', applyFilters);
     }
 
+    // Update pill active class immediately when a radio is clicked
+    document.querySelectorAll('.cat-filter-radio').forEach(radio => {
+        radio.addEventListener('change', () => {
+            document.querySelectorAll(`input[name="${radio.name}"]`).forEach(r => {
+                r.closest('.cat-filter-pill')
+                    ?.classList.toggle('cat-filter-pill--active', r.checked);
+            });
+        });
+    });
+
     if (searchInput) {
         searchInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') applyFilters();

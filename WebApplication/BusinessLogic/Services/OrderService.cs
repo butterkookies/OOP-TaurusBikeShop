@@ -610,6 +610,7 @@ public sealed class OrderService : IOrderService
         OrderDate     = order.OrderDate,
         ItemCount     = order.Items.Count,
         DeliveryMethod= order.PickupOrder != null ? "Pickup" : "Delivery",
+        SubTotal      = order.SubTotal,
         ShippingFee   = order.ShippingFee,
         DiscountAmount= order.DiscountAmount
     };
@@ -647,8 +648,8 @@ public sealed class OrderService : IOrderService
             DeliveryMethod        = isPickup ? "Pickup" : "Delivery",
             ShippingAddress       = order.ShippingAddress,
             PickupOrder           = order.PickupOrder,
-            Payments              = order.Payments.ToList().AsReadOnly(),
-            Deliveries            = order.Deliveries.ToList().AsReadOnly(),
+            Payments              = (order.Payments  ?? []).ToList().AsReadOnly(),
+            Deliveries            = (order.Deliveries ?? []).ToList().AsReadOnly(),
             IsCancellable         = CancellableStatuses.Contains(order.OrderStatus),
             // Delivery confirmation is only available for courier-delivery orders
             // (not pickup, not walk-in) that are currently in Shipped status.
