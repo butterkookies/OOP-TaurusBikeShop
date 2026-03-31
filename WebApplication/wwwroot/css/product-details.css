@@ -208,10 +208,41 @@
     transition: color var(--tbs-transition), border-color var(--tbs-transition);
     flex-shrink: 0;
 }
-.tbs-wishlist-toggle:hover,
+
+.tbs-wishlist-toggle svg {
+    transition: opacity 0.2s ease;
+}
+
+.tbs-wishlist-toggle .heart-filled {
+    display: none;
+    color: #E53E3E;
+}
+
+.tbs-wishlist-toggle .heart-outline {
+    display: block;
+    color: var(--tbs-gray-400);
+}
+
+.tbs-wishlist-toggle:hover {
+    color: #E53E3E;
+    border-color: #FED7D7;
+}
+
+.tbs-wishlist-toggle:hover .heart-outline {
+    color: #E53E3E;
+}
+
 .tbs-wishlist-toggle--active {
     color: #E53E3E;
     border-color: #FED7D7;
+}
+
+.tbs-wishlist-toggle--active .heart-filled {
+    display: block;
+}
+
+.tbs-wishlist-toggle--active .heart-outline {
+    display: none;
 }
 
 /* Tabs */

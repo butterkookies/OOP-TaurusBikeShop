@@ -84,6 +84,8 @@ namespace AdminSystem.Views
         }
 
         // ── Navigation ────────────────────────────────────────────────────
+        public void NavigateTo(string page) => Navigate(page);
+
         private void Navigate(string page)
         {
             switch (page)

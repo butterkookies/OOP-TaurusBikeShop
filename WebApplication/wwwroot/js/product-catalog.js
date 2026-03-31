@@ -85,8 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  .tbs-wishlist-toggle[data-product-id="${productId}"]`
             ).forEach(btn => {
                 const isNowInWishlist = data.data?.isInWishlist ?? false;
-                btn.classList.toggle('tbs-product-card__wishlist--active', isNowInWishlist);
-                btn.classList.toggle('tbs-wishlist-toggle--active', isNowInWishlist);
+                btn.classList.toggle('is-active', isNowInWishlist);
                 btn.setAttribute('aria-pressed', isNowInWishlist ? 'true' : 'false');
                 btn.setAttribute('aria-label',
                     isNowInWishlist ? 'Remove from wishlist' : 'Add to wishlist');

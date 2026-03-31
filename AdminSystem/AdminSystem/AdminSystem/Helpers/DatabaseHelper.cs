@@ -9,14 +9,14 @@ namespace AdminSystem.Helpers
 {
     /// <summary>
     /// Provides SQL Server connections for all Dapper repository operations.
-    /// Connection string is read from App.config "TaurusBikeShopDB".
+    /// Connection string is read from App.config "Taurus-bike-shop-sqlserver-2026".
     /// </summary>
     public static class DatabaseHelper
     {
         private static readonly string _connectionString =
-            ConfigurationManager.ConnectionStrings["TaurusBikeShopDB"]?.ConnectionString
+            ConfigurationManager.ConnectionStrings["Taurus-bike-shop-sqlserver-2026"]?.ConnectionString
             ?? throw new InvalidOperationException(
-                "Connection string 'TaurusBikeShopDB' not found in App.config.");
+                "Connection string 'Taurus-bike-shop-sqlserver-2026' not found in App.config.");
 
         /// <summary>
         /// Opens and returns a new SQL Server connection.

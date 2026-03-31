@@ -1,0 +1,60 @@
+Using the /frontend-design and /ui-ux-pro-max skills, redesign the Admin Dashboard 
+for Taurus Bike Shop to match the layout and feel of a modern dark-themed analytics 
+dashboard with the following specifications:
+
+LAYOUT STRUCTURE
+- Left sidebar: narrow icon + label nav, same modules as current 
+  (Dashboard, Pending Orders, Payment Verify, Logistics, Walk-In POS, 
+  Inventory, Order History, Analytics, Support Tickets, Products, Vouchers, Users)
+- Top bar: app title left, user info + refresh + notification icons right
+- Main content: CSS Grid, not flexbox stacking
+
+HEADER METRIC CARDS (top row, 4 cards)
+Replace the plain boxes with modern stat cards. Each card has:
+- A small icon top-left
+- Metric label in muted text
+- Large bold number
+- Subtle subtext below
+- Left accent border or top accent line using semantic colors:
+  - Active Orders → Blue (#3B82F6) — in-progress/neutral action
+  - Pending Payments → Amber (#F59E0B) — needs attention/warning  
+  - Low Stock Items → Red (#EF4444) — critical/danger
+  - Today's Sales → Green (#22C55E) — income/positive
+
+MAIN CONTENT AREA
+Split into two columns:
+- Left (wider): Recent Orders table — dark card, clean rows, 
+  status badges with colors (Pending = amber pill, Processing = blue pill, 
+  Delivered = green pill, Cancelled = red pill)
+- Right (narrower): Activity Feed panel — Pending Payments list 
+  and System Status indicators (Database, POS Terminal, Payment Gateway) 
+  each with a colored dot (green = online, red = offline, amber = degraded)
+
+DESIGN SYSTEM
+- Background: #0F1117 (near black page bg)
+- Card surface: #1A1D27
+- Card border: 1px solid rgba(255,255,255,0.07)
+- Border radius: 12px on cards, 8px on badges/pills
+- Typography: 'Inter' or 'DM Sans' — avoid system fonts
+- Sidebar active state: subtle left border accent + slightly lighter bg
+- Hover states on all interactive elements
+- No harsh pure white — use #E2E8F0 for primary text, #94A3B8 for muted
+
+SIDEBAR
+- Logo area at top with TAURUS BIKE SHOP branding
+- Group nav items under section labels (MODULES, REPORTS, SUPPORT, CATALOG) 
+  same as current
+- Badge counts on Pending Orders, Payment Verify, Support Tickets 
+  — use semantic colors matching their card above
+- Bottom: Exit Application (red text) and Logout
+
+ACTIVITY FEED (right panel)
+- Section header "Activity Feed"
+- "Pending Payments" subsection — list items with order ref, amount, timestamp
+- "System Alerts" subsection — Support Tickets alert card styled as 
+  amber warning banner
+- "System Status" subsection — three rows with colored status dots
+
+Keep all existing functionality and routing intact. Only change the HTML/CSS/JS 
+presentation layer. Do not remove or rename any existing controller actions, 
+view models, or Razor tag helpers (asp-controller, asp-action, asp-route-*).

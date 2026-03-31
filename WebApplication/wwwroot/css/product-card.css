@@ -1,6 +1,6 @@
 /* ==========================================================================
    product-card.css  —  Taurus Bike Shop
-   Portrait card — same editorial style, shorter and slightly wider.
+   White card, image-reference inspired layout, uniform fixed sizing.
    ========================================================================== */
 
 /* ── Card shell ─────────────────────────────────────────────────────────── */
@@ -8,37 +8,47 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    border-radius: var(--radius-card);
+    border-radius: 20px;
     overflow: hidden;
-    background: var(--glass-t2-bg);
-    backdrop-filter: var(--glass-t2-blur);
-    -webkit-backdrop-filter: var(--glass-t2-blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    transition: var(--transition-base);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.07),
+        0 8px 24px rgba(0, 0, 0, 0.06);
+    transition:
+        transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+        box-shadow 0.25s ease;
     width: 100%;
+    /* Fixed height keeps all cards uniform regardless of text length */
+    height: 340px;
 }
 
 .tbs-product-card:hover {
-    transform: translateY(-4px) scale(1.01);
-    box-shadow: var(--glass-shadow-hover);
-    border-color: var(--glass-border-hover);
+    transform: translateY(-4px);
+    box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.10),
+        0 16px 40px rgba(0, 0, 0, 0.09);
 }
 
 .tbs-product-card--oos {
-    opacity: 0.7;
+    opacity: 0.65;
 }
 
-/* ── Image wrap — reduced aspect ratio to shorten the card ─────────────── */
-.tbs-product-card__img-wrap {
+/* ── Image zone — positioning context for the link + floating controls ──── */
+.tbs-product-card__img-zone {
     position: relative;
+    flex-shrink: 0;
+    margin: 8px 8px 0;
+}
+
+/* ── Image wrap — inset, rounded, floats inside card ────────────────────── */
+.tbs-product-card__img-wrap {
     display: block;
     width: 100%;
-    aspect-ratio: 4 / 3;
-    /* was 3/4 (tall portrait) — now wider, shorter */
+    height: 185px;
     overflow: hidden;
     text-decoration: none;
-    flex-shrink: 0;
+    border-radius: 14px;
 }
 
 .tbs-product-card__img {
@@ -47,32 +57,23 @@
     object-fit: cover;
     object-position: center;
     display: block;
+    border-radius: 14px;
     transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .tbs-product-card:hover .tbs-product-card__img {
-    transform: scale(1.06);
+    transform: scale(1.04);
 }
 
 .tbs-product-card__img-placeholder {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #1a1628 0%, #12101e 50%, #1e1530 100%);
+    background: #ece9e3;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.2);
-}
-
-/* ── Gradient fade — image bleeds into card body ────────────────────────── */
-.tbs-product-card__img-fade {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom,
-            transparent 25%,
-            rgba(10, 8, 20, 0.5) 60%,
-            rgba(10, 8, 20, 0.92) 100%);
-    pointer-events: none;
+    color: #b0a99e;
+    border-radius: 14px;
 }
 
 /* ── Stock badge — top-left over image ──────────────────────────────────── */
@@ -80,27 +81,28 @@
     position: absolute;
     top: 10px;
     left: 10px;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    padding: 3px 9px;
+    letter-spacing: 0.04em;
+    text-transform: capitalize;
+    padding: 4px 11px;
     border-radius: 20px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     z-index: 2;
 }
 
 .tbs-product-card__badge--oos {
-    background: rgba(160, 20, 40, 0.8);
+    background: #1a1a1a;
     color: #fff;
-    border: 1px solid rgba(200, 30, 50, 0.4);
 }
 
 .tbs-product-card__badge--low {
-    background: rgba(180, 100, 10, 0.8);
-    color: #fff;
-    border: 1px solid rgba(220, 140, 20, 0.4);
+    background: #fff3cd;
+    color: #7a5800;
+}
+
+.tbs-product-card__badge--best {
+    background: rgba(240, 237, 232, 0.92);
+    color: #333;
 }
 
 /* ── Wishlist — top-right over image ────────────────────────────────────── */
@@ -111,60 +113,107 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: rgba(255, 255, 255, 0.7);
+    border: none;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #999;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
     z-index: 2;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
 .tbs-product-card__wishlist:hover {
-    background: rgba(160, 20, 40, 0.6);
-    color: #fff;
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.95);
+    transform: scale(1.08);
 }
 
-.tbs-product-card__wishlist.is-active {
-    background: rgba(160, 20, 40, 0.8);
-    color: #fff;
-    border-color: rgba(200, 30, 50, 0.5);
+.tbs-product-card__wishlist svg {
+    transition: opacity 0.2s ease;
 }
 
-/* ── Title overlaid on image bottom ─────────────────────────────────────── */
-.tbs-product-card__img-title {
+.tbs-product-card__wishlist .heart-filled {
+    display: none;
+    color: #e0284a;
+}
+
+.tbs-product-card__wishlist .heart-outline {
+    display: block;
+    color: #999;
+}
+
+.tbs-product-card__wishlist:hover .heart-outline {
+    color: #e0284a;
+}
+
+.tbs-product-card__wishlist.is-active .heart-filled {
+    display: block;
+}
+
+.tbs-product-card__wishlist.is-active .heart-outline {
+    display: none;
+}
+
+/* ── Dot indicators — bottom-center over image ──────────────────────────── */
+.tbs-product-card__dots {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 12px 14px 10px;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 5px;
     z-index: 2;
 }
 
-.tbs-product-card__brand {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.4);
-    margin: 0 0 3px;
-    line-height: 1;
+.tbs-product-card__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transition: background 0.2s;
 }
 
+.tbs-product-card__dot--active {
+    background: #fff;
+}
+
+/* ── Card body ───────────────────────────────────────────────────────────── */
+/*
+   justify-content: space-between pins the meta block to the top
+   and the footer to the bottom — the key fix for cross-card alignment.
+*/
+.tbs-product-card__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    padding: 10px 12px 12px;
+    overflow: hidden;
+}
+
+/* ── Meta (name, subtitle, description) ─────────────────────────────────── */
+.tbs-product-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    overflow: hidden;
+}
+
+/* Clamps to 2 lines max — name never pushes the footer */
 .tbs-product-card__name {
-    font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
-    font-size: clamp(1rem, 2vw, 1.3rem);
-    font-weight: 400;
-    line-height: 1.1;
-    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #111;
     margin: 0;
-    letter-spacing: 0.01em;
-    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .tbs-product-card__name a {
@@ -172,99 +221,94 @@
     text-decoration: none;
 }
 
-/* ── Card body — tightened padding ──────────────────────────────────────── */
-.tbs-product-card__body {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 10px 14px 12px;
-    background: transparent;
+/* Single-line, never wraps */
+.tbs-product-card__subtitle {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #888;
+    margin: 0;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
+/* 2-line clamp for short description */
+.tbs-product-card__desc {
+    font-size: 11px;
+    color: #bbb;
+    margin: 1px 0 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ── Footer: price + CTA — always pinned to card bottom ─────────────────── */
 .tbs-product-card__footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
+    flex-shrink: 0;
+    padding-top: 8px;
+    /* Subtle separator between meta and footer */
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+/* Price pill */
 .tbs-product-card__price {
-    font-size: 0.95rem;
+    font-size: 13px;
     font-weight: 700;
-    color: #fff;
-    letter-spacing: 0.01em;
+    color: #111;
+    background: #f0ede8;
+    padding: 6px 12px;
+    border-radius: 50px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
+/* CTA button — trimmed down, balanced with the price pill */
 .tbs-product-card__cart-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(160, 20, 40, 0.7);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    color: #fff;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
+    gap: 5px;
+    padding: 6px 13px;
+    border-radius: 50px;
+    border: none;
+    background: #111;
+    color: #fff;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
     cursor: pointer;
     transition: background 0.2s ease, transform 0.15s ease;
+    white-space: nowrap;
     flex-shrink: 0;
 }
 
 .tbs-product-card__cart-btn:hover {
-    background: rgba(160, 20, 40, 1);
-    transform: scale(1.08);
-}
-
-.tbs-product-card__cart-btn:active {
-    transform: scale(0.95);
-}
-
-.tbs-product-card__cart-btn svg {
-    width: 14px;
-    height: 14px;
-}
-
-/* ── Full-width CTA pill ─────────────────────────────────────────────────── */
-.tbs-product-card__cta {
-    width: 100%;
-    padding: 9px 16px;
-    border-radius: 50px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    color: #fff;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transition:
-        background 0.25s ease,
-        border-color 0.25s ease,
-        transform 0.15s ease;
-    text-align: center;
-}
-
-.tbs-product-card__cta:hover {
-    background: rgba(160, 20, 40, 0.85);
-    border-color: rgba(200, 30, 50, 0.6);
+    background: #333;
     transform: translateY(-1px);
 }
 
-.tbs-product-card__cta:active {
-    transform: translateY(0);
+.tbs-product-card__cart-btn:active {
+    transform: scale(0.97);
 }
 
-.tbs-product-card__cta--disabled {
-    opacity: 0.4;
+.tbs-product-card__cart-btn svg {
+    width: 11px;
+    height: 11px;
+}
+
+.tbs-product-card__cart-btn--disabled {
+    background: #e0ddd9;
+    color: #aaa;
     cursor: not-allowed;
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.08);
 }
 
-.tbs-product-card__cta--disabled:hover {
+.tbs-product-card__cart-btn--disabled:hover {
+    background: #e0ddd9;
     transform: none;
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.08);
 }

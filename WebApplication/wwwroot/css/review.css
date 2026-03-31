@@ -501,39 +501,15 @@
 
 /* Brand mark */
 .brand-logo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: rgba(220,20,60,0.12);
-    border: 1px solid rgba(220,20,60,0.25);
-    border-radius: 8px;
-    color: #DC143C;
-    font-size: 18px;
+    display: block;
     text-decoration: none;
     margin-bottom: 20px;
-    transition: background 0.2s ease-out;
 }
-.brand-logo:hover { background: rgba(220,20,60,0.20); }
-
-.brand-name {
-    font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
-    font-size: 3.5rem;
-    letter-spacing: 0.04em;
-    color: rgba(240,240,240,0.92);
-    line-height: 1;
-    margin: 0;
-}
-
-.brand-tagline {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.20em;
-    text-transform: uppercase;
-    color: rgba(240,240,240,0.40);
-    margin: 4px 0 0;
+.brand-logo__img {
+    height: 56px;
+    width: auto;
+    object-fit: contain;
+    display: block;
 }
 
 .brand-divider {
@@ -693,7 +669,6 @@
 @media (max-width: 860px) {
     .deco-wheel { display: none; }
     .brand-panel__inner { padding: 32px 24px; }
-    .brand-name { font-size: 2.5rem; }
     .product-card { display: none; }
 }
 

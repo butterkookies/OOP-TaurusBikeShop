@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <!-- EF Core — SQL Server provider for Google Cloud SQL (SQL Server 2019+ dialect) -->
+    <PackageReference Include="CloudinaryDotNet" Version="1.28.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
     <!-- EF Core design-time tools — required for migrations and scaffolding -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">

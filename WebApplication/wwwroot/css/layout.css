@@ -41,6 +41,12 @@
     font-size: 1.1rem;
     box-shadow: 0 0 16px rgba(220, 20, 60, 0.40);
 }
+.tbs-brand__logo {
+    height: 38px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+}
 .navbar-nav {
     display: flex;
     align-items: center;
