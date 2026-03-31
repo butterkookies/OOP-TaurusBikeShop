@@ -922,14 +922,6 @@
 									<Ellipse x:Name="ActivityDbDot" Width="7" Height="7" Fill="{StaticResource StatusGreen}" VerticalAlignment="Center" Margin="0,0,7,0"/>
 									<TextBlock x:Name="ActivityDbStatus" Text="Database · Checking..." Foreground="{StaticResource TextSecondary}" FontSize="11" FontFamily="Segoe UI" VerticalAlignment="Center"/>
 								</StackPanel>
-								<StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-									<Ellipse Width="7" Height="7" Fill="{StaticResource StatusGreen}" VerticalAlignment="Center" Margin="0,0,7,0"/>
-									<TextBlock Text="POS Terminal · Active" Foreground="{StaticResource TextSecondary}" FontSize="11" FontFamily="Segoe UI" VerticalAlignment="Center"/>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal">
-									<Ellipse Width="7" Height="7" Fill="{StaticResource StatusGreen}" VerticalAlignment="Center" Margin="0,0,7,0"/>
-									<TextBlock Text="Payment Gateway · Online" Foreground="{StaticResource TextSecondary}" FontSize="11" FontFamily="Segoe UI" VerticalAlignment="Center"/>
-								</StackPanel>
 							</StackPanel>
 						</Border>
 

@@ -48,8 +48,7 @@ namespace AdminSystem.Views
                 return;
             }
 
-            ComboBoxItem selected = CbAdjType.SelectedItem as ComboBoxItem;
-            if (selected == null)
+            if (!(CbAdjType.SelectedItem is ComboBoxItem selected))
             {
                 TbAdjError.Text       = "Select a change type.";
                 TbAdjError.Visibility = Visibility.Visible;
@@ -58,7 +57,7 @@ namespace AdminSystem.Views
 
             _vm.AdjustVariantId  = variantId;
             _vm.AdjustQuantity   = qty;
-            _vm.AdjustChangeType = selected.Content.ToString();
+            _vm.AdjustChangeType = selected.Content?.ToString() ?? string.Empty;
             _vm.AdjustNotes      = TbAdjNotes.Text.Trim();
 
             _vm.AdjustCommand.Execute(null);
@@ -78,10 +77,8 @@ namespace AdminSystem.Views
                 TbAdjQty.Text           = string.Empty;
                 TbAdjNotes.Text         = string.Empty;
                 CbAdjType.SelectedIndex = -1;
-
-                // Refresh grids
-                DgInventoryLog.ItemsSource = _vm.Logs;
-                DgLowStock.ItemsSource     = _vm.LowStock;
+                // ItemsSource reassignment not needed — ObservableCollections
+                // already bound; VM.AdjustStock calls Load() which updates in-place.
             }
         }
     }

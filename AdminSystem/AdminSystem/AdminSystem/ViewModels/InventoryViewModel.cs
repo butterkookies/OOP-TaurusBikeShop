@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using AdminSystem.Models;
 using AdminSystem.Services;
@@ -14,7 +15,6 @@ namespace AdminSystem.ViewModels
             Logs     = new ObservableCollection<InventoryLog>();
             LowStock = new ObservableCollection<InventoryLog>();
 
-            LoadCommand   = new RelayCommand(Load);
             AdjustCommand = new RelayCommand(AdjustStock,
                 _ => AdjustVariantId > 0 && AdjustQuantity != 0
                      && !string.IsNullOrWhiteSpace(AdjustChangeType));
@@ -29,32 +29,31 @@ namespace AdminSystem.ViewModels
         public int AdjustVariantId
         {
             get { return _adjustVariantId; }
-            set { SetField(ref _adjustVariantId, value, "AdjustVariantId"); }
+            set { SetField(ref _adjustVariantId, value, nameof(AdjustVariantId)); }
         }
 
         private int _adjustQuantity;
         public int AdjustQuantity
         {
             get { return _adjustQuantity; }
-            set { SetField(ref _adjustQuantity, value, "AdjustQuantity"); }
+            set { SetField(ref _adjustQuantity, value, nameof(AdjustQuantity)); }
         }
 
         private string _adjustChangeType;
         public string AdjustChangeType
         {
             get { return _adjustChangeType; }
-            set { SetField(ref _adjustChangeType, value, "AdjustChangeType"); }
+            set { SetField(ref _adjustChangeType, value, nameof(AdjustChangeType)); }
         }
 
         private string _adjustNotes;
         public string AdjustNotes
         {
             get { return _adjustNotes; }
-            set { SetField(ref _adjustNotes, value, "AdjustNotes"); }
+            set { SetField(ref _adjustNotes, value, nameof(AdjustNotes)); }
         }
 
         // ── Commands ────────────────────────────────────────────────────
-        public RelayCommand LoadCommand   { get; }
         public RelayCommand AdjustCommand { get; }
 
         // ── Methods ─────────────────────────────────────────────────────
@@ -72,7 +71,7 @@ namespace AdminSystem.ViewModels
                 foreach (InventoryLog l in _inventoryService.GetLowStockVariants())
                     LowStock.Add(l);
             }
-            catch (System.Exception ex) { ShowError(ex.Message); }
+            catch (Exception ex) { ShowError(ex.Message); }
             finally { IsLoading = false; }
         }
 
@@ -91,7 +90,7 @@ namespace AdminSystem.ViewModels
                 AdjustNotes      = string.Empty;
                 Load();
             }
-            catch (System.Exception ex) { ShowError(ex.Message); }
+            catch (Exception ex) { ShowError(ex.Message); }
         }
     }
 }

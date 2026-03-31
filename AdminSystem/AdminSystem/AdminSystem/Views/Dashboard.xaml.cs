@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -24,20 +25,23 @@ namespace AdminSystem.Views
         /// <summary>
         /// Called by MainWindow whenever this page is activated or manually refreshed.
         /// </summary>
-        public void Refresh()
+        public async Task Refresh()
         {
-            _vm.LoadData();
+            await _vm.LoadDataAsync();
             UpdateStatCards();
             UpdateSubtitle();
-            DgRecentOrders.ItemsSource = _vm.RecentOrders;
+            DgRecentOrders.ItemsSource    = _vm.RecentOrders;
+            DgPendingPayments.ItemsSource = _vm.PendingPayments;
+            TbNoPendingPayments.Visibility = _vm.PendingPayments.Count == 0
+                ? Visibility.Visible : Visibility.Collapsed;
             BuildLowStockPanel();
             ShowOrHideError();
         }
 
         // ── Event handlers ──────────────────────────────────────────────────
 
-        private void BtnDashRefresh_Click(object sender, RoutedEventArgs e)
-            => Refresh();
+        private async void BtnDashRefresh_Click(object sender, RoutedEventArgs e)
+            => await Refresh();
 
         private void BtnOpenPOS_Click(object sender, RoutedEventArgs e)
             => NavigateTo(PageNames.POS);
@@ -70,8 +74,6 @@ namespace AdminSystem.Views
             while (SpLowStock.Children.Count > 1)
                 SpLowStock.Children.RemoveAt(1);
 
-            TbLowStockBadge.Text = _vm.LowStockCount.ToString();
-
             if (_vm.LowStockItems.Count == 0)
             {
                 TbNoLowStock.Visibility = Visibility.Visible;
@@ -84,6 +86,15 @@ namespace AdminSystem.Views
                 SpLowStock.Children.Add(BuildLowStockRow(item));
         }
 
+        // Cached brushes/resources shared across all rows
+        private static readonly SolidColorBrush _dotBrush       = new SolidColorBrush(Color.FromRgb(0xDC, 0x26, 0x26));
+        private static readonly SolidColorBrush _labelBrush     = new SolidColorBrush(Color.FromRgb(0xC0, 0xC0, 0xC0));
+        private static readonly SolidColorBrush _stockNumBrush  = new SolidColorBrush(Color.FromRgb(0xEF, 0x44, 0x44));
+        private static readonly SolidColorBrush _pillBrush      = new SolidColorBrush(Color.FromRgb(0x2A, 0x0A, 0x0A));
+        private static readonly SolidColorBrush _rowBorderBrush = new SolidColorBrush(Color.FromRgb(0x28, 0x28, 0x28));
+        private static readonly SolidColorBrush _rowHoverBrush  = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x2A));
+        private static readonly FontFamily      _segoeUi        = new FontFamily("Segoe UI");
+
         private static Border BuildLowStockRow(InventoryLog item)
         {
             // ── Warning dot ──
@@ -92,7 +103,7 @@ namespace AdminSystem.Views
                 Width        = 6,
                 Height       = 6,
                 CornerRadius = new CornerRadius(3),
-                Background   = new SolidColorBrush(Color.FromRgb(0xDC, 0x26, 0x26)),
+                Background   = _dotBrush,
                 Margin       = new Thickness(0, 0, 8, 0),
                 VerticalAlignment = VerticalAlignment.Center
             };
@@ -101,11 +112,11 @@ namespace AdminSystem.Views
             TextBlock label = new TextBlock
             {
                 Text       = item.ProductVariantId.HasValue
-                             ? string.Format("Variant #{0}", item.ProductVariantId)
+                             ? string.Format("Variant #{0}", item.ProductVariantId.Value)
                              : string.Format("Product #{0}", item.ProductId),
-                Foreground = new SolidColorBrush(Color.FromRgb(0xC0, 0xC0, 0xC0)),
+                Foreground = _labelBrush,
                 FontSize   = 12,
-                FontFamily = new FontFamily("Segoe UI"),
+                FontFamily = _segoeUi,
                 VerticalAlignment = VerticalAlignment.Center
             };
 
@@ -113,16 +124,16 @@ namespace AdminSystem.Views
             TextBlock stockNum = new TextBlock
             {
                 Text       = item.ChangeQuantity.ToString(),
-                Foreground = new SolidColorBrush(Color.FromRgb(0xEF, 0x44, 0x44)),
+                Foreground = _stockNumBrush,
                 FontSize   = 11,
                 FontWeight = FontWeights.SemiBold,
-                FontFamily = new FontFamily("Segoe UI"),
+                FontFamily = _segoeUi,
                 VerticalAlignment = VerticalAlignment.Center
             };
 
             Border stockPill = new Border
             {
-                Background   = new SolidColorBrush(Color.FromRgb(0x2A, 0x0A, 0x0A)),
+                Background   = _pillBrush,
                 CornerRadius = new CornerRadius(4),
                 Padding      = new Thickness(7, 2, 7, 2),
                 VerticalAlignment = VerticalAlignment.Center,
@@ -147,15 +158,13 @@ namespace AdminSystem.Views
             {
                 Padding         = new Thickness(16, 10, 16, 10),
                 BorderThickness = new Thickness(0, 0, 0, 1),
-                BorderBrush     = new SolidColorBrush(Color.FromRgb(0x28, 0x28, 0x28)),
+                BorderBrush     = _rowBorderBrush,
                 Child           = rowGrid
             };
 
             // Hover effect
-            row.MouseEnter += (s, e) =>
-                row.Background = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x2A));
-            row.MouseLeave += (s, e) =>
-                row.Background = Brushes.Transparent;
+            row.MouseEnter += (s, e) => row.Background = _rowHoverBrush;
+            row.MouseLeave += (s, e) => row.Background = Brushes.Transparent;
 
             return row;
         }

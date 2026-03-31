@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AdminSystem.Models;
 
 namespace AdminSystem.Services
@@ -8,6 +9,7 @@ namespace AdminSystem.Services
         IEnumerable<Order> GetAllOrders();
         IEnumerable<Order> GetOrdersByStatus(string status);
         IEnumerable<Order> GetActiveOrders();
+        Task<List<Order>>  GetActiveOrdersAsync();
         Order GetOrderById(int orderId);
         void UpdateOrderStatus(int orderId, string newStatus);
         void AssignDelivery(int orderId, string courier);

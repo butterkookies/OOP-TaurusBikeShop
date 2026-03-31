@@ -1,5 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using AdminSystem.Helpers;
 using AdminSystem.Models;
@@ -19,13 +21,13 @@ namespace AdminSystem.Views
         private readonly UserRepository      _userRepo      = new UserRepository();
 
         // ── Services ──────────────────────────────────────────────────────
-        private IOrderService     _orderSvc;
-        private IPaymentService   _paymentSvc;
-        private IProductService   _productSvc;
-        private IInventoryService _inventorySvc;
-        private IDeliveryService  _deliverySvc;
-        private ISupportService   _supportSvc;
-        private IReportService    _reportSvc;
+        private readonly IOrderService     _orderSvc;
+        private readonly IPaymentService   _paymentSvc;
+        private readonly IProductService   _productSvc;
+        private readonly IInventoryService _inventorySvc;
+        private readonly IDeliveryService  _deliverySvc;
+        private readonly ISupportService   _supportSvc;
+        private readonly IReportService    _reportSvc;
 
         // ── Cached UserControl views (lazy) ───────────────────────────────
         private DashboardView  _dashboardView;
@@ -56,9 +58,20 @@ namespace AdminSystem.Views
             _supportSvc   = new SupportService();
             _reportSvc    = new ReportService(_inventoryRepo, _productRepo);
 
-            // Top-bar user display
+            // Top-bar and sidebar user display
             if (App.CurrentUser != null)
-                TbCurrentUser.Text = App.CurrentUser.FullName;
+            {
+                TbCurrentUser.Text         = App.CurrentUser.FullName;
+                AdminNameTextBlock.Text    = App.CurrentUser.FullName;
+                AdminAvatarTextBlock.Text  = App.CurrentUser.FullName.Length > 0
+                    ? App.CurrentUser.FullName[0].ToString().ToUpper()
+                    : "A";
+                AdminRoleTextBlock.Text    = App.CurrentUser.Role ?? "Administrator";
+            }
+
+            // Wire exit and refresh buttons
+            ExitButton.Click          += (s, e) => Close();
+            RefreshTopBarButton.Click += (s, e) => { LoadActivityFeed(); Navigate(PageNames.Dashboard); };
 
             // Wire nav buttons
             BtnNavDashboard.Click  += (s, e) => Navigate(PageNames.Dashboard);
@@ -71,6 +84,9 @@ namespace AdminSystem.Views
             BtnNavProducts.Click   += (s, e) => Navigate(PageNames.Products);
             BtnNavVouchers.Click   += (s, e) => Navigate(PageNames.Vouchers);
             BtnNavUsers.Click      += (s, e) => Navigate(PageNames.Users);
+
+            PaymentVerificationNavButton.Click += (s, e) => Navigate(PageNames.Orders);
+            OrderHistoryNavButton.Click        += (s, e) => Navigate(PageNames.Orders);
 
             // Sidebar buttons that navigate from activity feed
             ReviewInventoryButton.Click += (s, e) => Navigate(PageNames.Inventory);
@@ -86,7 +102,7 @@ namespace AdminSystem.Views
         // ── Navigation ────────────────────────────────────────────────────
         public void NavigateTo(string page) => Navigate(page);
 
-        private void Navigate(string page)
+        private async void Navigate(string page)
         {
             switch (page)
             {
@@ -96,7 +112,7 @@ namespace AdminSystem.Views
                             new DashboardViewModel(_orderSvc, _paymentSvc,
                                                    _inventorySvc, _reportSvc));
                     ContentArea.Content = _dashboardView;
-                    _dashboardView.Refresh();
+                    await _dashboardView.Refresh();
                     PageTitleTextBlock.Text     = "Dashboard";
                     PageBreadcrumbTextBlock.Text = "Admin → Dashboard";
                     break;
@@ -208,9 +224,17 @@ namespace AdminSystem.Views
                     });
                 }
 
+                try
+                {
+                    PendingOrdersBadgeTextBlock.Text          = _orderSvc.GetActiveOrders().Count().ToString();
+                    PaymentVerificationBadgeTextBlock.Text    = _paymentSvc.GetPendingVerification().Count().ToString();
+                    SupportTicketsBadgeTextBlock.Text         = _supportSvc.GetTicketsByStatus("Open").Count().ToString();
+                }
+                catch (Exception badgeEx) { System.Diagnostics.Debug.WriteLine("[Badges] " + badgeEx.Message); }
+
                 int low = 0;
-                try { low = System.Linq.Enumerable.Count(_inventorySvc.GetLowStockVariants()); }
-                catch { }
+                try { low = _inventorySvc.GetLowStockVariants().Count(); }
+                catch (Exception lowEx) { System.Diagnostics.Debug.WriteLine("[LowStock] " + lowEx.Message); }
 
                 ActivityLowStockBadge.Text  = low.ToString();
                 ActivityLowStockDetail.Text = low > 0
@@ -232,9 +256,7 @@ namespace AdminSystem.Views
         // ── Verify Payment (activity feed button) ─────────────────────────
         private void BtnVerifyPayment_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Controls.Button btn =
-                sender as System.Windows.Controls.Button;
-            if (btn == null || btn.Tag == null) return;
+            if (!(sender is System.Windows.Controls.Button btn) || btn.Tag == null) return;
 
             int paymentId;
             if (!int.TryParse(btn.Tag.ToString(), out paymentId)) return;

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using AdminSystem.Models;
 using AdminSystem.Services;
 
@@ -28,7 +30,7 @@ namespace AdminSystem.ViewModels
             RecentOrders    = new ObservableCollection<Order>();
             LowStockItems   = new ObservableCollection<InventoryLog>();
 
-            RefreshCommand = new RelayCommand(LoadData);
+            RefreshCommand = new AsyncRelayCommand(LoadDataAsync);
         }
 
         // ── Stats ───────────────────────────────────────────────────────
@@ -36,28 +38,28 @@ namespace AdminSystem.ViewModels
         public int ActiveOrderCount
         {
             get { return _activeOrderCount; }
-            set { SetField(ref _activeOrderCount, value, "ActiveOrderCount"); }
+            set { SetField(ref _activeOrderCount, value, nameof(ActiveOrderCount)); }
         }
 
         private int _pendingPaymentCount;
         public int PendingPaymentCount
         {
             get { return _pendingPaymentCount; }
-            set { SetField(ref _pendingPaymentCount, value, "PendingPaymentCount"); }
+            set { SetField(ref _pendingPaymentCount, value, nameof(PendingPaymentCount)); }
         }
 
         private int _lowStockCount;
         public int LowStockCount
         {
             get { return _lowStockCount; }
-            set { SetField(ref _lowStockCount, value, "LowStockCount"); }
+            set { SetField(ref _lowStockCount, value, nameof(LowStockCount)); }
         }
 
         private decimal _todaySales;
         public decimal TodaySales
         {
             get { return _todaySales; }
-            set { SetField(ref _todaySales, value, "TodaySales"); }
+            set { SetField(ref _todaySales, value, nameof(TodaySales)); }
         }
 
         public string TodaySalesDisplay
@@ -71,44 +73,42 @@ namespace AdminSystem.ViewModels
         public ObservableCollection<InventoryLog> LowStockItems   { get; }
 
         // ── Commands ────────────────────────────────────────────────────
-        public RelayCommand RefreshCommand { get; }
+        public AsyncRelayCommand RefreshCommand { get; }
 
         // ── Load ────────────────────────────────────────────────────────
-        public void LoadData()
+        public async Task LoadDataAsync()
         {
             IsLoading = true;
             ClearMessages();
 
             try
             {
+                // Fetch all data concurrently
+                List<Order>        active   = await _orderService.GetActiveOrdersAsync();
+                List<Payment>      pending  = await _paymentService.GetPendingVerificationAsync();
+                List<InventoryLog> lowStock = await _inventoryService.GetLowStockVariantsAsync();
+                decimal            sales    = await _reportService.GetTotalSalesTodayAsync();
+
                 // Stats
-                List<Order> active = _orderService.GetActiveOrders().ToList();
                 ActiveOrderCount = active.Count;
 
                 PendingPayments.Clear();
-                foreach (Payment p in _paymentService.GetPendingVerification())
-                    PendingPayments.Add(p);
+                foreach (Payment p in pending) PendingPayments.Add(p);
                 PendingPaymentCount = PendingPayments.Count;
 
                 LowStockItems.Clear();
-                foreach (InventoryLog l in _inventoryService.GetLowStockVariants())
-                    LowStockItems.Add(l);
+                foreach (InventoryLog l in lowStock) LowStockItems.Add(l);
                 LowStockCount = LowStockItems.Count;
 
-                TodaySales = _reportService.GetTotalSalesToday();
-                OnPropertyChanged("TodaySalesDisplay");
+                TodaySales = sales;
+                OnPropertyChanged(nameof(TodaySalesDisplay));
 
                 // Recent orders (last 10 active)
                 RecentOrders.Clear();
-                int count = 0;
-                foreach (Order o in active)
-                {
-                    if (count >= 10) break;
+                foreach (Order o in active.Take(10))
                     RecentOrders.Add(o);
-                    count++;
-                }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 ShowError("Failed to load dashboard: " + ex.Message);
             }

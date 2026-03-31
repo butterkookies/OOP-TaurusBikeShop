@@ -32,25 +32,56 @@ namespace AdminSystem.Repositories
         public IEnumerable<Product> GetAll()
         {
             using (SqlConnection conn = GetConnection())
-                return conn.Query<Product>(
+            {
+                List<Product> products = conn.Query<Product>(
                     @"SELECT p.*, c.Name AS CategoryName, b.BrandName
                       FROM Product p
                       LEFT JOIN Category c ON p.CategoryId=c.CategoryId
                       LEFT JOIN Brand b ON p.BrandId=b.BrandId
-                      ORDER BY p.Name");
+                      ORDER BY p.Name").ToList();
+
+                PopulateVariants(conn, products);
+                return products;
+            }
         }
 
         public IEnumerable<Product> Search(string searchText)
         {
             using (SqlConnection conn = GetConnection())
-                return conn.Query<Product>(
+            {
+                List<Product> products = conn.Query<Product>(
                     @"SELECT p.*, c.Name AS CategoryName, b.BrandName
                       FROM Product p
                       LEFT JOIN Category c ON p.CategoryId=c.CategoryId
                       LEFT JOIN Brand b ON p.BrandId=b.BrandId
                       WHERE p.Name LIKE @Search OR p.Description LIKE @Search
                       ORDER BY p.Name",
-                    new { Search = "%" + searchText + "%" });
+                    new { Search = "%" + searchText + "%" }).ToList();
+
+                PopulateVariants(conn, products);
+                return products;
+            }
+        }
+
+        private static void PopulateVariants(SqlConnection conn, List<Product> products)
+        {
+            if (products.Count == 0) return;
+
+            List<int> ids = products.Select(p => p.ProductId).ToList();
+            IEnumerable<ProductVariant> variants = conn.Query<ProductVariant>(
+                "SELECT * FROM ProductVariant WHERE ProductId IN @Ids AND IsActive=1 ORDER BY VariantName",
+                new { Ids = ids });
+
+            System.Collections.Generic.Dictionary<int, List<ProductVariant>> map =
+                variants.GroupBy(v => v.ProductId)
+                         .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (Product p in products)
+            {
+                List<ProductVariant> pv;
+                if (map.TryGetValue(p.ProductId, out pv))
+                    p.Variants = pv;
+            }
         }
 
         public int Insert(Product entity)

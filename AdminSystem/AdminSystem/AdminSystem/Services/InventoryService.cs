@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AdminSystem.Helpers;
 using AdminSystem.Models;
 using AdminSystem.Repositories;
@@ -42,6 +44,9 @@ namespace AdminSystem.Services
 
         public IEnumerable<InventoryLog> GetLowStockVariants()
             => _inventoryRepo.GetLowStockVariants();
+
+        public Task<List<InventoryLog>> GetLowStockVariantsAsync()
+            => Task.Run(() => _inventoryRepo.GetLowStockVariants().ToList());
 
         public void AdjustStock(int variantId, int quantity,
             string changeType, string notes = null)

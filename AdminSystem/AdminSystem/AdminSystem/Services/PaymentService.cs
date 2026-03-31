@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AdminSystem.Models;
 using AdminSystem.Repositories;
 
@@ -16,6 +18,9 @@ namespace AdminSystem.Services
 
         public IEnumerable<Payment> GetPendingVerification()
             => _paymentRepo.GetPendingVerification();
+
+        public Task<List<Payment>> GetPendingVerificationAsync()
+            => Task.Run(() => _paymentRepo.GetPendingVerification().ToList());
 
         public Payment GetPaymentById(int paymentId)
             => _paymentRepo.GetById(paymentId);

@@ -117,6 +117,7 @@ namespace AdminSystem.Views
                 }
 
                 _userRepo.UpdateLastLogin(user.UserId);
+                user.Role = _userRepo.GetUserRole(user.UserId);
                 App.CurrentUser = user;
                 NavigationHelper.NavigateToMain(this);
             }

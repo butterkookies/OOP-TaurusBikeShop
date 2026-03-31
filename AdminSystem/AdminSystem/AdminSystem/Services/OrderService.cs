@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AdminSystem.Models;
 using AdminSystem.Repositories;
 
@@ -22,6 +24,9 @@ namespace AdminSystem.Services
 
         public IEnumerable<Order> GetActiveOrders()
             => _orderRepo.GetActiveOrders();
+
+        public Task<List<Order>> GetActiveOrdersAsync()
+            => Task.Run(() => _orderRepo.GetActiveOrders().ToList());
 
         public Order GetOrderById(int orderId)
             => _orderRepo.GetById(orderId);

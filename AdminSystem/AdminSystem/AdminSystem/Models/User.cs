@@ -14,6 +14,7 @@ namespace AdminSystem.Models
         public System.DateTime? LastLoginAt { get; set; }
         public System.DateTime CreatedAt   { get; set; }
         public System.DateTime? UpdatedAt  { get; set; }
+        public string  Role            { get; set; }
         public string  FullName        => FirstName + " " + LastName;
     }
 

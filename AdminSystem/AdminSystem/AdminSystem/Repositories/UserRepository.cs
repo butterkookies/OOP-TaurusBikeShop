@@ -50,6 +50,17 @@ namespace AdminSystem.Repositories
                     new { RoleName = roleName });
         }
 
+        public string GetUserRole(int userId)
+        {
+            using (SqlConnection conn = GetConnection())
+                return conn.QueryFirstOrDefault<string>(
+                    @"SELECT TOP 1 r.RoleName
+                      FROM UserRole ur
+                      INNER JOIN Role r ON ur.RoleId = r.RoleId
+                      WHERE ur.UserId = @UserId",
+                    new { UserId = userId });
+        }
+
         public void UpdateLastLogin(int userId)
             => Execute(
                 "UPDATE [User] SET LastLoginAt=GETUTCDATE() WHERE UserId=@UserId",

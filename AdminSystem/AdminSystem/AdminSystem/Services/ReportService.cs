@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AdminSystem.Helpers;
 using AdminSystem.Models;
 using AdminSystem.Repositories;
@@ -26,6 +27,20 @@ namespace AdminSystem.Services
                 DatabaseHelper.GetConnection())
             {
                 return conn.ExecuteScalar<decimal>(
+                    @"SELECT ISNULL(SUM(p.Amount), 0)
+                      FROM Payment p
+                      WHERE p.PaymentStatus = @Status
+                        AND CAST(p.CreatedAt AS DATE) = CAST(GETUTCDATE() AS DATE)",
+                    new { Status = PaymentStatuses.Completed });
+            }
+        }
+
+        public async Task<decimal> GetTotalSalesTodayAsync()
+        {
+            using (System.Data.SqlClient.SqlConnection conn =
+                DatabaseHelper.GetConnection())
+            {
+                return await conn.ExecuteScalarAsync<decimal>(
                     @"SELECT ISNULL(SUM(p.Amount), 0)
                       FROM Payment p
                       WHERE p.PaymentStatus = @Status
