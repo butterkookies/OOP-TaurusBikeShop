@@ -33,7 +33,7 @@ namespace AdminSystem.ViewModels
         public bool IsLoading
         {
             get { return _isLoading; }
-            set { SetField(ref _isLoading, value, "IsLoading"); }
+            set { SetField(ref _isLoading, value, nameof(IsLoading)); }
         }
 
         private string _errorMessage;
@@ -42,8 +42,8 @@ namespace AdminSystem.ViewModels
             get { return _errorMessage; }
             set
             {
-                SetField(ref _errorMessage, value, "ErrorMessage");
-                OnPropertyChanged("HasError");
+                SetField(ref _errorMessage, value, nameof(ErrorMessage));
+                OnPropertyChanged(nameof(HasError));
             }
         }
 
@@ -58,8 +58,8 @@ namespace AdminSystem.ViewModels
             get { return _successMessage; }
             set
             {
-                SetField(ref _successMessage, value, "SuccessMessage");
-                OnPropertyChanged("HasSuccess");
+                SetField(ref _successMessage, value, nameof(SuccessMessage));
+                OnPropertyChanged(nameof(HasSuccess));
             }
         }
 

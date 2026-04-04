@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Data.SqlClient;
 using AdminSystem.Helpers;
 using AdminSystem.Models;
 using Dapper;
@@ -50,7 +51,7 @@ namespace AdminSystem.ViewModels
             ClearMessages();
             try
             {
-                using (System.Data.SqlClient.SqlConnection conn =
+                using (SqlConnection conn =
                     DatabaseHelper.GetConnection())
                 {
                     Vouchers.Clear();
@@ -79,7 +80,7 @@ namespace AdminSystem.ViewModels
             ClearMessages();
             try
             {
-                using (System.Data.SqlClient.SqlConnection conn =
+                using (SqlConnection conn =
                     DatabaseHelper.GetConnection())
                 {
                     if (EditingVoucher.VoucherId == 0)
@@ -125,7 +126,7 @@ namespace AdminSystem.ViewModels
             ClearMessages();
             try
             {
-                using (System.Data.SqlClient.SqlConnection conn =
+                using (SqlConnection conn =
                     DatabaseHelper.GetConnection())
                 {
                     conn.Execute(

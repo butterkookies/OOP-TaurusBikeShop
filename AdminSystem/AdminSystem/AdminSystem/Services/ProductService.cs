@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using AdminSystem.Helpers;
 using AdminSystem.Models;
 using AdminSystem.Repositories;
@@ -67,7 +68,7 @@ namespace AdminSystem.Services
                 throw new ArgumentException("Stock quantity cannot be negative.");
 
             variant.IsActive = true;
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 conn.Execute(
@@ -86,7 +87,7 @@ namespace AdminSystem.Services
             if (variant == null)
                 throw new ArgumentNullException("variant");
 
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 conn.Execute(
@@ -109,7 +110,7 @@ namespace AdminSystem.Services
             if (string.IsNullOrWhiteSpace(image.ImageUrl))
                 throw new ArgumentException("Image URL is required.");
 
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 conn.Execute(
@@ -123,7 +124,7 @@ namespace AdminSystem.Services
 
         public void DeleteProductImage(int imageId)
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 conn.Execute(

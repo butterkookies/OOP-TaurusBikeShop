@@ -1,0 +1,667 @@
+<UserControl x:Class="AdminSystem_v2.Views.OrdersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:AdminSystem_v2.Converters"
+             Background="#111827">
+
+    <UserControl.Resources>
+        <converters:StatusToColorConverter x:Key="StatusColor"/>
+        <BooleanToVisibilityConverter      x:Key="BoolToVis"/>
+
+        <!-- ── Filter chip style ── -->
+        <Style x:Key="FilterChip" TargetType="Button">
+            <Setter Property="Background"    Value="Transparent"/>
+            <Setter Property="Foreground"    Value="#9CA3AF"/>
+            <Setter Property="BorderBrush"   Value="#374151"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"       Value="12,5"/>
+            <Setter Property="FontSize"      Value="12"/>
+            <Setter Property="Cursor"        Value="Hand"/>
+            <Setter Property="Margin"        Value="0,0,6,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background"  Value="#1F2937"/>
+                                <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                <Setter Property="BorderBrush" Value="#6B7280"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── Active filter chip ── -->
+        <Style x:Key="FilterChipActive" TargetType="Button" BasedOn="{StaticResource FilterChip}">
+            <Setter Property="Background"    Value="#1E3A5F"/>
+            <Setter Property="Foreground"    Value="#60A5FA"/>
+            <Setter Property="BorderBrush"   Value="#3B82F6"/>
+        </Style>
+
+        <!-- ── Order list item style ── -->
+        <Style x:Key="OrderListItem" TargetType="ListBoxItem">
+            <Setter Property="Background"    Value="Transparent"/>
+            <Setter Property="Padding"       Value="0"/>
+            <Setter Property="Margin"        Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                Padding="12,10" Margin="0,0,0,1">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1E3A5F"/>
+                                <Setter TargetName="Bd" Property="BorderThickness" Value="3,0,0,0"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1F2937"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── Detail section label ── -->
+        <Style x:Key="SectionLabel" TargetType="TextBlock">
+            <Setter Property="Foreground"  Value="#4B5563"/>
+            <Setter Property="FontSize"    Value="10"/>
+            <Setter Property="FontWeight"  Value="SemiBold"/>
+            <Setter Property="Margin"      Value="0,0,0,8"/>
+        </Style>
+
+        <!-- ── Detail field label ── -->
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#6B7280"/>
+            <Setter Property="FontSize"   Value="11"/>
+            <Setter Property="Margin"     Value="0,0,0,2"/>
+        </Style>
+
+        <!-- ── Detail field value ── -->
+        <Style x:Key="FieldValue" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#E5E7EB"/>
+            <Setter Property="FontSize"   Value="13"/>
+            <Setter Property="Margin"     Value="0,0,0,12"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Top toolbar -->
+            <RowDefinition Height="56"/>
+            <!-- Status messages -->
+            <RowDefinition Height="Auto"/>
+            <!-- Main split -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ══════════════════════════════════════
+             ROW 0 — TOOLBAR
+             ══════════════════════════════════════ -->
+        <Border Grid.Row="0" Background="#1F2937" BorderBrush="#374151"
+                BorderThickness="0,0,0,1" Padding="20,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Online Orders" Foreground="#F9FAFB"
+                               FontSize="14" FontWeight="SemiBold"
+                               VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <TextBlock Text="{Binding Orders.Count, StringFormat='({0})'}"
+                               Foreground="#6B7280" FontSize="12"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <Button Grid.Column="1" Command="{Binding RefreshCommand}"
+                        ToolTip="Refresh orders list"
+                        Background="Transparent" BorderThickness="0"
+                        Cursor="Hand" Padding="8,0">
+                    <TextBlock Text="&#x21BB;" Foreground="#9CA3AF" FontSize="16"
+                               VerticalAlignment="Center"/>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- ══════════════════════════════════════
+             ROW 1 — STATUS MESSAGES
+             ══════════════════════════════════════ -->
+        <Border Grid.Row="1" Background="#1C3A2A" Padding="20,8"
+                Visibility="{Binding HasSuccess, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="{Binding SuccessMessage}" Foreground="#6EE7B7" FontSize="13"/>
+        </Border>
+        <Border Grid.Row="1" Background="#3B1010" Padding="20,8"
+                Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="#FCA5A5" FontSize="13"/>
+        </Border>
+
+        <!-- ══════════════════════════════════════
+             ROW 2 — SPLIT: LIST | DETAIL
+             ══════════════════════════════════════ -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" MinWidth="240"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" MinWidth="360"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ═══════════════════════════
+                 COL 0 — ORDER LIST
+                 ═══════════════════════════ -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Filter chips -->
+                <Border Grid.Row="0" Background="#1F2937" Padding="10,8"
+                        BorderBrush="#374151" BorderThickness="0,0,0,1">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding StatusFilters}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Content="{Binding}"
+                                            Command="{Binding DataContext.SelectStatusCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource FilterChip}">
+                                                <Style.Triggers>
+                                                    <DataTrigger
+                                                        Binding="{Binding DataContext.SelectedStatusFilter,
+                                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        Value="{Binding}">
+                                                        <Setter Property="Style"
+                                                                Value="{StaticResource FilterChipActive}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- Order list -->
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding Orders}"
+                         SelectedItem="{Binding SelectedOrder}"
+                         Background="#111827"
+                         BorderThickness="0"
+                         ItemContainerStyle="{StaticResource OrderListItem}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Order number + status badge -->
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding OrderNumber}"
+                                               Foreground="#F9FAFB"
+                                               FontSize="13" FontWeight="SemiBold"/>
+                                    <Border Grid.Column="1"
+                                            Background="#1F2937"
+                                            CornerRadius="4" Padding="6,2">
+                                        <TextBlock Text="{Binding OrderStatus}"
+                                                   Foreground="{Binding OrderStatus,
+                                                       Converter={StaticResource StatusColor}}"
+                                                   FontSize="10" FontWeight="SemiBold"/>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Customer name -->
+                                <TextBlock Grid.Row="1"
+                                           Text="{Binding CustomerName}"
+                                           Foreground="#9CA3AF"
+                                           FontSize="12" Margin="0,2,0,0"/>
+
+                                <!-- Date + type -->
+                                <Grid Grid.Row="2" Margin="0,3,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding OrderDate, StringFormat='{}{0:MMM d, yyyy}'}"
+                                               Foreground="#6B7280" FontSize="11"/>
+                                    <Border Grid.Column="1" CornerRadius="3" Padding="5,1">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="#134E4A"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DeliveryType}" Value="Pickup">
+                                                        <Setter Property="Background" Value="#312E81"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <TextBlock Text="{Binding DeliveryType}" FontSize="10">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#5EEAD4"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding DeliveryType}" Value="Pickup">
+                                                            <Setter Property="Foreground" Value="#A5B4FC"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+            </Grid>
+
+            <!-- ── Splitter ── -->
+            <GridSplitter Grid.Column="1" Width="1"
+                          Background="#374151" ResizeBehavior="PreviousAndNext"
+                          HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+
+            <!-- ═══════════════════════════
+                 COL 2 — DETAIL PANEL
+                 ═══════════════════════════ -->
+            <Grid Grid.Column="2">
+
+                <!-- Empty state -->
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                            Visibility="{Binding IsDetailVisible,
+                                Converter={StaticResource BoolToVis},
+                                ConverterParameter=Inverse}">
+                    <TextBlock Text="&#x1F4CB;" FontSize="36"
+                               HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                    <TextBlock Text="Select an order to view details"
+                               Foreground="#4B5563" FontSize="14"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Detail content -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Visibility="{Binding IsDetailVisible, Converter={StaticResource BoolToVis}}">
+                    <StackPanel Margin="24" DataContext="{Binding SelectedOrder}">
+
+                        <!-- ── Order header ── -->
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding OrderNumber}"
+                                           Foreground="#F9FAFB"
+                                           FontSize="20" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding OrderDate, StringFormat='Placed {0:MMMM d, yyyy  h:mm tt}'}"
+                                           Foreground="#6B7280" FontSize="12" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <!-- Status badge (large) -->
+                            <Border Grid.Column="1" CornerRadius="6" Padding="12,6"
+                                    VerticalAlignment="Top">
+                                <Border.Background>
+                                    <SolidColorBrush Color="#1F2937"/>
+                                </Border.Background>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" Margin="0,0,6,0"
+                                             VerticalAlignment="Center">
+                                        <Ellipse.Fill>
+                                            <Binding Path="OrderStatus"
+                                                     Converter="{StaticResource StatusColor}"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <TextBlock Text="{Binding OrderStatus}"
+                                               Foreground="{Binding OrderStatus,
+                                                   Converter={StaticResource StatusColor}}"
+                                               FontSize="13" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <Separator Background="#374151" Margin="0,0,0,20"/>
+
+                        <!-- ── Two-column info grid ── -->
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Left column -->
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="CUSTOMER" Style="{StaticResource SectionLabel}"/>
+
+                                <TextBlock Text="Name" Style="{StaticResource FieldLabel}"/>
+                                <TextBlock Text="{Binding CustomerName}" Style="{StaticResource FieldValue}"/>
+
+                                <TextBlock Text="Email" Style="{StaticResource FieldLabel}"/>
+                                <TextBlock Text="{Binding CustomerEmail}" Style="{StaticResource FieldValue}"/>
+
+                                <TextBlock Text="Phone" Style="{StaticResource FieldLabel}"/>
+                                <TextBlock Text="{Binding ContactPhone, TargetNullValue='—'}"
+                                           Style="{StaticResource FieldValue}"/>
+                            </StackPanel>
+
+                            <!-- Right column -->
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="ORDER TOTALS" Style="{StaticResource SectionLabel}"/>
+
+                                <TextBlock Text="Subtotal" Style="{StaticResource FieldLabel}"/>
+                                <TextBlock Text="{Binding SubTotal, StringFormat='₱{0:N2}'}"
+                                           Style="{StaticResource FieldValue}"/>
+
+                                <TextBlock Text="Discount" Style="{StaticResource FieldLabel}"/>
+                                <TextBlock Text="{Binding DiscountAmount, StringFormat='−₱{0:N2}'}"
+                                           Style="{StaticResource FieldValue}"/>
+
+                                <TextBlock Text="Shipping" Style="{StaticResource FieldLabel}"/>
+                                <TextBlock Text="{Binding ShippingFee, StringFormat='₱{0:N2}'}"
+                                           Style="{StaticResource FieldValue}"/>
+
+                                <Separator Background="#374151" Margin="0,0,0,8"/>
+                                <TextBlock Text="Grand Total" Style="{StaticResource FieldLabel}"/>
+                                <TextBlock Text="{Binding GrandTotal, StringFormat='₱{0:N2}'}"
+                                           Foreground="#34D399" FontSize="15" FontWeight="Bold"
+                                           Margin="0,0,0,12"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- ── Delivery / Pickup info ── -->
+                        <Border Background="#1F2937" CornerRadius="8" Padding="16"
+                                Margin="0,0,0,20" BorderThickness="1" BorderBrush="#374151">
+                            <StackPanel>
+                                <TextBlock Text="{Binding DeliveryType, StringFormat='\{0\} INFO'}"
+                                           Style="{StaticResource SectionLabel}"/>
+
+                                <!-- Pickup details -->
+                                <StackPanel DataContext="{Binding Pickup}">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.DeliveryType,
+                                                             RelativeSource={RelativeSource AncestorType=ScrollViewer}}"
+                                                             Value="Pickup">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Ready At" Style="{StaticResource FieldLabel}"/>
+                                            <TextBlock Style="{StaticResource FieldValue}">
+                                                <TextBlock.Text>
+                                                    <Binding Path="PickupReadyAt"
+                                                             TargetNullValue="Not yet set"
+                                                             StringFormat="{}{0:MMM d, h:mm tt}"/>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="Expires At" Style="{StaticResource FieldLabel}"/>
+                                            <TextBlock Style="{StaticResource FieldValue}">
+                                                <TextBlock.Text>
+                                                    <Binding Path="PickupExpiresAt"
+                                                             TargetNullValue="Not yet set"
+                                                             StringFormat="{}{0:MMM d, h:mm tt}"/>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <TextBlock Text="Confirmed At" Style="{StaticResource FieldLabel}"/>
+                                    <TextBlock Style="{StaticResource FieldValue}">
+                                        <TextBlock.Text>
+                                            <Binding Path="PickupConfirmedAt"
+                                                     TargetNullValue="Not yet confirmed"
+                                                     StringFormat="{}{0:MMM d, yyyy  h:mm tt}"/>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <!-- Delivery details -->
+                                <StackPanel DataContext="{Binding Delivery}">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.DeliveryType,
+                                                             RelativeSource={RelativeSource AncestorType=ScrollViewer}}"
+                                                             Value="Delivery">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Courier" Style="{StaticResource FieldLabel}"/>
+                                            <TextBlock Text="{Binding Courier, TargetNullValue='Not assigned'}"
+                                                       Style="{StaticResource FieldValue}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="Courier Status" Style="{StaticResource FieldLabel}"/>
+                                            <TextBlock Text="{Binding DeliveryStatus, TargetNullValue='—'}"
+                                                       Style="{StaticResource FieldValue}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <TextBlock Text="Tracking" Style="{StaticResource FieldLabel}"/>
+                                    <TextBlock Text="{Binding TrackingInfo, TargetNullValue='—'}"
+                                               Style="{StaticResource FieldValue}"/>
+
+                                    <TextBlock Text="Est. Delivery" Style="{StaticResource FieldLabel}"/>
+                                    <TextBlock Style="{StaticResource FieldValue}">
+                                        <TextBlock.Text>
+                                            <Binding Path="EstimatedDeliveryTime"
+                                                     TargetNullValue="Not set"
+                                                     StringFormat="{}{0:MMM d, yyyy}"/>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <!-- No delivery info yet (delivery order, no Delivery row) -->
+                                <TextBlock Foreground="#4B5563" FontSize="13"
+                                           Text="No courier assigned yet."
+                                           HorizontalAlignment="Center"
+                                           Margin="0,4">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <!-- Show when DeliveryType=Delivery but Delivery object is null -->
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding DataContext.DeliveryType,
+                                                                   RelativeSource={RelativeSource AncestorType=ScrollViewer}}"
+                                                                   Value="Delivery"/>
+                                                        <Condition Binding="{Binding DataContext.SelectedOrder.Delivery,
+                                                                   RelativeSource={RelativeSource AncestorType=ScrollViewer},
+                                                                   Converter={StaticResource BoolToVis}}"
+                                                                   Value="Collapsed"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ── Order items ── -->
+                        <TextBlock Text="ORDER ITEMS" Style="{StaticResource SectionLabel}"/>
+
+                        <DataGrid ItemsSource="{Binding Items}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  Background="#1F2937"
+                                  Foreground="#E5E7EB"
+                                  BorderBrush="#374151" BorderThickness="1"
+                                  RowBackground="#1F2937"
+                                  AlternatingRowBackground="#172032"
+                                  GridLinesVisibility="Horizontal"
+                                  HorizontalGridLinesBrush="#374151"
+                                  HeadersVisibility="Column"
+                                  CanUserResizeRows="False"
+                                  SelectionMode="Single"
+                                  FontSize="13"
+                                  Margin="0,0,0,20">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background"    Value="#111827"/>
+                                    <Setter Property="Foreground"    Value="#9CA3AF"/>
+                                    <Setter Property="FontSize"      Value="11"/>
+                                    <Setter Property="FontWeight"    Value="SemiBold"/>
+                                    <Setter Property="Padding"       Value="12,8"/>
+                                    <Setter Property="BorderBrush"   Value="#374151"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Padding"         Value="12,8"/>
+                                    <Setter Property="Foreground"      Value="#E5E7EB"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#1E3A5F"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.CellStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Product"
+                                                    Binding="{Binding DisplayName}"
+                                                    Width="*"/>
+                                <DataGridTextColumn Header="Qty"
+                                                    Binding="{Binding Quantity}"
+                                                    Width="60"/>
+                                <DataGridTextColumn Header="Unit Price"
+                                                    Binding="{Binding UnitPrice, StringFormat='₱{0:N2}'}"
+                                                    Width="100"/>
+                                <DataGridTextColumn Header="Subtotal"
+                                                    Binding="{Binding Subtotal, StringFormat='₱{0:N2}'}"
+                                                    Width="110"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- ── Action buttons ── -->
+                        <Border Background="#1F2937" CornerRadius="8" Padding="16"
+                                BorderThickness="1" BorderBrush="#374151">
+                            <StackPanel>
+                                <TextBlock Text="ACTIONS" Style="{StaticResource SectionLabel}"/>
+                                <WrapPanel>
+
+                                    <!-- Pickup actions -->
+                                    <Button Content="Mark Ready for Pickup"
+                                            Command="{Binding DataContext.MarkReadyForPickupCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            IsEnabled="{Binding DataContext.CanMarkReadyForPickup,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Style="{StaticResource PrimaryButton}"
+                                            Margin="0,0,8,8"/>
+
+                                    <Button Content="Confirm Pickup"
+                                            Command="{Binding DataContext.ConfirmPickupCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            IsEnabled="{Binding DataContext.CanConfirmPickup,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Style="{StaticResource PrimaryButton}"
+                                            Margin="0,0,8,8"/>
+
+                                    <!-- Delivery actions -->
+                                    <Button Content="Mark as Shipped"
+                                            Command="{Binding DataContext.MarkShippedCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            IsEnabled="{Binding DataContext.CanMarkShipped,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Style="{StaticResource PrimaryButton}"
+                                            Margin="0,0,8,8"/>
+
+                                    <Button Content="Mark as Delivered"
+                                            Command="{Binding DataContext.MarkDeliveredCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            IsEnabled="{Binding DataContext.CanMarkDelivered,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Style="{StaticResource PrimaryButton}"
+                                            Margin="0,0,8,8"/>
+
+                                    <!-- Universal -->
+                                    <Button Content="Cancel Order"
+                                            Command="{Binding DataContext.CancelOrderCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Style="{StaticResource DangerButton}"
+                                            Margin="0,0,8,8"/>
+
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Loading overlay -->
+                <Border Background="#80111827"
+                        Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Loading..." Foreground="#9CA3AF"
+                               FontSize="14" HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+            </Grid>
+
+        </Grid>
+
+    </Grid>
+</UserControl>

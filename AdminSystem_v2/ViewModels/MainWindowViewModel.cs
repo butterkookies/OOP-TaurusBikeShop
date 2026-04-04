@@ -1,0 +1,143 @@
+using System.Windows.Input;
+using AdminSystem_v2.Helpers;
+using AdminSystem_v2.Models;
+using AdminSystem_v2.Services;
+
+namespace AdminSystem_v2.ViewModels
+{
+    public class MainWindowViewModel : BaseViewModel
+    {
+        private readonly IAuthService       _authService;
+        private readonly DashboardViewModel _dashboardVm;
+        private readonly ProductViewModel   _productVm;
+        private readonly OrderViewModel     _orderVm;
+        private readonly ReportViewModel    _reportVm;
+        private readonly StaffViewModel     _staffVm;
+
+        // ── Session ───────────────────────────────────────────────────────
+
+        public string UserFullName { get; }
+        public string UserInitials { get; }
+        public string UserRole     { get; }
+
+        // ── Navigation State ──────────────────────────────────────────────
+
+        private object _currentViewModel = null!;
+        public object CurrentViewModel
+        {
+            get => _currentViewModel;
+            private set => SetProperty(ref _currentViewModel, value);
+        }
+
+        private string _activePage = string.Empty;
+        public string ActivePage
+        {
+            get => _activePage;
+            private set => SetProperty(ref _activePage, value);
+        }
+
+        public string PageTitle      => ActivePage;
+        public string PageBreadcrumb => $"Admin \u2192 {ActivePage}";
+
+        // ── Commands ──────────────────────────────────────────────────────
+
+        public ICommand NavigateCommand { get; }
+        public ICommand SignOutCommand  { get; }
+        public ICommand ExitCommand     { get; }
+
+        // ── Events ────────────────────────────────────────────────────────
+
+        public event Action? SignOutRequested;
+
+        // ── Constructor ───────────────────────────────────────────────────
+
+        public MainWindowViewModel(
+            IAuthService       authService,
+            DashboardViewModel dashboardVm,
+            ProductViewModel   productVm,
+            OrderViewModel     orderVm,
+            ReportViewModel    reportVm,
+            StaffViewModel     staffVm)
+        {
+            _authService  = authService;
+            _dashboardVm  = dashboardVm;
+            _productVm    = productVm;
+            _orderVm      = orderVm;
+            _reportVm     = reportVm;
+            _staffVm      = staffVm;
+
+            User? user   = App.CurrentUser;
+            UserFullName = user?.FullName ?? "Administrator";
+            UserInitials = user?.Initials ?? "A";
+            UserRole     = user?.Role     ?? "Admin";
+
+            NavigateCommand = new RelayCommand<string>(Navigate);
+            SignOutCommand  = new RelayCommand(ExecuteSignOut);
+            ExitCommand     = new RelayCommand(ExecuteExit);
+
+            Navigate(PageNames.Dashboard);
+        }
+
+        // ── Navigation ────────────────────────────────────────────────────
+
+        private void Navigate(string? page)
+        {
+            if (string.IsNullOrEmpty(page)) return;
+
+            CurrentViewModel = page switch
+            {
+                PageNames.Dashboard => _dashboardVm,
+                PageNames.Products  => _productVm,
+                PageNames.Orders    => _orderVm,
+                PageNames.Reports   => _reportVm,
+                PageNames.Staff     => _staffVm,
+                _                   => _dashboardVm
+            };
+
+            ActivePage = page;
+            OnPropertyChanged(nameof(PageTitle));
+            OnPropertyChanged(nameof(PageBreadcrumb));
+
+            // Trigger data load when the user navigates to a page
+            if (page == PageNames.Dashboard)
+                _ = _dashboardVm.LoadAsync();
+            else if (page == PageNames.Products)
+                _ = _productVm.LoadAsync();
+            else if (page == PageNames.Orders)
+                _ = _orderVm.LoadAsync();
+            else if (page == PageNames.Reports)
+                _ = _reportVm.LoadAsync();
+            else if (page == PageNames.Staff)
+                _ = _staffVm.LoadAsync();
+        }
+
+        // ── Command Handlers ──────────────────────────────────────────────
+
+        private void ExecuteSignOut()
+        {
+            var result = System.Windows.MessageBox.Show(
+                "Sign out of Taurus Bike Shop Admin?",
+                "Sign Out",
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Question);
+
+            if (result == System.Windows.MessageBoxResult.Yes)
+            {
+                _authService.Logout();
+                SignOutRequested?.Invoke();
+            }
+        }
+
+        private void ExecuteExit()
+        {
+            var result = System.Windows.MessageBox.Show(
+                "Exit Taurus Bike Shop Admin?",
+                "Exit",
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Question);
+
+            if (result == System.Windows.MessageBoxResult.Yes)
+                System.Windows.Application.Current.Shutdown();
+        }
+    }
+}

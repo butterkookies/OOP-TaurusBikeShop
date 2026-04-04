@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using AdminSystem.Helpers;
 using AdminSystem.Models;
 using Dapper;
@@ -10,7 +11,7 @@ namespace AdminSystem.Services
     {
         public IEnumerable<Delivery> GetActiveDeliveries()
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 return conn.Query<Delivery>(
@@ -25,7 +26,7 @@ namespace AdminSystem.Services
 
         public Delivery GetDeliveryById(int deliveryId)
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 Delivery d = conn.QueryFirstOrDefault<Delivery>(
@@ -60,7 +61,7 @@ namespace AdminSystem.Services
                         "Invalid delivery status: " + newStatus);
             }
 
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 conn.Execute(
@@ -76,19 +77,24 @@ namespace AdminSystem.Services
             if (string.IsNullOrWhiteSpace(bookingRef))
                 throw new ArgumentException("Booking reference is required.");
 
-            using (System.Data.SqlClient.SqlConnection conn =
-                DatabaseHelper.GetConnection())
+            using (SqlConnection conn = DatabaseHelper.GetConnection())
+            using (System.Data.IDbTransaction tx = conn.BeginTransaction())
             {
-                conn.Execute(
-                    @"UPDATE LalamoveDelivery
-                      SET BookingRef = @Ref
-                      WHERE DeliveryId = @Id",
-                    new { Ref = bookingRef, Id = deliveryId });
-                conn.Execute(
-                    @"UPDATE Delivery
-                      SET DeliveryStatus = @Status, UpdatedAt = GETUTCDATE()
-                      WHERE DeliveryId = @Id",
-                    new { Status = DeliveryStatuses.PickedUp, Id = deliveryId });
+                try
+                {
+                    conn.Execute(
+                        @"UPDATE LalamoveDelivery
+                          SET BookingRef = @Ref
+                          WHERE DeliveryId = @Id",
+                        new { Ref = bookingRef, Id = deliveryId }, tx);
+                    conn.Execute(
+                        @"UPDATE Delivery
+                          SET DeliveryStatus = @Status, UpdatedAt = GETUTCDATE()
+                          WHERE DeliveryId = @Id",
+                        new { Status = DeliveryStatuses.PickedUp, Id = deliveryId }, tx);
+                    tx.Commit();
+                }
+                catch { tx.Rollback(); throw; }
             }
         }
 
@@ -97,19 +103,24 @@ namespace AdminSystem.Services
             if (string.IsNullOrWhiteSpace(trackingNumber))
                 throw new ArgumentException("Tracking number is required.");
 
-            using (System.Data.SqlClient.SqlConnection conn =
-                DatabaseHelper.GetConnection())
+            using (SqlConnection conn = DatabaseHelper.GetConnection())
+            using (System.Data.IDbTransaction tx = conn.BeginTransaction())
             {
-                conn.Execute(
-                    @"UPDATE LBCDelivery
-                      SET TrackingNumber = @Tracking
-                      WHERE DeliveryId = @Id",
-                    new { Tracking = trackingNumber, Id = deliveryId });
-                conn.Execute(
-                    @"UPDATE Delivery
-                      SET DeliveryStatus = @Status, UpdatedAt = GETUTCDATE()
-                      WHERE DeliveryId = @Id",
-                    new { Status = DeliveryStatuses.PickedUp, Id = deliveryId });
+                try
+                {
+                    conn.Execute(
+                        @"UPDATE LBCDelivery
+                          SET TrackingNumber = @Tracking
+                          WHERE DeliveryId = @Id",
+                        new { Tracking = trackingNumber, Id = deliveryId }, tx);
+                    conn.Execute(
+                        @"UPDATE Delivery
+                          SET DeliveryStatus = @Status, UpdatedAt = GETUTCDATE()
+                          WHERE DeliveryId = @Id",
+                        new { Status = DeliveryStatuses.PickedUp, Id = deliveryId }, tx);
+                    tx.Commit();
+                }
+                catch { tx.Rollback(); throw; }
             }
         }
 

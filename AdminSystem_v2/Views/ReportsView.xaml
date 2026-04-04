@@ -1,0 +1,524 @@
+<UserControl x:Class="AdminSystem_v2.Views.ReportsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:AdminSystem_v2.Converters"
+             Background="#111827">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <converters:StatusToColorConverter x:Key="StatusColor"/>
+
+        <!-- ── Tab button — inactive ── -->
+        <Style x:Key="TabBtn" TargetType="Button">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="#9CA3AF"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="BorderBrush"     Value="Transparent"/>
+            <Setter Property="Padding"         Value="20,0"/>
+            <Setter Property="Height"          Value="48"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="FontWeight"      Value="SemiBold"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#D1D5DB"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── Tab button — active ── -->
+        <Style x:Key="TabBtnActive" TargetType="Button" BasedOn="{StaticResource TabBtn}">
+            <Setter Property="Foreground"  Value="#F9FAFB"/>
+            <Setter Property="BorderBrush" Value="#DC2626"/>
+        </Style>
+
+        <!-- ── Stat card ── -->
+        <Style x:Key="StatCard" TargetType="Border">
+            <Setter Property="Background"    Value="#1F2937"/>
+            <Setter Property="CornerRadius"  Value="8"/>
+            <Setter Property="Padding"       Value="20"/>
+            <Setter Property="BorderBrush"   Value="#374151"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- ── DataGrid shared style ── -->
+        <Style x:Key="ReportGrid" TargetType="DataGrid">
+            <Setter Property="AutoGenerateColumns"     Value="False"/>
+            <Setter Property="IsReadOnly"              Value="True"/>
+            <Setter Property="Background"              Value="#1F2937"/>
+            <Setter Property="Foreground"              Value="#E5E7EB"/>
+            <Setter Property="BorderBrush"             Value="#374151"/>
+            <Setter Property="BorderThickness"         Value="1"/>
+            <Setter Property="RowBackground"           Value="#1F2937"/>
+            <Setter Property="AlternatingRowBackground" Value="#172032"/>
+            <Setter Property="GridLinesVisibility"     Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#374151"/>
+            <Setter Property="HeadersVisibility"       Value="Column"/>
+            <Setter Property="CanUserResizeRows"       Value="False"/>
+            <Setter Property="SelectionMode"           Value="Single"/>
+            <Setter Property="FontSize"                Value="13"/>
+            <Setter Property="ColumnHeaderStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background"    Value="#111827"/>
+                        <Setter Property="Foreground"    Value="#9CA3AF"/>
+                        <Setter Property="FontSize"      Value="11"/>
+                        <Setter Property="FontWeight"    Value="SemiBold"/>
+                        <Setter Property="Padding"       Value="12,8"/>
+                        <Setter Property="BorderBrush"   Value="#374151"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="CellStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding"         Value="12,8"/>
+                        <Setter Property="Foreground"      Value="#E5E7EB"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#1E3A5F"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Tab bar -->
+            <RowDefinition Height="48"/>
+            <!-- Status messages -->
+            <RowDefinition Height="Auto"/>
+            <!-- Content -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ══════════════════════════════════════
+             ROW 0 — TAB BAR
+             ══════════════════════════════════════ -->
+        <Border Grid.Row="0" Background="#1F2937"
+                BorderBrush="#374151" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal">
+
+                <Button Command="{Binding ShowSalesTabCommand}" Content="Sales Report">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource TabBtn}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSalesTab}" Value="True">
+                                    <Setter Property="Style" Value="{StaticResource TabBtnActive}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <Button Command="{Binding ShowInventoryTabCommand}" Content="Inventory Report">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource TabBtn}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsInventoryTab}" Value="True">
+                                    <Setter Property="Style" Value="{StaticResource TabBtnActive}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+            </StackPanel>
+        </Border>
+
+        <!-- ══════════════════════════════════════
+             ROW 1 — STATUS MESSAGES
+             ══════════════════════════════════════ -->
+        <Border Grid.Row="1" Background="#1C3A2A" Padding="20,8"
+                Visibility="{Binding HasSuccess, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="{Binding SuccessMessage}" Foreground="#6EE7B7" FontSize="13"/>
+        </Border>
+        <Border Grid.Row="1" Background="#3B1010" Padding="20,8"
+                Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="#FCA5A5" FontSize="13"/>
+        </Border>
+
+        <!-- ══════════════════════════════════════
+             ROW 2 — CONTENT
+             ══════════════════════════════════════ -->
+        <Grid Grid.Row="2">
+
+            <!-- ── Loading overlay ── -->
+            <Border Background="#80111827" Panel.ZIndex="10"
+                    Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="Loading..." Foreground="#9CA3AF"
+                           FontSize="14" HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Border>
+
+            <!-- ════════════════════
+                 SALES REPORT TAB
+                 ════════════════════ -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          Visibility="{Binding IsSalesTab, Converter={StaticResource BoolToVis}}">
+                <StackPanel Margin="28">
+
+                    <!-- Header -->
+                    <TextBlock Text="Sales Report" Foreground="#F9FAFB"
+                               FontSize="20" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <TextBlock Text="Revenue and order breakdown for a selected date range."
+                               Foreground="#6B7280" FontSize="12" Margin="0,0,0,24"/>
+
+                    <!-- ── Date range controls ── -->
+                    <Border Background="#1F2937" CornerRadius="8" Padding="20"
+                            BorderThickness="1" BorderBrush="#374151" Margin="0,0,0,24">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="24"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="24"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="FROM" Foreground="#6B7280"
+                                           FontSize="10" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                <DatePicker SelectedDate="{Binding FromDate}"
+                                            Width="160" Height="36"
+                                            Background="#111827" Foreground="#F9FAFB"
+                                            BorderBrush="#374151" FontSize="13"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="TO" Foreground="#6B7280"
+                                           FontSize="10" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                <DatePicker SelectedDate="{Binding ToDate}"
+                                            Width="160" Height="36"
+                                            Background="#111827" Foreground="#F9FAFB"
+                                            BorderBrush="#374151" FontSize="13"/>
+                            </StackPanel>
+
+                            <Button Grid.Column="4"
+                                    Content="Run Report"
+                                    Command="{Binding RunSalesReportCommand}"
+                                    Style="{StaticResource PrimaryButton}"
+                                    VerticalAlignment="Bottom" Width="120"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- ── Summary cards ── -->
+                    <UniformGrid Rows="1" Columns="3" Margin="0,0,0,24">
+
+                        <!-- Total Orders -->
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,12,0">
+                            <StackPanel>
+                                <TextBlock Text="TOTAL ORDERS" Foreground="#6B7280"
+                                           FontSize="10" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding SalesSummary.TotalOrders, FallbackValue='—'}"
+                                           Foreground="#F9FAFB"
+                                           FontSize="36" FontWeight="Bold" Margin="0,8,0,4"/>
+                                <TextBlock Text="Non-cancelled online orders"
+                                           Foreground="#4B5563" FontSize="11"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Total Revenue -->
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,12,0">
+                            <StackPanel>
+                                <TextBlock Text="TOTAL REVENUE" Foreground="#6B7280"
+                                           FontSize="10" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding SalesSummary.TotalRevenue,
+                                               StringFormat='₱{0:N0}', FallbackValue='—'}"
+                                           Foreground="#34D399"
+                                           FontSize="28" FontWeight="Bold" Margin="0,8,0,4"/>
+                                <TextBlock Foreground="#4B5563" FontSize="11">
+                                    <Run Text="Avg "/>
+                                    <Run Text="{Binding SalesSummary.AvgOrderValue,
+                                                StringFormat='₱{0:N2}', FallbackValue='—'}"/>
+                                    <Run Text=" / order"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Discounts / Shipping -->
+                        <Border Style="{StaticResource StatCard}">
+                            <StackPanel>
+                                <TextBlock Text="GROSS / DISCOUNTS" Foreground="#6B7280"
+                                           FontSize="10" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding SalesSummary.GrossRevenue,
+                                               StringFormat='₱{0:N0}', FallbackValue='—'}"
+                                           Foreground="#F9FAFB"
+                                           FontSize="28" FontWeight="Bold" Margin="0,8,0,4"/>
+                                <TextBlock Foreground="#4B5563" FontSize="11">
+                                    <Run Text="Discounts "/>
+                                    <Run Foreground="#EF4444"
+                                         Text="{Binding SalesSummary.TotalDiscounts,
+                                                StringFormat='−₱{0:N2}', FallbackValue='—'}"/>
+                                    <Run Text="  Shipping "/>
+                                    <Run Foreground="#60A5FA"
+                                         Text="{Binding SalesSummary.TotalShipping,
+                                                StringFormat='₱{0:N2}', FallbackValue='—'}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                    </UniformGrid>
+
+                    <!-- ── Two-column: daily breakdown | top products ── -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="340"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Daily breakdown -->
+                        <Border Grid.Column="0" Style="{StaticResource StatCard}">
+                            <StackPanel>
+                                <TextBlock Text="DAILY BREAKDOWN" Foreground="#6B7280"
+                                           FontSize="10" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                                <DataGrid ItemsSource="{Binding DailySales}"
+                                          Style="{StaticResource ReportGrid}"
+                                          MaxHeight="400">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Date"
+                                                            Binding="{Binding SaleDateDisplay}"
+                                                            Width="*"/>
+                                        <DataGridTextColumn Header="Orders"
+                                                            Binding="{Binding OrderCount}"
+                                                            Width="70"/>
+                                        <DataGridTextColumn Header="Revenue"
+                                                            Binding="{Binding Revenue, StringFormat='₱{0:N2}'}"
+                                                            Width="120"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+
+                                <!-- Empty state -->
+                                <TextBlock Text="No data — select a date range and click Run Report."
+                                           Foreground="#4B5563" FontSize="12"
+                                           HorizontalAlignment="Center" Margin="0,16"
+                                           Visibility="{Binding DailySales.Count,
+                                               Converter={StaticResource BoolToVis},
+                                               ConverterParameter=Inverse}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Top products -->
+                        <Border Grid.Column="2" Style="{StaticResource StatCard}">
+                            <StackPanel>
+                                <TextBlock Text="TOP 10 PRODUCTS" Foreground="#6B7280"
+                                           FontSize="10" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                                <DataGrid ItemsSource="{Binding TopProducts}"
+                                          Style="{StaticResource ReportGrid}"
+                                          MaxHeight="400">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Product"
+                                                            Binding="{Binding ProductName}"
+                                                            Width="*"/>
+                                        <DataGridTextColumn Header="Units"
+                                                            Binding="{Binding UnitsSold}"
+                                                            Width="60"/>
+                                        <DataGridTextColumn Header="Revenue"
+                                                            Binding="{Binding Revenue, StringFormat='₱{0:N2}'}"
+                                                            Width="110"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+
+                                <TextBlock Text="No data for selected range."
+                                           Foreground="#4B5563" FontSize="12"
+                                           HorizontalAlignment="Center" Margin="0,16"
+                                           Visibility="{Binding TopProducts.Count,
+                                               Converter={StaticResource BoolToVis},
+                                               ConverterParameter=Inverse}"/>
+                            </StackPanel>
+                        </Border>
+
+                    </Grid>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- ════════════════════
+                 INVENTORY REPORT TAB
+                 ════════════════════ -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          Visibility="{Binding IsInventoryTab, Converter={StaticResource BoolToVis}}">
+                <StackPanel Margin="28">
+
+                    <!-- Header -->
+                    <Grid Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Inventory Report" Foreground="#F9FAFB"
+                                       FontSize="20" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                            <TextBlock Text="Stock levels for all active product variants."
+                                       Foreground="#6B7280" FontSize="12"/>
+                        </StackPanel>
+                        <Button Grid.Column="1"
+                                Command="{Binding RefreshInventoryCommand}"
+                                Style="{StaticResource SecondaryButton}"
+                                VerticalAlignment="Bottom">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#x21BB;" FontSize="12" Margin="0,0,6,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Refresh" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <!-- ── Inventory summary cards ── -->
+                    <UniformGrid Rows="1" Columns="5" Margin="0,0,0,24">
+
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="TOTAL VARIANTS" Foreground="#6B7280"
+                                           FontSize="9" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding InvTotal}" Foreground="#F9FAFB"
+                                           FontSize="28" FontWeight="Bold" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="IN STOCK" Foreground="#6B7280"
+                                           FontSize="9" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding InvInStock}" Foreground="#22C55E"
+                                           FontSize="28" FontWeight="Bold" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="LOW STOCK" Foreground="#6B7280"
+                                           FontSize="9" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding InvLowStock}" Foreground="#EAB308"
+                                           FontSize="28" FontWeight="Bold" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="OUT OF STOCK" Foreground="#6B7280"
+                                           FontSize="9" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding InvOutOfStock}" Foreground="#EF4444"
+                                           FontSize="28" FontWeight="Bold" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource StatCard}">
+                            <StackPanel>
+                                <TextBlock Text="TOTAL VALUE" Foreground="#6B7280"
+                                           FontSize="9" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding InvTotalValue, StringFormat='₱{0:N0}'}"
+                                           Foreground="#60A5FA"
+                                           FontSize="22" FontWeight="Bold" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                    </UniformGrid>
+
+                    <!-- ── Inventory DataGrid ── -->
+                    <Border Style="{StaticResource StatCard}" Padding="0">
+                        <DataGrid ItemsSource="{Binding InventoryItems}"
+                                  Style="{StaticResource ReportGrid}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Product"
+                                                    Binding="{Binding ProductName}"
+                                                    Width="*" MinWidth="120"/>
+                                <DataGridTextColumn Header="Variant"
+                                                    Binding="{Binding VariantName}"
+                                                    Width="120"/>
+                                <DataGridTextColumn Header="SKU"
+                                                    Binding="{Binding SKU}"
+                                                    Width="100"/>
+                                <DataGridTextColumn Header="Category"
+                                                    Binding="{Binding CategoryName}"
+                                                    Width="110"/>
+                                <DataGridTextColumn Header="Stock"
+                                                    Binding="{Binding StockQuantity}"
+                                                    Width="70"/>
+                                <DataGridTextColumn Header="Threshold"
+                                                    Binding="{Binding ReorderThreshold}"
+                                                    Width="80"/>
+                                <DataGridTextColumn Header="Unit Price"
+                                                    Binding="{Binding Price, StringFormat='₱{0:N2}'}"
+                                                    Width="100"/>
+                                <DataGridTextColumn Header="Stock Value"
+                                                    Binding="{Binding StockValue, StringFormat='₱{0:N2}'}"
+                                                    Width="110"/>
+
+                                <!-- Status column with colour coding -->
+                                <DataGridTemplateColumn Header="Status" Width="100">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="4" Padding="8,3" Margin="4,3"
+                                                    HorizontalAlignment="Left">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="#14532D"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding StockStatus}"
+                                                                         Value="LowStock">
+                                                                <Setter Property="Background" Value="#713F12"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding StockStatus}"
+                                                                         Value="OutOfStock">
+                                                                <Setter Property="Background" Value="#450A0A"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock Text="{Binding StockStatus}" FontSize="11">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="#86EFAC"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding StockStatus}"
+                                                                             Value="LowStock">
+                                                                    <Setter Property="Foreground" Value="#FDE68A"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding StockStatus}"
+                                                                             Value="OutOfStock">
+                                                                    <Setter Property="Foreground" Value="#FCA5A5"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+
+        </Grid>
+    </Grid>
+</UserControl>

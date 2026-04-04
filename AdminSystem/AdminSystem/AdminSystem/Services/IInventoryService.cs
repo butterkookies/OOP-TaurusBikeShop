@@ -6,10 +6,10 @@ namespace AdminSystem.Services
 {
     public interface IInventoryService
     {
-        IEnumerable<InventoryLog>  GetRecentLogs(int top = 500);
+        IEnumerable<InventoryLog>  GetRecentLogs();
         IEnumerable<InventoryLog>  GetLogsByProduct(int productId);
-        IEnumerable<InventoryLog>  GetLowStockVariants();
-        Task<List<InventoryLog>>   GetLowStockVariantsAsync();
+        IEnumerable<LowStockVariant>  GetLowStockVariants();
+        Task<List<LowStockVariant>>   GetLowStockVariantsAsync();
         void AdjustStock(int variantId, int quantity,
             string changeType, string notes = null);
         void ReceiveStock(int purchaseOrderId,

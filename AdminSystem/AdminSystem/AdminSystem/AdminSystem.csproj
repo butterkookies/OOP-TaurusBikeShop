@@ -148,6 +148,7 @@
     <Compile Include="Models\InventoryLog.cs" />
     <Compile Include="Models\LalamoveDelivery.cs" />
     <Compile Include="Models\LBCDelivery.cs" />
+    <Compile Include="Models\LowStockVariant.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderItem.cs" />
     <Compile Include="Models\Payment.cs" />

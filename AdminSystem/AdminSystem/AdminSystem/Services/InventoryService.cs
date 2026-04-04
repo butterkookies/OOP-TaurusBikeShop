@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using AdminSystem.Helpers;
@@ -22,12 +24,12 @@ namespace AdminSystem.Services
             _productRepo   = productRepo;
         }
 
-        public IEnumerable<InventoryLog> GetRecentLogs(int top = 500)
+        public IEnumerable<InventoryLog> GetRecentLogs()
             => _inventoryRepo.GetAll();
 
         public IEnumerable<InventoryLog> GetLogsByProduct(int productId)
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 return conn.Query<InventoryLog>(
@@ -42,10 +44,10 @@ namespace AdminSystem.Services
             }
         }
 
-        public IEnumerable<InventoryLog> GetLowStockVariants()
+        public IEnumerable<LowStockVariant> GetLowStockVariants()
             => _inventoryRepo.GetLowStockVariants();
 
-        public Task<List<InventoryLog>> GetLowStockVariantsAsync()
+        public Task<List<LowStockVariant>> GetLowStockVariantsAsync()
             => Task.Run(() => _inventoryRepo.GetLowStockVariants().ToList());
 
         public void AdjustStock(int variantId, int quantity,
@@ -80,9 +82,9 @@ namespace AdminSystem.Services
 
             int userId = App.CurrentUser != null ? App.CurrentUser.UserId : 0;
 
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
-            using (System.Data.IDbTransaction tx = conn.BeginTransaction())
+            using (IDbTransaction tx = conn.BeginTransaction())
             {
                 try
                 {

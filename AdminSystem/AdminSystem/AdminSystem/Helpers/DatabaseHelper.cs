@@ -30,13 +30,6 @@ namespace AdminSystem.Helpers
         }
 
         /// <summary>
-        /// Creates a new SQL Server connection without opening it.
-        /// Useful when Dapper manages the connection lifecycle.
-        /// </summary>
-        public static SqlConnection CreateConnection()
-            => new SqlConnection(_connectionString);
-
-        /// <summary>
         /// Tests the connection to the database.
         /// Returns true if successful, false if the connection fails.
         /// </summary>

@@ -13,7 +13,7 @@ namespace AdminSystem.ViewModels
         {
             _inventoryService = inventoryService;
             Logs     = new ObservableCollection<InventoryLog>();
-            LowStock = new ObservableCollection<InventoryLog>();
+            LowStock = new ObservableCollection<LowStockVariant>();
 
             AdjustCommand = new RelayCommand(AdjustStock,
                 _ => AdjustVariantId > 0 && AdjustQuantity != 0
@@ -21,8 +21,8 @@ namespace AdminSystem.ViewModels
         }
 
         // ── Collections ─────────────────────────────────────────────────
-        public ObservableCollection<InventoryLog> Logs     { get; }
-        public ObservableCollection<InventoryLog> LowStock { get; }
+        public ObservableCollection<InventoryLog>    Logs     { get; }
+        public ObservableCollection<LowStockVariant> LowStock { get; }
 
         // ── Adjustment form ─────────────────────────────────────────────
         private int _adjustVariantId;
@@ -68,7 +68,7 @@ namespace AdminSystem.ViewModels
                     Logs.Add(l);
 
                 LowStock.Clear();
-                foreach (InventoryLog l in _inventoryService.GetLowStockVariants())
+                foreach (LowStockVariant l in _inventoryService.GetLowStockVariants())
                     LowStock.Add(l);
             }
             catch (Exception ex) { ShowError(ex.Message); }

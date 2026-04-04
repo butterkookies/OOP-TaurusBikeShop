@@ -28,7 +28,7 @@ namespace AdminSystem.ViewModels
 
             PendingPayments = new ObservableCollection<Payment>();
             RecentOrders    = new ObservableCollection<Order>();
-            LowStockItems   = new ObservableCollection<InventoryLog>();
+            LowStockItems   = new ObservableCollection<LowStockVariant>();
 
             RefreshCommand = new AsyncRelayCommand(LoadDataAsync);
         }
@@ -68,9 +68,9 @@ namespace AdminSystem.ViewModels
         }
 
         // ── Collections ─────────────────────────────────────────────────
-        public ObservableCollection<Payment>      PendingPayments { get; }
-        public ObservableCollection<Order>        RecentOrders    { get; }
-        public ObservableCollection<InventoryLog> LowStockItems   { get; }
+        public ObservableCollection<Payment>        PendingPayments { get; }
+        public ObservableCollection<Order>          RecentOrders    { get; }
+        public ObservableCollection<LowStockVariant> LowStockItems  { get; }
 
         // ── Commands ────────────────────────────────────────────────────
         public AsyncRelayCommand RefreshCommand { get; }
@@ -84,10 +84,17 @@ namespace AdminSystem.ViewModels
             try
             {
                 // Fetch all data concurrently
-                List<Order>        active   = await _orderService.GetActiveOrdersAsync();
-                List<Payment>      pending  = await _paymentService.GetPendingVerificationAsync();
-                List<InventoryLog> lowStock = await _inventoryService.GetLowStockVariantsAsync();
-                decimal            sales    = await _reportService.GetTotalSalesTodayAsync();
+                Task<List<Order>>        activeTask   = _orderService.GetActiveOrdersAsync();
+                Task<List<Payment>>      pendingTask  = _paymentService.GetPendingVerificationAsync();
+                Task<List<LowStockVariant>> lowStockTask = _inventoryService.GetLowStockVariantsAsync();
+                Task<decimal>            salesTask    = _reportService.GetTotalSalesTodayAsync();
+
+                await Task.WhenAll(activeTask, pendingTask, lowStockTask, salesTask);
+
+                List<Order>        active   = activeTask.Result;
+                List<Payment>      pending  = pendingTask.Result;
+                List<LowStockVariant> lowStock = lowStockTask.Result;
+                decimal            sales    = salesTask.Result;
 
                 // Stats
                 ActiveOrderCount = active.Count;
@@ -97,7 +104,7 @@ namespace AdminSystem.ViewModels
                 PendingPaymentCount = PendingPayments.Count;
 
                 LowStockItems.Clear();
-                foreach (InventoryLog l in lowStock) LowStockItems.Add(l);
+                foreach (LowStockVariant l in lowStock) LowStockItems.Add(l);
                 LowStockCount = LowStockItems.Count;
 
                 TodaySales = sales;

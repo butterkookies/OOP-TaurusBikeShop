@@ -24,6 +24,7 @@ namespace AdminSystem.Services
             if (!PasswordHelper.Verify(password, user.PasswordHash)) return null;
 
             _userRepo.UpdateLastLogin(user.UserId);
+            user.Role       = _userRepo.GetUserRole(user.UserId);
             App.CurrentUser = user;
             return user;
         }

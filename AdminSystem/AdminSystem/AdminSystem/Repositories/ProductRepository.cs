@@ -72,9 +72,8 @@ namespace AdminSystem.Repositories
                 "SELECT * FROM ProductVariant WHERE ProductId IN @Ids AND IsActive=1 ORDER BY VariantName",
                 new { Ids = ids });
 
-            System.Collections.Generic.Dictionary<int, List<ProductVariant>> map =
-                variants.GroupBy(v => v.ProductId)
-                         .ToDictionary(g => g.Key, g => g.ToList());
+            var map = variants.GroupBy(v => v.ProductId)
+                              .ToDictionary(g => g.Key, g => g.ToList());
 
             foreach (Product p in products)
             {

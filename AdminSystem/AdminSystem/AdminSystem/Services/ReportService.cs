@@ -1,29 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using AdminSystem.Helpers;
 using AdminSystem.Models;
-using AdminSystem.Repositories;
 using Dapper;
 
 namespace AdminSystem.Services
 {
     public class ReportService : IReportService
     {
-        private readonly InventoryRepository _inventoryRepo;
-        private readonly ProductRepository   _productRepo;
-
-        public ReportService(
-            InventoryRepository inventoryRepo,
-            ProductRepository   productRepo)
-        {
-            _inventoryRepo = inventoryRepo;
-            _productRepo   = productRepo;
-        }
 
         public decimal GetTotalSalesToday()
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 return conn.ExecuteScalar<decimal>(
@@ -37,7 +27,7 @@ namespace AdminSystem.Services
 
         public async Task<decimal> GetTotalSalesTodayAsync()
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 return await conn.ExecuteScalarAsync<decimal>(
@@ -51,7 +41,7 @@ namespace AdminSystem.Services
 
         public decimal GetTotalSalesForPeriod(DateTime from, DateTime to)
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 return conn.ExecuteScalar<decimal>(
@@ -66,7 +56,7 @@ namespace AdminSystem.Services
 
         public int GetOrderCountByStatus(string status)
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 return conn.ExecuteScalar<int>(
@@ -77,20 +67,22 @@ namespace AdminSystem.Services
 
         public IEnumerable<Order> GetTopOrdersByValue(int top)
         {
-            using (System.Data.SqlClient.SqlConnection conn =
-                DatabaseHelper.GetConnection())
+            using (SqlConnection conn = DatabaseHelper.GetConnection())
             {
                 return conn.Query<Order>(
-                    @"SELECT TOP (@Top) o.*,
+                    @"WITH OrderPayments AS (
+                          SELECT OrderId, ISNULL(SUM(Amount), 0) AS TotalPaid
+                          FROM Payment
+                          WHERE PaymentStatus = @PaymentStatus
+                          GROUP BY OrderId
+                      )
+                      SELECT TOP (@Top) o.*,
                              u.FirstName + ' ' + u.LastName AS CustomerName
                       FROM [Order] o
                       INNER JOIN [User] u ON o.UserId = u.UserId
+                      LEFT  JOIN OrderPayments op ON o.OrderId = op.OrderId
                       WHERE o.OrderStatus = @OrderStatus
-                      ORDER BY
-                        (SELECT ISNULL(SUM(Amount),0)
-                         FROM Payment
-                         WHERE OrderId = o.OrderId
-                           AND PaymentStatus = @PaymentStatus) DESC",
+                      ORDER BY ISNULL(op.TotalPaid, 0) DESC",
                     new { Top = top,
                           OrderStatus   = OrderStatuses.Delivered,
                           PaymentStatus = PaymentStatuses.Completed });
@@ -99,27 +91,28 @@ namespace AdminSystem.Services
 
         public IEnumerable<Product> GetLowStockProducts()
         {
-            IEnumerable<InventoryLog> lowVariants =
-                _inventoryRepo.GetLowStockVariants();
-            System.Collections.Generic.List<Product> result =
-                new System.Collections.Generic.List<Product>();
-            System.Collections.Generic.HashSet<int> seen =
-                new System.Collections.Generic.HashSet<int>();
-
-            foreach (InventoryLog log in lowVariants)
+            using (SqlConnection conn = DatabaseHelper.GetConnection())
             {
-                if (seen.Contains(log.ProductId)) continue;
-                seen.Add(log.ProductId);
-                Product p = _productRepo.GetById(log.ProductId);
-                if (p != null) result.Add(p);
+                return conn.Query<Product>(
+                    @"SELECT DISTINCT p.ProductId, p.CategoryId, p.BrandId,
+                             p.Name, p.Description, p.Price,
+                             p.IsActive, p.IsFeatured, p.CreatedAt, p.UpdatedAt,
+                             c.Name AS CategoryName, b.BrandName
+                      FROM Product p
+                      INNER JOIN ProductVariant pv ON pv.ProductId = p.ProductId
+                      LEFT  JOIN Category c ON p.CategoryId = c.CategoryId
+                      LEFT  JOIN Brand    b ON p.BrandId    = b.BrandId
+                      WHERE p.IsActive  = 1
+                        AND pv.IsActive = 1
+                        AND pv.StockQuantity <= pv.ReorderThreshold
+                      ORDER BY p.Name");
             }
-            return result;
         }
 
         public IEnumerable<InventoryLog> GetInventoryMovements(
             DateTime from, DateTime to)
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 return conn.Query<InventoryLog>(

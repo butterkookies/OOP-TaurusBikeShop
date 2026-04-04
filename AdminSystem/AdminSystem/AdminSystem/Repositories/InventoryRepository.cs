@@ -26,17 +26,16 @@ namespace AdminSystem.Repositories
                       ORDER BY il.CreatedAt DESC");
         }
 
-        public IEnumerable<InventoryLog> GetLowStockVariants()
+        public IEnumerable<LowStockVariant> GetLowStockVariants()
         {
             using (SqlConnection conn = GetConnection())
-                return conn.Query<InventoryLog>(
-                    @"SELECT pv.ProductVariantId AS LogId, pv.ProductId,
+                return conn.Query<LowStockVariant>(
+                    @"SELECT pv.ProductVariantId, pv.ProductId,
                              pv.VariantName, p.Name AS ProductName,
-                             pv.StockQuantity AS ChangeQuantity,
-                             pv.ReorderThreshold
+                             pv.StockQuantity, pv.ReorderThreshold
                       FROM ProductVariant pv
-                      INNER JOIN Product p ON pv.ProductId=p.ProductId
-                      WHERE pv.IsActive=1 AND p.IsActive=1
+                      INNER JOIN Product p ON pv.ProductId = p.ProductId
+                      WHERE pv.IsActive = 1 AND p.IsActive = 1
                         AND pv.StockQuantity <= pv.ReorderThreshold
                       ORDER BY pv.StockQuantity ASC");
         }

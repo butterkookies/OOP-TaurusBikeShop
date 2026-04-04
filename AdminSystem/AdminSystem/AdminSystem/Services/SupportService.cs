@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using AdminSystem.Helpers;
 using AdminSystem.Models;
@@ -11,7 +13,7 @@ namespace AdminSystem.Services
     {
         public IEnumerable<SupportTicket> GetAllTickets()
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 return conn.Query<SupportTicket>(
@@ -27,7 +29,7 @@ namespace AdminSystem.Services
 
         public IEnumerable<SupportTicket> GetTicketsByStatus(string status)
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 return conn.Query<SupportTicket>(
@@ -45,7 +47,7 @@ namespace AdminSystem.Services
 
         public SupportTicket GetTicketById(int ticketId)
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 SupportTicket ticket = conn.QueryFirstOrDefault<SupportTicket>(
@@ -79,7 +81,7 @@ namespace AdminSystem.Services
 
         public void AssignTicket(int ticketId, int assignedToUserId)
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 conn.Execute(
@@ -108,7 +110,7 @@ namespace AdminSystem.Services
                         "Invalid ticket status: " + newStatus);
             }
 
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 conn.Execute(
@@ -124,9 +126,9 @@ namespace AdminSystem.Services
 
             int userId = App.CurrentUser != null ? App.CurrentUser.UserId : 0;
 
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
-            using (System.Data.IDbTransaction tx = conn.BeginTransaction())
+            using (IDbTransaction tx = conn.BeginTransaction())
             {
                 try
                 {
@@ -174,7 +176,7 @@ namespace AdminSystem.Services
                         "Invalid task type: " + task.TaskType);
             }
 
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 conn.Execute(
@@ -205,21 +207,25 @@ namespace AdminSystem.Services
                         "Invalid task status: " + newStatus);
             }
 
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
-                string completedAt = newStatus == SupportTaskStatuses.Done
-                    ? ", CompletedAt = GETUTCDATE()" : string.Empty;
-                conn.Execute(
-                    "UPDATE SupportTask SET TaskStatus = @Status" +
-                    completedAt + " WHERE TaskId = @Id",
-                    new { Status = newStatus, Id = taskId });
+                if (newStatus == SupportTaskStatuses.Done)
+                    conn.Execute(
+                        @"UPDATE SupportTask
+                          SET TaskStatus = @Status, CompletedAt = GETUTCDATE()
+                          WHERE TaskId = @Id",
+                        new { Status = newStatus, Id = taskId });
+                else
+                    conn.Execute(
+                        "UPDATE SupportTask SET TaskStatus = @Status WHERE TaskId = @Id",
+                        new { Status = newStatus, Id = taskId });
             }
         }
 
         public void ResolveTicket(int ticketId)
         {
-            using (System.Data.SqlClient.SqlConnection conn =
+            using (SqlConnection conn =
                 DatabaseHelper.GetConnection())
             {
                 conn.Execute(

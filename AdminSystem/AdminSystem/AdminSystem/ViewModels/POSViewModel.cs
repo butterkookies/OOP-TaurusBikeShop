@@ -31,6 +31,8 @@ namespace AdminSystem.ViewModels
         // ── Product list ────────────────────────────────────────────────
         public ObservableCollection<Product> Products { get; }
 
+        public event System.EventHandler ProductsRefreshed;
+
         private string _productSearch;
         public string ProductSearch
         {
@@ -133,6 +135,7 @@ namespace AdminSystem.ViewModels
                 Products.Clear();
                 foreach (Product p in _productService.GetAllProducts())
                     if (p.IsActive) Products.Add(p);
+                ProductsRefreshed?.Invoke(this, System.EventArgs.Empty);
             }
             catch (System.Exception ex) { ShowError(ex.Message); }
             finally { IsLoading = false; }
@@ -149,6 +152,7 @@ namespace AdminSystem.ViewModels
                         : _productService.SearchProducts(ProductSearch);
                 foreach (Product p in result)
                     if (p.IsActive) Products.Add(p);
+                ProductsRefreshed?.Invoke(this, System.EventArgs.Empty);
             }
             catch (System.Exception ex) { ShowError(ex.Message); }
         }
