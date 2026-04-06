@@ -7,7 +7,8 @@ namespace AdminSystem_v2.ViewModels
 {
     public class LoginViewModel : BaseViewModel
     {
-        private readonly IAuthService _authService;
+        private readonly IAuthService   _authService;
+        private readonly IDialogService _dialog;
 
         // ── Bound Properties ──────────────────────────────────────────────
 
@@ -64,9 +65,10 @@ namespace AdminSystem_v2.ViewModels
 
         // ── Constructor ───────────────────────────────────────────────────
 
-        public LoginViewModel(IAuthService authService)
+        public LoginViewModel(IAuthService authService, IDialogService dialog)
         {
             _authService = authService;
+            _dialog      = dialog;
 
             LoginCommand          = new RelayCommand(async () => await ExecuteLoginAsync(), () => IsNotLoading);
             TogglePasswordCommand = new RelayCommand(() => IsPasswordVisible = !IsPasswordVisible);
@@ -111,11 +113,9 @@ namespace AdminSystem_v2.ViewModels
 
         private void ExecuteForgotPassword()
         {
-            System.Windows.MessageBox.Show(
+            _dialog.ShowInfo(
                 "Please contact your system administrator to reset your password.",
-                "Password Reset",
-                System.Windows.MessageBoxButton.OK,
-                System.Windows.MessageBoxImage.Information);
+                "Password Reset");
         }
     }
 }

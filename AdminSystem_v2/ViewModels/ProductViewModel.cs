@@ -116,6 +116,29 @@ namespace AdminSystem_v2.ViewModels
             InventoryChangeTypes.Loss,
         };
 
+        // ── Product images ────────────────────────────────────────────────
+
+        private ObservableCollection<ProductImage> _editImages = new();
+        public  ObservableCollection<ProductImage> EditImages
+        {
+            get => _editImages;
+            private set => SetProperty(ref _editImages, value);
+        }
+
+        private string _newImageUrl = string.Empty;
+        public  string NewImageUrl
+        {
+            get => _newImageUrl;
+            set
+            {
+                if (SetProperty(ref _newImageUrl, value))
+                    OnPropertyChanged(nameof(IsNewImageUrlEmpty));
+            }
+        }
+
+        /// <summary>True when the URL input is blank — used to show/hide the placeholder hint.</summary>
+        public bool IsNewImageUrlEmpty => string.IsNullOrEmpty(_newImageUrl);
+
         // ── Add-variant overlay ───────────────────────────────────────────
         private bool _isAddingVariant;
         public  bool IsAddingVariant
@@ -143,6 +166,8 @@ namespace AdminSystem_v2.ViewModels
         public ICommand OpenAddVariantCommand { get; }
         public ICommand SaveVariantCommand    { get; }
         public ICommand CancelVariantCommand  { get; }
+        public ICommand AddImageCommand       { get; }
+        public ICommand RemoveImageCommand    { get; }
 
         public ProductViewModel(IProductService productService)
         {
@@ -159,6 +184,9 @@ namespace AdminSystem_v2.ViewModels
             OpenAddVariantCommand = new RelayCommand(OpenAddVariant, () => EditProduct != null && EditProduct.ProductId > 0);
             SaveVariantCommand    = new RelayCommand(async () => await SaveVariantAsync(), () => IsAddingVariant);
             CancelVariantCommand  = new RelayCommand(() => IsAddingVariant = false);
+            AddImageCommand       = new RelayCommand(async () => await AddImageAsync(),
+                                        () => EditProduct?.ProductId > 0 && !string.IsNullOrWhiteSpace(NewImageUrl));
+            RemoveImageCommand    = new RelayCommand<ProductImage>(async img => await RemoveImageAsync(img));
         }
 
         // ── Called by MainWindowViewModel when navigating here ────────────
@@ -202,7 +230,7 @@ namespace AdminSystem_v2.ViewModels
                     ? await _productService.GetAllAsync()
                     : await _productService.SearchAsync(SearchText);
 
-                RunOnUI(() => Products = new ObservableCollection<Product>(results));
+                Products = new ObservableCollection<Product>(results);
             }
             catch (Exception ex)
             {
@@ -212,7 +240,13 @@ namespace AdminSystem_v2.ViewModels
 
         private void OnProductSelected(Product? product)
         {
-            if (product == null) { IsEditing = false; EditProduct = null; return; }
+            if (product == null)
+            {
+                IsEditing   = false;
+                EditProduct = null;
+                EditImages  = new ObservableCollection<ProductImage>();
+                return;
+            }
 
             // Clone so edits don't mutate the list item until saved
             EditProduct = CloneProduct(product);
@@ -220,6 +254,10 @@ namespace AdminSystem_v2.ViewModels
             ClearMessages();
             IsAdjustingStock = false;
             IsAddingVariant  = false;
+            NewImageUrl      = string.Empty;
+
+            // Images load separately — they don't block selection
+            _ = LoadImagesAsync(product.ProductId);
         }
 
         private void BeginAdd()
@@ -229,6 +267,8 @@ namespace AdminSystem_v2.ViewModels
             IsEditing        = true;
             IsAdjustingStock = false;
             IsAddingVariant  = false;
+            EditImages       = new ObservableCollection<ProductImage>();
+            NewImageUrl      = string.Empty;
             ClearMessages();
         }
 
@@ -373,12 +413,74 @@ namespace AdminSystem_v2.ViewModels
             }
         }
 
+        // ── Image actions ─────────────────────────────────────────────────
+
+        private async Task LoadImagesAsync(int productId)
+        {
+            try
+            {
+                var images = await _productService.GetImagesAsync(productId);
+                EditImages = new ObservableCollection<ProductImage>(images);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[Products] Image load failed: {ex}");
+            }
+        }
+
+        private async Task AddImageAsync()
+        {
+            if (EditProduct == null || EditProduct.ProductId == 0) return;
+            if (string.IsNullOrWhiteSpace(NewImageUrl)) return;
+
+            IsLoading = true;
+            ClearMessages();
+            try
+            {
+                await _productService.AddImageAsync(EditProduct.ProductId, NewImageUrl);
+                NewImageUrl = string.Empty;
+                await LoadImagesAsync(EditProduct.ProductId);
+                ShowSuccess("Image added.");
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Failed to add image: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        private async Task RemoveImageAsync(ProductImage? image)
+        {
+            if (image == null) return;
+
+            IsLoading = true;
+            ClearMessages();
+            try
+            {
+                await _productService.DeleteImageAsync(image.ProductImageId);
+                EditImages.Remove(image);
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Failed to remove image: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        // ── List refresh helper ───────────────────────────────────────────
+
         private async Task RefreshListAsync()
         {
             var products = string.IsNullOrWhiteSpace(SearchText)
                 ? await _productService.GetAllAsync()
                 : await _productService.SearchAsync(SearchText);
-            RunOnUI(() => Products = new ObservableCollection<Product>(products));
+            Products = new ObservableCollection<Product>(products);
         }
 
         private static Product CloneProduct(Product src) => new()
@@ -395,7 +497,7 @@ namespace AdminSystem_v2.ViewModels
             IsFeatured       = src.IsFeatured,
             CategoryName     = src.CategoryName,
             BrandName        = src.BrandName,
-            Variants         = src.Variants,   // shared ref — variants edited separately
+            Variants         = new List<ProductVariant>(src.Variants ?? new()),
         };
     }
 }

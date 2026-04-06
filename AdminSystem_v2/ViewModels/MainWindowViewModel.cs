@@ -8,6 +8,7 @@ namespace AdminSystem_v2.ViewModels
     public class MainWindowViewModel : BaseViewModel
     {
         private readonly IAuthService       _authService;
+        private readonly IDialogService     _dialog;
         private readonly DashboardViewModel _dashboardVm;
         private readonly ProductViewModel   _productVm;
         private readonly OrderViewModel     _orderVm;
@@ -57,9 +58,11 @@ namespace AdminSystem_v2.ViewModels
             ProductViewModel   productVm,
             OrderViewModel     orderVm,
             ReportViewModel    reportVm,
-            StaffViewModel     staffVm)
+            StaffViewModel     staffVm,
+            IDialogService     dialog)
         {
             _authService  = authService;
+            _dialog       = dialog;
             _dashboardVm  = dashboardVm;
             _productVm    = productVm;
             _orderVm      = orderVm;
@@ -115,13 +118,7 @@ namespace AdminSystem_v2.ViewModels
 
         private void ExecuteSignOut()
         {
-            var result = System.Windows.MessageBox.Show(
-                "Sign out of Taurus Bike Shop Admin?",
-                "Sign Out",
-                System.Windows.MessageBoxButton.YesNo,
-                System.Windows.MessageBoxImage.Question);
-
-            if (result == System.Windows.MessageBoxResult.Yes)
+            if (_dialog.Confirm("Sign out of Taurus Bike Shop Admin?", "Sign Out"))
             {
                 _authService.Logout();
                 SignOutRequested?.Invoke();
@@ -130,14 +127,11 @@ namespace AdminSystem_v2.ViewModels
 
         private void ExecuteExit()
         {
-            var result = System.Windows.MessageBox.Show(
-                "Exit Taurus Bike Shop Admin?",
-                "Exit",
-                System.Windows.MessageBoxButton.YesNo,
-                System.Windows.MessageBoxImage.Question);
-
-            if (result == System.Windows.MessageBoxResult.Yes)
+            if (_dialog.Confirm("Exit Taurus Bike Shop Admin?", "Exit"))
+            {
+                _authService.Logout(); // clears App.CurrentUser so Window_Closing skips its dialog
                 System.Windows.Application.Current.Shutdown();
+            }
         }
     }
 }

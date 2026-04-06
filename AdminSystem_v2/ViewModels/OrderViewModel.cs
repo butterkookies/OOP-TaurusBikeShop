@@ -1,5 +1,8 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows.Input;
+using System.Windows.Media;
 using AdminSystem_v2.Helpers;
 using AdminSystem_v2.Models;
 using AdminSystem_v2.Services;
@@ -8,21 +11,37 @@ namespace AdminSystem_v2.ViewModels
 {
     public class OrderViewModel : BaseViewModel
     {
-        private readonly IOrderService _orderService;
+        private readonly IOrderService  _orderService;
+        private readonly IDialogService _dialog;
 
         // ── Order list ────────────────────────────────────────────────────────
 
-        private ObservableCollection<Order> _orders = new();
-        public  ObservableCollection<Order> Orders
+        private ObservableCollection<SelectableOrder> _orders = new();
+        public  ObservableCollection<SelectableOrder> Orders
         {
             get => _orders;
-            private set => SetProperty(ref _orders, value);
+            private set
+            {
+                UnwireSelectionTracking(_orders);
+                SetProperty(ref _orders, value);
+                WireSelectionTracking(value);
+                RefreshSelectionState();
+            }
+        }
+
+        // ── Status badges ─────────────────────────────────────────────────────
+
+        private List<StatusBadge> _statusBadges = new();
+        public  List<StatusBadge> StatusBadges
+        {
+            get => _statusBadges;
+            private set => SetProperty(ref _statusBadges, value);
         }
 
         // ── Status filter ─────────────────────────────────────────────────────
 
-        /// <summary>All filter chips shown at the top of the list.</summary>
-        public List<string> StatusFilters { get; } = new()
+        /// <summary>All available status filter values, including "All".</summary>
+        public IReadOnlyList<string> StatusFilters { get; } = new List<string>
         {
             "All",
             OrderStatuses.Pending,
@@ -31,6 +50,7 @@ namespace AdminSystem_v2.ViewModels
             OrderStatuses.PickedUp,
             OrderStatuses.Shipped,
             OrderStatuses.Delivered,
+            OrderStatuses.Cancelled,
         };
 
         private string _selectedStatusFilter = "All";
@@ -44,18 +64,29 @@ namespace AdminSystem_v2.ViewModels
             }
         }
 
-        // ── Selected order ────────────────────────────────────────────────────
+        // ── Selected order (row click → detail panel) ─────────────────────────
 
-        private Order? _selectedOrder;
-        public  Order? SelectedOrder
+        private SelectableOrder? _selectedRow;
+
+        /// <summary>
+        /// The DataGrid's currently-highlighted row.
+        /// Setting this triggers detail loading and shows the right-hand panel.
+        /// </summary>
+        public SelectableOrder? SelectedRow
         {
-            get => _selectedOrder;
+            get => _selectedRow;
             set
             {
-                if (SetProperty(ref _selectedOrder, value))
-                    OnOrderSelected(value);
+                if (SetProperty(ref _selectedRow, value))
+                {
+                    OnPropertyChanged(nameof(SelectedOrder));
+                    _ = OnOrderSelectedAsync(value?.Order);
+                }
             }
         }
+
+        /// <summary>Convenience accessor — the raw <see cref="Order"/> shown in the detail panel.</summary>
+        public Order? SelectedOrder => _selectedRow?.Order;
 
         private bool _isDetailVisible;
         public  bool IsDetailVisible
@@ -64,72 +95,125 @@ namespace AdminSystem_v2.ViewModels
             private set => SetProperty(ref _isDetailVisible, value);
         }
 
-        // ── Action availability ───────────────────────────────────────────────
+        // ── Bulk selection ────────────────────────────────────────────────────
+
+        private bool _suppressSelectionRefresh;
+
+        /// <summary>Number of rows currently checked for bulk operations.</summary>
+        public int  SelectionCount => Orders.Count(o => o.IsSelected);
+
+        /// <summary>True when at least one row is checked.</summary>
+        public bool HasSelection   => SelectionCount > 0;
+
+        /// <summary>
+        /// True when every row is checked; False otherwise.
+        /// Setting this property checks or unchecks all rows at once.
+        /// </summary>
+        public bool IsAllSelected
+        {
+            get => Orders.Count > 0 && Orders.All(o => o.IsSelected);
+            set
+            {
+                _suppressSelectionRefresh = true;
+                foreach (var o in Orders)
+                    o.IsSelected = value;
+                _suppressSelectionRefresh = false;
+                RefreshSelectionState();
+            }
+        }
+
+        // ── Single-order action availability ─────────────────────────────────
 
         public bool CanMarkReadyForPickup =>
-            _selectedOrder is { DeliveryType: "Pickup" }
-            && _selectedOrder.OrderStatus is OrderStatuses.Pending or OrderStatuses.Processing;
+            SelectedOrder is { DeliveryType: "Pickup" }
+            && SelectedOrder.OrderStatus is OrderStatuses.Pending or OrderStatuses.Processing;
 
         public bool CanConfirmPickup =>
-            _selectedOrder is { DeliveryType: "Pickup", OrderStatus: OrderStatuses.ReadyForPickup };
+            SelectedOrder is { DeliveryType: "Pickup", OrderStatus: OrderStatuses.ReadyForPickup };
 
         public bool CanMarkShipped =>
-            _selectedOrder is { DeliveryType: "Delivery" }
-            && _selectedOrder.OrderStatus is OrderStatuses.Pending or OrderStatuses.Processing;
+            SelectedOrder is { DeliveryType: "Delivery" }
+            && SelectedOrder.OrderStatus is OrderStatuses.Pending or OrderStatuses.Processing;
 
         public bool CanMarkDelivered =>
-            _selectedOrder is { DeliveryType: "Delivery", OrderStatus: OrderStatuses.Shipped };
+            SelectedOrder is { DeliveryType: "Delivery", OrderStatus: OrderStatuses.Shipped };
 
         // ── Commands ──────────────────────────────────────────────────────────
 
-        public ICommand RefreshCommand          { get; }
-        public ICommand SelectStatusCommand     { get; }
-        public ICommand MarkReadyForPickupCommand { get; }
-        public ICommand ConfirmPickupCommand    { get; }
-        public ICommand MarkShippedCommand      { get; }
-        public ICommand MarkDeliveredCommand    { get; }
-        public ICommand CancelOrderCommand      { get; }
+        public ICommand RefreshCommand             { get; }
+        public ICommand SelectStatusCommand        { get; }
+        public ICommand MarkReadyForPickupCommand  { get; }
+        public ICommand ConfirmPickupCommand       { get; }
+        public ICommand MarkShippedCommand         { get; }
+        public ICommand MarkDeliveredCommand       { get; }
+        public ICommand CancelOrderCommand         { get; }
+        public ICommand BulkUpdateStatusCommand    { get; }
+        public ICommand BulkCancelCommand          { get; }
+        public ICommand DeselectAllCommand         { get; }
 
         // ── Constructor ───────────────────────────────────────────────────────
 
-        public OrderViewModel(IOrderService orderService)
+        public OrderViewModel(IOrderService orderService, IDialogService dialog)
         {
             _orderService = orderService;
+            _dialog       = dialog;
 
             RefreshCommand            = new RelayCommand(async () => await LoadAsync());
             SelectStatusCommand       = new RelayCommand<string>(s => SelectedStatusFilter = s ?? "All");
-            MarkReadyForPickupCommand = new RelayCommand(async () => await MarkReadyForPickupAsync(), () => CanMarkReadyForPickup);
-            ConfirmPickupCommand      = new RelayCommand(async () => await ConfirmPickupAsync(),    () => CanConfirmPickup);
-            MarkShippedCommand        = new RelayCommand(async () => await MarkShippedAsync(),      () => CanMarkShipped);
-            MarkDeliveredCommand      = new RelayCommand(async () => await MarkDeliveredAsync(),    () => CanMarkDelivered);
+            MarkReadyForPickupCommand = new RelayCommand(async () => await MarkReadyForPickupAsync(),  () => CanMarkReadyForPickup);
+            ConfirmPickupCommand      = new RelayCommand(async () => await ConfirmPickupAsync(),       () => CanConfirmPickup);
+            MarkShippedCommand        = new RelayCommand(async () => await MarkShippedAsync(),         () => CanMarkShipped);
+            MarkDeliveredCommand      = new RelayCommand(async () => await MarkDeliveredAsync(),       () => CanMarkDelivered);
             CancelOrderCommand        = new RelayCommand(async () => await CancelOrderAsync(),
-                                            () => _selectedOrder?.OrderStatus
+                                            () => SelectedOrder?.OrderStatus
                                                     is OrderStatuses.Pending or OrderStatuses.Processing);
+            BulkUpdateStatusCommand   = new RelayCommand<string>(async s => await BulkUpdateStatusAsync(s), _ => HasSelection);
+            BulkCancelCommand         = new RelayCommand(async () => await BulkCancelAsync(),          () => HasSelection);
+            DeselectAllCommand        = new RelayCommand(() => IsAllSelected = false,                  () => HasSelection);
         }
 
-        // ── Called by MainWindowViewModel on navigation ───────────────────────
+        // ── Load ──────────────────────────────────────────────────────────────
 
+        /// <summary>
+        /// Loads the filtered order list and refreshes status-badge counts.
+        /// Called on navigation, filter change, and after every status-update action.
+        /// </summary>
         public async Task LoadAsync()
         {
             IsLoading = true;
             ClearMessages();
             try
             {
-                var orders = await _orderService.GetOrdersAsync(
-                    SelectedStatusFilter == "All" ? null : SelectedStatusFilter);
+                string? filter   = SelectedStatusFilter == "All" ? null : SelectedStatusFilter;
+                var orders = await _orderService.GetOrdersAsync(filter);
+                var counts = await _orderService.GetStatusCountsAsync();
 
-                RunOnUI(() =>
+                int? previousId  = _selectedRow?.Order.OrderId;
+
+                Orders = new ObservableCollection<SelectableOrder>(
+                    orders.Select(o => new SelectableOrder(o)));
+
+                BuildStatusBadges(counts);
+
+                // Restore the previously-selected order if it still appears in the new list
+                if (previousId.HasValue)
                 {
-                    Orders = new ObservableCollection<Order>(orders);
-
-                    // Re-select the same order if it's still in the list after refresh
-                    if (_selectedOrder != null)
+                    var restored = Orders.FirstOrDefault(r => r.Order.OrderId == previousId.Value);
+                    if (restored != null)
                     {
-                        var still = Orders.FirstOrDefault(o => o.OrderId == _selectedOrder.OrderId);
-                        if (still != null) _ = OnOrderSelected(still);
-                        else { SelectedOrder = null; IsDetailVisible = false; }
+                        _selectedRow = restored;
+                        OnPropertyChanged(nameof(SelectedRow));
+                        OnPropertyChanged(nameof(SelectedOrder));
+                        await OnOrderSelectedAsync(restored.Order);
                     }
-                });
+                    else
+                    {
+                        _selectedRow = null;
+                        OnPropertyChanged(nameof(SelectedRow));
+                        OnPropertyChanged(nameof(SelectedOrder));
+                        IsDetailVisible = false;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -142,11 +226,78 @@ namespace AdminSystem_v2.ViewModels
             }
         }
 
-        // ── Selection ─────────────────────────────────────────────────────────
+        // ── Bulk selection tracking ───────────────────────────────────────────
 
-        private async Task OnOrderSelected(Order? order)
+        private void WireSelectionTracking(ObservableCollection<SelectableOrder> orders)
         {
-            _selectedOrder = order;
+            orders.CollectionChanged += OnOrdersCollectionChanged;
+            foreach (var o in orders)
+                o.PropertyChanged += OnOrderSelectionChanged;
+        }
+
+        private void UnwireSelectionTracking(ObservableCollection<SelectableOrder> orders)
+        {
+            orders.CollectionChanged -= OnOrdersCollectionChanged;
+            foreach (var o in orders)
+                o.PropertyChanged -= OnOrderSelectionChanged;
+        }
+
+        private void OnOrdersCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+                foreach (SelectableOrder o in e.NewItems) o.PropertyChanged += OnOrderSelectionChanged;
+            if (e.OldItems != null)
+                foreach (SelectableOrder o in e.OldItems) o.PropertyChanged -= OnOrderSelectionChanged;
+            RefreshSelectionState();
+        }
+
+        private void OnOrderSelectionChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SelectableOrder.IsSelected) && !_suppressSelectionRefresh)
+                RefreshSelectionState();
+        }
+
+        private void RefreshSelectionState()
+        {
+            OnPropertyChanged(nameof(SelectionCount));
+            OnPropertyChanged(nameof(HasSelection));
+            OnPropertyChanged(nameof(IsAllSelected));
+        }
+
+        // ── Status badges ─────────────────────────────────────────────────────
+
+        private void BuildStatusBadges(Dictionary<string, int> counts)
+        {
+            int total = counts.Values.Sum();
+            StatusBadges = new List<StatusBadge>
+            {
+                Badge("All",                        "All Orders",       total,                                         0x37,0x41,0x51, 0xD1,0xD5,0xDB),
+                Badge(OrderStatuses.Pending,        "Pending",          counts.GetValueOrDefault(OrderStatuses.Pending),        0x29,0x21,0x00, 0xF5,0x9E,0x0B),
+                Badge(OrderStatuses.Processing,     "Processing",       counts.GetValueOrDefault(OrderStatuses.Processing),     0x1F,0x12,0x00, 0xF9,0x73,0x16),
+                Badge(OrderStatuses.ReadyForPickup, "Ready for Pickup", counts.GetValueOrDefault(OrderStatuses.ReadyForPickup), 0x0F,0x1E,0x3D, 0x60,0xA5,0xFA),
+                Badge(OrderStatuses.PickedUp,       "Picked Up",        counts.GetValueOrDefault(OrderStatuses.PickedUp),       0x0A,0x1F,0x0E, 0x34,0xD3,0x99),
+                Badge(OrderStatuses.Shipped,        "Shipped",          counts.GetValueOrDefault(OrderStatuses.Shipped),        0x1A,0x0A,0x3D, 0xA7,0x8B,0xFA),
+                Badge(OrderStatuses.Delivered,      "Delivered",        counts.GetValueOrDefault(OrderStatuses.Delivered),      0x0A,0x1F,0x0E, 0x34,0xD3,0x99),
+                Badge(OrderStatuses.Cancelled,      "Cancelled",        counts.GetValueOrDefault(OrderStatuses.Cancelled),      0x1F,0x00,0x00, 0xF8,0x71,0x71),
+            };
+        }
+
+        private static StatusBadge Badge(
+            string label, string display, int count,
+            byte bgR, byte bgG, byte bgB,
+            byte fgR, byte fgG, byte fgB) => new()
+        {
+            Label        = label,
+            DisplayLabel = display,
+            Count        = count,
+            Background   = new SolidColorBrush(Color.FromRgb(bgR, bgG, bgB)),
+            Foreground   = new SolidColorBrush(Color.FromRgb(fgR, fgG, fgB)),
+        };
+
+        // ── Order detail loading ──────────────────────────────────────────────
+
+        private async Task OnOrderSelectedAsync(Order? order)
+        {
             NotifyActionAvailability();
 
             if (order == null)
@@ -155,7 +306,6 @@ namespace AdminSystem_v2.ViewModels
                 return;
             }
 
-            // Load full detail (items + delivery/pickup) in the background
             IsLoading = true;
             try
             {
@@ -167,12 +317,9 @@ namespace AdminSystem_v2.ViewModels
                     order.Pickup   = detail.Pickup;
                 }
 
-                RunOnUI(() =>
-                {
-                    IsDetailVisible = true;
-                    NotifyActionAvailability();
-                    OnPropertyChanged(nameof(SelectedOrder));
-                });
+                IsDetailVisible = true;
+                NotifyActionAvailability();
+                OnPropertyChanged(nameof(SelectedOrder));
             }
             catch (Exception ex)
             {
@@ -185,108 +332,136 @@ namespace AdminSystem_v2.ViewModels
             }
         }
 
-        // ── Status-change actions ─────────────────────────────────────────────
+        // ── Single-order status actions ───────────────────────────────────────
 
         private async Task MarkReadyForPickupAsync()
         {
-            if (_selectedOrder == null) return;
-            IsLoading = true;
-            ClearMessages();
-            try
-            {
-                await _orderService.MarkReadyForPickupAsync(_selectedOrder.OrderId);
-                ShowSuccess($"Order {_selectedOrder.OrderNumber} is ready for pickup.");
-                await LoadAsync();
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Action failed: {ex.Message}");
-            }
-            finally { IsLoading = false; }
+            if (SelectedOrder == null) return;
+            await ExecuteOrderActionAsync(
+                () => _orderService.MarkReadyForPickupAsync(SelectedOrder.OrderId),
+                $"Order {SelectedOrder.OrderNumber} is ready for pickup.");
         }
 
         private async Task ConfirmPickupAsync()
         {
-            if (_selectedOrder == null) return;
-            IsLoading = true;
-            ClearMessages();
-            try
-            {
-                await _orderService.ConfirmPickupAsync(_selectedOrder.OrderId);
-                ShowSuccess($"Pickup confirmed for order {_selectedOrder.OrderNumber}.");
-                await LoadAsync();
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Action failed: {ex.Message}");
-            }
-            finally { IsLoading = false; }
+            if (SelectedOrder == null) return;
+            await ExecuteOrderActionAsync(
+                () => _orderService.ConfirmPickupAsync(SelectedOrder.OrderId),
+                $"Pickup confirmed for order {SelectedOrder.OrderNumber}.");
         }
 
         private async Task MarkShippedAsync()
         {
-            if (_selectedOrder == null) return;
-            IsLoading = true;
-            ClearMessages();
-            try
-            {
-                await _orderService.UpdateOrderStatusAsync(_selectedOrder.OrderId, OrderStatuses.Shipped);
-                ShowSuccess($"Order {_selectedOrder.OrderNumber} marked as Shipped.");
-                await LoadAsync();
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Action failed: {ex.Message}");
-            }
-            finally { IsLoading = false; }
+            if (SelectedOrder == null) return;
+            await ExecuteOrderActionAsync(
+                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.Shipped),
+                $"Order {SelectedOrder.OrderNumber} marked as Shipped.");
         }
 
         private async Task MarkDeliveredAsync()
         {
-            if (_selectedOrder == null) return;
-            IsLoading = true;
-            ClearMessages();
-            try
-            {
-                await _orderService.UpdateOrderStatusAsync(_selectedOrder.OrderId, OrderStatuses.Delivered);
-                ShowSuccess($"Order {_selectedOrder.OrderNumber} marked as Delivered.");
-                await LoadAsync();
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Action failed: {ex.Message}");
-            }
-            finally { IsLoading = false; }
+            if (SelectedOrder == null) return;
+            await ExecuteOrderActionAsync(
+                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.Delivered),
+                $"Order {SelectedOrder.OrderNumber} marked as Delivered.");
         }
 
         private async Task CancelOrderAsync()
         {
-            if (_selectedOrder == null) return;
+            if (SelectedOrder == null) return;
+            if (!_dialog.Confirm(
+                    $"Cancel order {SelectedOrder.OrderNumber}? This cannot be undone.",
+                    "Cancel Order")) return;
+            await ExecuteOrderActionAsync(
+                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.Cancelled),
+                $"Order {SelectedOrder.OrderNumber} cancelled.");
+        }
 
-            var confirm = System.Windows.MessageBox.Show(
-                $"Cancel order {_selectedOrder.OrderNumber}? This cannot be undone.",
-                "Cancel Order",
-                System.Windows.MessageBoxButton.YesNo,
-                System.Windows.MessageBoxImage.Warning);
+        // ── Bulk status actions ───────────────────────────────────────────────
 
-            if (confirm != System.Windows.MessageBoxResult.Yes) return;
+        private async Task BulkUpdateStatusAsync(string? status)
+        {
+            if (string.IsNullOrEmpty(status)) return;
+            var targets = Orders.Where(o => o.IsSelected).Select(o => o.Order).ToList();
+            if (targets.Count == 0) return;
 
+            if (!_dialog.Confirm(
+                    $"Update {targets.Count} order(s) to '{status}'?",
+                    "Bulk Update Status")) return;
+
+            await ExecuteBulkActionAsync(
+                o => _orderService.UpdateOrderStatusAsync(o.OrderId, status),
+                targets,
+                $"{targets.Count} order(s) updated to '{status}'.");
+        }
+
+        private async Task BulkCancelAsync()
+        {
+            var targets = Orders.Where(o => o.IsSelected).Select(o => o.Order).ToList();
+            if (targets.Count == 0) return;
+
+            if (!_dialog.Confirm(
+                    $"Cancel {targets.Count} order(s)? This cannot be undone.",
+                    "Bulk Cancel Orders")) return;
+
+            await ExecuteBulkActionAsync(
+                o => _orderService.UpdateOrderStatusAsync(o.OrderId, OrderStatuses.Cancelled),
+                targets,
+                $"{targets.Count} order(s) cancelled.");
+        }
+
+        // ── Shared action helpers ─────────────────────────────────────────────
+
+        private async Task ExecuteOrderActionAsync(Func<Task> action, string successMessage)
+        {
             IsLoading = true;
             ClearMessages();
             try
             {
-                await _orderService.UpdateOrderStatusAsync(_selectedOrder.OrderId, OrderStatuses.Cancelled);
-                ShowSuccess($"Order {_selectedOrder.OrderNumber} cancelled.");
+                await action();
+                ShowSuccess(successMessage);
                 await LoadAsync();
             }
             catch (Exception ex)
             {
                 ShowError($"Action failed: {ex.Message}");
             }
-            finally { IsLoading = false; }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
-        // ── Helpers ───────────────────────────────────────────────────────────
+        private async Task ExecuteBulkActionAsync(
+            Func<Order, Task> action, IList<Order> targets, string successMessage)
+        {
+            IsLoading = true;
+            ClearMessages();
+            int failed = 0;
+            try
+            {
+                foreach (var order in targets)
+                {
+                    try   { await action(order); }
+                    catch { failed++; }
+                }
+
+                if (failed > 0)
+                    ShowError($"Action failed for {failed} order(s). Others may have succeeded.");
+                else
+                    ShowSuccess(successMessage);
+
+                await LoadAsync();
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Bulk action failed: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
 
         private void NotifyActionAvailability()
         {

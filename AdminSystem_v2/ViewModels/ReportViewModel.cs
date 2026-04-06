@@ -155,12 +155,9 @@ namespace AdminSystem_v2.ViewModels
 
                 await Task.WhenAll(summaryTask, dailyTask, topTask);
 
-                RunOnUI(() =>
-                {
-                    SalesSummary = summaryTask.Result;
-                    DailySales   = new ObservableCollection<DailySales>(dailyTask.Result);
-                    TopProducts  = new ObservableCollection<TopProduct>(topTask.Result);
-                });
+                SalesSummary = summaryTask.Result;
+                DailySales   = new ObservableCollection<DailySales>(dailyTask.Result);
+                TopProducts  = new ObservableCollection<TopProduct>(topTask.Result);
 
                 _salesLoaded = true;
             }
@@ -183,16 +180,13 @@ namespace AdminSystem_v2.ViewModels
             {
                 var items = (await _reportService.GetInventoryReportAsync()).ToList();
 
-                RunOnUI(() =>
-                {
-                    InventoryItems = new ObservableCollection<InventoryReportItem>(items);
+                InventoryItems = new ObservableCollection<InventoryReportItem>(items);
 
-                    InvTotal      = items.Count;
-                    InvInStock    = items.Count(i => i.StockStatus == StockStatuses.InStock);
-                    InvLowStock   = items.Count(i => i.StockStatus == StockStatuses.LowStock);
-                    InvOutOfStock = items.Count(i => i.StockStatus == StockStatuses.OutOfStock);
-                    InvTotalValue = items.Sum(i => i.StockValue);
-                });
+                InvTotal      = items.Count;
+                InvInStock    = items.Count(i => i.StockStatus == StockStatuses.InStock);
+                InvLowStock   = items.Count(i => i.StockStatus == StockStatuses.LowStock);
+                InvOutOfStock = items.Count(i => i.StockStatus == StockStatuses.OutOfStock);
+                InvTotalValue = items.Sum(i => i.StockValue);
 
                 _inventoryLoaded = true;
             }

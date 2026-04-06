@@ -38,7 +38,7 @@ namespace AdminSystem_v2.Repositories
 
         public async Task<string> GetUserRoleAsync(int userId)
         {
-            await using var conn = Helpers.DatabaseHelper.GetConnection();
+            await using var conn = GetConnection();
             return await conn.QueryFirstOrDefaultAsync<string>(
                 @"SELECT TOP 1 r.RoleName
                   FROM UserRole ur
@@ -54,7 +54,7 @@ namespace AdminSystem_v2.Repositories
 
         public async Task<bool> HasRoleAsync(int userId, string roleName)
         {
-            await using var conn = Helpers.DatabaseHelper.GetConnection();
+            await using var conn = GetConnection();
             int count = await conn.ExecuteScalarAsync<int>(
                 @"SELECT COUNT(1) FROM UserRole ur
                   INNER JOIN Role r ON ur.RoleId = r.RoleId
@@ -80,7 +80,7 @@ namespace AdminSystem_v2.Repositories
 
         public async Task SetUserRoleAsync(int userId, string roleName)
         {
-            await using var conn = Helpers.DatabaseHelper.GetConnection();
+            await using var conn = GetConnection();
             await using var tx   = await conn.BeginTransactionAsync();
             try
             {
@@ -116,7 +116,7 @@ namespace AdminSystem_v2.Repositories
 
         public async Task CreateStaffAsync(User user, string passwordHash, string roleName)
         {
-            await using var conn = Helpers.DatabaseHelper.GetConnection();
+            await using var conn = GetConnection();
             await using var tx   = await conn.BeginTransactionAsync();
             try
             {

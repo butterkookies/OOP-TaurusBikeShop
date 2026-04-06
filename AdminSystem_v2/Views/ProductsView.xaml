@@ -333,6 +333,136 @@
                         </Button>
                     </StackPanel>
 
+                    <!-- ── Images section (only for saved products) ─────── -->
+                    <StackPanel Margin="0,0,0,24">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding EditProduct.ProductId}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <TextBlock Text="Product Images"
+                                   FontSize="14" FontWeight="SemiBold" Foreground="White"
+                                   Margin="0,0,0,12"/>
+
+                        <!-- Thumbnail strip (scrollable) -->
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Disabled"
+                                      Margin="0,0,0,10" Height="116">
+                            <ItemsControl ItemsSource="{Binding EditImages}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Width="114" Margin="0,0,8,0">
+                                            <!-- Thumbnail frame -->
+                                            <Border Width="114" Height="108"
+                                                    CornerRadius="6"
+                                                    BorderBrush="#374151" BorderThickness="1"
+                                                    Background="#1F2937" ClipToBounds="True">
+                                                <Image Source="{Binding ImageUrl}"
+                                                       Stretch="UniformToFill"
+                                                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                                            </Border>
+                                            <!-- "Primary" badge -->
+                                            <Border CornerRadius="4" Padding="5,2"
+                                                    HorizontalAlignment="Left" VerticalAlignment="Top"
+                                                    Margin="5,5,0,0" Background="#3B82F6">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsPrimary}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock Text="Primary" Foreground="White"
+                                                           FontSize="9" FontWeight="SemiBold"/>
+                                            </Border>
+                                            <!-- Remove button -->
+                                            <Button Width="20" Height="20"
+                                                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                    Margin="0,5,5,0"
+                                                    Command="{Binding DataContext.RemoveImageCommand,
+                                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    ToolTip="Remove image"
+                                                    Cursor="Hand">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border Background="#EF4444" CornerRadius="10"
+                                                                Width="{TemplateBinding Width}"
+                                                                Height="{TemplateBinding Height}">
+                                                            <TextBlock Text="&#x2715;" Foreground="White"
+                                                                       FontSize="9" FontWeight="Bold"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="#DC2626"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <!-- Empty state -->
+                        <TextBlock Text="No images yet." Foreground="#4B5563" FontSize="13"
+                                   Margin="0,0,0,10">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding EditImages.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <!-- URL input + Add button -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- TextBox with overlay placeholder -->
+                            <Grid Grid.Column="0">
+                                <TextBox Text="{Binding NewImageUrl, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource FormTextBox}"/>
+                                <TextBlock Text="Paste Cloudinary image URL..."
+                                           Foreground="#4B5563" FontSize="13"
+                                           Margin="12,0" VerticalAlignment="Center"
+                                           IsHitTestVisible="False"
+                                           Visibility="{Binding IsNewImageUrlEmpty,
+                                               Converter={StaticResource BoolToVis}}"/>
+                            </Grid>
+
+                            <Button Grid.Column="2" Content="Add Image"
+                                    Command="{Binding AddImageCommand}"
+                                    Style="{StaticResource PrimaryButton}"/>
+                        </Grid>
+                    </StackPanel>
+
                     <!-- ── Variants section (only for saved products) ──── -->
                     <StackPanel>
                         <StackPanel.Style>

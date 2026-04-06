@@ -19,7 +19,8 @@ namespace AdminSystem_v2.Models
         public string CategoryName { get; set; } = string.Empty;
         public string BrandName    { get; set; } = string.Empty;
 
-        public List<ProductVariant> Variants { get; set; } = new();
+        public List<ProductVariant>  Variants { get; set; } = new();
+        public List<ProductImage>   Images   { get; set; } = new();
 
         public int TotalStock => Variants
             .Where(v => v.IsActive)

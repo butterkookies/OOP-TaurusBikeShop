@@ -39,12 +39,6 @@
             </Setter>
         </Style>
 
-        <!-- ── Tab button — active ── -->
-        <Style x:Key="TabBtnActive" TargetType="Button" BasedOn="{StaticResource TabBtn}">
-            <Setter Property="Foreground"  Value="#F9FAFB"/>
-            <Setter Property="BorderBrush" Value="#DC2626"/>
-        </Style>
-
         <!-- ── Stat card ── -->
         <Style x:Key="StatCard" TargetType="Border">
             <Setter Property="Background"    Value="#1F2937"/>
@@ -123,7 +117,8 @@
                         <Style TargetType="Button" BasedOn="{StaticResource TabBtn}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsSalesTab}" Value="True">
-                                    <Setter Property="Style" Value="{StaticResource TabBtnActive}"/>
+                                    <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                    <Setter Property="BorderBrush" Value="#DC2626"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -135,7 +130,8 @@
                         <Style TargetType="Button" BasedOn="{StaticResource TabBtn}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsInventoryTab}" Value="True">
-                                    <Setter Property="Style" Value="{StaticResource TabBtnActive}"/>
+                                    <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                    <Setter Property="BorderBrush" Value="#DC2626"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

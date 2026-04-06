@@ -217,9 +217,9 @@
                     </Button>
 
                     <!-- CONNECTION ERROR -->
-                    <TextBlock Text="{Binding ConnectionError}"
+                    <TextBlock Text="{Binding ErrorMessage}"
                                Style="{StaticResource ErrorText}"
-                               Visibility="{Binding HasConnectionError, Converter={StaticResource BoolToVisibility}}"
+                               Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}"
                                HorizontalAlignment="Center"
                                Margin="0,10,0,0"/>
 

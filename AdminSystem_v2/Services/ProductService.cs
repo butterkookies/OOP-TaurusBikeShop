@@ -60,5 +60,18 @@ namespace AdminSystem_v2.Services
 
         public Task<IEnumerable<Brand>> GetAllBrandsAsync()
             => _productRepo.GetAllBrandsAsync();
+
+        public Task<IEnumerable<ProductImage>> GetImagesAsync(int productId)
+            => _productRepo.GetImagesAsync(productId);
+
+        public Task<int> AddImageAsync(int productId, string imageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl))
+                throw new ArgumentException("Image URL cannot be empty.");
+            return _productRepo.AddImageAsync(productId, imageUrl.Trim());
+        }
+
+        public Task DeleteImageAsync(int imageId)
+            => _productRepo.DeleteImageAsync(imageId);
     }
 }

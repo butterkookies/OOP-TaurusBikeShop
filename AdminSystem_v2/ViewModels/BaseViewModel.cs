@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows;
 
 namespace AdminSystem_v2.ViewModels
 {
@@ -79,16 +78,5 @@ namespace AdminSystem_v2.ViewModels
             SuccessMessage = string.Empty;
         }
 
-        /// <summary>
-        /// Runs an action on the UI thread. Safe to call from background threads
-        /// (e.g. after an async DB call completes).
-        /// </summary>
-        protected void RunOnUI(Action action)
-        {
-            if (Application.Current?.Dispatcher != null)
-                Application.Current.Dispatcher.Invoke(action);
-            else
-                action();
-        }
     }
 }

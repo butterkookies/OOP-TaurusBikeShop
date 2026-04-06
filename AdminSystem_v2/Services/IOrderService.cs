@@ -9,5 +9,8 @@ namespace AdminSystem_v2.Services
         Task UpdateOrderStatusAsync(int orderId, string status);
         Task MarkReadyForPickupAsync(int orderId);
         Task ConfirmPickupAsync(int orderId);
+
+        /// <summary>Returns order counts per status for the badge bar (single cheap query).</summary>
+        Task<Dictionary<string, int>> GetStatusCountsAsync();
     }
 }

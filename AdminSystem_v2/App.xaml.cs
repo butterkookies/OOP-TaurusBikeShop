@@ -30,8 +30,9 @@ namespace AdminSystem_v2
             IOrderService     orderSvc     = new OrderService(orderRepo);
             IReportService    reportSvc    = new ReportService(reportRepo);
             IUserService      userSvc      = new UserService(userRepo);
+            IDialogService    dialogSvc    = new DialogService();
 
-            ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc);
+            ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc);
         }
 
         private void ShowLogin(IAuthService authSvc,
@@ -39,15 +40,16 @@ namespace AdminSystem_v2
                                IInventoryService inventorySvc,
                                IOrderService orderSvc,
                                IReportService reportSvc,
-                               IUserService userSvc)
+                               IUserService userSvc,
+                               IDialogService dialogSvc)
         {
-            var loginVm   = new LoginViewModel(authSvc);
+            var loginVm   = new LoginViewModel(authSvc, dialogSvc);
             var loginView = new LoginView(loginVm);
 
             loginVm.LoginSucceeded += () =>
             {
+                ShowMain(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc);
                 loginView.Close();
-                ShowMain(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc);
             };
 
             loginView.Show();
@@ -58,21 +60,22 @@ namespace AdminSystem_v2
                               IInventoryService inventorySvc,
                               IOrderService orderSvc,
                               IReportService reportSvc,
-                              IUserService userSvc)
+                              IUserService userSvc,
+                              IDialogService dialogSvc)
         {
             var dashboardVm = new DashboardViewModel(productSvc, inventorySvc);
             var productVm   = new ProductViewModel(productSvc);
-            var orderVm     = new OrderViewModel(orderSvc);
+            var orderVm     = new OrderViewModel(orderSvc, dialogSvc);
             var reportVm    = new ReportViewModel(reportSvc);
             var staffVm     = new StaffViewModel(userSvc);
 
-            var mainVm   = new MainWindowViewModel(authSvc, dashboardVm, productVm, orderVm, reportVm, staffVm);
+            var mainVm   = new MainWindowViewModel(authSvc, dashboardVm, productVm, orderVm, reportVm, staffVm, dialogSvc);
             var mainView = new MainShell(mainVm);
 
             mainVm.SignOutRequested += () =>
             {
                 mainView.Close();
-                ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc);
+                ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc);
             };
 
             mainView.Show();

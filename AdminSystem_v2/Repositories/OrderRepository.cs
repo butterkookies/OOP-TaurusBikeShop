@@ -17,7 +17,9 @@ namespace AdminSystem_v2.Repositories
                 u.FirstName + ' ' + u.LastName  AS CustomerName,
                 u.Email                          AS CustomerEmail,
                 CASE WHEN po.PickupOrderId IS NOT NULL THEN 'Pickup' ELSE 'Delivery' END
-                                                 AS DeliveryType
+                                                 AS DeliveryType,
+                (SELECT COUNT(*) FROM vw_OrderItemDetail vi WHERE vi.OrderId = o.OrderId)
+                                                 AS ItemCount
               FROM [Order] o
               INNER JOIN [User]         u  ON o.UserId  = u.UserId
               LEFT  JOIN PickupOrder    po ON o.OrderId = po.OrderId
@@ -154,6 +156,27 @@ namespace AdminSystem_v2.Repositories
                 await tx.RollbackAsync();
                 throw;
             }
+        }
+
+        public async Task<Dictionary<string, int>> GetStatusCountsAsync()
+        {
+            const string sql =
+                @"SELECT OrderStatus, COUNT(*) AS Cnt
+                  FROM [Order]
+                  WHERE IsWalkIn = 0
+                  GROUP BY OrderStatus";
+
+            await using var conn = GetConnection();
+            var rows = await conn.QueryAsync<StatusCountRow>(sql);
+            return rows.ToDictionary(r => r.OrderStatus, r => r.Cnt);
+        }
+
+        // ── Private helpers ───────────────────────────────────────────────────
+
+        private sealed class StatusCountRow
+        {
+            public string OrderStatus { get; set; } = string.Empty;
+            public int    Cnt         { get; set; }
         }
     }
 }

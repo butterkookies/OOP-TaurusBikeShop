@@ -23,5 +23,11 @@ namespace AdminSystem_v2.Repositories
         /// Sets Order status to PickedUp and stamps PickupOrder.PickupConfirmedAt.
         /// </summary>
         Task ConfirmPickupAsync(int orderId);
+
+        /// <summary>
+        /// Returns a dictionary of OrderStatus → count for all online orders.
+        /// Used to populate the status badge bar without loading every row.
+        /// </summary>
+        Task<Dictionary<string, int>> GetStatusCountsAsync();
     }
 }

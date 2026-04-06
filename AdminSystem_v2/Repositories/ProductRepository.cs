@@ -166,6 +166,35 @@ namespace AdminSystem_v2.Repositories
             => await QueryAsync<Brand>(
                 "SELECT * FROM Brand WHERE IsActive = 1 ORDER BY BrandName");
 
+        // ── Product images ────────────────────────────────────────────────
+
+        public async Task<IEnumerable<ProductImage>> GetImagesAsync(int productId)
+            => await QueryAsync<ProductImage>(
+                @"SELECT * FROM ProductImage
+                  WHERE ProductId = @ProductId
+                  ORDER BY IsPrimary DESC, DisplayOrder",
+                new { ProductId = productId });
+
+        public async Task<int> AddImageAsync(int productId, string imageUrl)
+            => await ExecuteScalarAsync(
+                @"INSERT INTO ProductImage
+                    (ProductId, ImageUrl, ImageType, StorageBucket, StoragePath,
+                     IsPrimary, DisplayOrder, CreatedAt)
+                  SELECT @ProductId, @Url, 'gallery', '', '',
+                         CASE WHEN NOT EXISTS
+                              (SELECT 1 FROM ProductImage WHERE ProductId = @ProductId)
+                              THEN 1 ELSE 0 END,
+                         ISNULL((SELECT MAX(DisplayOrder) + 1
+                                 FROM ProductImage WHERE ProductId = @ProductId), 1),
+                         GETUTCDATE();
+                  SELECT CAST(SCOPE_IDENTITY() AS INT);",
+                new { ProductId = productId, Url = imageUrl });
+
+        public async Task DeleteImageAsync(int imageId)
+            => await ExecuteAsync(
+                "DELETE FROM ProductImage WHERE ProductImageId = @Id",
+                new { Id = imageId });
+
         // ── Private helpers ───────────────────────────────────────────────
 
         private static async Task PopulateVariantsAsync(

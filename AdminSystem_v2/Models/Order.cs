@@ -30,8 +30,12 @@ namespace AdminSystem_v2.Models
         public DeliveryDetail?  Delivery { get; set; }
         public PickupOrder?     Pickup   { get; set; }
 
+        // ── Populated by list query (subquery count) ─────────────────────────
+        public int ItemCount { get; set; }
+
         // ── Computed ──────────────────────────────────────────────────────────
-        public decimal GrandTotal => SubTotal - DiscountAmount + ShippingFee;
+        public decimal GrandTotal    => SubTotal - DiscountAmount + ShippingFee;
+        public string  PaymentMethod => IsWalkIn ? "Walk-in" : "Online";
     }
 
     /// <summary>

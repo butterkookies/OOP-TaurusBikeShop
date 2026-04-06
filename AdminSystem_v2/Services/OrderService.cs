@@ -23,5 +23,8 @@ namespace AdminSystem_v2.Services
 
         public Task ConfirmPickupAsync(int orderId)
             => _repo.ConfirmPickupAsync(orderId);
+
+        public Task<Dictionary<string, int>> GetStatusCountsAsync()
+            => _repo.GetStatusCountsAsync();
     }
 }

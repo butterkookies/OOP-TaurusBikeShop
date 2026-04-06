@@ -15,6 +15,7 @@
         <Style x:Key="NavButton" TargetType="Button">
             <Setter Property="Background"              Value="Transparent"/>
             <Setter Property="Foreground"              Value="#9CA3AF"/>
+            <Setter Property="BorderBrush"             Value="Transparent"/>
             <Setter Property="BorderThickness"         Value="0"/>
             <Setter Property="Height"                  Value="40"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -27,7 +28,7 @@
                         <Border x:Name="Bd"
                                 Background="{TemplateBinding Background}"
                                 BorderThickness="3,0,0,0"
-                                BorderBrush="Transparent"
+                                BorderBrush="{TemplateBinding BorderBrush}"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter VerticalAlignment="Center"/>
                         </Border>
@@ -38,24 +39,6 @@
                                 <Setter Property="Foreground"                   Value="#F9FAFB"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- ── NAV BUTTON ACTIVE (same template, pre-applied hover state) ── -->
-        <Style x:Key="NavButtonActive" TargetType="Button" BasedOn="{StaticResource NavButton}">
-            <Setter Property="Background" Value="#1F2937"/>
-            <Setter Property="Foreground" Value="#F9FAFB"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="#1F2937"
-                                BorderThickness="3,0,0,0"
-                                BorderBrush="#DC2626"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter VerticalAlignment="Center"/>
-                        </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -219,7 +202,9 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Dashboard">
-                                            <Setter Property="Style" Value="{StaticResource NavButtonActive}"/>
+                                            <Setter Property="Background"  Value="#1F2937"/>
+                                <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                <Setter Property="BorderBrush" Value="#DC2626"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -243,7 +228,9 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Orders">
-                                            <Setter Property="Style" Value="{StaticResource NavButtonActive}"/>
+                                            <Setter Property="Background"  Value="#1F2937"/>
+                                <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                <Setter Property="BorderBrush" Value="#DC2626"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -263,7 +250,9 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Reports">
-                                            <Setter Property="Style" Value="{StaticResource NavButtonActive}"/>
+                                            <Setter Property="Background"  Value="#1F2937"/>
+                                <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                <Setter Property="BorderBrush" Value="#DC2626"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -286,7 +275,9 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Products">
-                                            <Setter Property="Style" Value="{StaticResource NavButtonActive}"/>
+                                            <Setter Property="Background"  Value="#1F2937"/>
+                                <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                <Setter Property="BorderBrush" Value="#DC2626"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -309,7 +300,9 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Staff">
-                                            <Setter Property="Style" Value="{StaticResource NavButtonActive}"/>
+                                            <Setter Property="Background"  Value="#1F2937"/>
+                                <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                <Setter Property="BorderBrush" Value="#DC2626"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

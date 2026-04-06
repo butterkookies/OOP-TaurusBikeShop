@@ -13,5 +13,10 @@ namespace AdminSystem_v2.Repositories
         Task                           UpdateVariantAsync(ProductVariant variant);
         Task<IEnumerable<Category>>    GetAllCategoriesAsync();
         Task<IEnumerable<Brand>>       GetAllBrandsAsync();
+
+        // ── Product images ────────────────────────────────────────────────
+        Task<IEnumerable<ProductImage>> GetImagesAsync(int productId);
+        Task<int>                       AddImageAsync(int productId, string imageUrl);
+        Task                            DeleteImageAsync(int imageId);
     }
 }

@@ -38,12 +38,6 @@
             </Setter>
         </Style>
 
-        <Style x:Key="RoleChipActive" TargetType="Button" BasedOn="{StaticResource RoleChip}">
-            <Setter Property="Background"  Value="#1E3A5F"/>
-            <Setter Property="Foreground"  Value="#60A5FA"/>
-            <Setter Property="BorderBrush" Value="#3B82F6"/>
-        </Style>
-
         <!-- ── User list item ── -->
         <Style x:Key="UserListItem" TargetType="ListBoxItem">
             <Setter Property="Background"    Value="Transparent"/>
@@ -191,7 +185,9 @@
                                                         Binding="{Binding DataContext.SelectedRoleFilter,
                                                                   RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                         Value="{Binding}">
-                                                        <Setter Property="Style" Value="{StaticResource RoleChipActive}"/>
+                                                        <Setter Property="Background"  Value="#1E3A5F"/>
+                                                        <Setter Property="Foreground"  Value="#60A5FA"/>
+                                                        <Setter Property="BorderBrush" Value="#3B82F6"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
