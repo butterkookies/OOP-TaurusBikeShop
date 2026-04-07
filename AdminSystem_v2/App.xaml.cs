@@ -22,6 +22,7 @@ namespace AdminSystem_v2
             IInventoryRepository inventoryRepo = new InventoryRepository();
             IOrderRepository     orderRepo     = new OrderRepository();
             IReportRepository    reportRepo    = new ReportRepository();
+            IPOSRepository       posRepo       = new POSRepository();
 
             // Services
             IAuthService      authSvc      = new AuthService(userRepo);
@@ -31,8 +32,9 @@ namespace AdminSystem_v2
             IReportService    reportSvc    = new ReportService(reportRepo);
             IUserService      userSvc      = new UserService(userRepo);
             IDialogService    dialogSvc    = new DialogService();
+            IPOSService       posSvc       = new POSService(posRepo);
 
-            ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc);
+            ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc);
         }
 
         private void ShowLogin(IAuthService authSvc,
@@ -41,14 +43,15 @@ namespace AdminSystem_v2
                                IOrderService orderSvc,
                                IReportService reportSvc,
                                IUserService userSvc,
-                               IDialogService dialogSvc)
+                               IDialogService dialogSvc,
+                               IPOSService posSvc)
         {
             var loginVm   = new LoginViewModel(authSvc, dialogSvc);
             var loginView = new LoginView(loginVm);
 
             loginVm.LoginSucceeded += () =>
             {
-                ShowMain(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc);
+                ShowMain(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc);
                 loginView.Close();
             };
 
@@ -61,21 +64,23 @@ namespace AdminSystem_v2
                               IOrderService orderSvc,
                               IReportService reportSvc,
                               IUserService userSvc,
-                              IDialogService dialogSvc)
+                              IDialogService dialogSvc,
+                              IPOSService posSvc)
         {
             var dashboardVm = new DashboardViewModel(productSvc, inventorySvc);
             var productVm   = new ProductViewModel(productSvc);
             var orderVm     = new OrderViewModel(orderSvc, dialogSvc);
             var reportVm    = new ReportViewModel(reportSvc);
             var staffVm     = new StaffViewModel(userSvc);
+            var posVm       = new POSViewModel(posSvc);
 
-            var mainVm   = new MainWindowViewModel(authSvc, dashboardVm, productVm, orderVm, reportVm, staffVm, dialogSvc);
+            var mainVm   = new MainWindowViewModel(authSvc, dashboardVm, productVm, orderVm, reportVm, staffVm, posVm, dialogSvc);
             var mainView = new MainShell(mainVm);
 
             mainVm.SignOutRequested += () =>
             {
                 mainView.Close();
-                ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc);
+                ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc);
             };
 
             mainView.Show();

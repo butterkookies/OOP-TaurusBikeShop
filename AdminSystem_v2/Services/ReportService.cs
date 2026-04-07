@@ -9,14 +9,17 @@ namespace AdminSystem_v2.Services
 
         public ReportService(IReportRepository repo) => _repo = repo;
 
-        public Task<SalesSummary> GetSalesSummaryAsync(DateTime from, DateTime to)
-            => _repo.GetSalesSummaryAsync(from, to);
+        public Task<SalesSummary> GetSalesSummaryAsync(DateTime from, DateTime to, bool? isWalkIn)
+            => _repo.GetSalesSummaryAsync(from, to, isWalkIn);
 
-        public Task<IEnumerable<DailySales>> GetDailySalesAsync(DateTime from, DateTime to)
-            => _repo.GetDailySalesAsync(from, to);
+        public Task<IEnumerable<DailySales>> GetDailySalesAsync(DateTime from, DateTime to, bool? isWalkIn)
+            => _repo.GetDailySalesAsync(from, to, isWalkIn);
 
-        public Task<IEnumerable<TopProduct>> GetTopProductsAsync(DateTime from, DateTime to, int top = 10)
-            => _repo.GetTopProductsAsync(from, to, top);
+        public Task<IEnumerable<TopProduct>> GetTopProductsAsync(DateTime from, DateTime to, int top, bool? isWalkIn)
+            => _repo.GetTopProductsAsync(from, to, top, isWalkIn);
+
+        public Task<IEnumerable<DailySales>> GetChartDataAsync(DateTime from, DateTime to, string groupBy, bool? isWalkIn)
+            => _repo.GetChartDataAsync(from, to, groupBy, isWalkIn);
 
         public Task<IEnumerable<InventoryReportItem>> GetInventoryReportAsync()
             => _repo.GetInventoryReportAsync();

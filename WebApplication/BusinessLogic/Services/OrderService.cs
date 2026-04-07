@@ -219,8 +219,7 @@ public sealed class OrderService : IOrderService
                     // the customer is actually notified, not at order placement.
                     PickupOrder pickup = new()
                     {
-                        PickupOrderId = order.OrderId,
-                        OrderId       = order.OrderId
+                        OrderId = order.OrderId
                     };
                     await _context.PickupOrders.AddAsync(pickup, cancellationToken);
                     await _context.SaveChangesAsync(cancellationToken);

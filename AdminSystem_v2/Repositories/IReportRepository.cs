@@ -4,16 +4,28 @@ namespace AdminSystem_v2.Repositories
 {
     public interface IReportRepository
     {
-        /// <summary>Returns aggregated sales figures for the given date window.</summary>
-        Task<SalesSummary> GetSalesSummaryAsync(DateTime from, DateTime to);
+        /// <summary>
+        /// Aggregated sales figures. isWalkIn: null = combined, false = online, true = walk-in.
+        /// </summary>
+        Task<SalesSummary> GetSalesSummaryAsync(DateTime from, DateTime to, bool? isWalkIn);
 
-        /// <summary>Returns one row per calendar day in the window, ordered newest first.</summary>
-        Task<IEnumerable<DailySales>> GetDailySalesAsync(DateTime from, DateTime to);
+        /// <summary>
+        /// One row per calendar day in the window, ordered oldest → newest.
+        /// </summary>
+        Task<IEnumerable<DailySales>> GetDailySalesAsync(DateTime from, DateTime to, bool? isWalkIn);
 
-        /// <summary>Returns the top N products by revenue in the window.</summary>
-        Task<IEnumerable<TopProduct>> GetTopProductsAsync(DateTime from, DateTime to, int top = 10);
+        /// <summary>
+        /// Top N products by revenue in the window.
+        /// </summary>
+        Task<IEnumerable<TopProduct>> GetTopProductsAsync(DateTime from, DateTime to, int top, bool? isWalkIn);
 
-        /// <summary>Returns one row per active product variant, ordered by stock status urgency.</summary>
+        /// <summary>
+        /// Chart data grouped by Day / Week / Month / Year, ordered oldest → newest.
+        /// groupBy must be one of: "Day", "Week", "Month", "Year".
+        /// </summary>
+        Task<IEnumerable<DailySales>> GetChartDataAsync(DateTime from, DateTime to, string groupBy, bool? isWalkIn);
+
+        /// <summary>One row per active product variant, ordered by urgency.</summary>
         Task<IEnumerable<InventoryReportItem>> GetInventoryReportAsync();
     }
 }

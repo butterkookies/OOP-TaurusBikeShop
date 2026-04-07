@@ -24,7 +24,7 @@
                 <!-- Search box -->
                 <Border Grid.Column="0" Background="#111827" CornerRadius="6"
                         BorderBrush="#374151" BorderThickness="1"
-                        VerticalAlignment="Center" Height="36" MaxWidth="320"
+                        VerticalAlignment="Center" Height="36" Width="420"
                         HorizontalAlignment="Left">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -37,7 +37,8 @@
                         <TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                  Background="Transparent" BorderThickness="0"
                                  Foreground="White" CaretBrush="White"
-                                 VerticalAlignment="Center" FontSize="13">
+                                 VerticalAlignment="Center" VerticalContentAlignment="Center"
+                                 TextAlignment="Left" FontSize="13" Padding="0">
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Resources>

@@ -180,7 +180,7 @@ namespace AdminSystem_v2.Repositories
                 @"INSERT INTO ProductImage
                     (ProductId, ImageUrl, ImageType, StorageBucket, StoragePath,
                      IsPrimary, DisplayOrder, CreatedAt)
-                  SELECT @ProductId, @Url, 'gallery', '', '',
+                  SELECT @ProductId, @Url, 'Full', '', '',
                          CASE WHEN NOT EXISTS
                               (SELECT 1 FROM ProductImage WHERE ProductId = @ProductId)
                               THEN 1 ELSE 0 END,
@@ -189,6 +189,7 @@ namespace AdminSystem_v2.Repositories
                          GETUTCDATE();
                   SELECT CAST(SCOPE_IDENTITY() AS INT);",
                 new { ProductId = productId, Url = imageUrl });
+
 
         public async Task DeleteImageAsync(int imageId)
             => await ExecuteAsync(

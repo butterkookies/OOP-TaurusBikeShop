@@ -14,6 +14,7 @@ namespace AdminSystem_v2.ViewModels
         private readonly OrderViewModel     _orderVm;
         private readonly ReportViewModel    _reportVm;
         private readonly StaffViewModel     _staffVm;
+        private readonly POSViewModel       _posVm;
 
         // ── Session ───────────────────────────────────────────────────────
 
@@ -59,6 +60,7 @@ namespace AdminSystem_v2.ViewModels
             OrderViewModel     orderVm,
             ReportViewModel    reportVm,
             StaffViewModel     staffVm,
+            POSViewModel       posVm,
             IDialogService     dialog)
         {
             _authService  = authService;
@@ -68,6 +70,7 @@ namespace AdminSystem_v2.ViewModels
             _orderVm      = orderVm;
             _reportVm     = reportVm;
             _staffVm      = staffVm;
+            _posVm        = posVm;
 
             User? user   = App.CurrentUser;
             UserFullName = user?.FullName ?? "Administrator";
@@ -94,6 +97,7 @@ namespace AdminSystem_v2.ViewModels
                 PageNames.Orders    => _orderVm,
                 PageNames.Reports   => _reportVm,
                 PageNames.Staff     => _staffVm,
+                PageNames.POS       => _posVm,
                 _                   => _dashboardVm
             };
 
@@ -112,6 +116,8 @@ namespace AdminSystem_v2.ViewModels
                 _ = _reportVm.LoadAsync();
             else if (page == PageNames.Staff)
                 _ = _staffVm.LoadAsync();
+            else if (page == PageNames.POS)
+                _ = _posVm.LoadAsync();
         }
 
         // ── Command Handlers ──────────────────────────────────────────────

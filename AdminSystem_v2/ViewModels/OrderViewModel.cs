@@ -78,15 +78,22 @@ namespace AdminSystem_v2.ViewModels
             set
             {
                 if (SetProperty(ref _selectedRow, value))
-                {
-                    OnPropertyChanged(nameof(SelectedOrder));
                     _ = OnOrderSelectedAsync(value?.Order);
-                }
             }
         }
 
-        /// <summary>Convenience accessor — the raw <see cref="Order"/> shown in the detail panel.</summary>
-        public Order? SelectedOrder => _selectedRow?.Order;
+        private Order? _selectedOrder;
+
+        /// <summary>
+        /// The fully-loaded <see cref="Order"/> shown in the detail panel.
+        /// Cycled through null after each async load so WPF re-evaluates all
+        /// child bindings (Items, Delivery, Pickup) on the new object reference.
+        /// </summary>
+        public Order? SelectedOrder
+        {
+            get => _selectedOrder;
+            private set => SetProperty(ref _selectedOrder, value);
+        }
 
         private bool _isDetailVisible;
         public  bool IsDetailVisible
@@ -203,14 +210,13 @@ namespace AdminSystem_v2.ViewModels
                     {
                         _selectedRow = restored;
                         OnPropertyChanged(nameof(SelectedRow));
-                        OnPropertyChanged(nameof(SelectedOrder));
                         await OnOrderSelectedAsync(restored.Order);
                     }
                     else
                     {
-                        _selectedRow = null;
+                        _selectedRow  = null;
+                        SelectedOrder = null;
                         OnPropertyChanged(nameof(SelectedRow));
-                        OnPropertyChanged(nameof(SelectedOrder));
                         IsDetailVisible = false;
                     }
                 }
@@ -298,11 +304,11 @@ namespace AdminSystem_v2.ViewModels
 
         private async Task OnOrderSelectedAsync(Order? order)
         {
-            NotifyActionAvailability();
-
             if (order == null)
             {
+                SelectedOrder   = null;
                 IsDetailVisible = false;
+                NotifyActionAvailability();
                 return;
             }
 
@@ -317,9 +323,12 @@ namespace AdminSystem_v2.ViewModels
                     order.Pickup   = detail.Pickup;
                 }
 
+                // Cycle through null so WPF sees a genuine reference change and
+                // re-evaluates every child binding (Items, Delivery, Pickup).
+                SelectedOrder   = null;
+                SelectedOrder   = order;
                 IsDetailVisible = true;
                 NotifyActionAvailability();
-                OnPropertyChanged(nameof(SelectedOrder));
             }
             catch (Exception ex)
             {

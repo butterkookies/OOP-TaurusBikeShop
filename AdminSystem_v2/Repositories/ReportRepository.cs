@@ -4,32 +4,37 @@ using Dapper;
 
 namespace AdminSystem_v2.Repositories
 {
-    // Inherits Repository<DailySales> only to reuse the GetConnection() helper;
-    // all methods use the typed QueryAsync<TResult>() overload.
     public class ReportRepository : Repository<DailySales>, IReportRepository
     {
-        // ── Excluded statuses ─────────────────────────────────────────────────
-        private static readonly string[] ExcludedStatuses =
-            { OrderStatuses.Cancelled };
+        private static readonly string[] ExcludedStatuses = { OrderStatuses.Cancelled };
+
+        // ── Source filter helper ──────────────────────────────────────────────
+        // Returns an empty string (no filter), "AND IsWalkIn = 0", or "AND IsWalkIn = 1"
+        // isWalkIn is always from our own code — never user input, so string interpolation is safe.
+        private static string WalkInClause(bool? isWalkIn) => isWalkIn switch
+        {
+            false => "AND IsWalkIn = 0",
+            true  => "AND IsWalkIn = 1",
+            _     => string.Empty
+        };
 
         // ── Sales summary ─────────────────────────────────────────────────────
 
-        public async Task<SalesSummary> GetSalesSummaryAsync(DateTime from, DateTime to)
+        public async Task<SalesSummary> GetSalesSummaryAsync(DateTime from, DateTime to, bool? isWalkIn)
         {
             await using var conn = GetConnection();
 
-            // vw_OrderSummary already computes TotalAmount = SubTotal - DiscountAmount + ShippingFee
             var row = await conn.QueryFirstOrDefaultAsync(
-                @"SELECT
-                    COUNT(DISTINCT OrderId)  AS TotalOrders,
-                    ISNULL(SUM(TotalAmount), 0)       AS TotalRevenue,
-                    ISNULL(AVG(TotalAmount), 0)       AS AvgOrderValue,
-                    ISNULL(SUM(SubTotal), 0)          AS GrossRevenue,
-                    ISNULL(SUM(DiscountAmount), 0)    AS TotalDiscounts,
-                    ISNULL(SUM(ShippingFee), 0)       AS TotalShipping
+                $@"SELECT
+                    COUNT(DISTINCT OrderId)       AS TotalOrders,
+                    ISNULL(SUM(TotalAmount),  0)  AS TotalRevenue,
+                    ISNULL(AVG(TotalAmount),  0)  AS AvgOrderValue,
+                    ISNULL(SUM(SubTotal),     0)  AS GrossRevenue,
+                    ISNULL(SUM(DiscountAmount),0) AS TotalDiscounts,
+                    ISNULL(SUM(ShippingFee),  0)  AS TotalShipping
                   FROM vw_OrderSummary
-                  WHERE IsWalkIn = 0
-                    AND OrderStatus NOT IN @Excluded
+                  WHERE OrderStatus NOT IN @Excluded
+                    {WalkInClause(isWalkIn)}
                     AND OrderDate >= @From
                     AND OrderDate  < @To",
                 new { Excluded = ExcludedStatuses, From = from, To = to });
@@ -49,15 +54,15 @@ namespace AdminSystem_v2.Repositories
 
         // ── Daily breakdown ───────────────────────────────────────────────────
 
-        public async Task<IEnumerable<DailySales>> GetDailySalesAsync(DateTime from, DateTime to)
+        public async Task<IEnumerable<DailySales>> GetDailySalesAsync(DateTime from, DateTime to, bool? isWalkIn)
             => await QueryAsync<DailySales>(
-                @"SELECT
-                    CAST(OrderDate AS DATE)   AS SaleDate,
-                    COUNT(OrderId)            AS OrderCount,
-                    ISNULL(SUM(TotalAmount), 0) AS Revenue
+                $@"SELECT
+                    CAST(OrderDate AS DATE)         AS SaleDate,
+                    COUNT(OrderId)                  AS OrderCount,
+                    ISNULL(SUM(TotalAmount), 0)     AS Revenue
                   FROM vw_OrderSummary
-                  WHERE IsWalkIn = 0
-                    AND OrderStatus NOT IN @Excluded
+                  WHERE OrderStatus NOT IN @Excluded
+                    {WalkInClause(isWalkIn)}
                     AND OrderDate >= @From
                     AND OrderDate  < @To
                   GROUP BY CAST(OrderDate AS DATE)
@@ -67,21 +72,54 @@ namespace AdminSystem_v2.Repositories
         // ── Top products ──────────────────────────────────────────────────────
 
         public async Task<IEnumerable<TopProduct>> GetTopProductsAsync(
-            DateTime from, DateTime to, int top = 10)
+            DateTime from, DateTime to, int top, bool? isWalkIn)
             => await QueryAsync<TopProduct>(
-                @"SELECT TOP (@Top)
+                $@"SELECT TOP (@Top)
                     oi.ProductName,
                     SUM(oi.Quantity)  AS UnitsSold,
                     SUM(oi.Subtotal)  AS Revenue
                   FROM vw_OrderItemDetail oi
                   INNER JOIN [Order] o ON oi.OrderId = o.OrderId
-                  WHERE o.IsWalkIn = 0
-                    AND o.OrderStatus NOT IN @Excluded
+                  WHERE o.OrderStatus NOT IN @Excluded
+                    {(isWalkIn.HasValue ? $"AND o.IsWalkIn = {(isWalkIn.Value ? 1 : 0)}" : "")}
                     AND o.OrderDate >= @From
                     AND o.OrderDate  < @To
                   GROUP BY oi.ProductName
                   ORDER BY Revenue DESC",
                 new { Top = top, Excluded = ExcludedStatuses, From = from, To = to });
+
+        // ── Chart data ────────────────────────────────────────────────────────
+
+        public async Task<IEnumerable<DailySales>> GetChartDataAsync(
+            DateTime from, DateTime to, string groupBy, bool? isWalkIn)
+        {
+            var (dateExpr, groupExpr) = groupBy switch
+            {
+                "Day"   => ("CAST(OrderDate AS DATE)",
+                            "CAST(OrderDate AS DATE)"),
+                "Week"  => ("DATEADD(WEEK, DATEDIFF(WEEK, 0, OrderDate), 0)",
+                            "DATEDIFF(WEEK, 0, OrderDate)"),
+                "Month" => ("DATEFROMPARTS(YEAR(OrderDate), MONTH(OrderDate), 1)",
+                            "YEAR(OrderDate), MONTH(OrderDate)"),
+                "Year"  => ("DATEFROMPARTS(YEAR(OrderDate), 1, 1)",
+                            "YEAR(OrderDate)"),
+                _ => throw new ArgumentException($"Unknown groupBy: {groupBy}")
+            };
+
+            return await QueryAsync<DailySales>(
+                $@"SELECT
+                    {dateExpr}                     AS SaleDate,
+                    COUNT(OrderId)                 AS OrderCount,
+                    ISNULL(SUM(TotalAmount), 0)    AS Revenue
+                  FROM vw_OrderSummary
+                  WHERE OrderStatus NOT IN @Excluded
+                    {WalkInClause(isWalkIn)}
+                    AND OrderDate >= @From
+                    AND OrderDate  < @To
+                  GROUP BY {groupExpr}
+                  ORDER BY SaleDate ASC",
+                new { Excluded = ExcludedStatuses, From = from, To = to });
+        }
 
         // ── Inventory report ──────────────────────────────────────────────────
 

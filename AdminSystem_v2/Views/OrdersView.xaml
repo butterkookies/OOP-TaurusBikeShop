@@ -275,6 +275,7 @@
                 <DataGrid ItemsSource="{Binding Orders}"
                           SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
                           AutoGenerateColumns="False"
+                          IsReadOnly="True"
                           SelectionMode="Single"
                           SelectionUnit="FullRow"
                           CanUserResizeColumns="True"
@@ -342,10 +343,10 @@
                                             Width="*"
                                             ElementStyle="{StaticResource GridCellText}"/>
 
-                        <!-- ── Date ── -->
+                        <!-- ── Date + Time ── -->
                         <DataGridTextColumn Header="Date"
-                                            Binding="{Binding Order.OrderDate, StringFormat='MMM d, yyyy'}"
-                                            Width="105"
+                                            Binding="{Binding Order.OrderDate, StringFormat='MMM d, yyyy  h:mm tt'}"
+                                            Width="160"
                                             ElementStyle="{StaticResource GridCellText}"/>
 
                         <!-- ── Items count ── -->
@@ -359,7 +360,8 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border CornerRadius="4" Padding="7,3"
-                                            HorizontalAlignment="Left" Margin="12,0">
+                                            HorizontalAlignment="Left" VerticalAlignment="Center"
+                                            Margin="12,0">
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Setter Property="Background" Value="#134E4A"/>
@@ -400,7 +402,8 @@
                                 <DataTemplate>
                                     <Border CornerRadius="4" Padding="8,3"
                                             Background="#1F2937"
-                                            HorizontalAlignment="Left" Margin="12,0">
+                                            HorizontalAlignment="Left" VerticalAlignment="Center"
+                                            Margin="12,0">
                                         <TextBlock Text="{Binding Order.OrderStatus}"
                                                    Foreground="{Binding Order.OrderStatus,
                                                        Converter={StaticResource StatusColor}}"
@@ -687,6 +690,8 @@
                                   CanUserResizeRows="False"
                                   SelectionMode="Single"
                                   FontSize="12"
+                                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                   Margin="0,0,0,16">
                             <DataGrid.ColumnHeaderStyle>
                                 <Style TargetType="DataGridColumnHeader">

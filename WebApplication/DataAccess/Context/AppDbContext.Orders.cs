@@ -95,10 +95,7 @@ public sealed partial class AppDbContext
             e.ToTable("PickupOrder");
             e.HasKey(po => po.PickupOrderId);
 
-            // PickupOrderId is NOT auto-generated — it mirrors the parent Order PK.
-            // DatabaseGeneratedOption.None tells EF Core not to treat it as identity.
-            e.Property(po => po.PickupOrderId)
-                .ValueGeneratedNever();
+            // PickupOrderId is an IDENTITY column — EF Core must not suppress generation.
 
             e.HasIndex(po => po.OrderId)
                 .IsUnique()
@@ -111,10 +108,10 @@ public sealed partial class AppDbContext
             e.HasIndex(po => po.OrderId)
                 .HasDatabaseName("IX_PickupOrder_OrderId");
 
-            // Shared-PK 1:1 — PickupOrderId = OrderId
+            // FK is OrderId (not PickupOrderId) — matches FK_PickupOrder_Order in schema.
             e.HasOne(po => po.Order)
                 .WithOne(o => o.PickupOrder)
-                .HasForeignKey<PickupOrder>(po => po.PickupOrderId)
+                .HasForeignKey<PickupOrder>(po => po.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

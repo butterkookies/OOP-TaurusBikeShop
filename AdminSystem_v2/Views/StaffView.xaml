@@ -6,6 +6,7 @@
 
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolVis"/>
+        <converters:EqualityConverter         x:Key="EqualityConverter"/>
 
         <!-- ── Role chip style ── -->
         <Style x:Key="RoleChip" TargetType="Button">
@@ -181,10 +182,14 @@
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource RoleChip}">
                                                 <Style.Triggers>
-                                                    <DataTrigger
-                                                        Binding="{Binding DataContext.SelectedRoleFilter,
-                                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        Value="{Binding}">
+                                                    <DataTrigger Value="True">
+                                                        <DataTrigger.Binding>
+                                                            <MultiBinding Converter="{StaticResource EqualityConverter}">
+                                                                <Binding Path="DataContext.SelectedRoleFilter"
+                                                                         RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                                <Binding/>
+                                                            </MultiBinding>
+                                                        </DataTrigger.Binding>
                                                         <Setter Property="Background"  Value="#1E3A5F"/>
                                                         <Setter Property="Foreground"  Value="#60A5FA"/>
                                                         <Setter Property="BorderBrush" Value="#3B82F6"/>
