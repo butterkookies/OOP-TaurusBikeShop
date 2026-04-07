@@ -25,6 +25,9 @@
         <DataTemplate DataType="{x:Type vm:POSViewModel}">
             <views:POSView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:VoucherViewModel}">
+            <views:VoucherView/>
+        </DataTemplate>
 
         <!-- ── Converters ───────────────────────────────────────────────── -->
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>

@@ -222,7 +222,7 @@
                                        FontSize="20" FontWeight="SemiBold"/>
                             <TextBlock Foreground="#6B7280" FontSize="12" Margin="0,2,0,0">
                                 <Run Text="Showing:"/>
-                                <Run Text="{Binding SourceLabel}" Foreground="#9CA3AF"/>
+                                <Run Text="{Binding SourceLabel, Mode=OneWay}" Foreground="#9CA3AF"/>
                             </TextBlock>
                         </StackPanel>
                     </Grid>
@@ -434,7 +434,7 @@
                                 <TextBlock Foreground="#4B5563" FontSize="11">
                                     <Run Text="Avg "/>
                                     <Run Text="{Binding SalesSummary.AvgOrderValue,
-                                                StringFormat='₱{0:N2}', FallbackValue='—'}"/>
+                                                StringFormat='₱{0:N2}', FallbackValue='—', Mode=OneWay}"/>
                                     <Run Text=" / order"/>
                                 </TextBlock>
                             </StackPanel>
@@ -453,11 +453,11 @@
                                     <Run Text="Discounts "/>
                                     <Run Foreground="#EF4444"
                                          Text="{Binding SalesSummary.TotalDiscounts,
-                                                StringFormat='−₱{0:N2}', FallbackValue='—'}"/>
+                                                StringFormat='−₱{0:N2}', FallbackValue='—', Mode=OneWay}"/>
                                     <Run Text="  Shipping "/>
                                     <Run Foreground="#60A5FA"
                                          Text="{Binding SalesSummary.TotalShipping,
-                                                StringFormat='₱{0:N2}', FallbackValue='—'}"/>
+                                                StringFormat='₱{0:N2}', FallbackValue='—', Mode=OneWay}"/>
                                 </TextBlock>
                             </StackPanel>
                         </Border>

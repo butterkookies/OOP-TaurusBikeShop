@@ -8,5 +8,6 @@ namespace AdminSystem_v2.Helpers
         public const string Reports   = "Reports";
         public const string Staff     = "Staff";
         public const string POS       = "POS";
+        public const string Vouchers  = "Vouchers";
     }
 }

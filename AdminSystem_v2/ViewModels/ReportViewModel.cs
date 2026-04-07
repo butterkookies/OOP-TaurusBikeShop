@@ -387,15 +387,15 @@ namespace AdminSystem_v2.ViewModels
 
             var yAxis = new LinearAxis
             {
-                Position         = AxisPosition.Left,
-                StringFormat     = "₱{0:N0}",
-                TextColor        = textColor,
-                TicklineColor    = gridColor,
+                Position           = AxisPosition.Left,
+                LabelFormatter     = v => $"₱{v:N0}",
+                TextColor          = textColor,
+                TicklineColor      = gridColor,
                 MajorGridlineStyle = LineStyle.Solid,
                 MajorGridlineColor = gridColor,
                 MinorGridlineStyle = LineStyle.None,
-                AxislineColor    = gridColor,
-                Minimum          = 0,
+                AxislineColor      = gridColor,
+                Minimum            = 0,
             };
             model.Axes.Add(yAxis);
 

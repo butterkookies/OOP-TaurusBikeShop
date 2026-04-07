@@ -287,6 +287,28 @@
                             </StackPanel>
                         </Button>
 
+                        <!-- Vouchers -->
+                        <Button Command="{Binding NavigateCommand}"
+                                CommandParameter="Vouchers">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ActivePage}" Value="Vouchers">
+                                            <Setter Property="Background"  Value="#1F2937"/>
+                                            <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                            <Setter Property="BorderBrush" Value="#DC2626"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#x1F3AB;" FontSize="13"
+                                           Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Vouchers" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
                         <Separator Style="{StaticResource SidebarSep}"/>
                         <TextBlock Text="CATALOG" Style="{StaticResource SectionLabel}"/>
 
