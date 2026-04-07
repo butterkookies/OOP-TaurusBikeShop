@@ -43,27 +43,37 @@
         <!-- ── Shared form controls ─────────────────────────────────────── -->
         <Style x:Key="FormTextBox" TargetType="TextBox">
             <Setter Property="Background"        Value="#111827"/>
-            <Setter Property="Foreground"        Value="White"/>
-            <Setter Property="CaretBrush"        Value="White"/>
+            <Setter Property="Foreground"        Value="#F9FAFB"/>
+            <Setter Property="CaretBrush"        Value="#3B82F6"/>
+            <Setter Property="SelectionBrush"    Value="#3B82F6"/>
+            <Setter Property="SelectionOpacity"  Value="0.3"/>
             <Setter Property="BorderBrush"       Value="#374151"/>
             <Setter Property="BorderThickness"   Value="1"/>
             <Setter Property="Padding"           Value="10,8"/>
             <Setter Property="FontSize"          Value="13"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border Background="{TemplateBinding Background}"
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="6"
-                                Padding="{TemplateBinding Padding}">
+                                SnapsToDevicePixels="True">
                             <ScrollViewer x:Name="PART_ContentHost"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                          Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Stretch"
+                                          HorizontalAlignment="Stretch"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="BorderBrush" Value="#3B82F6"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4B5563"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
