@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:AdminSystem_v2.ViewModels"
              xmlns:views="clr-namespace:AdminSystem_v2.Views"
+             xmlns:conv="clr-namespace:AdminSystem_v2.Converters"
             >
     <Application.Resources>
 
@@ -30,7 +31,7 @@
         </DataTemplate>
 
         <!-- ── Converters ───────────────────────────────────────────────── -->
-        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
 
         <!-- ── Shared typography ────────────────────────────────────────── -->
         <Style x:Key="FieldLabel" TargetType="TextBlock">

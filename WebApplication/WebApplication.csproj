@@ -9,6 +9,7 @@
     <!-- Treat all compiler warnings as errors to enforce code quality -->
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors />
+    <UserSecretsId>fbe64185-b3a5-41ff-9715-6b03fc7c1472</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

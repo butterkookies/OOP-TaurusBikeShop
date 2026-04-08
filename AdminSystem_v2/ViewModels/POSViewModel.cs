@@ -83,7 +83,28 @@ namespace AdminSystem_v2.ViewModels
         public string VoucherCodeInput
         {
             get => _voucherCodeInput;
-            set => SetProperty(ref _voucherCodeInput, value);
+            set
+            {
+                if (SetProperty(ref _voucherCodeInput, value))
+                    ApplyVoucherFilter();
+            }
+        }
+
+        // Suggestions dropdown
+        private List<POSVoucherSuggestion> _allVoucherSuggestions = new();
+
+        private ObservableCollection<POSVoucherSuggestion> _voucherSuggestions = new();
+        public ObservableCollection<POSVoucherSuggestion> VoucherSuggestions
+        {
+            get => _voucherSuggestions;
+            private set => SetProperty(ref _voucherSuggestions, value);
+        }
+
+        private bool _isVoucherDropdownOpen;
+        public bool IsVoucherDropdownOpen
+        {
+            get => _isVoucherDropdownOpen;
+            set => SetProperty(ref _isVoucherDropdownOpen, value);
         }
 
         private POSVoucherResult? _appliedVoucher;
@@ -184,8 +205,11 @@ namespace AdminSystem_v2.ViewModels
         public ICommand ToggleCustomerDropdownCommand { get; }
         public ICommand CompleteSaleCommand       { get; }
         public ICommand NewSaleCommand            { get; }
-        public ICommand ApplyVoucherCommand       { get; }
-        public ICommand RemoveVoucherCommand      { get; }
+        public ICommand ApplyVoucherCommand            { get; }
+        public ICommand RemoveVoucherCommand           { get; }
+        public ICommand LoadVoucherSuggestionsCommand  { get; }
+        public ICommand SelectVoucherCommand           { get; }
+        public ICommand CloseVoucherDropdownCommand    { get; }
 
         // ── Constructor ───────────────────────────────────────────────────────
 
@@ -203,8 +227,11 @@ namespace AdminSystem_v2.ViewModels
             ToggleCustomerDropdownCommand = new RelayCommand(() => IsCustomerDropdownOpen = !IsCustomerDropdownOpen);
             CompleteSaleCommand       = new RelayCommand(async () => await CompleteSaleAsync(), CanCompleteSale);
             NewSaleCommand            = new RelayCommand(StartNewSale);
-            ApplyVoucherCommand       = new RelayCommand(async () => await ApplyVoucherAsync());
-            RemoveVoucherCommand      = new RelayCommand(RemoveVoucher);
+            ApplyVoucherCommand           = new RelayCommand(async () => await ApplyVoucherAsync());
+            RemoveVoucherCommand          = new RelayCommand(RemoveVoucher);
+            LoadVoucherSuggestionsCommand = new RelayCommand(async () => await LoadVoucherSuggestionsAsync());
+            SelectVoucherCommand          = new RelayCommand<POSVoucherSuggestion>(SelectVoucher);
+            CloseVoucherDropdownCommand   = new RelayCommand(() => IsVoucherDropdownOpen = false);
         }
 
         // ── Called by MainWindowViewModel on navigate ─────────────────────────
@@ -321,9 +348,47 @@ namespace AdminSystem_v2.ViewModels
 
         // ── Voucher ──────────────────────────────────────────────────────────
 
+        private async Task LoadVoucherSuggestionsAsync()
+        {
+            if (HasVoucherApplied) return;
+
+            int userId = SelectedCustomer?.UserId ?? _walkInUserId;
+            try
+            {
+                var suggestions = await _pos.GetVoucherSuggestionsAsync(userId);
+                _allVoucherSuggestions = suggestions.ToList();
+                ApplyVoucherFilter();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[POS] Failed to load voucher suggestions: {ex.Message}");
+            }
+        }
+
+        private void ApplyVoucherFilter()
+        {
+            string filter = _voucherCodeInput.Trim().ToUpperInvariant();
+            IEnumerable<POSVoucherSuggestion> filtered = string.IsNullOrEmpty(filter)
+                ? _allVoucherSuggestions
+                : _allVoucherSuggestions.Where(s => s.Code.StartsWith(filter, StringComparison.OrdinalIgnoreCase));
+
+            VoucherSuggestions     = new ObservableCollection<POSVoucherSuggestion>(filtered);
+            IsVoucherDropdownOpen  = VoucherSuggestions.Count > 0 && !HasVoucherApplied;
+        }
+
+        private void SelectVoucher(POSVoucherSuggestion? suggestion)
+        {
+            if (suggestion == null) return;
+            // Temporarily suppress filter re-run by bypassing the public setter
+            _voucherCodeInput      = suggestion.Code;
+            OnPropertyChanged(nameof(VoucherCodeInput));
+            IsVoucherDropdownOpen  = false;
+        }
+
         private async Task ApplyVoucherAsync()
         {
-            VoucherError = string.Empty;
+            VoucherError          = string.Empty;
+            IsVoucherDropdownOpen = false;
 
             if (string.IsNullOrWhiteSpace(VoucherCodeInput))
             {
@@ -346,8 +411,9 @@ namespace AdminSystem_v2.ViewModels
 
                 if (result.IsValid)
                 {
-                    AppliedVoucher = result;
-                    VoucherError   = string.Empty;
+                    AppliedVoucher        = result;
+                    VoucherError          = string.Empty;
+                    IsVoucherDropdownOpen = false;
                 }
                 else
                 {
@@ -364,9 +430,12 @@ namespace AdminSystem_v2.ViewModels
 
         private void RemoveVoucher()
         {
-            AppliedVoucher   = null;
-            VoucherCodeInput = string.Empty;
-            VoucherError     = string.Empty;
+            AppliedVoucher        = null;
+            VoucherCodeInput      = string.Empty;
+            VoucherError          = string.Empty;
+            _allVoucherSuggestions.Clear();
+            VoucherSuggestions     = new ObservableCollection<POSVoucherSuggestion>();
+            IsVoucherDropdownOpen  = false;
         }
 
         private async Task RevalidateVoucherAsync()
@@ -410,6 +479,11 @@ namespace AdminSystem_v2.ViewModels
             // Re-validate voucher for the new customer (per-user cap may differ)
             if (HasVoucherApplied)
                 _ = RevalidateVoucherAsync();
+
+            // Refresh available voucher suggestions for this customer
+            _allVoucherSuggestions.Clear();
+            VoucherSuggestions     = new ObservableCollection<POSVoucherSuggestion>();
+            IsVoucherDropdownOpen  = false;
         }
 
         private void SetWalkIn()
@@ -421,6 +495,11 @@ namespace AdminSystem_v2.ViewModels
 
             if (HasVoucherApplied)
                 _ = RevalidateVoucherAsync();
+
+            // Refresh available voucher suggestions for walk-in
+            _allVoucherSuggestions.Clear();
+            VoucherSuggestions     = new ObservableCollection<POSVoucherSuggestion>();
+            IsVoucherDropdownOpen  = false;
         }
 
         // ── Search helpers ────────────────────────────────────────────────────
@@ -522,9 +601,12 @@ namespace AdminSystem_v2.ViewModels
             SelectedCustomer       = null;
             SelectedPaymentMethod  = POSPaymentMethods.Cash;
             CashReceivedText       = "0";
-            VoucherCodeInput       = string.Empty;
-            AppliedVoucher         = null;
-            VoucherError           = string.Empty;
+            VoucherCodeInput           = string.Empty;
+            AppliedVoucher             = null;
+            VoucherError               = string.Empty;
+            _allVoucherSuggestions.Clear();
+            VoucherSuggestions         = new ObservableCollection<POSVoucherSuggestion>();
+            IsVoucherDropdownOpen      = false;
             ProductSearch          = string.Empty;
             CustomerSearch         = string.Empty;
             SearchResults          = new ObservableCollection<POSProductItem>();

@@ -466,60 +466,141 @@
                                    FontSize="10" FontWeight="SemiBold"
                                    Margin="0,0,0,4"/>
                         <Grid Margin="0,0,0,4">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>   <!-- input row -->
+                                <RowDefinition Height="Auto"/>   <!-- suggestions dropdown -->
+                            </Grid.RowDefinitions>
 
-                            <!-- Input (visible when no voucher applied) -->
-                            <TextBox Grid.Column="0"
-                                     Style="{StaticResource FormTextBox}"
-                                     Text="{Binding VoucherCodeInput, UpdateSourceTrigger=PropertyChanged}"
-                                     Height="30" Padding="8,4"
-                                     FontSize="12"
-                                     CharacterCasing="Upper"
-                                     Visibility="{Binding HasVoucherApplied,
-                                         Converter={StaticResource BoolToVis},
-                                         ConverterParameter=Invert}"/>
+                            <!-- ── Row 0: Input + Apply/Remove button ── -->
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
 
-                            <!-- Applied badge (visible when voucher applied) -->
-                            <Border Grid.Column="0"
-                                    Background="#064E3B" CornerRadius="4"
-                                    Padding="8,4" Height="30"
-                                    VerticalAlignment="Center"
-                                    Visibility="{Binding HasVoucherApplied,
+                                <!-- Input (visible when no voucher applied) -->
+                                <TextBox Grid.Column="0"
+                                         x:Name="VoucherCodeBox"
+                                         Style="{StaticResource FormTextBox}"
+                                         Text="{Binding VoucherCodeInput, UpdateSourceTrigger=PropertyChanged}"
+                                         Height="30" Padding="8,4"
+                                         FontSize="12"
+                                         CharacterCasing="Upper"
+                                         GotFocus="VoucherInput_GotFocus"
+                                         LostFocus="VoucherInput_LostFocus"
+                                         Visibility="{Binding HasVoucherApplied,
+                                             Converter={StaticResource BoolToVis},
+                                             ConverterParameter=Invert}"/>
+
+                                <!-- Applied badge (visible when voucher applied) -->
+                                <Border Grid.Column="0"
+                                        Background="#064E3B" CornerRadius="4"
+                                        Padding="8,4" Height="30"
+                                        VerticalAlignment="Center"
+                                        Visibility="{Binding HasVoucherApplied,
+                                            Converter={StaticResource BoolToVis}}">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding AppliedVoucher.VoucherCode}"
+                                                   Foreground="#34D399" FontSize="12" FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock Text=" — " Foreground="#6EE7B7" FontSize="12"
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding VoucherDiscountDisplay}"
+                                                   Foreground="#6EE7B7" FontSize="12"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Apply button (visible when no voucher applied) -->
+                                <Button Grid.Column="1" Margin="4,0,0,0"
+                                        Style="{StaticResource PayBtn}"
+                                        Height="30" Padding="10,0"
+                                        Command="{Binding ApplyVoucherCommand}"
+                                        Visibility="{Binding HasVoucherApplied,
+                                            Converter={StaticResource BoolToVis},
+                                            ConverterParameter=Invert}">
+                                    <TextBlock Text="Apply" FontSize="11" FontWeight="SemiBold"/>
+                                </Button>
+
+                                <!-- Remove button (visible when voucher applied) -->
+                                <Button Grid.Column="1" Margin="4,0,0,0"
+                                        Height="30" Padding="10,0"
+                                        Background="#7F1D1D" Foreground="#FCA5A5"
+                                        BorderThickness="0" Cursor="Hand"
+                                        Command="{Binding RemoveVoucherCommand}"
+                                        Visibility="{Binding HasVoucherApplied,
+                                            Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Remove" FontSize="11" FontWeight="SemiBold"/>
+                                </Button>
+                            </Grid>
+
+                            <!-- ── Row 1: Available vouchers dropdown ── -->
+                            <Border Grid.Row="1"
+                                    Background="#111827"
+                                    BorderBrush="#374151"
+                                    BorderThickness="1,0,1,1"
+                                    CornerRadius="0,0,6,6"
+                                    MaxHeight="140"
+                                    Visibility="{Binding IsVoucherDropdownOpen,
                                         Converter={StaticResource BoolToVis}}">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding AppliedVoucher.VoucherCode}"
-                                               Foreground="#34D399" FontSize="12" FontWeight="SemiBold"
-                                               VerticalAlignment="Center"/>
-                                    <TextBlock Text=" — " Foreground="#6EE7B7" FontSize="12"
-                                               VerticalAlignment="Center"/>
-                                    <TextBlock Text="{Binding VoucherDiscountDisplay}"
-                                               Foreground="#6EE7B7" FontSize="12"
-                                               VerticalAlignment="Center"/>
-                                </StackPanel>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                              HorizontalScrollBarVisibility="Disabled">
+                                    <ItemsControl ItemsSource="{Binding VoucherSuggestions}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Padding="10,7"
+                                                        Cursor="Hand"
+                                                        Tag="{Binding}"
+                                                        MouseLeftButtonDown="VoucherSuggestion_Click">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="Transparent"/>
+                                                            <Style.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" Value="#374151"/>
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Grid.Column="0"
+                                                                    VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding Code}"
+                                                                       Foreground="#F9FAFB"
+                                                                       FontSize="12" FontWeight="SemiBold"/>
+                                                            <TextBlock Text="{Binding Description}"
+                                                                       Foreground="#6B7280" FontSize="11">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Description}" Value="">
+                                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                        <Border Grid.Column="1"
+                                                                Background="#064E3B"
+                                                                CornerRadius="4"
+                                                                Padding="6,2"
+                                                                VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding DiscountDisplay}"
+                                                                       Foreground="#34D399"
+                                                                       FontSize="11" FontWeight="SemiBold"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
                             </Border>
-
-                            <!-- Apply / Remove button -->
-                            <Button Grid.Column="1" Margin="4,0,0,0"
-                                    Style="{StaticResource PayBtn}"
-                                    Height="30" Padding="10,0"
-                                    Command="{Binding ApplyVoucherCommand}"
-                                    Visibility="{Binding HasVoucherApplied,
-                                        Converter={StaticResource BoolToVis},
-                                        ConverterParameter=Invert}">
-                                <TextBlock Text="Apply" FontSize="11" FontWeight="SemiBold"/>
-                            </Button>
-                            <Button Grid.Column="1" Margin="4,0,0,0"
-                                    Height="30" Padding="10,0"
-                                    Background="#7F1D1D" Foreground="#FCA5A5"
-                                    BorderThickness="0" Cursor="Hand"
-                                    Command="{Binding RemoveVoucherCommand}"
-                                    Visibility="{Binding HasVoucherApplied,
-                                        Converter={StaticResource BoolToVis}}">
-                                <TextBlock Text="Remove" FontSize="11" FontWeight="SemiBold"/>
-                            </Button>
                         </Grid>
 
                         <!-- Voucher error -->

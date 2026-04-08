@@ -67,6 +67,53 @@ namespace AdminSystem_v2.Repositories
             return await conn.ExecuteScalarAsync<int>(sql);
         }
 
+        // ── Voucher suggestions ───────────────────────────────────────────────
+
+        public async Task<IEnumerable<POSVoucherSuggestion>> GetVoucherSuggestionsAsync(int userId)
+        {
+            const string sql =
+                @"SELECT TOP 20
+                      v.Code,
+                      ISNULL(v.Description, '') AS Description,
+                      v.DiscountType,
+                      v.DiscountValue
+                  FROM Voucher v
+                  WHERE v.IsActive = 1
+                    AND GETUTCDATE() >= v.StartDate
+                    AND (v.EndDate IS NULL OR GETUTCDATE() <= v.EndDate)
+                    AND (
+                        v.MaxUses IS NULL
+                        OR (SELECT COUNT(*) FROM VoucherUsage WHERE VoucherId = v.VoucherId) < v.MaxUses
+                    )
+                    AND (
+                        v.MaxUsesPerUser IS NULL
+                        OR (SELECT COUNT(*) FROM VoucherUsage
+                            WHERE VoucherId = v.VoucherId AND UserId = @UserId) < v.MaxUsesPerUser
+                    )
+                    AND (
+                        NOT EXISTS (SELECT 1 FROM UserVoucher WHERE VoucherId = v.VoucherId)
+                        OR EXISTS (
+                            SELECT 1 FROM UserVoucher
+                            WHERE VoucherId = v.VoucherId
+                              AND UserId    = @UserId
+                              AND (ExpiresAt IS NULL OR GETUTCDATE() <= ExpiresAt)
+                        )
+                    )
+                  ORDER BY v.Code";
+
+            await using var conn = GetConnection();
+            var rows = await conn.QueryAsync<dynamic>(sql, new { UserId = userId });
+
+            return rows.Select(r => new POSVoucherSuggestion
+            {
+                Code            = (string)r.Code,
+                Description     = (string)r.Description,
+                DiscountDisplay = (string)r.DiscountType == "Percentage"
+                    ? $"{(decimal)r.DiscountValue:0.##}% off"
+                    : $"\u20b1{(decimal)r.DiscountValue:N2} off"
+            }).ToList();
+        }
+
         // ── Voucher validation ────────────────────────────────────────────────
 
         public async Task<POSVoucherResult> ValidateVoucherAsync(string code, int userId, decimal subtotal)

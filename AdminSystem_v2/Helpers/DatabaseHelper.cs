@@ -12,11 +12,14 @@ namespace AdminSystem_v2.Helpers
             IConfiguration config = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .AddUserSecrets<DatabaseHelper>(optional: true)
+                .AddEnvironmentVariables()
                 .Build();
 
             return config.GetConnectionString("Taurus-bike-shop-sqlserver-2026")
                 ?? throw new InvalidOperationException(
-                    "Connection string 'Taurus-bike-shop-sqlserver-2026' not found in appsettings.json.");
+                    "Connection string 'Taurus-bike-shop-sqlserver-2026' not found. " +
+                    "Set it via User Secrets (dev) or the CONNECTIONSTRINGS__TAURUS-BIKE-SHOP-SQLSERVER-2026 environment variable (prod).");
         }
 
         /// <summary>

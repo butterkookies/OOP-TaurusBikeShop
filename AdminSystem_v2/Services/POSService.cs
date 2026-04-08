@@ -18,6 +18,9 @@ namespace AdminSystem_v2.Services
         public Task<int> GetWalkInUserIdAsync()
             => _repo.GetWalkInUserIdAsync();
 
+        public Task<IEnumerable<POSVoucherSuggestion>> GetVoucherSuggestionsAsync(int userId)
+            => _repo.GetVoucherSuggestionsAsync(userId);
+
         public Task<POSVoucherResult> ValidateVoucherAsync(string code, int userId, decimal subtotal)
             => _repo.ValidateVoucherAsync(code, userId, subtotal);
 

@@ -14,6 +14,13 @@ namespace AdminSystem_v2.Repositories
         Task<int> GetWalkInUserIdAsync();
 
         /// <summary>
+        /// Returns active, eligible vouchers for the given user:
+        /// either global (no UserVoucher rows) or specifically assigned to them.
+        /// Global and per-user usage caps are checked.
+        /// </summary>
+        Task<IEnumerable<POSVoucherSuggestion>> GetVoucherSuggestionsAsync(int userId);
+
+        /// <summary>
         /// Validates a voucher code for a POS transaction.
         /// Checks: exists + active, date window, min order, global cap, per-user cap.
         /// </summary>
