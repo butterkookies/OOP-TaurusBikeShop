@@ -1,6 +1,6 @@
 # AdminSystem_v2 — Security Remediation Plan
 
-Generated: 2026-04-08
+Generated: 2026-04-08 | Last updated: 2026-04-09
 Source: Internal security review of AdminSystem_v2 codebase.
 
 ---
@@ -18,37 +18,31 @@ Source: Internal security review of AdminSystem_v2 codebase.
 
 ## Remediation Tasks (Chronological Order)
 
-Work through these in order. Each task builds on or depends on the ones before it.
+---
+
+### Step 1 — Rotate Compromised Credentials (VULN-001) ✅ DONE 2026-04-09
+
+- [x] **1a.** Created a new Google Cloud SQL Server instance with a new login and strong password.
+- [x] **1b.** New login granted minimum required permissions only.
+- [x] **1c.** Old instance decommissioned (new instance replaces it entirely).
+- [x] **1d.** Firewall rules scoped to known IP ranges on new instance.
 
 ---
 
-### Step 1 — Rotate Compromised Credentials (VULN-001, Immediate)
+### Step 2 — Remove Credentials from Source Code (VULN-001) ✅ DONE 2026-04-09
 
-**Do this first.** The SQL Server password is already exposed in source control history.
-
-- [ ] **1a.** Log in to the database server and create a new SQL Server login with a strong, randomly generated password.
-- [ ] **1b.** Grant the new login only the minimum required permissions (SELECT/INSERT/UPDATE/DELETE on app tables — no `sysadmin`, no `db_owner`).
-- [ ] **1c.** Revoke or drop the old `sqlserver` login after confirming the new one works.
-- [ ] **1d.** If the database is intentionally public-facing, restrict its firewall rules to known IP ranges only (e.g., your server/dev machines). If not, move it behind a VPC or private network.
-
----
-
-### Step 2 — Remove Credentials from Source Code (VULN-001)
-
-- [ ] **2a.** Move the connection string out of `appsettings.json` into a secrets store:
-  - **Dev**: Use .NET User Secrets (`dotnet user-secrets set "ConnectionStrings:Default" "..."`)
-  - **Prod**: Use environment variables or Azure Key Vault / AWS Secrets Manager
-- [ ] **2b.** Update `appsettings.json` to use a placeholder only:
-  ```json
-  {
-    "ConnectionStrings": {
-      "Default": "SET_VIA_ENVIRONMENT_OR_USER_SECRETS"
-    }
-  }
-  ```
-- [ ] **2c.** Add `appsettings.*.json` and any `.env` files to `.gitignore` if not already present.
-- [ ] **2d.** Purge the credential from git history using `git filter-repo` or BFG Repo Cleaner, then force-push. Treat the old password as permanently compromised regardless.
-- [ ] **2e.** Change `TrustServerCertificate=True` to `False` once a valid TLS certificate is in place on the SQL Server.
+- [x] **2a.** Connection strings moved to .NET User Secrets (dev) for both AdminSystem_v2 and WebApplication. Cloudinary ApiKey + ApiSecret also moved to User Secrets.
+- [x] **2b.** All `appsettings.json` and `appsettings.Development.json` files updated to `SET_VIA_USER_SECRETS_OR_ENVIRONMENT_VARIABLE` placeholders.
+- [x] **2c.** `appsettings.Development.json` already in `.gitignore`. Confirmed no `.env` files present.
+- [x] **2d.** Git history purged with `git filter-repo` (3 passes). The following were scrubbed from all commits:
+  - Old DB passwords (`oop_db_bsit22A`, `oop_db_bsitt22A`)
+  - Old DB server IPs (`34.81.116.25`, `35.221.161.150`)
+  - New DB server IP (`34.87.100.66`)
+  - Cloudinary ApiSecrets (`8zVyPr3g...`, `TUpmzr4V...`)
+  - Cloudinary ApiKey (`342386339...`)
+  - History force-pushed to `origin/main`. All SHAs rewritten.
+- [x] **2e.** `DatabaseHelper.cs` updated to load config via `AddUserSecrets<DatabaseHelper>()` + `AddEnvironmentVariables()` in addition to `appsettings.json`. Dead config builder code removed from `App.xaml.cs`.
+- [ ] **2f.** Change `TrustServerCertificate=True` to `False` once a valid TLS certificate is in place on the new Cloud SQL instance.
 
 ---
 
@@ -58,7 +52,7 @@ Do this before adding role guards so you know the auth baseline is sound.
 
 - [ ] **3a.** Open `AuthService.LoginAsync` and inspect the SQL query that fetches the user by email.
 - [ ] **3b.** Confirm the query includes a role/type filter (e.g., `WHERE Role IN ('Admin','Staff')`). If it does not:
-  - [ ] Add the filter to the query so customer accounts cannot log into the admin system.
+  - [ ] Add the filter so customer accounts cannot log into the admin system.
   - [ ] Manual test: attempt login with a known customer-only account and confirm it is rejected.
 - [ ] **3c.** If roles are stored in a separate `UserRole` table, adjust the join/filter accordingly.
 
@@ -130,7 +124,7 @@ The navigation guard stops the UI, but the service layer must also enforce autho
 
 - [ ] **7a.** Run the app as each role (Admin, Staff) and walk every nav route. Confirm no unauthorized screens are reachable.
 - [ ] **7b.** Confirm `appsettings.json` in the working directory and in any published output contains no real credentials.
-- [ ] **7c.** Confirm git log no longer exposes the old password (after history purge in Step 2d).
+- [ ] **7c.** Confirm git log no longer exposes any credentials (`git log --all -p -- "*.json" | grep Password`).
 - [ ] **7d.** Confirm the database server's firewall allows only expected IP ranges.
 - [ ] **7e.** Document the secrets management approach (User Secrets for dev, environment variable name for prod) so future developers don't re-introduce hardcoded credentials.
 
@@ -140,7 +134,11 @@ The navigation guard stops the UI, but the service layer must also enforce autho
 
 | File | Steps |
 |------|-------|
-| `appsettings.json` | 1, 2 |
+| `appsettings.json` (both projects) | 1, 2 |
+| `appsettings.Development.json` (WebApplication) | 2 |
+| `AdminSystem_v2.csproj` | 2 |
+| `Helpers/DatabaseHelper.cs` | 2 |
+| `App.xaml.cs` | 2 |
 | `Services/AuthService.cs` | 3, 6 |
 | `Services/UserService.cs` | 5 |
 | `ViewModels/MainWindowViewModel.cs` | 4a, 4b |
