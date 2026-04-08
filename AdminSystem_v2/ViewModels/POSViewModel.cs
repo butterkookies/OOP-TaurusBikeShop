@@ -77,6 +77,44 @@ namespace AdminSystem_v2.ViewModels
 
         public bool IsCartEmpty => CartItems.Count == 0;
 
+        // ── Voucher ───────────────────────────────────────────────────────────
+
+        private string _voucherCodeInput = string.Empty;
+        public string VoucherCodeInput
+        {
+            get => _voucherCodeInput;
+            set => SetProperty(ref _voucherCodeInput, value);
+        }
+
+        private POSVoucherResult? _appliedVoucher;
+        public POSVoucherResult? AppliedVoucher
+        {
+            get => _appliedVoucher;
+            private set
+            {
+                SetProperty(ref _appliedVoucher, value);
+                OnPropertyChanged(nameof(HasVoucherApplied));
+                OnPropertyChanged(nameof(VoucherDiscountDisplay));
+                OnPropertyChanged(nameof(DiscountAmount));
+                RefreshTotals();
+            }
+        }
+
+        public bool   HasVoucherApplied    => _appliedVoucher is { IsValid: true };
+        public string VoucherDiscountDisplay => _appliedVoucher?.FormattedDiscount ?? string.Empty;
+
+        private string _voucherError = string.Empty;
+        public string VoucherError
+        {
+            get => _voucherError;
+            set
+            {
+                SetProperty(ref _voucherError, value);
+                OnPropertyChanged(nameof(HasVoucherError));
+            }
+        }
+        public bool HasVoucherError => !string.IsNullOrEmpty(_voucherError);
+
         // ── Payment ───────────────────────────────────────────────────────────
 
         private string _selectedPaymentMethod = POSPaymentMethods.Cash;
@@ -110,20 +148,9 @@ namespace AdminSystem_v2.ViewModels
         private decimal CashReceived =>
             decimal.TryParse(_cashReceivedText, out var v) ? v : 0m;
 
-        private string _discountText = "0";
-        public string DiscountText
-        {
-            get => _discountText;
-            set
-            {
-                SetProperty(ref _discountText, value);
-                OnPropertyChanged(nameof(GrandTotal));
-                OnPropertyChanged(nameof(Change));
-            }
-        }
-
-        private decimal DiscountAmount =>
-            decimal.TryParse(_discountText, out var v) ? Math.Max(0m, v) : 0m;
+        public decimal DiscountAmount => _appliedVoucher is { IsValid: true }
+            ? _appliedVoucher.DiscountAmount
+            : 0m;
 
         public decimal Subtotal    => CartItems.Sum(i => i.LineTotal);
         public decimal GrandTotal  => Math.Max(0m, Subtotal - DiscountAmount);
@@ -157,6 +184,8 @@ namespace AdminSystem_v2.ViewModels
         public ICommand ToggleCustomerDropdownCommand { get; }
         public ICommand CompleteSaleCommand       { get; }
         public ICommand NewSaleCommand            { get; }
+        public ICommand ApplyVoucherCommand       { get; }
+        public ICommand RemoveVoucherCommand      { get; }
 
         // ── Constructor ───────────────────────────────────────────────────────
 
@@ -174,6 +203,8 @@ namespace AdminSystem_v2.ViewModels
             ToggleCustomerDropdownCommand = new RelayCommand(() => IsCustomerDropdownOpen = !IsCustomerDropdownOpen);
             CompleteSaleCommand       = new RelayCommand(async () => await CompleteSaleAsync(), CanCompleteSale);
             NewSaleCommand            = new RelayCommand(StartNewSale);
+            ApplyVoucherCommand       = new RelayCommand(async () => await ApplyVoucherAsync());
+            RemoveVoucherCommand      = new RelayCommand(RemoveVoucher);
         }
 
         // ── Called by MainWindowViewModel on navigate ─────────────────────────
@@ -230,6 +261,10 @@ namespace AdminSystem_v2.ViewModels
 
             RefreshTotals();
             ClearMessages();
+
+            // Re-validate applied voucher when cart changes (subtotal may affect min order / discount)
+            if (HasVoucherApplied)
+                _ = RevalidateVoucherAsync();
         }
 
         private void RemoveFromCart(POSCartItem? item)
@@ -238,6 +273,9 @@ namespace AdminSystem_v2.ViewModels
             item.PropertyChanged -= OnCartItemChanged;
             CartItems.Remove(item);
             RefreshTotals();
+
+            if (HasVoucherApplied)
+                _ = RevalidateVoucherAsync();
         }
 
         private void IncrementQty(POSCartItem? item)
@@ -250,6 +288,9 @@ namespace AdminSystem_v2.ViewModels
             }
             item.Quantity++;
             RefreshTotals();
+
+            if (HasVoucherApplied)
+                _ = RevalidateVoucherAsync();
         }
 
         private void DecrementQty(POSCartItem? item)
@@ -258,6 +299,9 @@ namespace AdminSystem_v2.ViewModels
             if (item.Quantity <= 1) { RemoveFromCart(item); return; }
             item.Quantity--;
             RefreshTotals();
+
+            if (HasVoucherApplied)
+                _ = RevalidateVoucherAsync();
         }
 
         private void OnCartItemChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -270,8 +314,88 @@ namespace AdminSystem_v2.ViewModels
         {
             OnPropertyChanged(nameof(IsCartEmpty));
             OnPropertyChanged(nameof(Subtotal));
+            OnPropertyChanged(nameof(DiscountAmount));
             OnPropertyChanged(nameof(GrandTotal));
             OnPropertyChanged(nameof(Change));
+        }
+
+        // ── Voucher ──────────────────────────────────────────────────────────
+
+        private async Task ApplyVoucherAsync()
+        {
+            VoucherError = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(VoucherCodeInput))
+            {
+                VoucherError = "Please enter a voucher code.";
+                return;
+            }
+
+            if (CartItems.Count == 0)
+            {
+                VoucherError = "Add items to the cart before applying a voucher.";
+                return;
+            }
+
+            int userId = SelectedCustomer?.UserId ?? _walkInUserId;
+
+            try
+            {
+                var result = await _pos.ValidateVoucherAsync(
+                    VoucherCodeInput.Trim(), userId, Subtotal);
+
+                if (result.IsValid)
+                {
+                    AppliedVoucher = result;
+                    VoucherError   = string.Empty;
+                }
+                else
+                {
+                    AppliedVoucher = null;
+                    VoucherError   = result.Error;
+                }
+            }
+            catch (Exception ex)
+            {
+                AppliedVoucher = null;
+                VoucherError   = $"Voucher validation failed: {ex.Message}";
+            }
+        }
+
+        private void RemoveVoucher()
+        {
+            AppliedVoucher   = null;
+            VoucherCodeInput = string.Empty;
+            VoucherError     = string.Empty;
+        }
+
+        private async Task RevalidateVoucherAsync()
+        {
+            if (_appliedVoucher == null) return;
+
+            int userId = SelectedCustomer?.UserId ?? _walkInUserId;
+
+            try
+            {
+                var result = await _pos.ValidateVoucherAsync(
+                    _appliedVoucher.VoucherCode, userId, Subtotal);
+
+                if (result.IsValid)
+                {
+                    AppliedVoucher = result;
+                    VoucherError   = string.Empty;
+                }
+                else
+                {
+                    AppliedVoucher = null;
+                    VoucherError   = result.Error;
+                }
+            }
+            catch
+            {
+                AppliedVoucher = null;
+                VoucherError   = "Voucher could not be re-validated.";
+            }
         }
 
         // ── Customer ──────────────────────────────────────────────────────────
@@ -282,6 +406,10 @@ namespace AdminSystem_v2.ViewModels
             IsCustomerDropdownOpen   = false;
             CustomerSearch           = string.Empty;
             CustomerResults          = new ObservableCollection<POSCustomer>();
+
+            // Re-validate voucher for the new customer (per-user cap may differ)
+            if (HasVoucherApplied)
+                _ = RevalidateVoucherAsync();
         }
 
         private void SetWalkIn()
@@ -290,6 +418,9 @@ namespace AdminSystem_v2.ViewModels
             IsCustomerDropdownOpen   = false;
             CustomerSearch           = string.Empty;
             CustomerResults          = new ObservableCollection<POSCustomer>();
+
+            if (HasVoucherApplied)
+                _ = RevalidateVoucherAsync();
         }
 
         // ── Search helpers ────────────────────────────────────────────────────
@@ -341,7 +472,7 @@ namespace AdminSystem_v2.ViewModels
             if (IsCardPayment)          { ShowError("Card payment is not yet available.");            return; }
             if (IsCashPayment && CashReceived < GrandTotal)
             {
-                ShowError($"Cash received (₱{CashReceived:N2}) is less than total (₱{GrandTotal:N2}).");
+                ShowError($"Cash received (\u20b1{CashReceived:N2}) is less than total (\u20b1{GrandTotal:N2}).");
                 return;
             }
 
@@ -359,7 +490,8 @@ namespace AdminSystem_v2.ViewModels
                     CartItems.ToList(),
                     SelectedPaymentMethod,
                     CashReceived,
-                    DiscountAmount);
+                    DiscountAmount,
+                    _appliedVoucher?.VoucherCode);
 
                 result.CashierName = CashierName;
                 LastResult         = result;
@@ -390,7 +522,9 @@ namespace AdminSystem_v2.ViewModels
             SelectedCustomer       = null;
             SelectedPaymentMethod  = POSPaymentMethods.Cash;
             CashReceivedText       = "0";
-            DiscountText           = "0";
+            VoucherCodeInput       = string.Empty;
+            AppliedVoucher         = null;
+            VoucherError           = string.Empty;
             ProductSearch          = string.Empty;
             CustomerSearch         = string.Empty;
             SearchResults          = new ObservableCollection<POSProductItem>();

@@ -11,13 +11,15 @@ namespace AdminSystem_v2.Models
         public string            PaymentMethod  { get; set; } = string.Empty;
         public decimal           CashReceived   { get; set; }
         public decimal           Change         { get; set; }
+        public string            VoucherCode    { get; set; } = string.Empty;
         public string            CustomerName   { get; set; } = string.Empty;
         public string            CashierName    { get; set; } = string.Empty;
         public DateTime          CompletedAt    { get; set; }
         public List<POSCartItem> Items          { get; set; } = new();
 
         // ── Computed helpers for XAML visibility bindings ─────────────────
-        public bool HasDiscount  => DiscountAmount > 0;
-        public bool IsCashMethod => PaymentMethod  == POSPaymentMethods.Cash;
+        public bool HasDiscount   => DiscountAmount > 0;
+        public bool HasVoucher    => !string.IsNullOrEmpty(VoucherCode);
+        public bool IsCashMethod  => PaymentMethod  == POSPaymentMethods.Cash;
     }
 }

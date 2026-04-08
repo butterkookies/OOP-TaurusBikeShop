@@ -7,6 +7,7 @@ namespace AdminSystem_v2.Services
         Task<IEnumerable<POSProductItem>> SearchProductsAsync(string search);
         Task<IEnumerable<POSCustomer>>    SearchCustomersAsync(string search);
         Task<int>                         GetWalkInUserIdAsync();
+        Task<POSVoucherResult>            ValidateVoucherAsync(string code, int userId, decimal subtotal);
 
         Task<POSOrderResult> CreatePOSSaleAsync(
             int    userId,
@@ -15,6 +16,7 @@ namespace AdminSystem_v2.Services
             List<POSCartItem> items,
             string  paymentMethod,
             decimal cashReceived,
-            decimal discountAmount);
+            decimal discountAmount,
+            string? voucherCode);
     }
 }

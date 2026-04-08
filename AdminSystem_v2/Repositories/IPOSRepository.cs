@@ -14,8 +14,15 @@ namespace AdminSystem_v2.Repositories
         Task<int> GetWalkInUserIdAsync();
 
         /// <summary>
+        /// Validates a voucher code for a POS transaction.
+        /// Checks: exists + active, date window, min order, global cap, per-user cap.
+        /// </summary>
+        Task<POSVoucherResult> ValidateVoucherAsync(string code, int userId, decimal subtotal);
+
+        /// <summary>
         /// Atomic POS checkout: creates Order + OrderItems, deducts stock,
-        /// logs InventoryLog entries, and records Payment — all in one transaction.
+        /// logs InventoryLog entries, records Payment, and records VoucherUsage
+        /// when a voucher is applied — all in one transaction.
         /// Throws InvalidOperationException when stock is insufficient.
         /// </summary>
         Task<POSOrderResult> CreatePOSSaleAsync(
@@ -25,6 +32,7 @@ namespace AdminSystem_v2.Repositories
             List<POSCartItem> items,
             string  paymentMethod,
             decimal cashReceived,
-            decimal discountAmount);
+            decimal discountAmount,
+            string? voucherCode);
     }
 }

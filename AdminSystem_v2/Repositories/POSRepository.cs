@@ -67,6 +67,90 @@ namespace AdminSystem_v2.Repositories
             return await conn.ExecuteScalarAsync<int>(sql);
         }
 
+        // ── Voucher validation ────────────────────────────────────────────────
+
+        public async Task<POSVoucherResult> ValidateVoucherAsync(string code, int userId, decimal subtotal)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return new POSVoucherResult { IsValid = false, Error = "Please enter a voucher code." };
+
+            string trimmedCode = code.Trim().ToUpperInvariant();
+
+            await using var conn = GetConnection();
+
+            // Step 1 — Exists and is active
+            var voucher = await conn.QueryFirstOrDefaultAsync<dynamic>(
+                @"SELECT VoucherId, Code, DiscountType, DiscountValue,
+                         MinimumOrderAmount, MaxUses, MaxUsesPerUser,
+                         StartDate, EndDate, IsActive
+                  FROM Voucher
+                  WHERE Code = @Code",
+                new { Code = trimmedCode });
+
+            if (voucher == null || !(bool)voucher.IsActive)
+                return new POSVoucherResult { IsValid = false, Error = "This voucher code does not exist or has been deactivated." };
+
+            // Step 2 — Date window
+            DateTime now = DateTime.UtcNow;
+            if (now < (DateTime)voucher.StartDate)
+                return new POSVoucherResult { IsValid = false, Error = "This voucher is not yet active." };
+            if (voucher.EndDate != null && now > (DateTime)voucher.EndDate)
+                return new POSVoucherResult { IsValid = false, Error = "This voucher has expired." };
+
+            // Step 3 — Minimum order amount
+            if (voucher.MinimumOrderAmount != null && subtotal < (decimal)voucher.MinimumOrderAmount)
+                return new POSVoucherResult
+                {
+                    IsValid = false,
+                    Error   = $"This voucher requires a minimum order of \u20b1{(decimal)voucher.MinimumOrderAmount:N2}."
+                };
+
+            // Step 4 — Global usage cap
+            if (voucher.MaxUses != null)
+            {
+                int globalCount = await conn.ExecuteScalarAsync<int>(
+                    "SELECT COUNT(*) FROM VoucherUsage WHERE VoucherId = @Id",
+                    new { Id = (int)voucher.VoucherId });
+                if (globalCount >= (int)voucher.MaxUses)
+                    return new POSVoucherResult { IsValid = false, Error = "This voucher has reached its maximum number of uses." };
+            }
+
+            // Step 5 — Per-user usage cap
+            if (voucher.MaxUsesPerUser != null)
+            {
+                int userCount = await conn.ExecuteScalarAsync<int>(
+                    "SELECT COUNT(*) FROM VoucherUsage WHERE VoucherId = @Id AND UserId = @UserId",
+                    new { Id = (int)voucher.VoucherId, UserId = userId });
+                if (userCount >= (int)voucher.MaxUsesPerUser)
+                    return new POSVoucherResult { IsValid = false, Error = "This customer has already used this voucher the maximum number of times." };
+            }
+
+            // Calculate discount
+            string discountType  = (string)voucher.DiscountType;
+            decimal discountValue = (decimal)voucher.DiscountValue;
+
+            decimal discountAmount = discountType == "Percentage"
+                ? Math.Round(subtotal * (discountValue / 100m), 2)
+                : discountValue;
+
+            discountAmount = Math.Min(discountAmount, subtotal);
+
+            string formatted = discountType == "Percentage"
+                ? $"{discountValue:0.##}% off"
+                : $"\u20b1{discountAmount:N2} off";
+
+            return new POSVoucherResult
+            {
+                IsValid           = true,
+                VoucherId         = (int)voucher.VoucherId,
+                VoucherCode       = (string)voucher.Code,
+                DiscountType      = discountType,
+                DiscountValue     = discountValue,
+                DiscountAmount    = discountAmount,
+                FormattedDiscount = formatted
+            };
+        }
+
         // ── Atomic POS sale ───────────────────────────────────────────────────
 
         public async Task<POSOrderResult> CreatePOSSaleAsync(
@@ -76,7 +160,8 @@ namespace AdminSystem_v2.Repositories
             List<POSCartItem> items,
             string  paymentMethod,
             decimal cashReceived,
-            decimal discountAmount)
+            decimal discountAmount,
+            string? voucherCode)
         {
             await using var conn = GetConnection();
             await using var tx   = await conn.BeginTransactionAsync();
@@ -189,6 +274,30 @@ namespace AdminSystem_v2.Repositories
                         Amount  = grandTotal
                     }, tx);
 
+                // 7 — Record VoucherUsage when a voucher was applied
+                if (!string.IsNullOrWhiteSpace(voucherCode) && discountAmount > 0)
+                {
+                    int? voucherId = await conn.ExecuteScalarAsync<int?>(
+                        "SELECT VoucherId FROM Voucher WHERE Code = @Code",
+                        new { Code = voucherCode.Trim().ToUpperInvariant() }, tx);
+
+                    if (voucherId.HasValue)
+                    {
+                        await conn.ExecuteAsync(
+                            @"INSERT INTO VoucherUsage
+                                  (VoucherId, UserId, OrderId, DiscountAmount, UsedAt)
+                              VALUES
+                                  (@VoucherId, @UserId, @OrderId, @Discount, GETUTCDATE())",
+                            new
+                            {
+                                VoucherId = voucherId.Value,
+                                UserId    = userId,
+                                OrderId   = orderId,
+                                Discount  = discountAmount
+                            }, tx);
+                    }
+                }
+
                 await tx.CommitAsync();
 
                 return new POSOrderResult
@@ -198,6 +307,7 @@ namespace AdminSystem_v2.Repositories
                     Subtotal       = subtotal,
                     DiscountAmount = discountAmount,
                     GrandTotal     = grandTotal,
+                    VoucherCode    = voucherCode ?? string.Empty,
                     PaymentMethod  = paymentMethod,
                     CashReceived   = cashReceived,
                     Change         = paymentMethod == POSPaymentMethods.Cash
