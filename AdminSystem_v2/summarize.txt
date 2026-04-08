@@ -1,0 +1,93 @@
+===============================================================================
+SESSION SUMMARY — Voucher Integration into POS System
+Date: 2026-04-08
+===============================================================================
+
+PROBLEM
+-------
+The Voucher system built in AdminSystem_v2 was NOT connected to the POS System.
+- POS had only a manual discount text field (no voucher validation)
+- No VoucherUsage audit trail was recorded for POS sales
+- WebApplication (online storefront) already had full voucher integration
+
+WHAT WE BUILT
+--------------
+Full voucher integration into the AdminSystem_v2 POS module, matching the
+WebApplication's existing 5-step validation chain.
+
+FILES CREATED
+~~~~~~~~~~~~~
+1. AdminSystem_v2/Models/POSVoucherResult.cs (NEW)
+   - Validation result model: IsValid, Error, VoucherId, VoucherCode,
+     DiscountType, DiscountValue, DiscountAmount, FormattedDiscount
+
+FILES MODIFIED
+~~~~~~~~~~~~~~
+2. AdminSystem_v2/Models/POSOrderResult.cs
+   - Added VoucherCode property and HasVoucher computed property for receipts
+
+3. AdminSystem_v2/Repositories/IPOSRepository.cs
+   - Added ValidateVoucherAsync method signature
+   - Updated CreatePOSSaleAsync signature with string? voucherCode param
+
+4. AdminSystem_v2/Repositories/POSRepository.cs (MAJOR)
+   - Added ValidateVoucherAsync with 5-step validation:
+     Step 1: Voucher exists and IsActive
+     Step 2: Date window (StartDate/EndDate)
+     Step 3: MinimumOrderAmount check
+     Step 4: Global usage cap (MaxUses)
+     Step 5: Per-user usage cap (MaxUsesPerUser)
+     + Discount calculation (Percentage vs Fixed, capped to subtotal)
+   - Added Step 7 to CreatePOSSaleAsync transaction: VoucherUsage recording
+     (INSERT INTO VoucherUsage inside the atomic sale transaction)
+
+5. AdminSystem_v2/Services/IPOSService.cs
+   - Added ValidateVoucherAsync to interface
+   - Updated CreatePOSSaleAsync signature
+
+6. AdminSystem_v2/Services/POSService.cs
+   - Added pass-through for ValidateVoucherAsync
+   - Updated CreatePOSSaleAsync pass-through
+
+7. AdminSystem_v2/ViewModels/POSViewModel.cs (FULL REWRITE)
+   - Removed manual DiscountText/DiscountAmount parsing
+   - Added: VoucherCodeInput, AppliedVoucher, VoucherError,
+     HasVoucherApplied, VoucherDiscountDisplay, HasVoucherError
+   - Added: ApplyVoucherCommand, RemoveVoucherCommand
+   - Added: ApplyVoucherAsync(), RemoveVoucher(), RevalidateVoucherAsync()
+   - DiscountAmount now computed from AppliedVoucher (not manual text)
+   - Cart changes and customer selection trigger auto-revalidation
+   - CompleteSaleAsync passes voucher code to service
+   - StartNewSale resets all voucher state
+
+8. AdminSystem_v2/Views/POSView.xaml
+   - Replaced manual discount textbox with voucher code UI:
+     * TextBox for voucher code input (CharacterCasing="Upper")
+     * Green badge showing applied voucher + discount
+     * Apply/Remove buttons with visibility toggling
+     * Red error text for validation failures
+   - Added voucher discount row in live totals section
+   - Receipt section shows voucher code and discount
+
+FULL PIPELINE NOW
+-----------------
+1. Admin creates/manages vouchers in AdminSystem_v2 (unchanged)
+2. POS cashier enters voucher code -> Apply -> 5-step validation -> discount shown
+3. Complete Sale -> atomic transaction: Order + OrderItems + stock deduction
+   + InventoryLog + Payment + VoucherUsage audit row
+4. Receipt displays voucher code and discount amount
+5. WebApplication online checkout already had integration (unchanged)
+
+BUILD STATUS
+------------
+- Code compiles successfully (CS8602 nullable warnings on dynamic are expected)
+- File-lock errors during build are from running processes, not code issues
+- Close running AdminSystem_v2/WebApplication instances before rebuilding
+
+NEXT STEPS
+----------
+- Close running app instances
+- Rebuild: dotnet build (from AdminSystem_v2 directory)
+- Test: Create a voucher in Admin, then use it in POS checkout
+- Verify: VoucherUsage table gets a new row after POS sale with voucher
+===============================================================================
