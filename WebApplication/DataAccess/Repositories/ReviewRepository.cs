@@ -65,6 +65,23 @@ public sealed class ReviewRepository : Repository<Review>
     }
 
     /// <summary>
+    /// Returns the OrderId of a Delivered order containing the specified product
+    /// for the given user, or <c>0</c> if none exists.
+    /// </summary>
+    public async Task<int> GetVerifiedPurchaseOrderIdAsync(
+        int userId,
+        int productId,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.OrderItems
+            .Where(oi => oi.ProductId == productId
+                      && oi.Order.UserId == userId
+                      && oi.Order.OrderStatus == OrderStatuses.Delivered)
+            .Select(oi => oi.OrderId)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    /// <summary>
     /// Calculates the average star rating for a product across all reviews.
     /// </summary>
     /// <param name="productId">The product ID to calculate the average for.</param>

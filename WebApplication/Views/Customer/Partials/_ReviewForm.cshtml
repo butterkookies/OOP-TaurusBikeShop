@@ -2,6 +2,17 @@
 @* Model: ReviewViewModel — ProductId and OrderId must be pre-populated *@
 @model WebApplication.Models.ViewModels.ReviewViewModel
 
+<style>
+    .tbs-rating-warning {
+        color: #dc3545;
+        background: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        border-radius: 6px;
+        padding: 0.6rem 1rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.875rem;
+    }
+</style>
 <div class="tbs-review-form">
     <h3 class="tbs-review-form__title">Write a Review</h3>
 
@@ -52,8 +63,41 @@
             <span asp-validation-for="Comment" class="tbs-field-error"></span>
         </div>
 
+        <div id="rating-warning" class="tbs-rating-warning" style="display:none;">
+            Please select a star rating before submitting your review.
+        </div>
+
         <button type="submit" class="btn tbs-btn-accent">
             Submit Review
         </button>
     </form>
 </div>
+
+<script>
+(function () {
+    var form = document.getElementById('review-form');
+    if (!form) return;
+
+    form.addEventListener('submit', function (e) {
+        var selected = form.querySelector('input[name="Rating"]:checked');
+        var warning = document.getElementById('rating-warning');
+        if (!selected) {
+            e.preventDefault();
+            if (warning) warning.style.display = 'block';
+            var picker = form.querySelector('.tbs-star-picker');
+            if (picker) picker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+        if (warning) warning.style.display = 'none';
+    });
+
+    // Hide warning when a rating is selected
+    var radios = form.querySelectorAll('input[name="Rating"]');
+    radios.forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            var warning = document.getElementById('rating-warning');
+            if (warning) warning.style.display = 'none';
+        });
+    });
+})();
+</script>

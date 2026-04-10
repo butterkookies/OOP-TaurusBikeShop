@@ -213,6 +213,7 @@ public sealed partial class AppDbContext
             e.HasOne(n => n.User)
                 .WithMany(u => u.Notifications)
                 .HasForeignKey(n => n.UserId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             e.HasOne(n => n.Order)

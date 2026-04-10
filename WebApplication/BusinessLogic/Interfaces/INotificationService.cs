@@ -45,8 +45,8 @@ public interface INotificationService
     /// Full message body. May be plain text or HTML for emails.
     /// </param>
     /// <param name="userId">
-    /// The recipient's <c>User.UserId</c>. Required — every notification
-    /// must be linked to a user row.
+    /// The recipient's <c>User.UserId</c>. Pass <c>null</c> for
+    /// pre-registration notifications (e.g. OTP sent before account creation).
     /// </param>
     /// <param name="orderId">
     /// Optional FK to the order this notification relates to.
@@ -63,7 +63,7 @@ public interface INotificationService
         string recipient,
         string? subject,
         string? body,
-        int userId,
+        int? userId,
         int? orderId = null,
         int? ticketId = null,
         CancellationToken cancellationToken = default);

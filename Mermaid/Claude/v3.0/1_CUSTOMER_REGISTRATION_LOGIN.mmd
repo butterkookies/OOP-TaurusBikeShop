@@ -29,15 +29,19 @@ A11B --> A11
 A11A -->|Yes| A13["Login Success"]
 
 %% REGISTRATION PATH
-A2A -->|Create New Account| A3[/"Enter Email & Password"/]
-A3 --> A4["Send OTP via Email/SMS"]
+A2A -->|Create New Account| A3[/"Enter Name, Email, Phone,
+Password & Address"/]
+A3 --> A3A{"Form Valid?"}
+A3A -->|No| A3B["Show Validation Errors"]
+A3B --> A3
+A3A -->|Yes| A4["Send OTP via Email & SMS"]
 A4 --> EXT4
-EXT4 --> A5[/"Enter OTP Code"/]
+EXT4 --> A5[/"Show OTP Modal —
+Enter OTP Code"/]
 A5 --> A6{"OTP Valid?"}
 A6 -->|No| A6B["Show Error: Invalid OTP"]
 A6B --> A5
-A6 -->|Yes| A7[/"Enter Full Address"/]
-A7 --> A8["Create Account & Save Address"]
+A6 -->|Yes| A8["Create Account, Save Address"]
 A8 --> DB1
 DB1 --> A9["Queue Welcome Email Notification"]
 A9 --> A13
@@ -55,8 +59,8 @@ classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
 classDef external fill:#80DEEA,stroke:#00838F,stroke-width:2px,color:#000
 
 class A0,A_END startend
-class A4,A8,A9,A13,A2B process
-class A2,A2A,A6,A11A decision
-class A1,A3,A5,A7,A11 io
+class A4,A8,A9,A13,A2B,A3B process
+class A2,A2A,A3A,A6,A11A decision
+class A1,A3,A5,A11 io
 class DB1 database
 class EXT4 external

@@ -101,6 +101,13 @@ public sealed class ProductDetailViewModel
     public bool CanReview { get; set; }
 
     /// <summary>
+    /// The OrderId from a Delivered order containing this product.
+    /// Used by the review form to link the review to the correct order.
+    /// Only populated when <see cref="CanReview"/> is <c>true</c>.
+    /// </summary>
+    public int ReviewOrderId { get; set; }
+
+    /// <summary>
     /// Primary image URL shortcut for &lt;meta og:image&gt; and thumbnails.
     /// </summary>
     public string? PrimaryImageUrl =>

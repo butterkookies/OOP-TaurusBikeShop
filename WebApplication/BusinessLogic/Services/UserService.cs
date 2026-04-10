@@ -63,7 +63,7 @@ public sealed class UserService : IUserService
             recipient: vm.Email,
             subject:   "Your Taurus Bike Shop Verification Code",
             body:      $"Your verification code is: {code}\n\nThis code expires in {OTPExpiryMinutes} minutes.",
-            userId:    0, // user does not exist yet — will be updated after account creation
+            userId:    null, // user does not exist yet
             cancellationToken: cancellationToken);
 
         // Also queue via SMS so the OTP is delivered even if the customer cannot
@@ -74,7 +74,7 @@ public sealed class UserService : IUserService
             recipient: vm.PhoneNumber,
             subject:   null, // SMS has no subject field
             body:      $"Taurus Bike Shop: your verification code is {code}. Expires in {OTPExpiryMinutes} minutes.",
-            userId:    0,
+            userId:    null, // user does not exist yet
             cancellationToken: cancellationToken);
 
         return ServiceResult.Ok();
@@ -162,7 +162,7 @@ public sealed class UserService : IUserService
             recipient: email,
             subject:   "Your New Taurus Bike Shop Verification Code",
             body:      $"Your new verification code is: {code}\n\nThis code expires in {OTPExpiryMinutes} minutes.",
-            userId:    0,
+            userId:    null, // user does not exist yet
             cancellationToken: cancellationToken);
 
         // Also resend via SMS if the phone number is available (Fix #10).
@@ -176,7 +176,7 @@ public sealed class UserService : IUserService
                 recipient: phoneNumber,
                 subject:   null,
                 body:      $"Taurus Bike Shop: your new verification code is {code}. Expires in {OTPExpiryMinutes} minutes.",
-                userId:    0,
+                userId:    null, // user does not exist yet
                 cancellationToken: cancellationToken);
         }
 

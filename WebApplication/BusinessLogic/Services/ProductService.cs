@@ -88,6 +88,12 @@ public sealed class ProductService : IProductService
             canReview    = await _reviewRepo.HasVerifiedPurchaseAsync(userId.Value, productId, cancellationToken);
         }
 
+        int reviewOrderId = 0;
+        if (canReview && userId.HasValue)
+        {
+            reviewOrderId = await _reviewRepo.GetVerifiedPurchaseOrderIdAsync(userId.Value, productId, cancellationToken);
+        }
+
         return new ProductDetailViewModel
         {
             ProductId          = product.ProductId,
@@ -119,7 +125,8 @@ public sealed class ProductService : IProductService
             SelectedVariantId  = (product.Variants.FirstOrDefault(v => v.IsActive && v.StockQuantity > 0)
                                ?? product.Variants.FirstOrDefault(v => v.IsActive))?.ProductVariantId,
             IsInWishlist       = isInWishlist,
-            CanReview          = canReview
+            CanReview          = canReview,
+            ReviewOrderId      = reviewOrderId
         };
     }
 

@@ -33,8 +33,8 @@ public sealed class Notification
     /// <summary>Primary key — auto-increment identity.</summary>
     public int NotificationId { get; set; }
 
-    /// <summary>FK to the recipient user.</summary>
-    public int UserId { get; set; }
+    /// <summary>FK to the recipient user. NULL for pre-registration notifications (e.g. OTP).</summary>
+    public int? UserId { get; set; }
 
     /// <summary>
     /// FK to the order this notification relates to.
@@ -119,8 +119,8 @@ public sealed class Notification
     // Navigation properties
     // -------------------------------------------------------------------------
 
-    /// <summary>The recipient user.</summary>
-    public User User { get; set; } = null!;
+    /// <summary>The recipient user. NULL for pre-registration notifications.</summary>
+    public User? User { get; set; }
 
     /// <summary>
     /// The order this notification relates to.
