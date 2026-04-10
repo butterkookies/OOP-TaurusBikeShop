@@ -337,9 +337,10 @@
                         <Separator Style="{StaticResource SidebarSep}"/>
                         <TextBlock Text="TEAM" Style="{StaticResource SectionLabel}"/>
 
-                        <!-- Staff -->
+                        <!-- Staff (Admin only) -->
                         <Button Command="{Binding NavigateCommand}"
-                                CommandParameter="Staff">
+                                CommandParameter="Staff"
+                                Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}">
                             <Button.Style>
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>

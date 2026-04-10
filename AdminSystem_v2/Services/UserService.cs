@@ -12,15 +12,27 @@ namespace AdminSystem_v2.Services
 
         public Task<IEnumerable<User>>   GetStaffUsersAsync()   => _repo.GetStaffUsersAsync();
         public Task<IEnumerable<string>> GetAllRoleNamesAsync() => _repo.GetAllRoleNamesAsync();
-        public Task SetUserRoleAsync(int userId, string roleName)  => _repo.SetUserRoleAsync(userId, roleName);
-        public Task ToggleActiveAsync(int userId, bool isActive)   => _repo.ToggleActiveAsync(userId, isActive);
+
+        public Task SetUserRoleAsync(int userId, string roleName, string callerRole)
+        {
+            RequireAdmin(callerRole);
+            return _repo.SetUserRoleAsync(userId, roleName);
+        }
+
+        public Task ToggleActiveAsync(int userId, bool isActive, string callerRole)
+        {
+            RequireAdmin(callerRole);
+            return _repo.ToggleActiveAsync(userId, isActive);
+        }
 
         public async Task CreateStaffAsync(
             string firstName, string lastName,
             string email, string? phone,
-            string roleName, string plainPassword)
+            string roleName, string plainPassword,
+            string callerRole)
         {
-            // Guard: email already registered?
+            RequireAdmin(callerRole);
+
             var existing = await _repo.FindByEmailAsync(email);
             if (existing != null)
                 throw new InvalidOperationException($"An account with email '{email}' already exists.");
@@ -40,10 +52,17 @@ namespace AdminSystem_v2.Services
             await _repo.CreateStaffAsync(user, hash, roleName);
         }
 
-        public Task ResetPasswordAsync(int userId, string newPlainPassword)
+        public Task ResetPasswordAsync(int userId, string newPlainPassword, string callerRole)
         {
+            RequireAdmin(callerRole);
             string hash = PasswordHelper.Hash(newPlainPassword);
             return _repo.ResetPasswordAsync(userId, hash);
+        }
+
+        private static void RequireAdmin(string callerRole)
+        {
+            if (callerRole != RoleNames.Admin)
+                throw new UnauthorizedAccessException("Only admins can perform this operation.");
         }
     }
 }

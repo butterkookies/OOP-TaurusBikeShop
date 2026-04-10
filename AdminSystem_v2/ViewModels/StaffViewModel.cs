@@ -226,7 +226,8 @@ namespace AdminSystem_v2.ViewModels
             try
             {
                 await _userService.CreateStaffAsync(
-                    NewFirstName, NewLastName, NewEmail, NewPhone, NewRole, NewPassword);
+                    NewFirstName, NewLastName, NewEmail, NewPhone, NewRole, NewPassword,
+                    App.CurrentUser?.Role ?? string.Empty);
 
                 IsCreating = false;
                 ShowSuccess($"Staff account created for {NewFirstName} {NewLastName}.");
@@ -256,7 +257,8 @@ namespace AdminSystem_v2.ViewModels
             ClearMessages();
             try
             {
-                await _userService.SetUserRoleAsync(_selectedUser.UserId, SelectedRole);
+                await _userService.SetUserRoleAsync(_selectedUser.UserId, SelectedRole,
+                    App.CurrentUser?.Role ?? string.Empty);
                 _selectedUser.Role = SelectedRole;
                 ShowSuccess($"Role updated to {SelectedRole}.");
 
@@ -293,7 +295,8 @@ namespace AdminSystem_v2.ViewModels
             ClearMessages();
             try
             {
-                await _userService.ToggleActiveAsync(_selectedUser.UserId, newState);
+                await _userService.ToggleActiveAsync(_selectedUser.UserId, newState,
+                    App.CurrentUser?.Role ?? string.Empty);
                 _selectedUser.IsActive = newState;
                 ShowSuccess(newState ? "Account activated." : "Account deactivated.");
                 OnPropertyChanged(nameof(SelectedUser));
@@ -321,7 +324,8 @@ namespace AdminSystem_v2.ViewModels
             ClearMessages();
             try
             {
-                await _userService.ResetPasswordAsync(_selectedUser.UserId, NewPasswordText);
+                await _userService.ResetPasswordAsync(_selectedUser.UserId, NewPasswordText,
+                    App.CurrentUser?.Role ?? string.Empty);
                 NewPasswordText = string.Empty;
                 ShowSuccess("Password reset successfully.");
             }

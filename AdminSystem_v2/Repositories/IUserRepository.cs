@@ -9,6 +9,8 @@ namespace AdminSystem_v2.Repositories
         Task<string> GetUserRoleAsync(int userId);
         Task         UpdateLastLoginAsync(int userId);
         Task<bool>   HasRoleAsync(int userId, string roleName);
+        Task         IncrementFailedLoginsAsync(int userId, int maxAttempts, int lockoutMinutes);
+        Task         ResetFailedLoginsAsync(int userId);
 
         // ── Staff management ──────────────────────────────────────────────────
 

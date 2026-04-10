@@ -14,6 +14,10 @@ namespace AdminSystem_v2.Models
         public DateTime? LastLoginAt      { get; set; }
         public DateTime  CreatedAt        { get; set; }
 
+        // Brute-force protection (VULN-003)
+        public int       FailedLoginAttempts { get; set; }
+        public DateTime? LockoutUntil        { get; set; }
+
         // Populated separately via GetUserRoleAsync — not a DB column
         public string Role { get; set; } = string.Empty;
 
@@ -21,6 +25,16 @@ namespace AdminSystem_v2.Models
         public string Initials  => FirstName.Length > 0
             ? FirstName[0].ToString().ToUpper()
             : "A";
+    }
+
+    public class LoginResult
+    {
+        public bool   Success      { get; init; }
+        public User?  User         { get; init; }
+        public string ErrorMessage { get; init; } = string.Empty;
+
+        public static LoginResult Ok(User user) => new() { Success = true, User = user };
+        public static LoginResult Fail(string message) => new() { Success = false, ErrorMessage = message };
     }
 
     public static class RoleNames

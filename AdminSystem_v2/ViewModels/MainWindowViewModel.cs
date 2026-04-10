@@ -22,6 +22,7 @@ namespace AdminSystem_v2.ViewModels
         public string UserFullName { get; }
         public string UserInitials { get; }
         public string UserRole     { get; }
+        public bool   IsAdmin      => UserRole == RoleNames.Admin;
 
         // ── Navigation State ──────────────────────────────────────────────
 
@@ -92,6 +93,9 @@ namespace AdminSystem_v2.ViewModels
         private void Navigate(string? page)
         {
             if (string.IsNullOrEmpty(page)) return;
+
+            // Block non-Admin users from the Staff page
+            if (page == PageNames.Staff && !IsAdmin) return;
 
             CurrentViewModel = page switch
             {

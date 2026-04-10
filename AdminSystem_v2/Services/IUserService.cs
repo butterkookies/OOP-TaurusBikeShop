@@ -6,20 +6,23 @@ namespace AdminSystem_v2.Services
     {
         Task<IEnumerable<User>>   GetStaffUsersAsync();
         Task<IEnumerable<string>> GetAllRoleNamesAsync();
-        Task SetUserRoleAsync(int userId, string roleName);
-        Task ToggleActiveAsync(int userId, bool isActive);
+        Task SetUserRoleAsync(int userId, string roleName, string callerRole);
+        Task ToggleActiveAsync(int userId, bool isActive, string callerRole);
 
         /// <summary>
         /// Creates a new staff account. Hashes the plain-text password internally.
         /// Throws <see cref="InvalidOperationException"/> if <paramref name="email"/> is already in use.
+        /// Throws <see cref="UnauthorizedAccessException"/> if caller is not Admin.
         /// </summary>
         Task CreateStaffAsync(string firstName, string lastName,
                               string email, string? phone,
-                              string roleName, string plainPassword);
+                              string roleName, string plainPassword,
+                              string callerRole);
 
         /// <summary>
         /// Resets the password for a staff user. Hashes the plain-text password internally.
+        /// Throws <see cref="UnauthorizedAccessException"/> if caller is not Admin.
         /// </summary>
-        Task ResetPasswordAsync(int userId, string newPlainPassword);
+        Task ResetPasswordAsync(int userId, string newPlainPassword, string callerRole);
     }
 }

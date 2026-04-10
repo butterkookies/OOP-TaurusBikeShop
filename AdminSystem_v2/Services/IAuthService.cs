@@ -4,8 +4,8 @@ namespace AdminSystem_v2.Services
 {
     public interface IAuthService
     {
-        /// <summary>Authenticates by email and password. Returns the User on success, null on failure.</summary>
-        Task<User?> LoginAsync(string email, string password);
+        /// <summary>Authenticates by email and password. Returns a LoginResult indicating success/failure with a message.</summary>
+        Task<LoginResult> LoginAsync(string email, string password);
 
         /// <summary>Clears the current session.</summary>
         void Logout();

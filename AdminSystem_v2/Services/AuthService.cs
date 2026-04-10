@@ -13,20 +13,48 @@ namespace AdminSystem_v2.Services
             _userRepo = userRepo;
         }
 
-        public async Task<User?> LoginAsync(string email, string password)
+        private const int MaxFailedAttempts = 5;
+        private const int LockoutMinutes   = 15;
+
+        private static readonly HashSet<string> AllowedRoles = new(StringComparer.OrdinalIgnoreCase)
+        {
+            RoleNames.Admin, RoleNames.Manager, RoleNames.Staff
+        };
+
+        public async Task<LoginResult> LoginAsync(string email, string password)
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
-                return null;
+                return LoginResult.Fail("Invalid email or password.");
 
             User? user = await _userRepo.FindByEmailAsync(email.Trim());
-            if (user == null || !user.IsActive) return null;
-            if (!PasswordHelper.Verify(password, user.PasswordHash)) return null;
+            if (user == null || !user.IsActive)
+                return LoginResult.Fail("Invalid email or password.");
 
+            // Check lockout before password verification
+            if (user.LockoutUntil.HasValue && user.LockoutUntil.Value > DateTime.UtcNow)
+                return LoginResult.Fail("Account locked. Try again later.");
+
+            if (!PasswordHelper.Verify(password, user.PasswordHash))
+            {
+                await _userRepo.IncrementFailedLoginsAsync(user.UserId, MaxFailedAttempts, LockoutMinutes);
+                int remaining = MaxFailedAttempts - (user.FailedLoginAttempts + 1);
+                if (remaining <= 0)
+                    return LoginResult.Fail("Account locked. Try again later.");
+                return LoginResult.Fail("Invalid email or password.");
+            }
+
+            // Reject non-staff accounts (e.g. Customer) from the admin system
+            string role = await _userRepo.GetUserRoleAsync(user.UserId);
+            if (!AllowedRoles.Contains(role))
+                return LoginResult.Fail("Invalid email or password.");
+
+            // Success — reset lockout state and record login
+            await _userRepo.ResetFailedLoginsAsync(user.UserId);
             await _userRepo.UpdateLastLoginAsync(user.UserId);
-            user.Role = await _userRepo.GetUserRoleAsync(user.UserId);
+            user.Role = role;
 
             App.CurrentUser = user;
-            return user;
+            return LoginResult.Ok(user);
         }
 
         public void Logout()

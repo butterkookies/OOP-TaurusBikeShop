@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
@@ -12,14 +13,28 @@ namespace AdminSystem_v2.Helpers
             IConfiguration config = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-                .AddUserSecrets<DatabaseHelper>(optional: true)
+                .AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true)
                 .AddEnvironmentVariables()
                 .Build();
 
-            return config.GetConnectionString("Taurus-bike-shop-sqlserver-2026")
+            string raw = config.GetConnectionString("Taurus-bike-shop-sqlserver-2026")
                 ?? throw new InvalidOperationException(
                     "Connection string 'Taurus-bike-shop-sqlserver-2026' not found. " +
                     "Set it via User Secrets (dev) or the CONNECTIONSTRINGS__TAURUS-BIKE-SHOP-SQLSERVER-2026 environment variable (prod).");
+
+            // If a separate DbPassword secret is set, inject it into the connection
+            // string via SqlConnectionStringBuilder. This avoids parsing issues when
+            // passwords contain characters that conflict with connection string syntax
+            // ({, }, ; etc.) in Microsoft.Data.SqlClient.
+            string? passwordOverride = config["DbPassword"];
+            if (!string.IsNullOrEmpty(passwordOverride))
+            {
+                var builder = new SqlConnectionStringBuilder(raw);
+                builder.Password = passwordOverride;
+                return builder.ConnectionString;
+            }
+
+            return raw;
         }
 
         /// <summary>

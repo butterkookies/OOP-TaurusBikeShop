@@ -29,7 +29,7 @@
                     @if (!ViewData.ModelState.IsValid)
                     {
                         <div class="tbs-auth-card__error" role="alert">
-                            <asp-validation-summary asp-validation-group="" />
+                            <div asp-validation-summary="All"></div>
                         </div>
                     }
 

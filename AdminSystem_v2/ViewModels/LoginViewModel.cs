@@ -91,10 +91,10 @@ namespace AdminSystem_v2.ViewModels
             IsLoading = true;
             try
             {
-                User? user = await _authService.LoginAsync(Email, Password);
-                if (user == null)
+                LoginResult result = await _authService.LoginAsync(Email, Password);
+                if (!result.Success)
                 {
-                    PasswordError = "Invalid email or password.";
+                    PasswordError = result.ErrorMessage;
                     Password      = string.Empty;
                     return;
                 }

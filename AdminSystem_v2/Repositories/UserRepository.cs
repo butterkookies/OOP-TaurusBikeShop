@@ -52,6 +52,22 @@ namespace AdminSystem_v2.Repositories
                 "UPDATE [User] SET LastLoginAt=GETUTCDATE() WHERE UserId=@UserId",
                 new { UserId = userId });
 
+        public async Task IncrementFailedLoginsAsync(int userId, int maxAttempts, int lockoutMinutes)
+            => await ExecuteAsync(
+                @"UPDATE [User]
+                  SET FailedLoginAttempts = FailedLoginAttempts + 1,
+                      LockoutUntil = CASE
+                          WHEN FailedLoginAttempts + 1 >= @Max
+                          THEN DATEADD(MINUTE, @Mins, GETUTCDATE())
+                          ELSE LockoutUntil END
+                  WHERE UserId = @UserId",
+                new { UserId = userId, Max = maxAttempts, Mins = lockoutMinutes });
+
+        public async Task ResetFailedLoginsAsync(int userId)
+            => await ExecuteAsync(
+                "UPDATE [User] SET FailedLoginAttempts = 0, LockoutUntil = NULL WHERE UserId = @UserId",
+                new { UserId = userId });
+
         public async Task<bool> HasRoleAsync(int userId, string roleName)
         {
             await using var conn = GetConnection();
