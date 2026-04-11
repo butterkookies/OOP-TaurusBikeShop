@@ -4,8 +4,8 @@ WORKDIR /src
 
 COPY . .
 
-RUN dotnet restore WebApplication.csproj
-RUN dotnet publish WebApplication.csproj -c Release -o /app/publish
+RUN dotnet restore WebApplication/WebApplication.csproj
+RUN dotnet publish WebApplication/WebApplication.csproj -c Release -o /app/publish
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
