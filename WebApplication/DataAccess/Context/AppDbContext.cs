@@ -7,7 +7,7 @@ namespace WebApplication.DataAccess.Context;
 
 /// <summary>
 /// EF Core database context for the Taurus Bike Shop WebApplication.
-/// Connects to Taurus-bike-shop-sqlserver-2026 on Google Cloud SQL for SQL Server.
+/// Connects to TaurusBikeShopSqlServer2026 on Google Cloud SQL for SQL Server.
 /// <para>
 /// All entity relationships, foreign keys, cascade behaviours, unique indexes,
 /// and filtered indexes are configured exclusively here via Fluent API in

@@ -27,9 +27,9 @@ builder.Services.AddScoped<IPhotoService, PhotoService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    string connectionString = builder.Configuration.GetConnectionString("Taurus-bike-shop-sqlserver-2026")
+    string connectionString = builder.Configuration.GetConnectionString("TaurusBikeShopSqlServer2026")
         ?? throw new InvalidOperationException(
-            "Connection string 'Taurus-bike-shop-sqlserver-2026' not found in configuration. " +
+            "Connection string 'TaurusBikeShopSqlServer2026' not found in configuration. " +
             "Ensure appsettings.Development.json is present and excluded from source control.");
 
     options.UseSqlServer(connectionString, sqlOptions =>
@@ -204,6 +204,20 @@ builder.Services.AddHostedService<WebApplication.BackgroundJobs.StockMonitorJob>
 builder.Services.AddHostedService<WebApplication.BackgroundJobs.DeliveryStatusPollJob>();
 
 // =============================================================================
+// CORS
+// =============================================================================
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// =============================================================================
 // MVC
 // =============================================================================
 
@@ -222,6 +236,19 @@ builder.Services.AddControllersWithViews(options =>
 AppWebApplication app = builder.Build();
 
 // =============================================================================
+// RENDER PORT BINDING
+// =============================================================================
+// Render sets a PORT environment variable. Bind to 0.0.0.0:{PORT} so the app
+// is reachable outside the container. Falls back to default Kestrel behavior
+// when PORT is not set (local development).
+
+string? port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    app.Urls.Add($"http://0.0.0.0:{port}");
+}
+
+// =============================================================================
 // MIDDLEWARE PIPELINE
 // =============================================================================
 
@@ -232,9 +259,15 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// Render terminates TLS at its reverse proxy, so the app receives plain HTTP.
+// HTTPS redirection in-app would cause redirect loops. Only enable locally.
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 app.UseRouting();
+app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
