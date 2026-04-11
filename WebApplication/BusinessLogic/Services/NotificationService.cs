@@ -46,7 +46,7 @@ public sealed class NotificationService : INotificationService
         string recipient,
         string? subject,
         string? body,
-        int? userId,
+        int userId,
         int? orderId = null,
         int? ticketId = null,
         CancellationToken cancellationToken = default)

@@ -56,12 +56,29 @@ public sealed class CustomerController : Controller
         if (User.Identity?.IsAuthenticated == true)
             return RedirectToAction(nameof(Dashboard));
 
-        return View(new RegisterViewModel());
+        // After a successful Register POST we redirect here (PRG pattern).
+        // If TempData signals the OTP modal should open, pass that through.
+        // Use Peek so TempData survives for the subsequent VerifyOTP POST.
+        bool showOtp = TempData["ShowOTPModal"] is true;
+        string? otpEmail = TempData.Peek(TempDataRegisterEmail) as string;
+
+        var vm = new RegisterViewModel();
+        if (showOtp && otpEmail != null)
+        {
+            // Keep the registration data alive for VerifyOTP / ResendOTP
+            TempData.Keep(TempDataRegisterVm);
+            TempData.Keep(TempDataRegisterEmail);
+
+            ViewBag.ShowOTPModal = true;
+            ViewBag.OTPEmail     = otpEmail;
+        }
+
+        return View(vm);
     }
 
     /// <summary>
-    /// POST /Customer/Register — validates the form, sends OTP, and displays
-    /// the OTP verification modal on success.
+    /// POST /Customer/Register — validates the form, sends OTP, and redirects
+    /// back to the GET page (PRG) so a browser refresh doesn't re-POST.
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -86,10 +103,10 @@ public sealed class CustomerController : Controller
             // create the account after the code is confirmed.
             TempData[TempDataRegisterVm]    = System.Text.Json.JsonSerializer.Serialize(vm);
             TempData[TempDataRegisterEmail] = vm.Email;
+            TempData["ShowOTPModal"]        = true;
 
-            ViewBag.ShowOTPModal = true;
-            ViewBag.OTPEmail     = vm.Email;
-            return View(vm);
+            // PRG: redirect to GET so browser refresh won't re-POST the form
+            return RedirectToAction(nameof(Register));
         }
         catch (Exception ex)
         {
@@ -139,13 +156,12 @@ public sealed class CustomerController : Controller
             if (!result.IsSuccess)
             {
                 TempData["error"] = result.Error;
-                // Re-expose the modal
+                // Keep registration session alive and re-show the OTP modal
                 TempData[TempDataRegisterVm]    = serialisedVm;
                 TempData[TempDataRegisterEmail] = email;
+                TempData["ShowOTPModal"]        = true;
 
-                ViewBag.ShowOTPModal = true;
-                ViewBag.OTPEmail     = email;
-                return View("Register", vm);
+                return RedirectToAction(nameof(Register));
             }
 
             await SignInUserAsync(result.Value!);

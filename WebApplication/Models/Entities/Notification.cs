@@ -33,8 +33,8 @@ public sealed class Notification
     /// <summary>Primary key — auto-increment identity.</summary>
     public int NotificationId { get; set; }
 
-    /// <summary>FK to the recipient user. NULL for pre-registration notifications (e.g. OTP).</summary>
-    public int? UserId { get; set; }
+    /// <summary>FK to the recipient user. Required — all notifications target an existing user.</summary>
+    public int UserId { get; set; }
 
     /// <summary>
     /// FK to the order this notification relates to.
@@ -58,7 +58,7 @@ public sealed class Notification
     public string Channel { get; set; } = string.Empty;
 
     /// <summary>
-    /// The type of notification. Constrained by CK_Notif_Type to 17 valid values.
+    /// The type of notification. Constrained by CK_Notif_Type to 16 valid values.
     /// Use <see cref="NotifTypes"/> constants instead of magic strings.
     /// </summary>
     [Required]
@@ -119,7 +119,7 @@ public sealed class Notification
     // Navigation properties
     // -------------------------------------------------------------------------
 
-    /// <summary>The recipient user. NULL for pre-registration notifications.</summary>
+    /// <summary>The recipient user.</summary>
     public User? User { get; set; }
 
     /// <summary>
@@ -166,15 +166,16 @@ public static class NotifStatuses
 
 /// <summary>
 /// Compile-time constants for all valid notification type values.
-/// Mirrors the CK_Notif_Type CHECK constraint in the database (17 values).
+/// Mirrors the CK_Notif_Type CHECK constraint in the database (16 values).
 /// Use these instead of magic strings in all calls to
 /// <c>INotificationService.QueueAsync</c>.
+/// <para>
+/// <b>OTP codes are not handled here.</b> OTP lifecycle is managed
+/// exclusively through the <c>OTPVerification</c> table.
+/// </para>
 /// </summary>
 public static class NotifTypes
 {
-    /// <summary>OTP code sent during customer registration.</summary>
-    public const string OTPCode = "OTPCode";
-
     /// <summary>Welcome email sent after successful registration.</summary>
     public const string WelcomeEmail = "WelcomeEmail";
 

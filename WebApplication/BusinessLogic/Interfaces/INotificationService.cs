@@ -14,9 +14,13 @@ namespace WebApplication.BusinessLogic.Interfaces;
 /// <para>
 /// This interface is injected into every service and background job that
 /// needs to send a notification. Use <see cref="Models.Entities.NotifTypes"/>
-/// constants for <paramref name="notifType"/> and
+/// constants for the notification type and
 /// <see cref="Models.Entities.NotifChannels"/> constants for
-/// <paramref name="channel"/> — never pass magic strings.
+/// the channel — never pass magic strings.
+/// <para>
+/// <b>OTP codes are not sent through this service.</b> OTP lifecycle
+/// is handled exclusively via the <c>OTPVerification</c> table.
+/// </para>
 /// </para>
 /// </summary>
 public interface INotificationService
@@ -31,7 +35,7 @@ public interface INotificationService
     /// <c>NotifChannels.SMS</c> — never a raw string.
     /// </param>
     /// <param name="notifType">
-    /// Notification type. Must be one of the 17 values defined in
+    /// Notification type. Must be one of the 16 values defined in
     /// <c>NotifTypes</c> — enforced by the database CHECK constraint.
     /// </param>
     /// <param name="recipient">
@@ -45,8 +49,8 @@ public interface INotificationService
     /// Full message body. May be plain text or HTML for emails.
     /// </param>
     /// <param name="userId">
-    /// The recipient's <c>User.UserId</c>. Pass <c>null</c> for
-    /// pre-registration notifications (e.g. OTP sent before account creation).
+    /// The recipient's <c>User.UserId</c>. Required — all notifications
+    /// must target an existing user.
     /// </param>
     /// <param name="orderId">
     /// Optional FK to the order this notification relates to.
@@ -63,7 +67,7 @@ public interface INotificationService
         string recipient,
         string? subject,
         string? body,
-        int? userId,
+        int userId,
         int? orderId = null,
         int? ticketId = null,
         CancellationToken cancellationToken = default);

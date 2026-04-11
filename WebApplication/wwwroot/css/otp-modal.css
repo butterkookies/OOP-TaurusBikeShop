@@ -1,5 +1,18 @@
 /* WebApplication/wwwroot/css/otp-modal.css */
 
+/*
+ * .tg-bg > * in taurus-glass.css applies position:relative; z-index:1 to
+ * every direct child of <body>.  Bootstrap appends .modal-backdrop to <body>
+ * AND we move #otpModal there too, so both get z-index:1 — the backdrop
+ * paints on top because it comes later in DOM order.  The ID selector below
+ * (specificity 1,1,0) overrides .tg-bg > * (0,1,0) and restores Bootstrap's
+ * expected stacking.
+ */
+#otpModal.modal {
+    position: fixed;
+    z-index: 1055;
+}
+
 .tbs-otp-dialog {
     max-width: 420px;
 }
@@ -52,11 +65,11 @@
 
 .tbs-otp-modal__code-input {
     width: 100%;
-    padding: 1rem;
-    font-size: 2rem;
+    padding: 0.875rem 0.75rem;
+    font-size: 1.75rem;
     font-family: var(--tbs-font-mono);
     font-weight: 700;
-    letter-spacing: 0.5em;
+    letter-spacing: 0.35em;
     text-align: center;
     border: 2px solid var(--tbs-gray-200);
     border-radius: 10px;

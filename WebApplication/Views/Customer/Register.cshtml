@@ -155,13 +155,75 @@
     @if (showOTPModal)
     {
         <script>
-            // Auto-open the OTP modal when the page loads after a successful registration POST
             document.addEventListener('DOMContentLoaded', () => {
                 const otpModal = document.getElementById('otpModal');
-                if (otpModal) {
-                    const modal = new bootstrap.Modal(otpModal, { backdrop: 'static', keyboard: false });
-                    modal.show();
-                }
+                if (!otpModal) return;
+
+                // Move the modal to <body> so it escapes the .tg-bg stacking
+                // context (isolation:isolate + z-index on children traps the
+                // modal behind Bootstrap's backdrop which is appended to body).
+                document.body.appendChild(otpModal);
+
+                const modal = new bootstrap.Modal(otpModal, { backdrop: 'static', keyboard: false });
+                modal.show();
+
+                // Focus the code input once the modal is fully shown
+                otpModal.addEventListener('shown.bs.modal', () => {
+                    document.getElementById('otp-code-input')?.focus();
+                });
+
+                // OTP countdown timer
+                const countdownEl = document.getElementById('otp-countdown');
+                const resendBtn   = document.getElementById('otp-resend-btn');
+                if (!countdownEl) return;
+
+                let seconds = 10 * 60;
+
+                const interval = setInterval(() => {
+                    seconds--;
+                    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    const s = (seconds % 60).toString().padStart(2, '0');
+                    countdownEl.textContent = `${m}:${s}`;
+
+                    if (seconds <= 0) {
+                        clearInterval(interval);
+                        countdownEl.textContent = '00:00';
+                        countdownEl.style.color = 'var(--tbs-error)';
+                        if (resendBtn) resendBtn.disabled = false;
+                    }
+                }, 1000);
+
+                // Enable resend after 60 seconds
+                setTimeout(() => {
+                    if (resendBtn) resendBtn.disabled = false;
+                }, 60000);
+
+                // Resend handler
+                resendBtn?.addEventListener('click', async () => {
+                    const email = document.querySelector('input[name="email"]')?.value;
+                    if (!email) return;
+
+                    resendBtn.disabled = true;
+                    resendBtn.textContent = 'Sending\u2026';
+
+                    try {
+                        const response = await fetchWithCSRF('/Customer/ResendOTP', {
+                            method: 'POST',
+                            body: JSON.stringify({ email })
+                        });
+                        const data = await parseJsonResponse(response);
+
+                        if (data.success) {
+                            seconds = 10 * 60;
+                        } else {
+                            resendBtn.disabled = false;
+                        }
+                    } catch {
+                        resendBtn.disabled = false;
+                    } finally {
+                        resendBtn.textContent = 'Resend Code';
+                    }
+                });
             });
         </script>
     }

@@ -54,28 +54,10 @@ public sealed class UserService : IUserService
         string code = GenerateOTPCode();
         DateTime expiresAt = DateTime.UtcNow.AddMinutes(OTPExpiryMinutes);
 
+        // Store the OTP in OTPVerification — delivery is handled
+        // exclusively through the OTPVerification table, not the
+        // Notification queue (Notification requires a valid UserId).
         await _userRepo.CreateOTPAsync(vm.Email, code, expiresAt, cancellationToken);
-
-        // Queue OTP notification via Email (flowchart Part 1).
-        await _notifications.QueueAsync(
-            channel:   NotifChannels.Email,
-            notifType: NotifTypes.OTPCode,
-            recipient: vm.Email,
-            subject:   "Your Taurus Bike Shop Verification Code",
-            body:      $"Your verification code is: {code}\n\nThis code expires in {OTPExpiryMinutes} minutes.",
-            userId:    null, // user does not exist yet
-            cancellationToken: cancellationToken);
-
-        // Also queue via SMS so the OTP is delivered even if the customer cannot
-        // access their email on the registration device (Fix #10).
-        await _notifications.QueueAsync(
-            channel:   NotifChannels.SMS,
-            notifType: NotifTypes.OTPCode,
-            recipient: vm.PhoneNumber,
-            subject:   null, // SMS has no subject field
-            body:      $"Taurus Bike Shop: your verification code is {code}. Expires in {OTPExpiryMinutes} minutes.",
-            userId:    null, // user does not exist yet
-            cancellationToken: cancellationToken);
 
         return ServiceResult.Ok();
     }
@@ -153,32 +135,9 @@ public sealed class UserService : IUserService
         string code = GenerateOTPCode();
         DateTime expiresAt = DateTime.UtcNow.AddMinutes(OTPExpiryMinutes);
 
+        // Store the new OTP in OTPVerification — delivery is handled
+        // exclusively through the OTPVerification table.
         await _userRepo.CreateOTPAsync(email, code, expiresAt, cancellationToken);
-
-        // Always resend via Email.
-        await _notifications.QueueAsync(
-            channel:   NotifChannels.Email,
-            notifType: NotifTypes.OTPCode,
-            recipient: email,
-            subject:   "Your New Taurus Bike Shop Verification Code",
-            body:      $"Your new verification code is: {code}\n\nThis code expires in {OTPExpiryMinutes} minutes.",
-            userId:    null, // user does not exist yet
-            cancellationToken: cancellationToken);
-
-        // Also resend via SMS if the phone number is available (Fix #10).
-        // Phone is passed by the controller when recovered from the stored
-        // registration session (TempData).
-        if (!string.IsNullOrWhiteSpace(phoneNumber))
-        {
-            await _notifications.QueueAsync(
-                channel:   NotifChannels.SMS,
-                notifType: NotifTypes.OTPCode,
-                recipient: phoneNumber,
-                subject:   null,
-                body:      $"Taurus Bike Shop: your new verification code is {code}. Expires in {OTPExpiryMinutes} minutes.",
-                userId:    null, // user does not exist yet
-                cancellationToken: cancellationToken);
-        }
 
         return ServiceResult.Ok();
     }
