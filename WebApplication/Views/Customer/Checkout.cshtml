@@ -4,248 +4,170 @@
     ViewData["Title"] = "Checkout";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/checkout.css" asp-append-version="true" />
-    <style>
-        body {
-            background-color: #0D0D1A;
-            background-image:
-                linear-gradient(rgba(8, 6, 18, 0.68), rgba(8, 6, 18, 0.68)),
-                url('/mobile wallpaper.png');
-            background-size: cover;
-            background-position: center top;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-        }
-    </style>
-}
-
 @Html.AntiForgeryToken()
 
-<div class="tbs-checkout-page">
-    <div class="container">
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)]">
+    <div class="max-w-[1200px] mx-auto px-6 py-12 md:py-16">
 
-        <div class="tbs-page-header">
-            <h1 class="tbs-page-header__title">Checkout</h1>
-        </div>
+        <h1 class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white mb-10" data-reveal>Checkout</h1>
 
-        <form asp-action="PlaceOrder" asp-controller="Checkout" method="post"
-              id="checkout-form" novalidate>
+        <form asp-action="PlaceOrder" asp-controller="Checkout" method="post" id="checkout-form" novalidate>
             @Html.AntiForgeryToken()
 
-            <div class="tbs-checkout-layout">
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
 
                 @* =================== LEFT: FORM =================== *@
-                <div class="tbs-checkout-layout__form">
+                <div class="space-y-8" data-reveal="delay-1">
 
                     @* ── DELIVERY ADDRESS ── *@
-                    <div class="tbs-checkout-section">
-                        <h2 class="tbs-checkout-section__title">Delivery Address</h2>
+                    <div class="cal-card-static p-6">
+                        <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white mb-5" style="letter-spacing:0.2px">Delivery Address</h2>
 
                         @if (Model.SavedAddresses.Any())
                         {
-                            <div class="tbs-address-selector" role="radiogroup"
-                                 aria-label="Select delivery address">
+                            <div class="space-y-3" role="radiogroup" aria-label="Select delivery address">
                                 @foreach (WebApplication.Models.Entities.Address addr in Model.SavedAddresses)
                                 {
-                                    <label class="tbs-address-option @(Model.SelectedAddressId == addr.AddressId ? "tbs-address-option--selected" : "")">
-                                        <input type="radio"
-                                               name="SelectedAddressId"
-                                               value="@addr.AddressId"
-                                               class="tbs-address-option__radio"
+                                    <label class="cal-option @(Model.SelectedAddressId == addr.AddressId ? "" : "")">
+                                        <input type="radio" name="SelectedAddressId" value="@addr.AddressId"
                                                @(Model.SelectedAddressId == addr.AddressId ? "checked" : "") />
-                                        <div class="tbs-address-option__body">
-                                            <span class="tbs-address-option__label">@addr.Label</span>
-                                            <address class="tbs-address-option__address">
-                                                @addr.Street, @addr.City@(!string.IsNullOrEmpty(addr.Province) ? $", {addr.Province}" : "")
-                                                — @addr.PostalCode
+                                        <div class="flex-1 min-w-0">
+                                            <span class="text-sm font-medium text-charcoal dark:text-white">@addr.Label</span>
+                                            <address class="text-xs text-mid-gray mt-0.5 not-italic">
+                                                @addr.Street, @addr.City@(!string.IsNullOrEmpty(addr.Province) ? $", {addr.Province}" : "") — @addr.PostalCode
                                             </address>
                                         </div>
                                         @if (addr.IsDefault)
                                         {
-                                            <span class="tbs-address-option__default">Default</span>
+                                            <span class="cal-badge cal-badge-muted">Default</span>
                                         }
                                     </label>
                                 }
                             </div>
                             <a asp-controller="Customer" asp-action="Profile"
-                               class="tbs-checkout-section__manage-link">
+                               class="inline-block mt-3 text-sm font-medium text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
                                 + Manage addresses
                             </a>
                         }
                         else
                         {
-                            <div class="tbs-checkout-section__empty">
-                                <p>No saved addresses found.</p>
-                                <a asp-controller="Customer" asp-action="Profile"
-                                   class="btn tbs-btn-primary">
-                                    Add Address
-                                </a>
+                            <div class="text-center py-6">
+                                <p class="text-sm text-mid-gray mb-3">No saved addresses found.</p>
+                                <a asp-controller="Customer" asp-action="Profile" class="btn-dark btn-sm">Add Address</a>
                             </div>
                         }
-                        <span asp-validation-for="SelectedAddressId"
-                              class="tbs-field-error"></span>
+                        <span asp-validation-for="SelectedAddressId" class="cal-field-error"></span>
                     </div>
 
                     @* ── DELIVERY METHOD ── *@
-                    <div class="tbs-checkout-section">
-                        <h2 class="tbs-checkout-section__title">Delivery Method</h2>
-                        <div class="tbs-delivery-options" role="radiogroup"
-                             aria-label="Select delivery method">
-
-                            <label class="tbs-delivery-option">
+                    <div class="cal-card-static p-6">
+                        <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white mb-5" style="letter-spacing:0.2px">Delivery Method</h2>
+                        <div class="space-y-3" role="radiogroup" aria-label="Select delivery method">
+                            <label class="cal-option">
                                 <input type="radio" name="DeliveryMethod" value="Lalamove"
-                                       class="tbs-delivery-option__radio"
                                        @(Model.DeliveryMethod == "Lalamove" ? "checked" : "") />
-                                <div class="tbs-delivery-option__body">
-                                    <span class="tbs-delivery-option__name">Lalamove</span>
-                                    <span class="tbs-delivery-option__fee"
-                                          id="fee-Lalamove">
-                                        ₱@CheckoutViewModel.LalamoveFee.ToString("N2")
-                                    </span>
+                                <div class="flex-1">
+                                    <span class="text-sm font-medium text-charcoal dark:text-white">Lalamove</span>
                                 </div>
+                                <span class="text-sm font-semibold text-charcoal dark:text-white" id="fee-Lalamove">₱@CheckoutViewModel.LalamoveFee.ToString("N2")</span>
                             </label>
-
-                            <label class="tbs-delivery-option">
+                            <label class="cal-option">
                                 <input type="radio" name="DeliveryMethod" value="LBC"
-                                       class="tbs-delivery-option__radio"
                                        @(Model.DeliveryMethod == "LBC" ? "checked" : "") />
-                                <div class="tbs-delivery-option__body">
-                                    <span class="tbs-delivery-option__name">LBC</span>
-                                    <span class="tbs-delivery-option__fee"
-                                          id="fee-LBC">
-                                        ₱@CheckoutViewModel.LBCFee.ToString("N2")
-                                    </span>
+                                <div class="flex-1">
+                                    <span class="text-sm font-medium text-charcoal dark:text-white">LBC</span>
                                 </div>
+                                <span class="text-sm font-semibold text-charcoal dark:text-white" id="fee-LBC">₱@CheckoutViewModel.LBCFee.ToString("N2")</span>
                             </label>
-
-                            <label class="tbs-delivery-option">
+                            <label class="cal-option">
                                 <input type="radio" name="DeliveryMethod" value="Pickup"
-                                       class="tbs-delivery-option__radio"
                                        @(Model.DeliveryMethod == "Pickup" ? "checked" : "") />
-                                <div class="tbs-delivery-option__body">
-                                    <span class="tbs-delivery-option__name">
-                                        In-Store Pickup
-                                    </span>
-                                    <span class="tbs-delivery-option__fee">Free</span>
+                                <div class="flex-1">
+                                    <span class="text-sm font-medium text-charcoal dark:text-white">In-Store Pickup</span>
                                 </div>
+                                <span class="text-sm font-semibold text-success">Free</span>
                             </label>
-
                         </div>
-                        <span asp-validation-for="DeliveryMethod"
-                              class="tbs-field-error"></span>
+                        <span asp-validation-for="DeliveryMethod" class="cal-field-error"></span>
                     </div>
 
                     @* ── PAYMENT METHOD ── *@
-                    <div class="tbs-checkout-section">
-                        <h2 class="tbs-checkout-section__title">Payment Method</h2>
-                        <div class="tbs-payment-options" role="radiogroup"
-                             aria-label="Select payment method">
-
-                            <label class="tbs-payment-option">
+                    <div class="cal-card-static p-6">
+                        <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white mb-5" style="letter-spacing:0.2px">Payment Method</h2>
+                        <div class="space-y-3" role="radiogroup" aria-label="Select payment method">
+                            <label class="cal-option">
                                 <input type="radio" name="PaymentMethod" value="GCash"
-                                       class="tbs-payment-option__radio"
                                        @(Model.PaymentMethod == "GCash" ? "checked" : "") />
-                                <div class="tbs-payment-option__body">
-                                    <span class="tbs-payment-option__name">GCash</span>
-                                    <span class="tbs-payment-option__note">
-                                        You'll upload your proof of payment after placing your order.
-                                    </span>
+                                <div class="flex-1">
+                                    <span class="text-sm font-medium text-charcoal dark:text-white">GCash</span>
+                                    <span class="block text-xs text-mid-gray mt-0.5">You'll upload your proof of payment after placing your order.</span>
                                 </div>
                             </label>
-
-                            <label class="tbs-payment-option">
+                            <label class="cal-option">
                                 <input type="radio" name="PaymentMethod" value="BankTransfer"
-                                       class="tbs-payment-option__radio"
                                        @(Model.PaymentMethod == "BankTransfer" ? "checked" : "") />
-                                <div class="tbs-payment-option__body">
-                                    <span class="tbs-payment-option__name">Bank Transfer (BPI)</span>
-                                    <span class="tbs-payment-option__note">
-                                        24-hour verification window after submitting proof.
-                                    </span>
+                                <div class="flex-1">
+                                    <span class="text-sm font-medium text-charcoal dark:text-white">Bank Transfer (BPI)</span>
+                                    <span class="block text-xs text-mid-gray mt-0.5">24-hour verification window after submitting proof.</span>
                                 </div>
                             </label>
-
                         </div>
-                        <span asp-validation-for="PaymentMethod"
-                              class="tbs-field-error"></span>
+                        <span asp-validation-for="PaymentMethod" class="cal-field-error"></span>
                     </div>
 
                     @* ── VOUCHER ── *@
-                    <div class="tbs-checkout-section">
-                        <h2 class="tbs-checkout-section__title">Voucher / Promo Code</h2>
+                    <div class="cal-card-static p-6">
+                        <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white mb-5" style="letter-spacing:0.2px">Voucher / Promo Code</h2>
 
                         @if (!string.IsNullOrWhiteSpace(Model.VoucherCode))
                         {
-                            <div class="tbs-voucher-applied" id="voucher-applied-banner">
-                                <span class="tbs-voucher-applied__icon">✓</span>
-                                <span id="voucher-applied-label">
-                                    @Model.VoucherCode applied
-                                </span>
-                                <button type="button" class="tbs-voucher-applied__remove"
-                                        id="voucher-remove-btn"
-                                        aria-label="Remove voucher">
-                                    ✕
-                                </button>
+                            <div class="flex items-center gap-2 p-3 bg-success/10 border border-success/20 rounded-lg text-sm text-success" id="voucher-applied-banner">
+                                <span>✓</span>
+                                <span id="voucher-applied-label">@Model.VoucherCode applied</span>
+                                <button type="button" id="voucher-remove-btn"
+                                        class="ml-auto text-success/60 hover:text-success transition-colors"
+                                        aria-label="Remove voucher">✕</button>
                             </div>
                         }
                         else
                         {
                             <div id="voucher-applied-banner" style="display:none">
-                                <div class="tbs-voucher-applied">
-                                    <span class="tbs-voucher-applied__icon">✓</span>
+                                <div class="flex items-center gap-2 p-3 bg-success/10 border border-success/20 rounded-lg text-sm text-success">
+                                    <span>✓</span>
                                     <span id="voucher-applied-label"></span>
-                                    <button type="button"
-                                            class="tbs-voucher-applied__remove"
-                                            id="voucher-remove-btn"
-                                            aria-label="Remove voucher">
-                                        ✕
-                                    </button>
+                                    <button type="button" id="voucher-remove-btn"
+                                            class="ml-auto text-success/60 hover:text-success transition-colors"
+                                            aria-label="Remove voucher">✕</button>
                                 </div>
                             </div>
                         }
 
-                        <div class="tbs-voucher-row" id="voucher-input-row">
-                            <input type="text"
-                                   id="voucher-code-input"
-                                   class="tbs-input"
-                                   placeholder="Enter voucher code"
-                                   autocomplete="off"
-                                   aria-label="Voucher code" />
-                            <button type="button"
-                                    id="voucher-apply-btn"
-                                    class="btn tbs-btn-outline">
-                                Apply
-                            </button>
+                        <div class="flex gap-3 mt-3" id="voucher-input-row">
+                            <input type="text" id="voucher-code-input" class="cal-input flex-1"
+                                   placeholder="Enter voucher code" autocomplete="off" aria-label="Voucher code" />
+                            <button type="button" id="voucher-apply-btn" class="btn-ghost">Apply</button>
                         </div>
-                        <p class="tbs-field-error"
-                           id="voucher-error"
-                           style="display:none"></p>
+                        <p class="cal-field-error" id="voucher-error" style="display:none"></p>
 
-                        @* Hidden fields — populated by voucher.js *@
-                        <input type="hidden" name="VoucherCode"
-                               value="@Model.VoucherCode" />
-                        <input type="hidden" name="DiscountAmount"
-                               value="@Model.DiscountAmount" />
+                        <input type="hidden" name="VoucherCode" value="@Model.VoucherCode" />
+                        <input type="hidden" name="DiscountAmount" value="@Model.DiscountAmount" />
                     </div>
 
                     @* Submit *@
-                    <button type="submit"
-                            class="btn tbs-btn-accent tbs-btn-full tbs-checkout-submit"
-                            id="place-order-btn">
+                    <button type="submit" class="btn-dark btn-lg btn-full" id="place-order-btn">
                         Place Order
                     </button>
 
-                    <p class="tbs-checkout-legal">
+                    <p class="text-xs text-mid-gray text-center mt-3">
                         By placing your order you agree to our
-                        <a asp-controller="Home" asp-action="Privacy">Privacy Policy</a>.
+                        <a asp-controller="Home" asp-action="Privacy" class="underline underline-offset-2 hover:text-charcoal dark:hover:text-white">Privacy Policy</a>.
                         No refunds. Payment confirmation required within 24 hours.
                     </p>
 
                 </div>
 
                 @* =================== RIGHT: ORDER SUMMARY =================== *@
-                <aside class="tbs-checkout-layout__summary">
+                <aside data-reveal="delay-2">
                     @await Html.PartialAsync("~/Views/Customer/Partials/_OrderSummary.cshtml", Model)
                 </aside>
 
@@ -256,6 +178,6 @@
 
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
-    <script src="~/js/voucher.js"   asp-append-version="true"></script>
-    <script src="~/js/checkout.js"  asp-append-version="true"></script>
+    <script src="~/js/voucher.js"  asp-append-version="true"></script>
+    <script src="~/js/checkout.js" asp-append-version="true"></script>
 }

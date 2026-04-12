@@ -5,79 +5,65 @@
     ViewData["Title"] = "Suppliers";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/supplier.css" asp-append-version="true" />
-}
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)]">
+    <div class="max-w-[1200px] mx-auto px-6 py-12 md:py-16">
 
-<div class="tbs-supplier-page">
-    <div class="container">
-
-        <div class="tbs-page-header">
-            <div>
-                <h1 class="tbs-page-header__title">Suppliers</h1>
-                <p class="tbs-page-header__subtitle">
-                    @Model.Count active supplier@(Model.Count != 1 ? "s" : "")
-                </p>
-            </div>
+        <div class="mb-10" data-reveal>
+            <h1 class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">Suppliers</h1>
+            <p class="text-base text-mid-gray mt-2">@Model.Count active supplier@(Model.Count != 1 ? "s" : "")</p>
         </div>
 
         @if (!Model.Any())
         {
-            <div class="tbs-supplier-empty">
-                <p>No active suppliers found.</p>
+            <div class="cal-card-static p-10 text-center" data-reveal="delay-1">
+                <p class="text-sm text-mid-gray">No active suppliers found.</p>
             </div>
         }
         else
         {
-            <div class="tbs-supplier-grid">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" data-reveal="delay-1">
                 @foreach (WebApplication.Models.Entities.Supplier supplier in Model)
                 {
-                    <div class="tbs-supplier-card">
-                        <div class="tbs-supplier-card__header">
-                            <h3 class="tbs-supplier-card__name">@supplier.Name</h3>
-                            <span class="tbs-badge tbs-badge--delivered">Active</span>
+                    <div class="cal-card p-6 flex flex-col hover:-translate-y-0.5">
+                        <div class="flex items-start justify-between gap-3 mb-4">
+                            <h3 class="font-display text-lg font-semibold text-charcoal dark:text-white" style="letter-spacing:0.2px">@supplier.Name</h3>
+                            <span class="cal-badge cal-badge-success shrink-0">Active</span>
                         </div>
 
-                        <dl class="tbs-supplier-card__details">
+                        <dl class="space-y-2 text-sm flex-1">
                             @if (!string.IsNullOrWhiteSpace(supplier.ContactPerson))
                             {
-                                <div class="tbs-supplier-card__detail">
-                                    <dt>Contact</dt>
-                                    <dd>@supplier.ContactPerson</dd>
+                                <div class="flex justify-between">
+                                    <dt class="text-mid-gray">Contact</dt>
+                                    <dd class="text-charcoal dark:text-white font-medium">@supplier.ContactPerson</dd>
                                 </div>
                             }
                             @if (!string.IsNullOrWhiteSpace(supplier.Email))
                             {
-                                <div class="tbs-supplier-card__detail">
-                                    <dt>Email</dt>
-                                    <dd>
-                                        <a href="mailto:@supplier.Email">@supplier.Email</a>
-                                    </dd>
+                                <div class="flex justify-between">
+                                    <dt class="text-mid-gray">Email</dt>
+                                    <dd><a href="mailto:@supplier.Email" class="text-charcoal dark:text-white hover:underline">@supplier.Email</a></dd>
                                 </div>
                             }
                             @if (!string.IsNullOrWhiteSpace(supplier.PhoneNumber))
                             {
-                                <div class="tbs-supplier-card__detail">
-                                    <dt>Phone</dt>
-                                    <dd>@supplier.PhoneNumber</dd>
+                                <div class="flex justify-between">
+                                    <dt class="text-mid-gray">Phone</dt>
+                                    <dd class="text-charcoal dark:text-white">@supplier.PhoneNumber</dd>
                                 </div>
                             }
                             @if (!string.IsNullOrWhiteSpace(supplier.Address))
                             {
-                                <div class="tbs-supplier-card__detail">
-                                    <dt>Address</dt>
-                                    <dd>@supplier.Address</dd>
+                                <div class="flex justify-between">
+                                    <dt class="text-mid-gray">Address</dt>
+                                    <dd class="text-charcoal dark:text-white text-right max-w-[60%]">@supplier.Address</dd>
                                 </div>
                             }
                         </dl>
 
-                        <div class="tbs-supplier-card__footer">
-                            <a asp-controller="Supplier"
-                               asp-action="PurchaseOrders"
-                               asp-route-supplierId="@supplier.SupplierId"
-                               class="btn tbs-btn-outline tbs-supplier-card__btn">
-                                View Purchase Orders
-                            </a>
+                        <div class="mt-5 pt-4 border-t border-border-ring dark:border-white/10">
+                            <a asp-controller="Supplier" asp-action="PurchaseOrders" asp-route-supplierId="@supplier.SupplierId"
+                               class="btn-ghost btn-sm btn-full text-center">View Purchase Orders</a>
                         </div>
                     </div>
                 }

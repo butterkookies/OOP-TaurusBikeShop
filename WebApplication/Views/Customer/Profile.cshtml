@@ -1,205 +1,132 @@
 @* WebApplication/Views/Customer/Profile.cshtml *@
 @model WebApplication.Models.ViewModels.ProfileViewModel
 @{
-    ViewData["Title"] = "My Profile";
+    ViewData["Title"] = "Profile";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/customer.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
-}
+@Html.AntiForgeryToken()
 
-<div class="tbs-customer-page">
-    <div class="container">
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)]">
+    <div class="max-w-[800px] mx-auto px-6 py-12 md:py-16">
 
-        <div class="tbs-page-header">
-            <h1 class="tbs-page-header__title">My Profile</h1>
+        <h1 class="font-display text-3xl font-semibold text-charcoal dark:text-white mb-10" data-reveal>Profile Settings</h1>
+
+        @* ── Account Info ── *@
+        <div class="cal-card-static p-6 mb-6" data-reveal="delay-1">
+            <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white mb-5" style="letter-spacing:0.2px">Account Information</h2>
+
+            <form asp-action="UpdateProfile" asp-controller="Customer" method="post" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label asp-for="FirstName" class="cal-label">First Name</label>
+                        <input asp-for="FirstName" class="cal-input" autocomplete="given-name" />
+                        <span asp-validation-for="FirstName" class="cal-field-error"></span>
+                    </div>
+                    <div>
+                        <label asp-for="LastName" class="cal-label">Last Name</label>
+                        <input asp-for="LastName" class="cal-input" autocomplete="family-name" />
+                        <span asp-validation-for="LastName" class="cal-field-error"></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label asp-for="Email" class="cal-label">Email</label>
+                        <input asp-for="Email" class="cal-input cal-input-readonly" readonly />
+                    </div>
+                    <div>
+                        <label asp-for="PhoneNumber" class="cal-label">Phone Number</label>
+                        <input asp-for="PhoneNumber" class="cal-input" type="tel" autocomplete="tel" />
+                        <span asp-validation-for="PhoneNumber" class="cal-field-error"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-dark btn-sm mt-2">Save Changes</button>
+            </form>
         </div>
 
-        <div class="row g-4">
+        @* ── Change Password ── *@
+        <div class="cal-card-static p-6 mb-6" data-reveal="delay-2">
+            <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white mb-5" style="letter-spacing:0.2px">Change Password</h2>
 
-            @* ===================== PERSONAL INFO ===================== *@
-            <div class="col-12 col-lg-6">
-                <div class="tbs-card">
-                    <h2 class="tbs-card__title">Personal Information</h2>
+            <form asp-action="ChangePassword" asp-controller="Customer" method="post" novalidate>
+                @Html.AntiForgeryToken()
 
-                    <form asp-action="Profile" asp-controller="Customer" method="post" novalidate>
-                        @Html.AntiForgeryToken()
-
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <div class="tbs-form-group">
-                                    <label asp-for="FirstName" class="tbs-label">First Name</label>
-                                    <input asp-for="FirstName" class="tbs-input" />
-                                    <span asp-validation-for="FirstName" class="tbs-field-error"></span>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="tbs-form-group">
-                                    <label asp-for="LastName" class="tbs-label">Last Name</label>
-                                    <input asp-for="LastName" class="tbs-input" />
-                                    <span asp-validation-for="LastName" class="tbs-field-error"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tbs-form-group">
-                            <label asp-for="Email" class="tbs-label">Email Address</label>
-                            <input asp-for="Email" class="tbs-input tbs-input--readonly" readonly />
-                            <small class="tbs-form-hint">Email cannot be changed.</small>
-                        </div>
-
-                        <div class="tbs-form-group">
-                            <label asp-for="PhoneNumber" class="tbs-label">
-                                Phone Number <span class="tbs-label__optional">(optional)</span>
-                            </label>
-                            <input asp-for="PhoneNumber" class="tbs-input" type="tel" placeholder="09XXXXXXXXX" />
-                            <span asp-validation-for="PhoneNumber" class="tbs-field-error"></span>
-                        </div>
-
-                        <button type="submit" class="btn tbs-btn-primary">Save Changes</button>
-                    </form>
+                <div class="space-y-4 max-w-sm">
+                    <div>
+                        <label asp-for="ChangePassword.CurrentPassword" class="cal-label">Current Password</label>
+                        <input asp-for="ChangePassword.CurrentPassword" class="cal-input" type="password" autocomplete="current-password" />
+                        <span asp-validation-for="ChangePassword.CurrentPassword" class="cal-field-error"></span>
+                    </div>
+                    <div>
+                        <label asp-for="ChangePassword.NewPassword" class="cal-label">New Password</label>
+                        <input asp-for="ChangePassword.NewPassword" class="cal-input" type="password" autocomplete="new-password" />
+                        <span asp-validation-for="ChangePassword.NewPassword" class="cal-field-error"></span>
+                    </div>
+                    <div>
+                        <label asp-for="ChangePassword.ConfirmNewPassword" class="cal-label">Confirm New Password</label>
+                        <input asp-for="ChangePassword.ConfirmNewPassword" class="cal-input" type="password" autocomplete="new-password" />
+                        <span asp-validation-for="ChangePassword.ConfirmNewPassword" class="cal-field-error"></span>
+                    </div>
                 </div>
-            </div>
-
-            @* ===================== CHANGE PASSWORD ===================== *@
-            <div class="col-12 col-lg-6">
-                <div class="tbs-card">
-                    <h2 class="tbs-card__title">Change Password</h2>
-
-                    <form asp-action="ChangePassword" asp-controller="Customer" method="post" novalidate>
-                        @Html.AntiForgeryToken()
-
-                        <div class="tbs-form-group">
-                            <label class="tbs-label">Current Password</label>
-                            <input name="CurrentPassword" class="tbs-input" type="password"
-                                   autocomplete="current-password" placeholder="Your current password" />
-                        </div>
-
-                        <div class="tbs-form-group">
-                            <label class="tbs-label">New Password</label>
-                            <input name="NewPassword" class="tbs-input" type="password"
-                                   autocomplete="new-password" placeholder="Minimum 8 characters" />
-                        </div>
-
-                        <div class="tbs-form-group">
-                            <label class="tbs-label">Confirm New Password</label>
-                            <input name="ConfirmNewPassword" class="tbs-input" type="password"
-                                   autocomplete="new-password" placeholder="Repeat new password" />
-                        </div>
-
-                        <button type="submit" class="btn tbs-btn-primary">Change Password</button>
-                    </form>
-                </div>
-            </div>
-
-            @* ===================== ADDRESSES ===================== *@
-            <div class="col-12">
-                <div class="tbs-card">
-                    <h2 class="tbs-card__title">Saved Addresses</h2>
-
-                    @if (Model.SavedAddresses.Any())
-                    {
-                        <div class="row g-3 tbs-address-grid">
-                            @foreach (var address in Model.SavedAddresses)
-                            {
-                                <div class="col-12 col-md-6 col-lg-4">
-                                    <div class="tbs-address-card @(address.IsDefault ? "tbs-address-card--default" : "")">
-                                        @if (address.IsDefault)
-                                        {
-                                            <span class="tbs-address-card__default-badge">Default</span>
-                                        }
-                                        <div class="tbs-address-card__label">@address.Label</div>
-                                        <address class="tbs-address-card__address">
-                                            @address.Street<br />
-                                            @address.City@(!string.IsNullOrEmpty(address.Province) ? $", {address.Province}" : "")<br />
-                                            @address.PostalCode &mdash; @address.Country
-                                        </address>
-                                        <div class="tbs-address-card__actions">
-                                            @if (!address.IsDefault)
-                                            {
-                                                <form asp-action="SetDefaultAddress" asp-controller="Customer"
-                                                      method="post" class="d-inline">
-                                                    @Html.AntiForgeryToken()
-                                                    <input type="hidden" name="addressId" value="@address.AddressId" />
-                                                    <button type="submit" class="tbs-address-card__action-btn">
-                                                        Set as Default
-                                                    </button>
-                                                </form>
-                                                <form asp-action="DeleteAddress" asp-controller="Customer"
-                                                      method="post" class="d-inline">
-                                                    @Html.AntiForgeryToken()
-                                                    <input type="hidden" name="addressId" value="@address.AddressId" />
-                                                    <button type="submit" class="tbs-address-card__action-btn tbs-address-card__action-btn--danger"
-                                                            onclick="return confirm('Remove this address?')">
-                                                        Remove
-                                                    </button>
-                                                </form>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <p class="tbs-profile__no-addresses">No saved addresses yet.</p>
-                    }
-
-                    @* Add new address *@
-                    <details class="tbs-profile__add-address mt-4">
-                        <summary class="tbs-profile__add-address-toggle">+ Add New Address</summary>
-                        <div class="tbs-profile__add-address-form mt-3">
-                            <form asp-action="AddAddress" asp-controller="Customer" method="post" novalidate>
-                                @Html.AntiForgeryToken()
-                                <div class="row g-3">
-                                    <div class="col-12">
-                                        <div class="tbs-form-group">
-                                            <label class="tbs-label">Street</label>
-                                            <input name="Street" class="tbs-input" placeholder="House no., Street, Barangay" />
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-5">
-                                        <div class="tbs-form-group">
-                                            <label class="tbs-label">City</label>
-                                            <input name="City" class="tbs-input" placeholder="Manila" />
-                                        </div>
-                                    </div>
-                                    <div class="col-6 col-sm-3">
-                                        <div class="tbs-form-group">
-                                            <label class="tbs-label">Postal Code</label>
-                                            <input name="PostalCode" class="tbs-input" placeholder="1000" maxlength="4" />
-                                        </div>
-                                    </div>
-                                    <div class="col-6 col-sm-4">
-                                        <div class="tbs-form-group">
-                                            <label class="tbs-label">Province</label>
-                                            <input name="Province" class="tbs-input" placeholder="Optional" />
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-4">
-                                        <div class="tbs-form-group">
-                                            <label class="tbs-label">Label</label>
-                                            <select name="Label" class="tbs-input tbs-select">
-                                                <option value="Home">Home</option>
-                                                <option value="Work">Work</option>
-                                                <option value="Other">Other</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <input type="hidden" name="Country" value="Philippines" />
-                                    <div class="col-12">
-                                        <button type="submit" class="btn tbs-btn-primary">Add Address</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
+                <button type="submit" class="btn-dark btn-sm mt-4">Update Password</button>
+            </form>
         </div>
+
+        @* ── Shipping Addresses ── *@
+        <div class="cal-card-static p-6" data-reveal="delay-3">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white" style="letter-spacing:0.2px">Shipping Addresses</h2>
+                <button type="button" class="btn-dark btn-sm" onclick="openModal('add-address-modal')">
+                    + Add Address
+                </button>
+            </div>
+
+            @if (Model.SavedAddresses != null && Model.SavedAddresses.Any())
+            {
+                <div class="space-y-3">
+                    @foreach (var addr in Model.SavedAddresses)
+                    {
+                        <div class="flex items-start gap-4 p-4 border border-border-ring dark:border-white/10 rounded-xl">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-charcoal dark:text-white">
+                                    @addr.Label
+                                    @if (addr.IsDefault)
+                                    {
+                                        <span class="cal-badge cal-badge-dark ml-2">Default</span>
+                                    }
+                                </p>
+                                <p class="text-xs text-mid-gray mt-1">
+                                    @addr.Street, @addr.City@(!string.IsNullOrEmpty(addr.Province) ? $", {addr.Province}" : "") — @addr.PostalCode
+                                </p>
+                            </div>
+                            <div class="flex gap-2 shrink-0">
+                                @if (!addr.IsDefault)
+                                {
+                                    <form asp-action="SetDefaultAddress" asp-controller="Customer" method="post" class="inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="addressId" value="@addr.AddressId" />
+                                        <button type="submit" class="text-xs text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">Set Default</button>
+                                    </form>
+                                }
+                                <form asp-action="DeleteAddress" asp-controller="Customer" method="post" class="inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="addressId" value="@addr.AddressId" />
+                                    <button type="submit" class="text-xs text-error hover:text-red-700 transition-colors">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-sm text-mid-gray text-center py-6">No shipping addresses saved yet.</p>
+            }
+        </div>
+
     </div>
 </div>
 

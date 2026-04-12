@@ -3,12 +3,12 @@
 @{
     string css = Model switch
     {
-        "Open"             => "tbs-badge--processing",
-        "InProgress"       => "tbs-badge--pending",
-        "AwaitingResponse" => "tbs-badge--onhold",
-        "Resolved"         => "tbs-badge--delivered",
-        "Closed"           => "tbs-badge--cancelled",
-        _                  => "tbs-badge--pending"
+        "Open"             => "cal-badge-info",
+        "InProgress"       => "cal-badge-warning",
+        "AwaitingResponse" => "cal-badge-warning",
+        "Resolved"         => "cal-badge-success",
+        "Closed"           => "cal-badge-muted",
+        _                  => "cal-badge-muted"
     };
     string label = Model switch
     {
@@ -17,4 +17,4 @@
         _                  => Model
     };
 }
-<span class="tbs-badge @css" aria-label="Ticket status: @label">@label</span>
+<span class="cal-badge @css" aria-label="Ticket status: @label">@label</span>

@@ -1,33 +1,37 @@
-﻿@* WebApplication/Views/Shared/Error.cshtml *@
+@* WebApplication/Views/Shared/Error.cshtml *@
 @model WebApplication.Models.ErrorViewModel
 @{
     ViewData["Title"] = "Error";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container tbs-error-page">
-    <div class="tbs-error-page__inner">
-        <div class="tbs-error-page__icon" aria-hidden="true">&#9651;</div>
-        <h1 class="tbs-error-page__title">Something went wrong</h1>
-        <p class="tbs-error-page__message">
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)] flex items-center justify-center px-6">
+    <div class="cal-card-static p-10 md:p-14 text-center max-w-md" data-reveal>
+
+        <div class="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+        </div>
+
+        <h1 class="font-display text-2xl font-semibold text-charcoal dark:text-white mb-2">Something went wrong</h1>
+        <p class="text-sm text-mid-gray mb-6 leading-relaxed">
             We hit an unexpected issue. Our team has been notified.
             Please try again, or return to the homepage.
         </p>
 
         @if (Model.ShowRequestId)
         {
-            <p class="tbs-error-page__request-id">
-                <small>Request ID: <code>@Model.RequestId</code></small>
+            <p class="text-xs text-mid-gray mb-4">
+                Request ID: <code class="font-mono text-charcoal dark:text-white bg-light-gray dark:bg-white/10 px-2 py-0.5 rounded">@Model.RequestId</code>
             </p>
         }
 
-        <div class="tbs-error-page__actions">
-            <a asp-controller="Home" asp-action="Index" class="btn tbs-btn-primary">
-                Back to Homepage
-            </a>
-            <button type="button" class="btn tbs-btn-outline" onclick="history.back()">
-                Go Back
-            </button>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a asp-controller="Home" asp-action="Index" class="btn-dark">Back to Homepage</a>
+            <button type="button" class="btn-ghost" onclick="history.back()">Go Back</button>
         </div>
     </div>
 </div>

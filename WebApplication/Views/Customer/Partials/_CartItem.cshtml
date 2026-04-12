@@ -1,73 +1,51 @@
 @* WebApplication/Views/Cart/Partials/_CartItem.cshtml *@
 @model WebApplication.Models.ViewModels.CartItemViewModel
 
-<div class="tbs-cart-item" id="cart-item-@Model.CartItemId" data-cart-item-id="@Model.CartItemId">
+<div class="flex items-center gap-4 px-5 py-4" id="cart-item-@Model.CartItemId" data-cart-item-id="@Model.CartItemId">
 
     @* Product image *@
-    <div class="tbs-cart-item__img-wrap">
+    <div class="w-16 h-16 bg-light-gray dark:bg-neutral-800 rounded-lg overflow-hidden shrink-0">
         @if (Model.ImageUrl != null)
         {
-            <img src="@Model.ImageUrl"
-                 alt="@Model.ProductName"
-                 class="tbs-cart-item__img"
-                 loading="lazy" />
+            <img src="@Model.ImageUrl" alt="@Model.ProductName" class="w-full h-full object-cover" loading="lazy" />
         }
         else
         {
-            <div class="tbs-cart-item__img-placeholder" aria-hidden="true">&#9651;</div>
+            <div class="w-full h-full flex items-center justify-center text-mid-gray text-lg">△</div>
         }
     </div>
 
     @* Info *@
-    <div class="tbs-cart-item__info">
-        <h3 class="tbs-cart-item__name">
-            <a asp-controller="Product" asp-action="Detail"
-               asp-route-id="@Model.ProductId">@Model.ProductName</a>
+    <div class="flex-1 min-w-0">
+        <h3 class="text-sm font-medium text-charcoal dark:text-white truncate">
+            <a asp-controller="Product" asp-action="Detail" asp-route-id="@Model.ProductId"
+               class="hover:underline">@Model.ProductName</a>
         </h3>
         @if (!string.IsNullOrWhiteSpace(Model.VariantName))
         {
-            <p class="tbs-cart-item__variant">@Model.VariantName</p>
+            <p class="text-xs text-mid-gray">@Model.VariantName</p>
         }
-        <p class="tbs-cart-item__unit-price">@Model.FormattedUnitPrice each</p>
+        <p class="text-xs text-mid-gray mt-0.5">@Model.FormattedUnitPrice each</p>
     </div>
 
     @* Qty stepper *@
-    <div class="tbs-cart-item__qty">
-        <button type="button"
-                class="tbs-qty-btn tbs-cart-item__qty-btn"
-                data-action="decrease"
-                data-cart-item-id="@Model.CartItemId"
-                aria-label="Decrease quantity">−</button>
-        <input type="number"
-               class="tbs-qty-input tbs-cart-item__qty-input"
-               value="@Model.Quantity"
-               min="1"
-               max="99"
-               data-cart-item-id="@Model.CartItemId"
-               aria-label="Quantity" />
-        <button type="button"
-                class="tbs-qty-btn tbs-cart-item__qty-btn"
-                data-action="increase"
-                data-cart-item-id="@Model.CartItemId"
-                aria-label="Increase quantity">+</button>
+    <div class="cal-qty shrink-0">
+        <button type="button" class="cal-qty-btn" data-action="decrease" data-cart-item-id="@Model.CartItemId" aria-label="Decrease quantity">−</button>
+        <input type="number" class="cal-qty-val" value="@Model.Quantity" min="1" max="99" data-cart-item-id="@Model.CartItemId" aria-label="Quantity" />
+        <button type="button" class="cal-qty-btn" data-action="increase" data-cart-item-id="@Model.CartItemId" aria-label="Increase quantity">+</button>
     </div>
 
     @* Line total *@
-    <div class="tbs-cart-item__total"
-         id="line-total-@Model.CartItemId">
+    <div class="text-sm font-semibold text-charcoal dark:text-white whitespace-nowrap w-24 text-right" id="line-total-@Model.CartItemId">
         @Model.FormattedLineTotal
     </div>
 
     @* Remove *@
     <button type="button"
-            class="tbs-cart-item__remove"
+            class="w-8 h-8 flex items-center justify-center text-mid-gray hover:text-error transition-colors shrink-0"
             data-cart-item-id="@Model.CartItemId"
             aria-label="Remove @Model.ProductName from cart">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-             fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
     </button>
 
 </div>

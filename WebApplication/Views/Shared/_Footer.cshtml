@@ -1,60 +1,117 @@
 @* WebApplication/Views/Shared/_Footer.cshtml *@
-<footer class="tbs-footer">
-    <div class="container">
-        <div class="row tbs-footer__grid">
 
-            @* Brand column *@
-            <div class="col-lg-4 col-md-6 tbs-footer__brand-col">
-                <div class="tbs-footer__brand">
-                    <img src="~/FULL-COLOR.png" alt="Taurus Bike Shop" class="tbs-footer__brand-logo" />
-                </div>
-                <p class="tbs-footer__tagline">
+<footer class="bg-white border-t border-border-ring dark:bg-midnight dark:border-white/10">
+    <div class="max-w-[1200px] mx-auto px-6 py-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+
+            @* ── Brand Column ── *@
+            <div class="lg:col-span-1">
+                <a asp-controller="Home" asp-action="Index" class="inline-block mb-4">
+                    <img src="~/FULL-COLOR.png" alt="Taurus Bike Shop" class="h-10 w-auto" />
+                </a>
+                <p class="text-sm text-mid-gray leading-relaxed">
                     Premium bikes and components for every rider — from trail to road, beginner to pro.
                 </p>
-                <p class="tbs-footer__address">
-                    Philippines &nbsp;·&nbsp; GCash &amp; Bank Transfer accepted
+                <p class="text-xs text-mid-gray mt-3">
+                    Philippines &middot; GCash &amp; Bank Transfer accepted
                 </p>
             </div>
 
-            @* Shop links *@
-            <div class="col-lg-2 col-md-3 col-6 tbs-footer__links-col">
-                <h6 class="tbs-footer__heading">Shop</h6>
-                <ul class="tbs-footer__links">
-                    <li><a asp-controller="Product" asp-action="List">All Products</a></li>
-                    <li><a asp-controller="Product" asp-action="List" asp-route-categoryCode="UNIT">Complete Bikes</a></li>
-                    <li><a asp-controller="Product" asp-action="List" asp-route-categoryCode="FRAME">Frames</a></li>
-                    <li><a asp-controller="Product" asp-action="List" asp-route-categoryCode="UPGKIT">Upgrade Kits</a></li>
+            @* ── Shop Links ── *@
+            <div>
+                <h6 class="font-display text-sm font-semibold text-charcoal uppercase tracking-wider mb-4 dark:text-neutral-100">
+                    Shop
+                </h6>
+                <ul class="space-y-2.5">
+                    <li>
+                        <a asp-controller="Product" asp-action="List"
+                           class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                            All Products
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Product" asp-action="List" asp-route-categoryCode="UNIT"
+                           class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                            Complete Bikes
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Product" asp-action="List" asp-route-categoryCode="FRAME"
+                           class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                            Frames
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Product" asp-action="List" asp-route-categoryCode="UPGKIT"
+                           class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                            Upgrade Kits
+                        </a>
+                    </li>
                 </ul>
             </div>
 
-            @* Account links *@
-            <div class="col-lg-2 col-md-3 col-6 tbs-footer__links-col">
-                <h6 class="tbs-footer__heading">Account</h6>
-                <ul class="tbs-footer__links">
-                    <li><a asp-controller="Customer" asp-action="Login">Sign In</a></li>
-                    <li><a asp-controller="Customer" asp-action="Register">Register</a></li>
-                    <li><a asp-controller="Order" asp-action="History">My Orders</a></li>
-                    <li><a asp-controller="Wishlist" asp-action="ViewWishlist">Wishlist</a></li>
+            @* ── Account Links ── *@
+            <div>
+                <h6 class="font-display text-sm font-semibold text-charcoal uppercase tracking-wider mb-4 dark:text-neutral-100">
+                    Account
+                </h6>
+                <ul class="space-y-2.5">
+                    <li>
+                        <a asp-controller="Customer" asp-action="Login"
+                           class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                            Sign In
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Customer" asp-action="Register"
+                           class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                            Register
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Order" asp-action="History"
+                           class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                            My Orders
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Wishlist" asp-action="ViewWishlist"
+                           class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                            Wishlist
+                        </a>
+                    </li>
                 </ul>
             </div>
 
-            @* Support links *@
-            <div class="col-lg-4 col-md-6 tbs-footer__links-col">
-                <h6 class="tbs-footer__heading">Support</h6>
-                <ul class="tbs-footer__links">
-                    <li><a asp-controller="Support" asp-action="Create">Contact Support</a></li>
-                    <li><a asp-controller="Home" asp-action="Privacy">Privacy Policy</a></li>
+            @* ── Support Links ── *@
+            <div>
+                <h6 class="font-display text-sm font-semibold text-charcoal uppercase tracking-wider mb-4 dark:text-neutral-100">
+                    Support
+                </h6>
+                <ul class="space-y-2.5">
+                    <li>
+                        <a asp-controller="Support" asp-action="Create"
+                           class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                            Contact Support
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="Privacy"
+                           class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                            Privacy Policy
+                        </a>
+                    </li>
                 </ul>
-                <p class="tbs-footer__courier-note mt-3">
-                    <strong>Delivery via:</strong> Lalamove &amp; LBC
+                <p class="text-xs text-mid-gray mt-5">
+                    <span class="font-medium text-charcoal dark:text-neutral-200">Delivery via:</span> Lalamove &amp; LBC
                 </p>
             </div>
 
         </div>
 
-        <div class="tbs-footer__bottom">
-            <hr class="tbs-footer__divider" />
-            <p class="tbs-footer__copyright">
+        @* ── Bottom Bar ── *@
+        <div class="mt-16 pt-8 border-t border-border-ring dark:border-white/10">
+            <p class="text-xs text-mid-gray text-center">
                 &copy; @DateTime.Now.Year Taurus Bike Shop. All rights reserved.
             </p>
         </div>

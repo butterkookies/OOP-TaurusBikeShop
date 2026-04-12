@@ -8,171 +8,94 @@
         ?? new List<WebApplication.Models.ViewModels.ReviewViewModel>();
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/review.css" asp-append-version="true" />
-    <style>
-        body {
-            background-color: #0D0D1A;
-            background-image:
-                linear-gradient(rgba(8, 6, 18, 0.68), rgba(8, 6, 18, 0.68)),
-                url('/mobile wallpaper.png');
-            background-size: cover;
-            background-position: center top;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-        }
-    </style>
-}
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)]">
+    <div class="max-w-[900px] mx-auto px-6 py-12 md:py-16">
 
-<div class="tbs-reviews-page">
-    <div class="container">
-
-        <div class="tbs-page-header rv-anim rv-anim-d0">
-            <div>
-                <p class="tbs-reviews-eyebrow">Your Feedback</p>
-                <h1 class="tbs-page-header__title">My Reviews</h1>
-                <p class="tbs-page-header__subtitle">
-                    Manage your product reviews and pending feedback
-                </p>
-            </div>
+        <div class="mb-10" data-reveal>
+            <p class="text-sm font-medium tracking-widest uppercase text-mid-gray mb-2">Your Feedback</p>
+            <h1 class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">My Reviews</h1>
+            <p class="text-base text-mid-gray mt-2">Manage your product reviews and pending feedback</p>
         </div>
 
         @* ── PENDING REVIEWS ── *@
         @if (pending.Any())
         {
-            <section class="tbs-reviews-section rv-anim rv-anim-d1">
-                <div class="tbs-reviews-section__header">
-                    <h2 class="tbs-reviews-section__title">
-                        Awaiting Your Review
-                    </h2>
-                    <span class="tbs-reviews-section__count">@pending.Count</span>
+            <div class="mb-10" data-reveal="delay-1">
+                <div class="flex items-center gap-3 mb-5">
+                    <h2 class="font-display text-xl font-semibold text-charcoal dark:text-white">Awaiting Your Review</h2>
+                    <span class="cal-badge cal-badge-warning">@pending.Count</span>
                 </div>
-                <p class="tbs-reviews-section__subtitle">
-                    You've received these products — share your experience.
-                </p>
-                <div class="tbs-pending-reviews">
+                <p class="text-sm text-mid-gray mb-4">You've received these products — share your experience.</p>
+
+                <div class="space-y-3">
                     @foreach (var item in pending)
                     {
-                        <div class="tbs-pending-review-card">
-                            <div class="tbs-pending-review-card__info">
-                                <span class="tbs-pending-review-card__name">
-                                    @item.ProductName
-                                </span>
-                                <span class="tbs-pending-review-card__badge">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"
-                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                         stroke-width="3" stroke-linecap="round"
-                                         stroke-linejoin="round" aria-hidden="true">
-                                        <polyline points="20 6 9 17 4 12"/>
-                                    </svg>
-                                    Verified Purchase
-                                </span>
+                        <div class="cal-card-static p-4 flex items-center justify-between gap-4">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-charcoal dark:text-white truncate">@item.ProductName</p>
+                                <span class="cal-badge cal-badge-success mt-1">✓ Verified Purchase</span>
                             </div>
-                            <a asp-controller="Product"
-                               asp-action="Detail"
-                               asp-route-id="@item.ProductId"
-                               asp-fragment="reviews-section"
-                               class="tbs-btn-accent-sm">
+                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.ProductId" asp-fragment="reviews-section"
+                               class="btn-dark btn-sm shrink-0">
                                 Write Review
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                     stroke-width="2.5" stroke-linecap="round"
-                                     stroke-linejoin="round" aria-hidden="true">
-                                    <polyline points="9 18 15 12 9 6"/>
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                             </a>
                         </div>
                     }
                 </div>
-            </section>
+            </div>
         }
 
         @* ── SUBMITTED REVIEWS ── *@
-        <section class="tbs-reviews-section rv-anim rv-anim-d2">
-            <div class="tbs-reviews-section__header">
-                <h2 class="tbs-reviews-section__title">
-                    Reviews I've Written
-                </h2>
+        <div data-reveal="delay-2">
+            <div class="flex items-center gap-3 mb-5">
+                <h2 class="font-display text-xl font-semibold text-charcoal dark:text-white">Reviews I've Written</h2>
                 @if (submitted.Any())
                 {
-                    <span class="tbs-reviews-section__count">@submitted.Count</span>
+                    <span class="cal-badge cal-badge-muted">@submitted.Count</span>
                 }
             </div>
 
             @if (!submitted.Any())
             {
-                <div class="tbs-reviews-empty">
-                    <div class="tbs-reviews-empty__icon" aria-hidden="true">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
-                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14
-                                             18.18 21.02 12 17.77 5.82 21.02
-                                             7 14.14 2 9.27 8.91 8.26 12 2"/>
-                        </svg>
+                <div class="cal-card-static p-10 text-center">
+                    <div class="text-mid-gray mb-3">
+                        <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                     </div>
-                    <p class="tbs-reviews-empty__text">You haven't written any reviews yet.</p>
+                    <p class="text-sm text-mid-gray">You haven't written any reviews yet.</p>
                     @if (!pending.Any())
                     {
-                        <p class="tbs-reviews-empty__hint">
-                            Reviews become available after your orders are delivered.
-                        </p>
+                        <p class="text-xs text-mid-gray mt-2">Reviews become available after your orders are delivered.</p>
                     }
                 </div>
             }
             else
             {
-                <div class="tbs-submitted-reviews">
+                <div class="space-y-4">
                     @foreach (var review in submitted)
                     {
-                        <div class="tbs-submitted-review-card">
-                            <div class="tbs-submitted-review-card__header">
-                                <a asp-controller="Product"
-                                   asp-action="Detail"
-                                   asp-route-id="@review.ProductId"
-                                   class="tbs-submitted-review-card__product">
-                                    @review.ProductName
-                                </a>
-                                <span class="tbs-submitted-review-card__date">
-                                    @review.CreatedAt
-                                </span>
+                        <div class="cal-card-static p-5">
+                            <div class="flex items-start justify-between gap-4 mb-2">
+                                <a asp-controller="Product" asp-action="Detail" asp-route-id="@review.ProductId"
+                                   class="text-sm font-medium text-charcoal dark:text-white hover:underline">@review.ProductName</a>
+                                <span class="text-xs text-mid-gray whitespace-nowrap">@review.CreatedAt</span>
                             </div>
-
-                            <div class="tbs-stars" aria-label="@review.Rating out of 5 stars">
+                            <div class="flex gap-0.5 mb-2" aria-label="@review.Rating out of 5 stars">
                                 @for (int i = 1; i <= 5; i++)
                                 {
-                                    <svg class="tbs-star-svg @(i <= review.Rating ? "tbs-star-svg--filled" : "")"
-                                         xmlns="http://www.w3.org/2000/svg"
-                                         width="14" height="14" viewBox="0 0 24 24"
-                                         aria-hidden="true">
-                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14
-                                                         18.18 21.02 12 17.77 5.82 21.02
-                                                         7 14.14 2 9.27 8.91 8.26 12 2"/>
-                                    </svg>
+                                    <span class="text-sm @(i <= review.Rating ? "cal-star--filled" : "cal-star")">★</span>
                                 }
                             </div>
-
                             @if (!string.IsNullOrWhiteSpace(review.Comment))
                             {
-                                <p class="tbs-submitted-review-card__comment">
-                                    @review.Comment
-                                </p>
+                                <p class="text-sm text-charcoal/80 dark:text-neutral-300 leading-relaxed">@review.Comment</p>
                             }
-
-                            <span class="tbs-submitted-review-card__verified">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"
-                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                     stroke-width="3" stroke-linecap="round"
-                                     stroke-linejoin="round" aria-hidden="true">
-                                    <polyline points="20 6 9 17 4 12"/>
-                                </svg>
-                                Verified Purchase
-                            </span>
+                            <span class="cal-badge cal-badge-success mt-3">✓ Verified Purchase</span>
                         </div>
                     }
                 </div>
             }
-        </section>
+        </div>
 
     </div>
 </div>

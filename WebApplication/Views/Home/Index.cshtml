@@ -4,174 +4,125 @@
     ViewData["Title"] = "Home";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/Index.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/product-card.css" asp-append-version="true" />
-    <style>
-        /*
-         * Homepage wallpaper — page-specific override.
-         * Stacks: dark tint (68%) → wallpaper image (fixed, cover)
-         * The tg-bg orbs (::before / ::after) layer on top via z-index.
-         * Glass cards then backdrop-filter: blur() against the frosted image.
-         */
-        body {
-            background-color: #0D0D1A;
-            background-image: none;
-            /* canvas replaces this */
-        }
-    </style>
-}
-
 @* ═══════════════════════════════════════════════════════════════
-   HERO — Magazine editorial, full-viewport
+   HERO — Cal.com-inspired minimal editorial
    ═══════════════════════════════════════════════════════════════ *@
-<section id="hero" class="idx-hero">
+<section class="relative overflow-hidden bg-white dark:bg-midnight">
+    <div class="max-w-[1200px] mx-auto px-6 py-24 md:py-32 lg:py-40">
 
-    @* Atmospheric radial glow pseudo-elements via Index.css ::before / ::after *@
-    @* Oversized typographic watermark — stays behind all content *@
-    <span class="hero-bg-text" aria-hidden="true">TAURUS</span>
-
-    <div class="idx-container idx-hero__inner">
-
-        <p class="idx-hero__eyebrow hero-anim hero-anim-d0">
+        <p class="text-sm font-medium tracking-widest uppercase text-mid-gray mb-4" data-reveal>
             Philippines' Premier Bike Shop
         </p>
 
-        <h1 class="idx-hero__headline hero-anim hero-anim-d1">
-            Built for the <span class="idx-crimson">Ride.</span>
+        <h1 class="font-display text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.08] text-charcoal dark:text-white max-w-3xl" data-reveal="delay-1">
+            Built for<br />the Ride.
         </h1>
 
-        <p class="idx-hero__sub hero-anim hero-anim-d2">
+        <p class="mt-6 text-lg text-mid-gray leading-relaxed max-w-xl" data-reveal="delay-2">
             Premium bicycles and components — from trail shredders to road racers.
             Delivered via Lalamove and LBC nationwide.
         </p>
 
-        <div class="idx-hero__ctas hero-anim hero-anim-d3">
-            <a asp-controller="Product" asp-action="List"
-               class="btn-primary tg-btn btn-glow">
+        <div class="mt-10 flex flex-wrap gap-4" data-reveal="delay-3">
+            <a asp-controller="Product" asp-action="List" class="btn-dark btn-lg">
                 Shop Now
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
-            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="UNIT"
-               class="btn-ghost tg-btn">
+            <a asp-controller="Product" asp-action="List" asp-route-categoryCode="UNIT" class="btn-ghost btn-lg">
                 View Complete Bikes
             </a>
         </div>
 
-        <div class="idx-hero__stats hero-anim hero-anim-d4">
-            <div class="idx-hero__stat">
-                <strong class="idx-hero__stat-value">148</strong>
-                <span class="idx-hero__stat-label">Products</span>
+        <div class="mt-16 flex gap-12 md:gap-16" data-reveal="delay-3">
+            <div>
+                <p class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">148</p>
+                <p class="text-sm text-mid-gray mt-1">Products</p>
             </div>
-            <div class="idx-hero__stat">
-                <strong class="idx-hero__stat-value">43</strong>
-                <span class="idx-hero__stat-label">Brands</span>
+            <div>
+                <p class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">43</p>
+                <p class="text-sm text-mid-gray mt-1">Brands</p>
             </div>
-            <div class="idx-hero__stat">
-                <strong class="idx-hero__stat-value">13</strong>
-                <span class="idx-hero__stat-label">Categories</span>
+            <div>
+                <p class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">13</p>
+                <p class="text-sm text-mid-gray mt-1">Categories</p>
             </div>
         </div>
 
     </div>
+    @* Subtle gradient accent *@
+    <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-light-gray/60 to-transparent pointer-events-none dark:from-white/[0.02]" aria-hidden="true"></div>
 </section>
 
 @* ═══════════════════════════════════════════════════════════════
-   CATEGORIES — Glass card grid
+   CATEGORIES — Shadow card grid
    ═══════════════════════════════════════════════════════════════ *@
-<section id="categories" class="idx-section tg-reveal">
-    <div class="idx-container">
+<section class="bg-light-gray dark:bg-midnight py-20 md:py-24">
+    <div class="max-w-[1200px] mx-auto px-6">
 
-        <div class="idx-section-header">
-            <h2 class="idx-section-title">Shop by Category</h2>
-        </div>
+        <h2 class="font-display text-3xl font-semibold text-charcoal dark:text-white mb-10" data-reveal>
+            Shop by Category
+        </h2>
 
-        <div class="idx-category-grid">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" data-reveal="delay-1">
 
             <a asp-controller="Product" asp-action="List" asp-route-categoryCode="UNIT"
-               class="glass-card idx-category-card">
-                <div class="idx-category-card__icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M4 10.781c.148 1.667 1.513 2.85 3.591 3.003V15h1.043v-1.216c2.078-.153 3.443-1.336 3.443-3.003 0-1.57-.962-2.556-2.802-3.021l-.643-.164V4.088c1.043.24 1.67.815 1.794 1.504h1.677c-.218-1.574-1.592-2.833-3.471-2.961V1.216h-1.043v1.415c-1.878.15-3.248 1.393-3.248 3.047 0 1.504.936 2.48 2.716 2.945l.532.14v3.701c-1.08-.246-1.74-.923-1.865-1.672H4zm2.77-3.113c-.59-.157-1.157-.4-1.157-1.112 0-.68.508-1.119 1.157-1.278v2.39zm.933 2.81c.74.178 1.186.526 1.186 1.2 0 .718-.539 1.143-1.186 1.28v-2.48z"/>
-                    </svg>
+               class="cal-card group p-6 flex flex-col gap-3 hover:-translate-y-0.5">
+                <div class="w-10 h-10 rounded-lg bg-charcoal/[0.06] dark:bg-white/10 flex items-center justify-center text-charcoal dark:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-5-5 6-2"/></svg>
                 </div>
-                <h3 class="idx-category-card__title">Complete Bikes</h3>
-                <p class="idx-category-card__desc">
-                    Fully assembled MTB, gravel, and CX builds ready to ride.
-                </p>
-                <span class="idx-category-card__arrow" aria-hidden="true">&rarr;</span>
+                <h3 class="font-display text-lg font-semibold text-charcoal dark:text-white" style="letter-spacing:0.2px">Complete Bikes</h3>
+                <p class="text-sm text-mid-gray leading-relaxed">Fully assembled MTB, gravel, and CX builds ready to ride.</p>
+                <span class="mt-auto text-sm font-medium text-charcoal/60 group-hover:text-charcoal transition-colors dark:text-white/40 dark:group-hover:text-white">&rarr;</span>
             </a>
 
             <a asp-controller="Product" asp-action="List" asp-route-categoryCode="FRAME"
-               class="glass-card idx-category-card">
-                <div class="idx-category-card__icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/>
-                    </svg>
+               class="cal-card group p-6 flex flex-col gap-3 hover:-translate-y-0.5">
+                <div class="w-10 h-10 rounded-lg bg-charcoal/[0.06] dark:bg-white/10 flex items-center justify-center text-charcoal dark:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
                 </div>
-                <h3 class="idx-category-card__title">Frames</h3>
-                <p class="idx-category-card__desc">
-                    Alloy and carbon framesets for MTB, gravel, and trail builds.
-                </p>
-                <span class="idx-category-card__arrow" aria-hidden="true">&rarr;</span>
+                <h3 class="font-display text-lg font-semibold text-charcoal dark:text-white" style="letter-spacing:0.2px">Frames</h3>
+                <p class="text-sm text-mid-gray leading-relaxed">Alloy and carbon framesets for MTB, gravel, and trail builds.</p>
+                <span class="mt-auto text-sm font-medium text-charcoal/60 group-hover:text-charcoal transition-colors dark:text-white/40 dark:group-hover:text-white">&rarr;</span>
             </a>
 
             <a asp-controller="Product" asp-action="List" asp-route-categoryCode="FORK"
-               class="glass-card idx-category-card">
-                <div class="idx-category-card__icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
-                    </svg>
+               class="cal-card group p-6 flex flex-col gap-3 hover:-translate-y-0.5">
+                <div class="w-10 h-10 rounded-lg bg-charcoal/[0.06] dark:bg-white/10 flex items-center justify-center text-charcoal dark:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 </div>
-                <h3 class="idx-category-card__title">Forks</h3>
-                <p class="idx-category-card__desc">
-                    Air and coil suspension forks — 100mm to 140mm travel.
-                </p>
-                <span class="idx-category-card__arrow" aria-hidden="true">&rarr;</span>
+                <h3 class="font-display text-lg font-semibold text-charcoal dark:text-white" style="letter-spacing:0.2px">Forks</h3>
+                <p class="text-sm text-mid-gray leading-relaxed">Air and coil suspension forks — 100mm to 140mm travel.</p>
+                <span class="mt-auto text-sm font-medium text-charcoal/60 group-hover:text-charcoal transition-colors dark:text-white/40 dark:group-hover:text-white">&rarr;</span>
             </a>
 
             <a asp-controller="Product" asp-action="List" asp-route-categoryCode="UPGKIT"
-               class="glass-card idx-category-card">
-                <div class="idx-category-card__icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                    </svg>
+               class="cal-card group p-6 flex flex-col gap-3 hover:-translate-y-0.5">
+                <div class="w-10 h-10 rounded-lg bg-charcoal/[0.06] dark:bg-white/10 flex items-center justify-center text-charcoal dark:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 </div>
-                <h3 class="idx-category-card__title">Upgrade Kits</h3>
-                <p class="idx-category-card__desc">
-                    Complete 9–12 speed drivetrain bundles — drop-in upgrades.
-                </p>
-                <span class="idx-category-card__arrow" aria-hidden="true">&rarr;</span>
+                <h3 class="font-display text-lg font-semibold text-charcoal dark:text-white" style="letter-spacing:0.2px">Upgrade Kits</h3>
+                <p class="text-sm text-mid-gray leading-relaxed">Complete 9–12 speed drivetrain bundles — drop-in upgrades.</p>
+                <span class="mt-auto text-sm font-medium text-charcoal/60 group-hover:text-charcoal transition-colors dark:text-white/40 dark:group-hover:text-white">&rarr;</span>
             </a>
 
             <a asp-controller="Product" asp-action="List" asp-route-categoryCode="TIRE"
-               class="glass-card idx-category-card">
-                <div class="idx-category-card__icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                        <path d="M8 13A5 5 0 1 1 8 3a5 5 0 0 1 0 10zm0 1A6 6 0 1 0 8 2a6 6 0 0 0 0 12z"/>
-                        <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
-                        <path d="M9.5 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-                    </svg>
+               class="cal-card group p-6 flex flex-col gap-3 hover:-translate-y-0.5">
+                <div class="w-10 h-10 rounded-lg bg-charcoal/[0.06] dark:bg-white/10 flex items-center justify-center text-charcoal dark:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                 </div>
-                <h3 class="idx-category-card__title">Tires &amp; Tubes</h3>
-                <p class="idx-category-card__desc">
-                    MTB, gravel, and BMX tires plus tubes for all wheel sizes.
-                </p>
-                <span class="idx-category-card__arrow" aria-hidden="true">&rarr;</span>
+                <h3 class="font-display text-lg font-semibold text-charcoal dark:text-white" style="letter-spacing:0.2px">Tires &amp; Tubes</h3>
+                <p class="text-sm text-mid-gray leading-relaxed">MTB, gravel, and BMX tires plus tubes for all wheel sizes.</p>
+                <span class="mt-auto text-sm font-medium text-charcoal/60 group-hover:text-charcoal transition-colors dark:text-white/40 dark:group-hover:text-white">&rarr;</span>
             </a>
 
             <a asp-controller="Product" asp-action="List"
-               class="glass-card idx-category-card idx-category-card--all">
-                <div class="idx-category-card__icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-                    </svg>
+               class="cal-card group p-6 flex flex-col gap-3 hover:-translate-y-0.5 border-2 border-dashed border-charcoal/10 dark:border-white/10 shadow-none hover:shadow-card">
+                <div class="w-10 h-10 rounded-lg bg-charcoal/[0.06] dark:bg-white/10 flex items-center justify-center text-charcoal dark:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                 </div>
-                <h3 class="idx-category-card__title">All Categories</h3>
-                <p class="idx-category-card__desc">
-                    Hubs, handlebars, saddles, chains, rims, grips, pedals, and more.
-                </p>
-                <span class="idx-category-card__arrow" aria-hidden="true">&rarr;</span>
+                <h3 class="font-display text-lg font-semibold text-charcoal dark:text-white" style="letter-spacing:0.2px">All Categories</h3>
+                <p class="text-sm text-mid-gray leading-relaxed">Hubs, handlebars, saddles, chains, rims, grips, pedals, and more.</p>
+                <span class="mt-auto text-sm font-medium text-charcoal/60 group-hover:text-charcoal transition-colors dark:text-white/40 dark:group-hover:text-white">&rarr;</span>
             </a>
 
         </div>
@@ -179,22 +130,22 @@
 </section>
 
 @* ═══════════════════════════════════════════════════════════════
-   FEATURED PRODUCTS — Floating glass card grid
+   FEATURED PRODUCTS
    ═══════════════════════════════════════════════════════════════ *@
 @if (Model != null && Model.Any())
 {
-    <section id="featured" class="idx-section idx-featured tg-reveal">
-        <div class="idx-container">
+    <section class="bg-white dark:bg-midnight py-20 md:py-24">
+        <div class="max-w-[1200px] mx-auto px-6">
 
-            <div class="idx-section-header">
-                <h2 class="idx-section-title">Featured Picks</h2>
+            <div class="flex items-center justify-between mb-10" data-reveal>
+                <h2 class="font-display text-3xl font-semibold text-charcoal dark:text-white">Featured Picks</h2>
                 <a asp-controller="Product" asp-action="List" asp-route-featured="true"
-                   class="idx-view-all-link">
+                   class="text-sm font-medium text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
                     View all &rarr;
                 </a>
             </div>
 
-            <div class="idx-product-grid">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" data-reveal="delay-1">
                 @foreach (WebApplication.Models.ViewModels.ProductViewModel product in Model)
                 {
                     @await Html.PartialAsync("~/Views/Customer/Partials/_ProductCard.cshtml", product)
@@ -206,47 +157,46 @@
 }
 
 @* ═══════════════════════════════════════════════════════════════
-   ABOUT — Two-column editorial + glass stat cards
+   ABOUT — Two-column editorial + stat cards
    ═══════════════════════════════════════════════════════════════ *@
-<section id="about" class="idx-section idx-section--lg tg-reveal">
-    <div class="idx-container">
-        <div class="idx-about-grid">
+<section class="bg-light-gray dark:bg-midnight py-20 md:py-28">
+    <div class="max-w-[1200px] mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
             @* Left: editorial copy *@
-            <div class="idx-about__copy">
-                <p class="idx-eyebrow">Our Story</p>
-                <h2 class="idx-about__headline">
-                    Built Different.<br />Built <span class="idx-crimson">Philippine.</span>
+            <div data-reveal>
+                <p class="text-sm font-medium tracking-widest uppercase text-mid-gray mb-3">Our Story</p>
+                <h2 class="font-display text-4xl md:text-5xl font-semibold leading-tight text-charcoal dark:text-white">
+                    Built Different.<br />Built Philippine.
                 </h2>
-                <p class="idx-about__body">
+                <p class="mt-6 text-base text-mid-gray leading-relaxed">
                     Taurus Bike Shop was founded by riders, for riders.
                     We carry the finest international and local brands —
                     from Shimano and Maxxis to Pinewood and Sagmit —
                     and deliver them to your door anywhere in the Philippines.
                 </p>
-                <a asp-controller="Product" asp-action="List"
-                   class="btn-primary tg-btn btn-glow">
+                <a asp-controller="Product" asp-action="List" class="btn-dark btn-lg mt-8 inline-flex">
                     Explore the Shop
                 </a>
             </div>
 
-            @* Right: 2×2 stat cards *@
-            <div class="idx-stat-grid">
-                <div class="tg-stat-card idx-stat-card tg-reveal tg-fade-up--d1">
-                    <p class="tg-stat-value tg-stat-value--primary">148</p>
-                    <p class="tg-stat-label">Products in Stock</p>
+            @* Right: 2x2 stat cards *@
+            <div class="grid grid-cols-2 gap-5">
+                <div class="cal-card-static p-6 text-center" data-reveal="delay-1">
+                    <p class="font-display text-4xl font-semibold text-charcoal dark:text-white">148</p>
+                    <p class="text-sm text-mid-gray mt-2">Products in Stock</p>
                 </div>
-                <div class="tg-stat-card idx-stat-card tg-reveal tg-fade-up--d2">
-                    <p class="tg-stat-value tg-stat-value--primary">43</p>
-                    <p class="tg-stat-label">Premium Brands</p>
+                <div class="cal-card-static p-6 text-center" data-reveal="delay-2">
+                    <p class="font-display text-4xl font-semibold text-charcoal dark:text-white">43</p>
+                    <p class="text-sm text-mid-gray mt-2">Premium Brands</p>
                 </div>
-                <div class="tg-stat-card idx-stat-card tg-reveal tg-fade-up--d3">
-                    <p class="tg-stat-value tg-stat-value--primary">13</p>
-                    <p class="tg-stat-label">Categories</p>
+                <div class="cal-card-static p-6 text-center" data-reveal="delay-3">
+                    <p class="font-display text-4xl font-semibold text-charcoal dark:text-white">13</p>
+                    <p class="text-sm text-mid-gray mt-2">Categories</p>
                 </div>
-                <div class="tg-stat-card idx-stat-card tg-reveal tg-fade-up--d4">
-                    <p class="tg-stat-value tg-stat-value--primary">PH</p>
-                    <p class="tg-stat-label">Nationwide Delivery</p>
+                <div class="cal-card-static p-6 text-center" data-reveal="delay-3">
+                    <p class="font-display text-4xl font-semibold text-charcoal dark:text-white">PH</p>
+                    <p class="text-sm text-mid-gray mt-2">Nationwide Delivery</p>
                 </div>
             </div>
 
@@ -255,64 +205,47 @@
 </section>
 
 @* ═══════════════════════════════════════════════════════════════
-   VALUE PROPS — Glass icon cards
+   VALUE PROPS — Icon cards
    ═══════════════════════════════════════════════════════════════ *@
-<section id="why-us" class="idx-section tg-reveal">
-    <div class="idx-container">
+<section class="bg-white dark:bg-midnight py-20 md:py-24">
+    <div class="max-w-[1200px] mx-auto px-6">
 
-        <h2 class="idx-section-title idx-section-title--center">
+        <h2 class="font-display text-3xl font-semibold text-charcoal dark:text-white text-center mb-12" data-reveal>
             The Taurus Advantage
         </h2>
 
-        <div class="idx-value-grid">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
-            <div class="glass-card idx-value-card tg-reveal tg-fade-up--d1">
-                <div class="idx-value-icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
-                        <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
-                    </svg>
+            <div class="cal-card-static p-6" data-reveal="delay-1">
+                <div class="w-10 h-10 rounded-lg bg-charcoal/[0.06] dark:bg-white/10 flex items-center justify-center text-charcoal dark:text-white mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
-                <h5 class="idx-value-title">Premium Quality</h5>
-                <p class="idx-value-desc">
-                    Curated brands trusted by serious riders — from trail shredders to race builds.
-                </p>
+                <h5 class="font-display font-semibold text-charcoal dark:text-white mb-2" style="letter-spacing:0.2px">Premium Quality</h5>
+                <p class="text-sm text-mid-gray leading-relaxed">Curated brands trusted by serious riders — from trail shredders to race builds.</p>
             </div>
 
-            <div class="glass-card idx-value-card tg-reveal tg-fade-up--d2">
-                <div class="idx-value-icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-                    </svg>
+            <div class="cal-card-static p-6" data-reveal="delay-2">
+                <div class="w-10 h-10 rounded-lg bg-charcoal/[0.06] dark:bg-white/10 flex items-center justify-center text-charcoal dark:text-white mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                 </div>
-                <h5 class="idx-value-title">Nationwide Delivery</h5>
-                <p class="idx-value-desc">
-                    Lalamove and LBC delivery across every island in the Philippines.
-                </p>
+                <h5 class="font-display font-semibold text-charcoal dark:text-white mb-2" style="letter-spacing:0.2px">Nationwide Delivery</h5>
+                <p class="text-sm text-mid-gray leading-relaxed">Lalamove and LBC delivery across every island in the Philippines.</p>
             </div>
 
-            <div class="glass-card idx-value-card tg-reveal tg-fade-up--d3">
-                <div class="idx-value-icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2z"/>
-                    </svg>
+            <div class="cal-card-static p-6" data-reveal="delay-3">
+                <div class="w-10 h-10 rounded-lg bg-charcoal/[0.06] dark:bg-white/10 flex items-center justify-center text-charcoal dark:text-white mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 </div>
-                <h5 class="idx-value-title">Secure Payment</h5>
-                <p class="idx-value-desc">
-                    GCash and bank transfer — fast, safe, and hassle-free checkout.
-                </p>
+                <h5 class="font-display font-semibold text-charcoal dark:text-white mb-2" style="letter-spacing:0.2px">Secure Payment</h5>
+                <p class="text-sm text-mid-gray leading-relaxed">GCash and bank transfer — fast, safe, and hassle-free checkout.</p>
             </div>
 
-            <div class="glass-card idx-value-card tg-reveal tg-fade-up--d4">
-                <div class="idx-value-icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5z"/>
-                    </svg>
+            <div class="cal-card-static p-6" data-reveal="delay-3">
+                <div class="w-10 h-10 rounded-lg bg-charcoal/[0.06] dark:bg-white/10 flex items-center justify-center text-charcoal dark:text-white mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 </div>
-                <h5 class="idx-value-title">Store Pickup</h5>
-                <p class="idx-value-desc">
-                    Walk in or pick up your online order at our shop at your convenience.
-                </p>
+                <h5 class="font-display font-semibold text-charcoal dark:text-white mb-2" style="letter-spacing:0.2px">Store Pickup</h5>
+                <p class="text-sm text-mid-gray leading-relaxed">Walk in or pick up your online order at our shop at your convenience.</p>
             </div>
 
         </div>
@@ -320,58 +253,51 @@
 </section>
 
 @* ═══════════════════════════════════════════════════════════════
-   CTA — Glass panel over gradient, NOT solid crimson bg
-   Routes corrected to Customer controller
+   CTA — Final push
    ═══════════════════════════════════════════════════════════════ *@
-<section id="cta" class="idx-cta-section tg-reveal">
-    <div class="idx-container">
-        <div class="glass-t3 idx-cta-panel">
+<section class="bg-charcoal dark:bg-neutral-900 py-20 md:py-28">
+    <div class="max-w-[1200px] mx-auto px-6">
+        <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
 
-            @* Decorative crimson glow behind panel — via Index.css *@
-            <div class="idx-cta-glow" aria-hidden="true"></div>
-
-            <div class="idx-cta-content">
-                <p class="idx-eyebrow">Get Started</p>
-                <h2 class="idx-cta-headline">
-                    Find Your<br />Perfect <span class="idx-crimson">Build</span>
+            <div class="flex-1" data-reveal>
+                <p class="text-sm font-medium tracking-widest uppercase text-white/50 mb-3">Get Started</p>
+                <h2 class="font-display text-4xl md:text-5xl font-semibold leading-tight text-white">
+                    Find Your<br />Perfect Build
                 </h2>
-                <p class="idx-cta-sub">
+                <p class="mt-6 text-base text-white/60 leading-relaxed max-w-lg">
                     Create a free account to save your wishlist, track your order,
                     and get access to exclusive deals. Already a member?
                     <a asp-controller="Customer" asp-action="Login"
-                       class="idx-cta-inline-link">Sign in</a>.
+                       class="text-white underline underline-offset-2 hover:text-white/80">Sign in</a>.
                 </p>
-                <div class="idx-cta-actions">
-                    <a asp-controller="Customer" asp-action="Register"
-                       class="btn-primary tg-btn btn-glow">
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a asp-controller="Customer" asp-action="Register" class="btn-white btn-lg">
                         Create Account
                     </a>
-                    <a asp-controller="Product" asp-action="List"
-                       class="btn-ghost tg-btn">
+                    <a asp-controller="Product" asp-action="List" class="btn-ghost btn-lg !text-white/70 !border-white/20 hover:!border-white/50 hover:!text-white hover:!bg-white/5">
                         Browse Without Account
                     </a>
                 </div>
             </div>
 
-            @* Right: decorative stat column *@
-            <div class="idx-cta-stat-col" aria-hidden="true">
-                <div class="idx-cta-stat">
-                    <span class="idx-cta-stat__value">148</span>
-                    <span class="idx-cta-stat__label">Products</span>
+            @* Right: stat column *@
+            <div class="flex lg:flex-col gap-8 lg:gap-6 shrink-0" data-reveal="delay-1" aria-hidden="true">
+                <div class="text-center">
+                    <p class="font-display text-4xl font-semibold text-white">148</p>
+                    <p class="text-xs text-white/40 mt-1">Products</p>
                 </div>
-                <div class="idx-cta-stat-divider"></div>
-                <div class="idx-cta-stat">
-                    <span class="idx-cta-stat__value">43</span>
-                    <span class="idx-cta-stat__label">Brands</span>
+                <div class="w-px lg:w-12 h-12 lg:h-px bg-white/10"></div>
+                <div class="text-center">
+                    <p class="font-display text-4xl font-semibold text-white">43</p>
+                    <p class="text-xs text-white/40 mt-1">Brands</p>
                 </div>
-                <div class="idx-cta-stat-divider"></div>
-                <div class="idx-cta-stat">
-                    <span class="idx-cta-stat__value">PH</span>
-                    <span class="idx-cta-stat__label">Delivery</span>
+                <div class="w-px lg:w-12 h-12 lg:h-px bg-white/10"></div>
+                <div class="text-center">
+                    <p class="font-display text-4xl font-semibold text-white">PH</p>
+                    <p class="text-xs text-white/40 mt-1">Delivery</p>
                 </div>
             </div>
 
         </div>
     </div>
 </section>
-<script src="~/js/mesh-gradient-bg.js"></script>

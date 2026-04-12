@@ -2,64 +2,54 @@
 @* Model: string email (the email address the OTP was sent to) *@
 @model string
 
-<div class="modal fade" id="otpModal" tabindex="-1"
+<div class="cal-modal-backdrop" id="otpModal" hidden
      aria-labelledby="otpModalLabel" aria-modal="true" role="dialog">
-    <div class="modal-dialog modal-dialog-centered tbs-otp-dialog">
-        <div class="modal-content tbs-otp-modal">
+    <div class="cal-modal" onclick="event.stopPropagation()">
 
-            <div class="tbs-otp-modal__header">
-                <div class="tbs-otp-modal__icon" aria-hidden="true">&#9993;</div>
-                <h2 class="tbs-otp-modal__title" id="otpModalLabel">Check Your Email</h2>
-                <p class="tbs-otp-modal__subtitle">
-                    We sent a 6-digit code to<br />
-                    <strong>@Model</strong>
-                </p>
+        <div class="p-8 text-center">
+            <div class="w-14 h-14 rounded-full bg-charcoal/[0.06] dark:bg-white/10 flex items-center justify-center mx-auto mb-5 text-2xl">
+                ✉
             </div>
+            <h2 class="font-display text-xl font-semibold text-charcoal dark:text-white mb-2" id="otpModalLabel">Check Your Email</h2>
+            <p class="text-sm text-mid-gray">
+                We sent a 6-digit code to<br />
+                <strong class="text-charcoal dark:text-white">@Model</strong>
+            </p>
+        </div>
 
-            <div class="tbs-otp-modal__body">
+        <div class="px-8 pb-8">
+            <form asp-action="VerifyOTP" asp-controller="Customer" method="post" id="otp-verify-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="email" value="@Model" />
 
-                @* OTP verification form *@
-                <form asp-action="VerifyOTP" asp-controller="Customer" method="post"
-                      id="otp-verify-form">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="email" value="@Model" />
-
-                    <div class="tbs-otp-modal__inputs" aria-label="Enter your 6-digit code">
-                        <input type="text"
-                               name="code"
-                               id="otp-code-input"
-                               class="tbs-otp-modal__code-input"
-                               maxlength="6"
-                               inputmode="numeric"
-                               autocomplete="one-time-code"
-                               pattern="[0-9]{6}"
-                               placeholder="______"
-                               required
-                               aria-label="6-digit verification code" />
-                    </div>
-
-                    <p class="tbs-otp-modal__error" id="otp-error" role="alert" style="display:none;"></p>
-
-                    <button type="submit" class="btn tbs-btn-accent tbs-btn-full" id="otp-verify-btn">
-                        Verify Code
-                    </button>
-                </form>
-
-                @* Countdown and resend *@
-                <div class="tbs-otp-modal__footer">
-                    <p class="tbs-otp-modal__countdown">
-                        Code expires in <span id="otp-countdown" class="tbs-otp-modal__countdown-value">10:00</span>
-                    </p>
-                    <p class="tbs-otp-modal__resend">
-                        Didn't receive it?
-                        <button type="button" class="tbs-otp-modal__resend-btn"
-                                id="otp-resend-btn" disabled>
-                            Resend Code
-                        </button>
-                    </p>
+                <div class="mb-4">
+                    <input type="text" name="code" id="otp-code-input"
+                           class="cal-input text-center text-2xl tracking-[0.5em] font-mono"
+                           maxlength="6" inputmode="numeric" autocomplete="one-time-code"
+                           pattern="[0-9]{6}" placeholder="______" required
+                           aria-label="6-digit verification code" />
                 </div>
 
+                <p class="cal-field-error text-center" id="otp-error" role="alert" style="display:none;"></p>
+
+                <button type="submit" class="btn-dark btn-full mt-2" id="otp-verify-btn">
+                    Verify Code
+                </button>
+            </form>
+
+            <div class="text-center mt-5 text-sm text-mid-gray">
+                <p>
+                    Code expires in <span id="otp-countdown" class="font-mono font-medium text-charcoal dark:text-white">10:00</span>
+                </p>
+                <p class="mt-2">
+                    Didn't receive it?
+                    <button type="button" id="otp-resend-btn" disabled
+                            class="font-medium text-charcoal hover:underline disabled:opacity-40 disabled:cursor-not-allowed dark:text-white">
+                        Resend Code
+                    </button>
+                </p>
             </div>
         </div>
+
     </div>
 </div>

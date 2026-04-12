@@ -4,133 +4,148 @@
     string? userName = isAuthenticated ? User.Identity!.Name : null;
 }
 
-<header class="tbs-header">
-    <nav class="navbar navbar-expand-lg tbs-navbar" aria-label="Main navigation">
-        <div class="container">
+<header class="cal-header sticky top-0 z-50 bg-white/95 backdrop-blur-md dark:bg-midnight/95 transition-shadow duration-300">
+    <nav class="max-w-[1200px] mx-auto px-6 flex items-center justify-between h-16" aria-label="Main navigation">
 
-            @* Logo *@
-            <a class="navbar-brand tbs-brand" asp-controller="Home" asp-action="Index">
-                <img src="~/FULL-COLOR.png" alt="Taurus Bike Shop" class="tbs-brand__logo" />
+        @* ── Logo ── *@
+        <a asp-controller="Home" asp-action="Index" class="flex items-center gap-2 shrink-0">
+            <img src="~/FULL-COLOR.png" alt="Taurus Bike Shop" class="h-9 w-auto" />
+        </a>
+
+        @* ── Desktop Navigation Links ── *@
+        <div class="hidden md:flex items-center gap-1 ml-8">
+            <a asp-controller="Home" asp-action="Index"
+               class="px-3 py-2 text-sm font-medium text-charcoal/70 hover:text-charcoal transition-colors dark:text-neutral-400 dark:hover:text-white">
+                Home
             </a>
+            <a asp-controller="Product" asp-action="List"
+               class="px-3 py-2 text-sm font-medium text-charcoal/70 hover:text-charcoal transition-colors dark:text-neutral-400 dark:hover:text-white">
+                Catalog
+            </a>
+        </div>
 
-            @* Mobile toggle *@
-            <button class="navbar-toggler tbs-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#mainNavbar"
-                    aria-controls="mainNavbar"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation">
-                <span class="tbs-toggler__bar"></span>
-                <span class="tbs-toggler__bar"></span>
-                <span class="tbs-toggler__bar"></span>
+        @* ── Desktop Right Actions ── *@
+        <div class="hidden md:flex items-center gap-2">
+
+            @* Dark mode toggle *@
+            <button id="dark-mode-toggle" type="button"
+                    class="w-9 h-9 flex items-center justify-center rounded-lg text-mid-gray hover:text-charcoal hover:bg-light-gray transition-colors dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/10"
+                    aria-label="Toggle dark mode">
+                <svg class="dark:hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg class="hidden dark:block" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
             </button>
 
-            <div class="collapse navbar-collapse" id="mainNavbar">
+            @if (isAuthenticated)
+            {
+                @* Wishlist *@
+                <a asp-controller="Wishlist" asp-action="ViewWishlist"
+                   class="w-9 h-9 flex items-center justify-center rounded-lg text-mid-gray hover:text-charcoal hover:bg-light-gray transition-colors dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/10"
+                   title="Wishlist" aria-label="Wishlist">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                </a>
+            }
 
-                @* Main nav links *@
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 tbs-nav">
-                    <li class="nav-item">
-                        <a class="nav-link tbs-nav__link" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link tbs-nav__link" asp-controller="Product" asp-action="List">Catalog</a>
-                    </li>
-                </ul>
+            @* Cart *@
+            <a asp-controller="Cart" asp-action="ViewCart"
+               class="relative w-9 h-9 flex items-center justify-center rounded-lg text-mid-gray hover:text-charcoal hover:bg-light-gray transition-colors dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/10"
+               title="Cart" aria-label="Shopping cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                <span id="cart-badge"
+                      class="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-charcoal text-white text-[10px] font-bold rounded-full leading-none dark:bg-white dark:text-midnight">
+                    0
+                </span>
+            </a>
 
-                @* Right-side actions *@
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 tbs-nav tbs-nav--right align-items-center">
+            @* Auth area *@
+            @if (isAuthenticated)
+            {
+                <div class="relative ml-1">
+                    <button type="button" id="user-dropdown-toggle"
+                            class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-charcoal hover:bg-light-gray transition-colors dark:text-neutral-300 dark:hover:bg-white/10"
+                            aria-expanded="false" aria-haspopup="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span>@userName</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
 
-                    @* Wishlist — authenticated only *@
-                    @if (isAuthenticated)
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link tbs-nav__icon-link"
-                               asp-controller="Wishlist"
-                               asp-action="ViewWishlist"
-                               title="Wishlist"
-                               aria-label="View wishlist">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                     fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                                    <path d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-                                </svg>
-                            </a>
-                        </li>
-                    }
-
-                    @* Cart badge *@
-                    <li class="nav-item">
-                        <a class="nav-link tbs-nav__icon-link tbs-cart-link"
-                           asp-controller="Cart"
-                           asp-action="ViewCart"
-                           title="Shopping Cart"
-                           aria-label="View cart">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                 fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                            </svg>
-                            <span class="tbs-cart-badge" id="cart-badge" aria-label="cart items">0</span>
+                    <div id="user-dropdown-menu"
+                         class="hidden absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-card py-1.5 z-50 dark:bg-neutral-900">
+                        <a asp-controller="Customer" asp-action="Dashboard"
+                           class="block px-4 py-2 text-sm text-charcoal hover:bg-light-gray transition-colors dark:text-neutral-200 dark:hover:bg-white/10">
+                            Dashboard
                         </a>
-                    </li>
-
-                    @* Auth links *@
-                    @if (isAuthenticated)
-                    {
-                        <li class="nav-item dropdown tbs-user-dropdown">
-                            <button class="nav-link tbs-nav__user-btn dropdown-toggle"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                    type="button">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                     fill="currentColor" viewBox="0 0 16 16" class="me-1" aria-hidden="true">
-                                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-                                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
-                                </svg>
-                                <span class="tbs-nav__user-name">@userName</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end tbs-dropdown">
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Customer" asp-action="Dashboard">
-                                        Dashboard
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Order" asp-action="History">
-                                        My Orders
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Customer" asp-action="Profile">
-                                        Profile
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider" /></li>
-                                <li>
-                                    <a class="dropdown-item tbs-dropdown__logout"
-                                       asp-controller="Customer"
-                                       asp-action="Logout">
-                                        Sign Out
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link tbs-nav__link" asp-controller="Customer" asp-action="Login">
-                                Sign In
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn tbs-btn-accent ms-2" asp-controller="Customer" asp-action="Register">
-                                Register
-                            </a>
-                        </li>
-                    }
-
-                </ul>
-            </div>
+                        <a asp-controller="Order" asp-action="History"
+                           class="block px-4 py-2 text-sm text-charcoal hover:bg-light-gray transition-colors dark:text-neutral-200 dark:hover:bg-white/10">
+                            My Orders
+                        </a>
+                        <a asp-controller="Customer" asp-action="Profile"
+                           class="block px-4 py-2 text-sm text-charcoal hover:bg-light-gray transition-colors dark:text-neutral-200 dark:hover:bg-white/10">
+                            Profile
+                        </a>
+                        <hr class="my-1.5 border-border-ring dark:border-white/10" />
+                        <a asp-controller="Customer" asp-action="Logout"
+                           class="block px-4 py-2 text-sm text-error hover:bg-red-50 transition-colors dark:hover:bg-red-500/10">
+                            Sign Out
+                        </a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <a asp-controller="Customer" asp-action="Login"
+                   class="px-3 py-2 text-sm font-medium text-charcoal hover:text-midnight transition-colors dark:text-neutral-300 dark:hover:text-white">
+                    Sign In
+                </a>
+                <a asp-controller="Customer" asp-action="Register" class="btn-dark btn-sm">
+                    Register
+                </a>
+            }
         </div>
+
+        @* ── Mobile Hamburger ── *@
+        <button type="button" id="mobile-nav-toggle"
+                class="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-mid-gray hover:text-charcoal transition-colors"
+                aria-label="Toggle navigation" aria-expanded="false">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+        </button>
+
     </nav>
+
+    @* ── Mobile Nav Panel ── *@
+    <div id="mobile-nav"
+         class="hidden md:hidden border-t border-border-ring bg-white px-6 py-4 space-y-1 dark:bg-midnight dark:border-white/10">
+        <a asp-controller="Home" asp-action="Index"
+           class="block py-2.5 text-sm font-medium text-charcoal dark:text-neutral-300">Home</a>
+        <a asp-controller="Product" asp-action="List"
+           class="block py-2.5 text-sm font-medium text-charcoal dark:text-neutral-300">Catalog</a>
+        <hr class="border-border-ring dark:border-white/10 my-2" />
+
+        @if (isAuthenticated)
+        {
+            <a asp-controller="Customer" asp-action="Dashboard"
+               class="block py-2.5 text-sm text-charcoal dark:text-neutral-300">Dashboard</a>
+            <a asp-controller="Order" asp-action="History"
+               class="block py-2.5 text-sm text-charcoal dark:text-neutral-300">My Orders</a>
+            <a asp-controller="Customer" asp-action="Profile"
+               class="block py-2.5 text-sm text-charcoal dark:text-neutral-300">Profile</a>
+            <a asp-controller="Wishlist" asp-action="ViewWishlist"
+               class="block py-2.5 text-sm text-charcoal dark:text-neutral-300">Wishlist</a>
+            <a asp-controller="Cart" asp-action="ViewCart"
+               class="block py-2.5 text-sm text-charcoal dark:text-neutral-300">Cart</a>
+            <hr class="border-border-ring dark:border-white/10 my-2" />
+            <a asp-controller="Customer" asp-action="Logout"
+               class="block py-2.5 text-sm text-error font-medium">Sign Out</a>
+        }
+        else
+        {
+            <a asp-controller="Customer" asp-action="Login"
+               class="block py-2.5 text-sm text-charcoal dark:text-neutral-300">Sign In</a>
+            <a asp-controller="Customer" asp-action="Register"
+               class="btn-dark btn-full mt-3">Register</a>
+        }
+    </div>
 </header>

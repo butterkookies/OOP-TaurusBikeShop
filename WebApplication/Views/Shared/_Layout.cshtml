@@ -4,77 +4,48 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Taurus Bike Shop — Premium bicycles and components in the Philippines." />
+    <meta name="description" content="Taurus Bike Shop — Premium bicycles, frames, and components in the Philippines." />
     <title>@(ViewData["Title"] != null ? $"{ViewData["Title"]} — Taurus Bike Shop" : "Taurus Bike Shop")</title>
 
-    @* ── Critical: paint the deep gradient before any CSS loads to prevent FOUC ── *@
-    <style>
-        html, body {
-            margin: 0;
-            background: #0D0D1A;
-            background: radial-gradient(ellipse at 20% 20%, #1a1035 0%, #0d0d1a 45%, #0a0a14 100%) fixed;
-            min-height: 100vh;
-        }
-    </style>
-
-    @* ── Google Fonts — Taurus brand stack ── *@
+    @* Fonts: Inter + Roboto Mono from Google Fonts *@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@600;700;800&family=Rajdhani:wght@500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet" />
 
-    @* ── Stylesheets ── *@
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/taurus-glass.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/notification-alert.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/footer.css" asp-append-version="true" />
+    @* Tailwind output — the ONLY stylesheet *@
+    <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
 
     @await RenderSectionAsync("Styles", required: false)
+
+    @* Dark mode: prevent FOUC — run before paint *@
+    <script>
+      (function(){
+        var t = localStorage.getItem('theme');
+        if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
 </head>
-<body class="tg-bg">
+<body class="font-body text-charcoal bg-white dark:bg-midnight dark:text-neutral-200 antialiased">
 
     @await Html.PartialAsync("~/Views/Customer/Partials/_NotificationAlert.cshtml")
 
     @await Html.PartialAsync("_Navbar")
 
-    <main class="tbs-main">
+    <main class="min-h-[calc(100vh-160px)]">
         @RenderBody()
     </main>
 
     @await Html.PartialAsync("_Footer")
 
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @* Core scripts *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/utils.js" asp-append-version="true"></script>
+    <script src="~/js/app.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    @* ── Taurus Glass — scroll reveal (IntersectionObserver for .tg-reveal) ── *@
-    <script>
-        (function () {
-            'use strict';
-
-            // Scroll-triggered fade-up reveals
-            var reveals = document.querySelectorAll('.tg-reveal');
-            if (reveals.length && 'IntersectionObserver' in window) {
-                var io = new IntersectionObserver(function (entries) {
-                    entries.forEach(function (entry) {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('tg-visible');
-                            io.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.12 });
-                reveals.forEach(function (el) { io.observe(el); });
-            } else {
-                // Fallback: show immediately if IO not supported
-                reveals.forEach(function (el) { el.classList.add('tg-visible'); });
-            }
-        })();
-    </script>
-
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
 </html>

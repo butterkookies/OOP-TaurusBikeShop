@@ -4,148 +4,74 @@
     ViewData["Title"] = "My Wishlist";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/wishlist.css" asp-append-version="true" />
-    <style>
-        body {
-            background-color: #0D0D1A;
-            background-image:
-                linear-gradient(rgba(8, 6, 18, 0.68), rgba(8, 6, 18, 0.68)),
-                url('/mobile wallpaper.png');
-            background-size: cover;
-            background-position: center top;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-        }
-    </style>
-}
-
 @Html.AntiForgeryToken()
 
-<div class="tbs-wishlist-page">
-    <div class="container">
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)]">
+    <div class="max-w-[1200px] mx-auto px-6 py-12 md:py-16">
 
-        <div class="tbs-page-header wl-anim wl-anim-d0">
-            <div>
-                <p class="tbs-wishlist-eyebrow">Saved Items</p>
-                <h1 class="tbs-page-header__title">My Wishlist</h1>
-                <p class="tbs-page-header__subtitle">
-                    @Model.ItemCount item@(Model.ItemCount != 1 ? "s" : "") saved
-                </p>
-            </div>
-            @if (!Model.IsEmpty)
+        <div class="mb-10" data-reveal>
+            <h1 class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">My Wishlist</h1>
+            @if (Model.Items != null && Model.Items.Any())
             {
-                <a asp-controller="Product" asp-action="List"
-                   class="tbs-wl-section-link">
-                    Continue Shopping
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
-                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                         aria-hidden="true">
-                        <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                </a>
+                <p class="text-base text-mid-gray mt-2">@Model.Items.Count() item@(Model.Items.Count() != 1 ? "s" : "") saved</p>
             }
         </div>
 
-        @if (Model.IsEmpty)
+        @if (Model.Items == null || !Model.Items.Any())
         {
-            <div class="tbs-wishlist-empty wl-anim wl-anim-d1">
-                <div class="tbs-wishlist-empty__icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"
+            <div class="cal-card-static p-12 text-center max-w-md mx-auto" data-reveal="delay-1">
+                <div class="text-mid-gray mb-4">
+                    <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" width="36" height="36"
                          viewBox="0 0 24 24" fill="none" stroke="currentColor"
                          stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06
-                                 a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78
-                                 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                     </svg>
                 </div>
-                <h2 class="tbs-wishlist-empty__title">Your wishlist is empty</h2>
-                <p class="tbs-wishlist-empty__text">
-                    Save products you love by clicking the heart icon on any product.
-                </p>
-                <a asp-controller="Product" asp-action="List"
-                   class="tbs-btn-accent">
-                    Browse Products
-                </a>
+                <h2 class="font-display text-xl font-semibold text-charcoal dark:text-white mb-2">Your wishlist is empty</h2>
+                <p class="text-sm text-mid-gray mb-6">Browse products and save items you love.</p>
+                <a asp-controller="Product" asp-action="List" class="btn-dark">Browse Catalog</a>
             </div>
         }
         else
         {
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 wl-anim wl-anim-d1"
-                 id="wishlist-grid">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" data-reveal="delay-1">
                 @foreach (var item in Model.Items)
                 {
-                    <div class="col" id="wishlist-card-@item.ProductId">
-                        <div class="tbs-wishlist-card">
-
-                            <a asp-controller="Product" asp-action="Detail"
-                               asp-route-id="@item.ProductId"
-                               class="tbs-wishlist-card__img-link">
-                                @if (item.PrimaryImageUrl != null)
-                                {
-                                    <img src="@item.PrimaryImageUrl"
-                                         alt="@item.Name"
-                                         class="tbs-wishlist-card__img"
-                                         loading="lazy" />
-                                }
-                                else
-                                {
-                                    <div class="tbs-wishlist-card__img-placeholder"
-                                         aria-hidden="true">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                             stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="3" y="3" width="18" height="18" rx="2"/>
-                                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                                            <polyline points="21 15 16 10 5 21"/>
-                                        </svg>
-                                    </div>
-                                }
-                            </a>
-
-                            @if (item.IsOutOfStock)
-                            {
-                                <span class="tbs-wishlist-card__oos-badge">Out of Stock</span>
-                            }
-
-                            <div class="tbs-wishlist-card__body">
-                                @if (item.Brand != null)
-                                {
-                                    <p class="tbs-wishlist-card__brand">@item.Brand</p>
-                                }
-                                <h3 class="tbs-wishlist-card__name">
-                                    <a asp-controller="Product" asp-action="Detail"
-                                       asp-route-id="@item.ProductId">@item.Name</a>
-                                </h3>
-                                <p class="tbs-wishlist-card__price">@item.FormattedPrice</p>
-                                <div class="tbs-wishlist-card__actions">
-                                    @if (!item.IsOutOfStock)
-                                    {
-                                        <button type="button"
-                                                class="tbs-wishlist-card__move-btn"
-                                                data-product-id="@item.ProductId">
-                                            Move to Cart
-                                        </button>
-                                    }
-                                    <button type="button"
-                                            class="tbs-wishlist-card__remove-btn"
-                                            data-product-id="@item.ProductId"
-                                            aria-label="Remove @item.Name from wishlist">
-                                        Remove
-                                    </button>
-                                </div>
+                    <div class="cal-card overflow-hidden group hover:-translate-y-0.5">
+                        <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.ProductId">
+                            <div class="aspect-square bg-light-gray dark:bg-neutral-800 overflow-hidden">
+                                <img src="@item.PrimaryImageUrl" alt="@item.Name"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                             </div>
+                        </a>
+                        <div class="p-4">
+                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.ProductId"
+                               class="text-sm font-medium text-charcoal dark:text-white line-clamp-2 hover:underline">
+                                @item.Name
+                            </a>
+                            <p class="font-display text-lg font-semibold text-charcoal dark:text-white mt-2">@item.FormattedPrice</p>
 
+                            <div class="flex gap-2 mt-3">
+                                <button type="button"
+                                        class="btn-dark btn-sm flex-1"
+                                        data-product-id="@item.ProductId"
+                                        onclick="addToCart(this.dataset.productId)">
+                                    Add to Cart
+                                </button>
+                                <form asp-action="RemoveFromWishlist" asp-controller="Wishlist" method="post" class="inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <button type="submit"
+                                            class="w-9 h-9 flex items-center justify-center border border-border-ring dark:border-white/15 rounded-lg text-mid-gray hover:text-error hover:border-error/30 transition-colors"
+                                            aria-label="Remove from wishlist">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 }
             </div>
         }
-
     </div>
 </div>
-
-@section Scripts {
-    <script src="~/js/wishlist.js" asp-append-version="true"></script>
-}

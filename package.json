@@ -4,6 +4,8 @@
   "description": "A repository for our finals project in DB-1 and OOP. An e-commerce website and an admin side software.",
   "main": "index.js",
   "scripts": {
+    "build:css": "npx @tailwindcss/cli -i ./WebApplication/wwwroot/css/tailwind.css -o ./WebApplication/wwwroot/css/output.css --minify",
+    "watch:css": "npx @tailwindcss/cli -i ./WebApplication/wwwroot/css/tailwind.css -o ./WebApplication/wwwroot/css/output.css --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -1,55 +1,53 @@
 @* WebApplication/Views/Customer/Partials/_OrderSummary.cshtml *@
 @model WebApplication.Models.ViewModels.CheckoutViewModel
 
-<div class="tbs-order-summary tbs-order-summary--checkout">
-    <h2 class="tbs-order-summary__title">Order Summary</h2>
+<div class="cal-card-static p-6 sticky top-24">
+    <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white mb-5" style="letter-spacing:0.2px">Order Summary</h2>
 
-    <ul class="tbs-order-summary__items">
+    <ul class="space-y-3 mb-5">
         @foreach (WebApplication.Models.ViewModels.CartItemViewModel item in Model.CartItems)
         {
-            <li class="tbs-order-summary__item">
-                <span class="tbs-order-summary__item-name">
+            <li class="flex items-start gap-3 text-sm">
+                <span class="flex-1 min-w-0 text-charcoal dark:text-white">
                     @item.ProductName
                     @if (!string.IsNullOrWhiteSpace(item.VariantName))
                     {
-                        <span class="tbs-order-summary__item-variant">(@item.VariantName)</span>
+                        <span class="text-mid-gray">(@item.VariantName)</span>
                     }
-                    <span class="tbs-order-summary__item-qty">&times;@item.Quantity</span>
+                    <span class="text-mid-gray">&times;@item.Quantity</span>
                 </span>
-                <span class="tbs-order-summary__item-total">@item.FormattedLineTotal</span>
+                <span class="text-charcoal dark:text-white font-medium whitespace-nowrap">@item.FormattedLineTotal</span>
             </li>
         }
     </ul>
 
-    <div class="tbs-order-summary__divider"></div>
+    <hr class="cal-divider" />
 
-    <div class="tbs-order-summary__row">
-        <span>Subtotal</span>
-        <span id="checkout-subtotal-value">@Model.FormattedSubTotal</span>
+    <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+            <span class="text-mid-gray">Subtotal</span>
+            <span class="text-charcoal dark:text-white" id="checkout-subtotal-value">@Model.FormattedSubTotal</span>
+        </div>
+
+        <div class="flex justify-between @(Model.DiscountAmount > 0 ? "" : "hidden")" id="checkout-discount-row-wrapper">
+            <span class="text-mid-gray">Voucher Discount</span>
+            <span class="text-success" id="checkout-discount-row">−₱@Model.DiscountAmount.ToString("N2")</span>
+        </div>
+
+        <div class="flex justify-between">
+            <span class="text-mid-gray">Shipping</span>
+            <span class="text-charcoal dark:text-white" id="checkout-shipping-fee">
+                @(Model.ShippingFee > 0 ? $"₱{Model.ShippingFee:N2}" : "TBD")
+            </span>
+        </div>
     </div>
 
-    <div class="tbs-order-summary__row tbs-order-summary__row--discount"
-         id="checkout-discount-row-wrapper"
-         style="@(Model.DiscountAmount > 0 ? "" : "display:none")">
-        <span>Voucher Discount</span>
-        <span id="checkout-discount-row">−₱@Model.DiscountAmount.ToString("N2")</span>
+    <hr class="cal-divider" />
+
+    <div class="flex justify-between text-base font-semibold">
+        <span class="text-charcoal dark:text-white">Total</span>
+        <span class="font-display text-charcoal dark:text-white" id="checkout-grand-total-row">@Model.FormattedSubTotal</span>
     </div>
 
-    <div class="tbs-order-summary__row">
-        <span>Shipping</span>
-        <span id="checkout-shipping-fee">
-            @(Model.ShippingFee > 0 ? $"₱{Model.ShippingFee:N2}" : "TBD")
-        </span>
-    </div>
-
-    <div class="tbs-order-summary__divider"></div>
-
-    <div class="tbs-order-summary__row tbs-order-summary__row--total">
-        <span>Total</span>
-        <span id="checkout-grand-total-row">@Model.FormattedSubTotal</span>
-    </div>
-
-    <p class="tbs-order-summary__payment-note">
-        GCash &bull; Bank Transfer
-    </p>
+    <p class="text-xs text-mid-gray text-center mt-4">GCash &bull; Bank Transfer</p>
 </div>

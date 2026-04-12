@@ -1,32 +1,14 @@
 @model dynamic
 
-<div class="confirmation-modal" id="confirmationModal">
-    <div class="modal-content">
-        <span class="close-btn" id="closeModal">&times;</span>
-        <h2>✅ Confirmation</h2>
-        <p id="modalMessage">@Model.Message</p>
-        <div class="modal-actions">
-            <button id="modalOk">OK</button>
+<div class="cal-modal-backdrop" id="confirmationModal" hidden
+     aria-modal="true" role="dialog">
+    <div class="cal-modal p-8 text-center" onclick="event.stopPropagation()">
+        <div class="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
+        <h2 class="font-display text-xl font-semibold text-charcoal dark:text-white mb-2">Confirmation</h2>
+        <p class="text-sm text-mid-gray mb-6" id="modalMessage">@Model.Message</p>
+        <button id="modalOk" class="btn-dark"
+                onclick="closeModal('confirmationModal')">OK</button>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        const modal = document.getElementById('confirmationModal');
-        const closeBtn = document.getElementById('closeModal');
-        const okBtn = document.getElementById('modalOk');
-
-        function showModal(message) {
-            document.getElementById('modalMessage').textContent = message;
-            modal.style.display = 'flex';
-        }
-
-        closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
-        okBtn.addEventListener('click', () => { modal.style.display = 'none'; });
-
-        window.addEventListener('click', e => {
-            if(e.target === modal) modal.style.display = 'none';
-        });
-    </script>
-}

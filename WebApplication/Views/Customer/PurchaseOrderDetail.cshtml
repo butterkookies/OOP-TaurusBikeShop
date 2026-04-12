@@ -6,147 +6,118 @@
     ViewData["Title"] = $"Purchase Order #{Model.PurchaseOrderId}";
     string badgeCss = Model.Status switch
     {
-        PurchaseOrderStatuses.Pending   => "tbs-badge--pending",
-        PurchaseOrderStatuses.Received  => "tbs-badge--delivered",
-        PurchaseOrderStatuses.Cancelled => "tbs-badge--cancelled",
-        _                               => "tbs-badge--pending"
+        PurchaseOrderStatuses.Pending   => "cal-badge-warning",
+        PurchaseOrderStatuses.Received  => "cal-badge-success",
+        PurchaseOrderStatuses.Cancelled => "cal-badge-error",
+        _                               => "cal-badge-muted"
     };
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/supplier.css" asp-append-version="true" />
-}
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)]">
+    <div class="max-w-[1000px] mx-auto px-6 py-12 md:py-16">
 
-<div class="tbs-supplier-page">
-    <div class="container">
-
-        <ol class="tbs-breadcrumb">
+        <ol class="cal-breadcrumb">
             <li><a asp-controller="Supplier" asp-action="Index">Suppliers</a></li>
             <li>
-                <a asp-controller="Supplier"
-                   asp-action="PurchaseOrders"
-                   asp-route-supplierId="@Model.SupplierId">
+                <a asp-controller="Supplier" asp-action="PurchaseOrders" asp-route-supplierId="@Model.SupplierId">
                     @(Model.Supplier?.Name ?? "Purchase Orders")
                 </a>
             </li>
             <li>PO #@Model.PurchaseOrderId</li>
         </ol>
 
-        <div class="tbs-page-header">
-    <div>
-        <h1 class="tbs-page-header__title">PO #@Model.PurchaseOrderId</h1>
-        <p class="tbs-page-header__subtitle">
-            Ordered @Model.OrderDate.ToString("MMMM d, yyyy")
-            @if (Model.CreatedBy != null)
-            {
-                var createdBy = Model.CreatedBy;
-                <text> · Created by @createdBy.FirstName @createdBy.LastName</text>
-            }
-        </p>
-    </div>
-    <span class="tbs-badge @badgeCss">@Model.Status</span>
-</div>
-        <div class="tbs-po-detail__layout">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8" data-reveal>
+            <div>
+                <h1 class="font-display text-2xl md:text-3xl font-semibold text-charcoal dark:text-white">PO #@Model.PurchaseOrderId</h1>
+                <p class="text-sm text-mid-gray mt-1">
+                    Ordered @Model.OrderDate.ToString("MMMM d, yyyy")
+                    @if (Model.CreatedBy != null)
+                    {
+                        var createdBy = Model.CreatedBy;
+                        <text> · Created by @createdBy.FirstName @createdBy.LastName</text>
+                    }
+                </p>
+            </div>
+            <span class="cal-badge @badgeCss">@Model.Status</span>
+        </div>
 
-            @* =================== LINE ITEMS =================== *@
-            <div class="tbs-po-detail__main">
-                <div class="tbs-card">
-                    <h2 class="tbs-card__title">Line Items</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
 
-                    <div class="tbs-po-items">
-                        @foreach (PurchaseOrderItem item in Model.Items)
-                        {
-                            <div class="tbs-po-item">
-                                <div class="tbs-po-item__info">
-                                    <span class="tbs-po-item__name">
-                                        @(item.Product?.Name ?? "Product")
-                                    </span>
-                                    @if (!string.IsNullOrWhiteSpace(item.Variant?.VariantName)
-                                         && item.Variant.VariantName != "Default")
-                                    {
-                                        <span class="tbs-po-item__variant">
-                                            @item.Variant.VariantName
-                                        </span>
-                                    }
-                                </div>
-                                <div class="tbs-po-item__numbers">
-                                    <span class="tbs-po-item__qty">
-                                        Qty: @item.Quantity
-                                    </span>
-                                    <span class="tbs-po-item__price">
-                                        ₱@item.UnitPrice.ToString("N2") / unit
-                                    </span>
-                                    <span class="tbs-po-item__subtotal">
-                                        ₱@((item.Quantity * item.UnitPrice).ToString("N2"))
-                                    </span>
-                                </div>
-                            </div>
-                        }
-                    </div>
-
-                    @* Total *@
-                    <div class="tbs-po-detail__total">
-                        <span>Total</span>
-                        <span class="tbs-po-detail__total-value">
-                            ₱@Model.Items.Sum(i => i.Quantity * i.UnitPrice).ToString("N2")
-                        </span>
-                    </div>
+            @* ── Line Items ── *@
+            <div class="cal-card-static overflow-hidden" data-reveal="delay-1">
+                <div class="px-6 py-4 border-b border-border-ring dark:border-white/10">
+                    <h2 class="font-display text-base font-semibold text-charcoal dark:text-white" style="letter-spacing:0.2px">Line Items</h2>
                 </div>
-
+                <div class="divide-y divide-border-ring dark:divide-white/10">
+                    @foreach (PurchaseOrderItem item in Model.Items)
+                    {
+                        <div class="flex items-center justify-between px-6 py-4">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-charcoal dark:text-white truncate">@(item.Product?.Name ?? "Product")</p>
+                                @if (!string.IsNullOrWhiteSpace(item.Variant?.VariantName) && item.Variant.VariantName != "Default")
+                                {
+                                    <p class="text-xs text-mid-gray">@item.Variant.VariantName</p>
+                                }
+                                <p class="text-xs text-mid-gray mt-0.5">Qty: @item.Quantity · ₱@item.UnitPrice.ToString("N2") / unit</p>
+                            </div>
+                            <p class="text-sm font-semibold text-charcoal dark:text-white whitespace-nowrap">₱@((item.Quantity * item.UnitPrice).ToString("N2"))</p>
+                        </div>
+                    }
+                </div>
+                <div class="flex justify-between px-6 py-4 border-t border-border-ring dark:border-white/10 bg-light-gray/50 dark:bg-white/[0.02]">
+                    <span class="text-sm font-semibold text-charcoal dark:text-white">Total</span>
+                    <span class="font-display text-lg font-semibold text-charcoal dark:text-white">₱@Model.Items.Sum(i => i.Quantity * i.UnitPrice).ToString("N2")</span>
+                </div>
             </div>
 
-            @* =================== SIDEBAR =================== *@
-            <aside class="tbs-po-detail__aside">
-                <div class="tbs-card">
-                    <h2 class="tbs-card__title">Supplier</h2>
+            @* ── Sidebar ── *@
+            <aside class="space-y-5">
+                <div class="cal-card-static p-5" data-reveal="delay-2">
+                    <h2 class="font-display text-base font-semibold text-charcoal dark:text-white mb-3" style="letter-spacing:0.2px">Supplier</h2>
                     @if (Model.Supplier != null)
                     {
-                        <dl class="tbs-supplier-card__details">
-                            <div class="tbs-supplier-card__detail">
-                                <dt>Name</dt>
-                                <dd>@Model.Supplier.Name</dd>
+                        <dl class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <dt class="text-mid-gray">Name</dt>
+                                <dd class="text-charcoal dark:text-white font-medium">@Model.Supplier.Name</dd>
                             </div>
                             @if (!string.IsNullOrWhiteSpace(Model.Supplier.ContactPerson))
                             {
-                                <div class="tbs-supplier-card__detail">
-                                    <dt>Contact</dt>
-                                    <dd>@Model.Supplier.ContactPerson</dd>
+                                <div class="flex justify-between">
+                                    <dt class="text-mid-gray">Contact</dt>
+                                    <dd class="text-charcoal dark:text-white">@Model.Supplier.ContactPerson</dd>
                                 </div>
                             }
                             @if (!string.IsNullOrWhiteSpace(Model.Supplier.Email))
                             {
-                                <div class="tbs-supplier-card__detail">
-                                    <dt>Email</dt>
-                                    <dd>
-                                        <a href="mailto:@Model.Supplier.Email">
-                                            @Model.Supplier.Email
-                                        </a>
-                                    </dd>
+                                <div class="flex justify-between">
+                                    <dt class="text-mid-gray">Email</dt>
+                                    <dd><a href="mailto:@Model.Supplier.Email" class="text-charcoal dark:text-white hover:underline">@Model.Supplier.Email</a></dd>
                                 </div>
                             }
                         </dl>
                     }
                 </div>
 
-                <div class="tbs-card mt-3">
-                    <h2 class="tbs-card__title">Timeline</h2>
-                    <dl class="tbs-supplier-card__details">
-                        <div class="tbs-supplier-card__detail">
-                            <dt>Ordered</dt>
-                            <dd>@Model.OrderDate.ToString("MMM d, yyyy")</dd>
+                <div class="cal-card-static p-5" data-reveal="delay-2">
+                    <h2 class="font-display text-base font-semibold text-charcoal dark:text-white mb-3" style="letter-spacing:0.2px">Timeline</h2>
+                    <dl class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <dt class="text-mid-gray">Ordered</dt>
+                            <dd class="text-charcoal dark:text-white">@Model.OrderDate.ToString("MMM d, yyyy")</dd>
                         </div>
                         @if (Model.ExpectedDeliveryDate.HasValue)
                         {
-                            <div class="tbs-supplier-card__detail">
-                                <dt>Expected</dt>
-                                <dd>@Model.ExpectedDeliveryDate.Value.ToString("MMM d, yyyy")</dd>
+                            <div class="flex justify-between">
+                                <dt class="text-mid-gray">Expected</dt>
+                                <dd class="text-charcoal dark:text-white">@Model.ExpectedDeliveryDate.Value.ToString("MMM d, yyyy")</dd>
                             </div>
                         }
                         @if (Model.Status == PurchaseOrderStatuses.Received)
                         {
-                            <div class="tbs-supplier-card__detail">
-                                <dt>Received</dt>
-                                <dd>@Model.CreatedAt.ToString("MMM d, yyyy")</dd>
+                            <div class="flex justify-between">
+                                <dt class="text-mid-gray">Received</dt>
+                                <dd class="text-charcoal dark:text-white">@Model.CreatedAt.ToString("MMM d, yyyy")</dd>
                             </div>
                         }
                     </dl>

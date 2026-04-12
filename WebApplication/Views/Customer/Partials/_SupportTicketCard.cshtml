@@ -1,33 +1,27 @@
 @* WebApplication/Views/Customer/Partials/_SupportTicketCard.cshtml *@
 @model WebApplication.Models.ViewModels.SupportTicketViewModel
 
-<a asp-controller="Support"
-   asp-action="Detail"
-   asp-route-ticketId="@Model.TicketId"
-   class="tbs-ticket-card">
+<a asp-controller="Support" asp-action="Detail" asp-route-ticketId="@Model.TicketId"
+   class="flex items-center px-5 py-4 hover:bg-surface-hover transition-colors gap-4 group dark:hover:bg-white/[0.03]">
 
-    <div class="tbs-ticket-card__main">
-        <div class="tbs-ticket-card__header">
-            <span class="tbs-ticket-card__id">#@Model.TicketId</span>
-            @await Html.PartialAsync(
-                "~/Views/Customer/Partials/_TicketStatusBadge.cshtml",
-                Model.Status)
+    <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-1">
+            <span class="text-xs text-mid-gray font-mono">#@Model.TicketId</span>
+            @await Html.PartialAsync("~/Views/Customer/Partials/_TicketStatusBadge.cshtml", Model.Status)
         </div>
-        <h3 class="tbs-ticket-card__subject">@Model.Subject</h3>
-        <div class="tbs-ticket-card__meta">
-            <span class="tbs-ticket-card__category">@Model.Category</span>
+        <h3 class="text-sm font-medium text-charcoal dark:text-white truncate">@Model.Subject</h3>
+        <div class="flex items-center gap-2 mt-1 text-xs text-mid-gray">
+            <span>@Model.Category</span>
             @if (Model.OrderId.HasValue)
             {
-                <span class="tbs-ticket-card__order">
-                    📦 Order @(Model.OrderNumber ?? $"#{Model.OrderId}")
-                </span>
+                <span>· Order @(Model.OrderNumber ?? $"#{Model.OrderId}")</span>
             }
         </div>
     </div>
 
-    <div class="tbs-ticket-card__aside">
-        <span class="tbs-ticket-card__date">@Model.FormattedCreatedAt</span>
-        <span class="tbs-ticket-card__arrow" aria-hidden="true">›</span>
+    <div class="text-right shrink-0">
+        <span class="text-xs text-mid-gray">@Model.FormattedCreatedAt</span>
     </div>
 
+    <svg class="shrink-0 text-mid-gray group-hover:text-charcoal transition-colors dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
 </a>

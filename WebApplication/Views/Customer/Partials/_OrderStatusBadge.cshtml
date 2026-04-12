@@ -3,16 +3,16 @@
 @{
     string css = Model switch
     {
-        "Pending"             => "tbs-badge--pending",
-        "PendingVerification" => "tbs-badge--pending",
-        "OnHold"              => "tbs-badge--onhold",
-        "Processing"          => "tbs-badge--processing",
-        "ReadyForPickup"      => "tbs-badge--pickup",
-        "PickedUp"            => "tbs-badge--pickup",
-        "Shipped"             => "tbs-badge--shipped",
-        "Delivered"           => "tbs-badge--delivered",
-        "Cancelled"           => "tbs-badge--cancelled",
-        _                     => "tbs-badge--pending"
+        "Pending"             => "cal-badge-warning",
+        "PendingVerification" => "cal-badge-warning",
+        "OnHold"              => "cal-badge-warning",
+        "Processing"          => "cal-badge-info",
+        "ReadyForPickup"      => "cal-badge-info",
+        "PickedUp"            => "cal-badge-info",
+        "Shipped"             => "cal-badge-info",
+        "Delivered"           => "cal-badge-success",
+        "Cancelled"           => "cal-badge-error",
+        _                     => "cal-badge-muted"
     };
     string label = Model switch
     {
@@ -21,4 +21,4 @@
         _                     => Model
     };
 }
-<span class="tbs-badge @css" aria-label="Order status: @label">@label</span>
+<span class="cal-badge @css" aria-label="Order status: @label">@label</span>

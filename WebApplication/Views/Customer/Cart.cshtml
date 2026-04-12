@@ -4,73 +4,47 @@
     ViewData["Title"] = "Shopping Cart";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/cart.css"      asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/cart-item.css" asp-append-version="true" />
-    <style>
-        body {
-            background-color: #0D0D1A;
-            background-image:
-                linear-gradient(rgba(8, 6, 18, 0.68), rgba(8, 6, 18, 0.68)),
-                url('/mobile wallpaper.png');
-            background-size: cover;
-            background-position: center top;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-        }
-    </style>
-}
-
 @Html.AntiForgeryToken()
 
-<div class="tbs-cart-page">
-    <div class="container">
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)]">
+    <div class="max-w-[1200px] mx-auto px-6 py-12 md:py-16">
 
-        <div class="tbs-page-header cart-anim cart-anim-d0">
-            <div>
-                <p class="tbs-cart-eyebrow">Your Selection</p>
-                <h1 class="tbs-page-header__title">Shopping Cart</h1>
-                @if (!Model.IsEmpty)
-                {
-                    <p class="tbs-page-header__subtitle">
-                        @Model.TotalQuantity item@(Model.TotalQuantity != 1 ? "s" : "") in your cart
-                    </p>
-                }
-            </div>
+        @* ── Page Header ── *@
+        <div class="mb-10" data-reveal>
+            <p class="text-sm font-medium tracking-widest uppercase text-mid-gray mb-2">Your Selection</p>
+            <h1 class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">Shopping Cart</h1>
+            @if (!Model.IsEmpty)
+            {
+                <p class="text-base text-mid-gray mt-2">
+                    @Model.TotalQuantity item@(Model.TotalQuantity != 1 ? "s" : "") in your cart
+                </p>
+            }
         </div>
 
         @if (Model.IsEmpty)
         {
-            <div class="tbs-cart-empty cart-anim cart-anim-d1">
-                <div class="tbs-cart-empty__icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"
+            <div class="cal-card-static p-12 text-center max-w-md mx-auto" data-reveal="delay-1">
+                <div class="text-mid-gray mb-4">
+                    <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" width="36" height="36"
                          viewBox="0 0 24 24" fill="none" stroke="currentColor"
                          stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="9" cy="21" r="1"/>
-                        <circle cx="20" cy="21" r="1"/>
-                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72
-                                 a2 2 0 0 0 2-1.61L23 6H6"/>
+                        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                     </svg>
                 </div>
-                <h2 class="tbs-cart-empty__title">Your cart is empty</h2>
-                <p class="tbs-cart-empty__text">
-                    Browse our catalog and add items to get started.
-                </p>
-                <a asp-controller="Product" asp-action="List"
-                   class="tbs-btn-accent">
-                    Shop Now
-                </a>
+                <h2 class="font-display text-xl font-semibold text-charcoal dark:text-white mb-2">Your cart is empty</h2>
+                <p class="text-sm text-mid-gray mb-6">Browse our catalog and add items to get started.</p>
+                <a asp-controller="Product" asp-action="List" class="btn-dark">Shop Now</a>
             </div>
         }
         else
         {
-            <div class="tbs-cart-layout">
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8" data-reveal="delay-1">
 
-                @* ── ITEMS ── *@
-                <div class="tbs-cart-layout__items cart-anim cart-anim-d1">
-
-                    <div class="tbs-cart-items-wrapper">
-                        <div class="tbs-cart-items" id="cart-items-list">
+                @* ── Cart Items ── *@
+                <div>
+                    <div class="cal-card-static overflow-hidden">
+                        <div id="cart-items-list" class="divide-y divide-border-ring dark:divide-white/10">
                             @foreach (WebApplication.Models.ViewModels.CartItemViewModel item in Model.Items)
                             {
                                 @await Html.PartialAsync("~/Views/Customer/Partials/_CartItem.cshtml", item)
@@ -78,13 +52,12 @@
                         </div>
                     </div>
 
-                    <div class="tbs-cart-footer">
+                    <div class="mt-4">
                         <a asp-controller="Product" asp-action="List"
-                           class="tbs-cart-back">
+                           class="inline-flex items-center gap-2 text-sm font-medium text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                                  viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                                 aria-hidden="true">
+                                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="15 18 9 12 15 6"/>
                             </svg>
                             Continue Shopping
@@ -92,66 +65,49 @@
                     </div>
                 </div>
 
-                @* ── ORDER SUMMARY ── *@
-                <aside class="tbs-cart-layout__summary cart-anim cart-anim-d2">
-                    <div class="tbs-order-summary">
-                        <h2 class="tbs-order-summary__title">Order Summary</h2>
+                @* ── Order Summary sidebar ── *@
+                <aside>
+                    <div class="cal-card-static p-6 sticky top-24">
+                        <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white mb-5" style="letter-spacing:0.2px">Order Summary</h2>
 
-                        <div class="tbs-order-summary__rows">
-
-                            <div class="tbs-order-summary__row">
-                                <span class="tbs-order-summary__row-label">Subtotal</span>
-                                <span class="tbs-order-summary__row-value"
-                                      id="cart-subtotal">@Model.FormattedSubTotal</span>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-mid-gray">Subtotal</span>
+                                <span class="text-charcoal dark:text-white font-medium" id="cart-subtotal">@Model.FormattedSubTotal</span>
                             </div>
-
                             @if (Model.DiscountAmount > 0)
                             {
-                                <div class="tbs-order-summary__row tbs-order-summary__row--discount">
-                                    <span class="tbs-order-summary__row-label">
-                                        Discount (@Model.AppliedVoucherCode)
-                                    </span>
-                                    <span class="tbs-order-summary__row-value tbs-order-summary__row-value--discount">
-                                        −₱@Model.DiscountAmount.ToString("N2")
-                                    </span>
+                                <div class="flex justify-between">
+                                    <span class="text-mid-gray">Discount (@Model.AppliedVoucherCode)</span>
+                                    <span class="text-success font-medium">−₱@Model.DiscountAmount.ToString("N2")</span>
                                 </div>
                             }
-
-                            <div class="tbs-order-summary__row">
-                                <span class="tbs-order-summary__row-label">Shipping</span>
-                                <span class="tbs-order-summary__row-value tbs-order-summary__shipping-note">
-                                    At checkout
-                                </span>
+                            <div class="flex justify-between">
+                                <span class="text-mid-gray">Shipping</span>
+                                <span class="text-mid-gray italic">At checkout</span>
                             </div>
-
                         </div>
 
-                        <div class="tbs-order-summary__divider"></div>
+                        <hr class="cal-divider" />
 
-                        <div class="tbs-order-summary__total">
-                            <span class="tbs-order-summary__total-label">Estimated Total</span>
-                            <span class="tbs-order-summary__total-value"
-                                  id="cart-total">@Model.FormattedSubTotal</span>
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="text-sm font-medium text-charcoal dark:text-white">Estimated Total</span>
+                            <span class="font-display text-xl font-semibold text-charcoal dark:text-white" id="cart-total">@Model.FormattedSubTotal</span>
                         </div>
 
-                        <a asp-controller="Checkout" asp-action="Index"
-                           class="tbs-btn-accent tbs-btn-full">
+                        <a asp-controller="Checkout" asp-action="Index" class="btn-dark btn-full">
                             Proceed to Checkout
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
                                  viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                                 aria-hidden="true">
+                                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="9 18 15 12 9 6"/>
                             </svg>
                         </a>
 
-                        <div class="tbs-order-summary__payment-note">
-                            <span>Accepted:</span>
-                            <strong>GCash</strong>
-                            <span class="tbs-order-summary__payment-sep">&bull;</span>
-                            <strong>Bank Transfer</strong>
-                        </div>
-
+                        <p class="text-xs text-mid-gray text-center mt-4">
+                            Accepted: <strong class="text-charcoal dark:text-white">GCash</strong> &bull;
+                            <strong class="text-charcoal dark:text-white">Bank Transfer</strong>
+                        </p>
                     </div>
                 </aside>
 

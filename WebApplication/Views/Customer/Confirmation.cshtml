@@ -1,160 +1,75 @@
 @* WebApplication/Views/Customer/Confirmation.cshtml *@
 @model WebApplication.Models.ViewModels.OrderViewModel
 @{
-    ViewData["Title"] = $"Order Confirmed — {Model.OrderNumber}";
-    bool isPendingPayment =
-        Model.OrderStatus == WebApplication.Models.Entities.OrderStatuses.Pending ||
-        Model.OrderStatus == WebApplication.Models.Entities.OrderStatuses.PendingVerification;
+    ViewData["Title"] = "Order Confirmed";
+    bool hasPendingPayment = Model.Payments.Count == 0
+        && Model.OrderStatus != "Cancelled";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/order.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/confirmation.css" asp-append-version="true" />
-}
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)]">
+    <div class="max-w-[600px] mx-auto px-6 py-16 md:py-24">
 
-<div class="tbs-confirmation-page">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 col-lg-9">
+        <div class="cal-card-static p-8 md:p-10 text-center" data-reveal>
 
-                @* Success hero *@
-                <div class="tbs-confirmation-hero">
-                    <div class="tbs-confirmation-hero__icon" aria-hidden="true">✓</div>
-                    <h1 class="tbs-confirmation-hero__title">Order Placed!</h1>
-                    <p class="tbs-confirmation-hero__number" title="Click to copy"
-                       id="order-number-copy">
-                        @Model.OrderNumber
-                    </p>
-                    <p class="tbs-confirmation-hero__message">
-                        Thank you for your order. We'll notify you once your
-                        payment has been verified.
-                    </p>
-                </div>
-
-                @* Payment CTA *@
-                @if (isPendingPayment && !Model.Payments.Any())
-                {
-                    <div class="tbs-confirmation-cta">
-                        <div class="tbs-confirmation-cta__body">
-                            <h2 class="tbs-confirmation-cta__title">Complete Your Payment</h2>
-                            <p class="tbs-confirmation-cta__text">
-                                Your order is reserved. Please submit your
-                                payment proof to confirm it.
-                            </p>
-                        </div>
-                        <a asp-controller="Payment"
-                           asp-action="Submit"
-                           asp-route-orderId="@Model.OrderId"
-                           class="btn tbs-btn-accent tbs-btn-lg">
-                            Submit Payment →
-                        </a>
-                    </div>
-                }
-                else if (Model.Payments.Any())
-                {
-                    <div class="tbs-confirmation-cta tbs-confirmation-cta--info">
-                        <div class="tbs-confirmation-cta__body">
-                            <h2 class="tbs-confirmation-cta__title">Payment Submitted</h2>
-                            <p class="tbs-confirmation-cta__text">
-                                We've received your payment details and are verifying them.
-                                You'll get an email update shortly.
-                            </p>
-                        </div>
-                    </div>
-                }
-
-                @* Order card *@
-                <div class="tbs-order-card">
-                    <div class="tbs-order-card__header">
-                        <div>
-                            <span class="tbs-order-card__label">Order Number</span>
-                            <span class="tbs-order-card__value">@Model.OrderNumber</span>
-                        </div>
-                        <div>
-                            <span class="tbs-order-card__label">Date</span>
-                            <span class="tbs-order-card__value">@Model.FormattedOrderDate</span>
-                        </div>
-                        <div>
-                            <span class="tbs-order-card__label">Status</span>
-                            @await Html.PartialAsync(
-                                "~/Views/Customer/Partials/_OrderStatusBadge.cshtml",
-                                Model.OrderStatus)
-                        </div>
-                        <div>
-                            <span class="tbs-order-card__label">Total</span>
-                            <span class="tbs-order-card__value tbs-order-card__value--total">
-                                @Model.FormattedGrandTotal
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="tbs-order-card__items">
-                        @foreach (var item in Model.Items)
-                        {
-                            <div class="tbs-order-item">
-                                @if (item.ImageUrl != null)
-                                {
-                                    <img src="@item.ImageUrl"
-                                         alt="@item.ProductName"
-                                         class="tbs-order-item__img"
-                                         loading="lazy" />
-                                }
-                                else
-                                {
-                                    <div class="tbs-order-item__img-placeholder"
-                                         aria-hidden="true">&#9651;</div>
-                                }
-                                <div class="tbs-order-item__info">
-                                    <span class="tbs-order-item__name">@item.ProductName</span>
-                                    @if (!string.IsNullOrWhiteSpace(item.VariantName))
-                                    {
-                                        <span class="tbs-order-item__variant">@item.VariantName</span>
-                                    }
-                                    <span class="tbs-order-item__qty">Qty: @item.Quantity</span>
-                                </div>
-                                <span class="tbs-order-item__total">@item.FormattedLineTotal</span>
-                            </div>
-                        }
-                    </div>
-
-                    <div class="tbs-order-card__totals">
-                        <div class="tbs-order-total-row">
-                            <span>Subtotal</span><span>@Model.FormattedSubTotal</span>
-                        </div>
-                        @if (Model.DiscountAmount > 0)
-                        {
-                            <div class="tbs-order-total-row tbs-order-total-row--discount">
-                                <span>Discount</span>
-                                <span>−₱@Model.DiscountAmount.ToString("N2")</span>
-                            </div>
-                        }
-                        <div class="tbs-order-total-row">
-                            <span>Shipping (@Model.DeliveryMethod)</span>
-                            <span>@Model.FormattedShippingFee</span>
-                        </div>
-                        <div class="tbs-order-total-row tbs-order-total-row--grand">
-                            <span>Total</span><span>@Model.FormattedGrandTotal</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tbs-confirmation-actions">
-                    <a asp-controller="Order" asp-action="Detail"
-                       asp-route-orderId="@Model.OrderId"
-                       class="btn tbs-btn-primary">
-                        Track Order
-                    </a>
-                    <a asp-controller="Product" asp-action="List"
-                       class="btn tbs-btn-outline">
-                        Continue Shopping
-                    </a>
-                </div>
-
+            @* Success icon *@
+            <div class="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
             </div>
+
+            <h1 class="font-display text-2xl md:text-3xl font-semibold text-charcoal dark:text-white mb-2">
+                Order Confirmed!
+            </h1>
+            <p class="text-sm text-mid-gray mb-6 leading-relaxed">
+                Your order <strong class="text-charcoal dark:text-white">@Model.OrderNumber</strong> has been placed successfully.
+                @if (hasPendingPayment)
+                {
+                    <text>Please upload your payment proof to complete the order.</text>
+                }
+            </p>
+
+            @* Order summary card *@
+            <div class="bg-light-gray dark:bg-white/5 rounded-xl p-5 text-left mb-6">
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-mid-gray">Order</span>
+                        <span class="text-charcoal dark:text-white font-medium">@Model.OrderNumber</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-mid-gray">Items</span>
+                        <span class="text-charcoal dark:text-white">@Model.ItemCount item@(Model.ItemCount != 1 ? "s" : "")</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-mid-gray">Delivery</span>
+                        <span class="text-charcoal dark:text-white">@Model.DeliveryMethod</span>
+                    </div>
+                    <hr class="cal-divider !my-2" />
+                    <div class="flex justify-between font-semibold">
+                        <span class="text-charcoal dark:text-white">Total</span>
+                        <span class="font-display text-charcoal dark:text-white">@Model.FormattedGrandTotal</span>
+                    </div>
+                </div>
+            </div>
+
+            @* Actions *@
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                @if (hasPendingPayment)
+                {
+                    <a asp-controller="Payment" asp-action="Submit" asp-route-orderId="@Model.OrderId" class="btn-dark">
+                        Upload Payment Proof
+                    </a>
+                }
+                <a asp-controller="Order" asp-action="Detail" asp-route-orderId="@Model.OrderId" class="btn-ghost">
+                    View Order Details
+                </a>
+            </div>
+
+            <p class="text-xs text-mid-gray mt-6">
+                A confirmation has been sent to your email. You can track your order from your
+                <a asp-controller="Customer" asp-action="Dashboard" class="underline underline-offset-2 hover:text-charcoal dark:hover:text-white">dashboard</a>.
+            </p>
+
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script src="~/js/order.js" asp-append-version="true"></script>
-}

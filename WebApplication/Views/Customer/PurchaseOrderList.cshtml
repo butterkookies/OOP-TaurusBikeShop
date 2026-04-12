@@ -7,82 +7,57 @@
     Supplier? supplier = ViewBag.Supplier as Supplier;
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/supplier.css" asp-append-version="true" />
-}
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)]">
+    <div class="max-w-[900px] mx-auto px-6 py-12 md:py-16">
 
-<div class="tbs-supplier-page">
-    <div class="container">
-
-        <ol class="tbs-breadcrumb">
+        <ol class="cal-breadcrumb">
             <li><a asp-controller="Supplier" asp-action="Index">Suppliers</a></li>
             <li>@(supplier?.Name ?? "Purchase Orders")</li>
         </ol>
 
-        <div class="tbs-page-header">
-            <div>
-                <h1 class="tbs-page-header__title">
-                    Purchase Orders
-                    @if (supplier != null)
-                    {
-                        <span class="tbs-po-page__supplier">— @supplier.Name</span>
-                    }
-                </h1>
-                <p class="tbs-page-header__subtitle">
-                    @Model.Count order@(Model.Count != 1 ? "s" : "")
-                </p>
-            </div>
+        <div class="mb-10" data-reveal>
+            <h1 class="font-display text-3xl font-semibold text-charcoal dark:text-white">
+                Purchase Orders
+                @if (supplier != null)
+                {
+                    <span class="text-mid-gray font-normal">— @supplier.Name</span>
+                }
+            </h1>
+            <p class="text-base text-mid-gray mt-2">@Model.Count order@(Model.Count != 1 ? "s" : "")</p>
         </div>
 
         @if (!Model.Any())
         {
-            <div class="tbs-supplier-empty">
-                <p>No purchase orders found for this supplier.</p>
+            <div class="cal-card-static p-10 text-center" data-reveal="delay-1">
+                <p class="text-sm text-mid-gray">No purchase orders found for this supplier.</p>
             </div>
         }
         else
         {
-            <div class="tbs-po-list">
+            <div class="cal-card-static divide-y divide-border-ring dark:divide-white/10 overflow-hidden" data-reveal="delay-1">
                 @foreach (PurchaseOrder po in Model)
                 {
-                    <a asp-controller="Supplier"
-                       asp-action="PurchaseOrderDetail"
-                       asp-route-purchaseOrderId="@po.PurchaseOrderId"
-                       class="tbs-po-row">
+                    var badgeCss = po.Status switch
+                    {
+                        PurchaseOrderStatuses.Pending   => "cal-badge-warning",
+                        PurchaseOrderStatuses.Received  => "cal-badge-success",
+                        PurchaseOrderStatuses.Cancelled => "cal-badge-error",
+                        _                               => "cal-badge-muted"
+                    };
+                    <a asp-controller="Supplier" asp-action="PurchaseOrderDetail" asp-route-purchaseOrderId="@po.PurchaseOrderId"
+                       class="flex items-center px-5 py-4 hover:bg-surface-hover transition-colors gap-4 group dark:hover:bg-white/[0.03]">
 
-                        <div class="tbs-po-row__id">
-                            <span class="tbs-po-row__label">PO #</span>
-                            <span class="tbs-po-row__value">@po.PurchaseOrderId</span>
-                        </div>
-
-                        <div class="tbs-po-row__date">
-                            <span class="tbs-po-row__label">Order Date</span>
-                            <span class="tbs-po-row__value">
-                                @po.OrderDate.ToString("MMM d, yyyy")
-                            </span>
-                        </div>
-
-                        <div class="tbs-po-row__items">
-                            <span class="tbs-po-row__label">Line Items</span>
-                            <span class="tbs-po-row__value">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-charcoal dark:text-white">PO #@po.PurchaseOrderId</p>
+                            <p class="text-xs text-mid-gray mt-0.5">
+                                @po.OrderDate.ToString("MMM d, yyyy") &middot;
                                 @po.Items.Count item@(po.Items.Count != 1 ? "s" : "")
-                            </span>
+                            </p>
                         </div>
 
-                        <div class="tbs-po-row__status">
-                            @{
-                                string badgeCss = po.Status switch
-                                {
-                                    PurchaseOrderStatuses.Pending   => "tbs-badge--pending",
-                                    PurchaseOrderStatuses.Received  => "tbs-badge--delivered",
-                                    PurchaseOrderStatuses.Cancelled => "tbs-badge--cancelled",
-                                    _                               => "tbs-badge--pending"
-                                };
-                            }
-                            <span class="tbs-badge @badgeCss">@po.Status</span>
-                        </div>
+                        <span class="cal-badge @badgeCss">@po.Status</span>
 
-                        <div class="tbs-po-row__arrow" aria-hidden="true">›</div>
+                        <svg class="shrink-0 text-mid-gray group-hover:text-charcoal transition-colors dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                     </a>
                 }
             </div>

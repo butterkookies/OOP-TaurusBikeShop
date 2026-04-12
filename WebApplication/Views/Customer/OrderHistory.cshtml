@@ -1,130 +1,48 @@
 @* WebApplication/Views/Customer/OrderHistory.cshtml *@
 @model IEnumerable<WebApplication.Models.ViewModels.OrderViewModel>
 @{
-    ViewData["Title"] = "My Orders";
-    int currentPage = ViewBag.CurrentPage ?? 1;
-    int totalPages  = ViewBag.TotalPages  ?? 1;
-    int totalCount  = ViewBag.TotalCount  ?? 0;
+    ViewData["Title"] = "Order History";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/order.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/order-history.css" asp-append-version="true" />
-    <style>
-        body {
-            background-color: #0D0D1A;
-            background-image:
-                linear-gradient(rgba(8, 6, 18, 0.68), rgba(8, 6, 18, 0.68)),
-                url('/mobile wallpaper.png');
-            background-size: cover;
-            background-position: center top;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-        }
-    </style>
-}
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)]">
+    <div class="max-w-[900px] mx-auto px-6 py-12 md:py-16">
 
-<div class="tbs-order-history-page">
-    <div class="container">
-
-        <div class="tbs-page-header oh-anim oh-anim-d0">
-            <div>
-                <p class="tbs-orders-eyebrow">Order History</p>
-                <h1 class="tbs-page-header__title">My Orders</h1>
-                <p class="tbs-page-header__subtitle">
-                    @totalCount order@(totalCount != 1 ? "s" : "") total
-                </p>
-            </div>
-        </div>
+        <h1 class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white mb-10" data-reveal>Order History</h1>
 
         @if (!Model.Any())
         {
-            <div class="tbs-order-history__empty oh-anim oh-anim-d1">
-                <div class="tbs-order-history__empty-icon" aria-hidden="true">📦</div>
-                <h2>No orders yet</h2>
-                <p>Your order history will appear here once you make a purchase.</p>
-                <a asp-controller="Product" asp-action="List"
-                   class="btn tbs-btn-accent">Start Shopping</a>
+            <div class="cal-card-static p-12 text-center" data-reveal="delay-1">
+                <div class="text-mid-gray mb-4">
+                    <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                </div>
+                <p class="text-sm text-mid-gray mb-4">You haven't placed any orders yet.</p>
+                <a asp-controller="Product" asp-action="List" class="btn-dark btn-sm">Browse Catalog</a>
             </div>
         }
         else
         {
-            <div class="tbs-order-history__list oh-anim oh-anim-d1">
-                @foreach (var order in Model)
+            <div class="cal-card-static divide-y divide-border-ring dark:divide-white/10 overflow-hidden" data-reveal="delay-1">
+                @foreach (WebApplication.Models.ViewModels.OrderViewModel order in Model)
                 {
-                    <a asp-controller="Order" asp-action="Detail"
-                       asp-route-orderId="@order.OrderId"
-                       class="tbs-order-row">
+                    <a asp-controller="Order" asp-action="Detail" asp-route-orderId="@order.OrderId"
+                       class="flex items-center px-5 py-4 hover:bg-surface-hover transition-colors gap-4 group dark:hover:bg-white/[0.03]">
 
-                        <div class="tbs-order-row__number">
-                            <span class="tbs-order-row__label">Order</span>
-                            <span class="tbs-order-row__value">@order.OrderNumber</span>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-charcoal dark:text-white">@order.OrderNumber</p>
+                            <p class="text-xs text-mid-gray mt-0.5">@order.OrderDate.ToString("MMM d, yyyy") &middot; @order.ItemCount item@(order.ItemCount != 1 ? "s" : "")</p>
                         </div>
 
-                        <div class="tbs-order-row__date">
-                            <span class="tbs-order-row__label">Date</span>
-                            <span class="tbs-order-row__value">
-                                @order.OrderDate.ToString("MMM d, yyyy")
-                            </span>
+                        <div class="hidden sm:block">
+                            @await Html.PartialAsync("~/Views/Customer/Partials/_OrderStatusBadge.cshtml", order.OrderStatus)
                         </div>
 
-                        <div class="tbs-order-row__items">
-                            <span class="tbs-order-row__label">Items</span>
-                            <span class="tbs-order-row__value">
-                                @order.ItemCount item@(order.ItemCount != 1 ? "s" : "")
-                            </span>
-                        </div>
+                        <p class="text-sm font-semibold text-charcoal dark:text-white whitespace-nowrap">@order.FormattedGrandTotal</p>
 
-                        <div class="tbs-order-row__status">
-                            @await Html.PartialAsync(
-                                "~/Views/Customer/Partials/_OrderStatusBadge.cshtml",
-                                order.OrderStatus)
-                        </div>
-
-                        <div class="tbs-order-row__total">
-                            <span class="tbs-order-row__label">Total</span>
-                            <span class="tbs-order-row__value tbs-order-row__value--total">
-                                @order.FormattedGrandTotal
-                            </span>
-                        </div>
-
-                        <div class="tbs-order-row__arrow" aria-hidden="true">›</div>
+                        <svg class="shrink-0 text-mid-gray group-hover:text-charcoal transition-colors dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                     </a>
                 }
             </div>
-
-            @if (totalPages > 1)
-            {
-                <nav class="tbs-pagination" aria-label="Order pages">
-                    @if (currentPage > 1)
-                    {
-                        <a class="tbs-pagination__btn"
-                           asp-action="History" asp-controller="Order"
-                           asp-route-page="@(currentPage - 1)"
-                           aria-label="Previous page">&lsaquo;</a>
-                    }
-                    @for (int p = Math.Max(1, currentPage - 2);
-                          p <= Math.Min(totalPages, currentPage + 2); p++)
-                    {
-                        <a class="tbs-pagination__btn @(p == currentPage ? "tbs-pagination__btn--active" : "")"
-                           asp-action="History" asp-controller="Order"
-                           asp-route-page="@p"
-                           aria-label="Page @p"
-                           aria-current="@(p == currentPage ? "page" : null)">@p</a>
-                    }
-                    @if (currentPage < totalPages)
-                    {
-                        <a class="tbs-pagination__btn"
-                           asp-action="History" asp-controller="Order"
-                           asp-route-page="@(currentPage + 1)"
-                           aria-label="Next page">&rsaquo;</a>
-                    }
-                </nav>
-            }
         }
+
     </div>
 </div>
-
-@section Scripts {
-    <script src="~/js/order-history.js" asp-append-version="true"></script>
-}

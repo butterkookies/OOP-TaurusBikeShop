@@ -1,336 +1,179 @@
+@* WebApplication/Views/Customer/Review.cshtml *@
 @model WebApplication.Models.ViewModels.ReviewViewModel
 @{
     ViewData["Title"] = "Write a Review";
-    Layout = null;
-
-    /*
-     * Expected ReviewViewModel properties:
-     *   int      ProductId
-     *   int      OrderId
-     *   string   ProductName
-     *   string   ProductCategory
-     *   string   BrandName
-     *   string   SKU
-     *   bool     IsVerifiedPurchase  (always true from this flow)
-     *
-     * Existing reviews list (for the feed section):
-     *   IEnumerable<ReviewItemViewModel>  ExistingReviews
-     *     each item: UserName, Rating, Comment, CreatedAt
-     *
-     * If you haven't built the ViewModel yet, replace @Model.*
-     * references with static placeholder strings for now.
-     */
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] — Taurus Bike Shop</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Place review.css at: /wwwroot/css/review.css -->
-    <link rel="stylesheet" href="~/css/review.css" />
-</head>
-<body>
 
-<div class="review-page">
+@Html.AntiForgeryToken()
 
-    <!-- ============================================================
-         ATMOSPHERIC BACKGROUND LAYERS
-         ============================================================ -->
-    <div class="bg-overlay"    aria-hidden="true"></div>
-    <div class="bg-grid"       aria-hidden="true"></div>
-    <div class="bg-red-glow"   aria-hidden="true"></div>
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)]">
+    <div class="max-w-[1000px] mx-auto px-6 py-12 md:py-16">
 
-    <!-- ============================================================
-         SPLIT LAYOUT
-         Left = Brand panel + product card
-         Right = Review form + existing reviews feed
-         ============================================================ -->
-    <div class="review-split">
+        <ol class="cal-breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><a asp-controller="Order" asp-action="History">Orders</a></li>
+            <li>Write a Review</li>
+        </ol>
 
-        <!-- ── LEFT PANEL ── -->
-        <div class="brand-panel">
-            <div class="brand-panel__inner">
+        <div class="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-10">
 
-                <!-- Brand mark -->
-                <a href="/" class="brand-logo" aria-label="Taurus Bike Shop home">
-                    <img src="~/FULL-COLOR.png" alt="Taurus Bike Shop" class="brand-logo__img" />
-                </a>
-                <div class="brand-divider" aria-hidden="true"></div>
-
-                <p class="brand-copy">Your feedback shapes<br>the ride for everyone.</p>
-
-                <!-- ── PRODUCT CARD ── -->
-                <div class="product-card" aria-label="Product being reviewed">
-
-                    <!-- Verified purchase badge -->
-                    <div class="product-card__badge">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        Verified Purchase
-                    </div>
-
-                    <!-- Product meta -->
-                    <div class="product-card__category">
-                        @(Model?.ProductCategory ?? "Mountain Bikes")
-                    </div>
-
-                    <h2 class="product-card__name">
-                        @(Model?.ProductName ?? "Sample Product Name")
-                    </h2>
-
-                    <div class="product-card__meta">
-                        <span class="product-card__brand">
-                            @(Model?.BrandName ?? "Brand")
-                        </span>
-                        @if (!string.IsNullOrEmpty(Model?.SKU))
-                        {
-                            <span class="product-card__sku">@Model.SKU</span>
-                        }
-                    </div>
-
-                    <!-- Static star display (filled from review rating via JS) -->
-                    <div class="product-card__stars" id="cardStars" aria-hidden="true">
-                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    </div>
-                </div>
-
-                <!-- Quick links -->
-                <div class="panel-links">
-                    <a href="/Customer/ProductCatalog" class="panel-link">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                            <line x1="19" y1="12" x2="5" y2="12"/>
-                            <polyline points="12 19 5 12 12 5"/>
-                        </svg>
-                        Back to Catalog
+            @* ── LEFT: Product context card ── *@
+            <div>
+                <div class="cal-card-static p-6 sticky top-24" data-reveal>
+                    <a asp-controller="Home" asp-action="Index" class="inline-block mb-5">
+                        <img src="~/FULL-COLOR.png" alt="Taurus Bike Shop" class="h-8 w-auto" />
                     </a>
-                    <a href="/Customer/Orders" class="panel-link">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                        </svg>
-                        My Orders
-                    </a>
-                </div>
-            </div>
 
-            <!-- Decorative spinning wheel -->
-            <div class="deco-wheel" aria-hidden="true">
-                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="100" r="95" stroke="#E10600" stroke-width="1.5" stroke-dasharray="6 4"/>
-                    <circle cx="100" cy="100" r="70" stroke="#ffffff10" stroke-width="1"/>
-                    <circle cx="100" cy="100" r="12" fill="#E10600"/>
-                    <line x1="100" y1="5"   x2="100" y2="88"  stroke="#ffffff20" stroke-width="1.5"/>
-                    <line x1="100" y1="112" x2="100" y2="195" stroke="#ffffff20" stroke-width="1.5"/>
-                    <line x1="5"   y1="100" x2="88"  y2="100" stroke="#ffffff20" stroke-width="1.5"/>
-                    <line x1="112" y1="100" x2="195" y2="100" stroke="#ffffff20" stroke-width="1.5"/>
-                    <line x1="32"  y1="32"  x2="91"  y2="91"  stroke="#ffffff15" stroke-width="1.5"/>
-                    <line x1="109" y1="109" x2="168" y2="168" stroke="#ffffff15" stroke-width="1.5"/>
-                    <line x1="168" y1="32"  x2="109" y2="91"  stroke="#ffffff15" stroke-width="1.5"/>
-                    <line x1="91"  y1="109" x2="32"  y2="168" stroke="#ffffff15" stroke-width="1.5"/>
-                </svg>
-            </div>
-        </div>
+                    <hr class="cal-divider !my-4" />
 
-        <!-- ── RIGHT PANEL: Form + Review Feed ── -->
-        <div class="form-panel">
-            <div class="form-panel__inner">
+                    <p class="text-sm text-mid-gray mb-5">Your feedback shapes the ride for everyone.</p>
 
-                <!-- ── FORM HEADER ── -->
-                <div class="form-header">
-                    <div class="form-header__eyebrow">Share Your Experience</div>
-                    <h2 class="form-header__title">Write a Review</h2>
-                    <p class="form-header__sub">Help other riders make the right choice</p>
-                </div>
-
-                <!-- ============================================================
-                     REVIEW FORM
-                     POST fields: Rating (int 1-5), Comment, ProductId, OrderId
-                     ============================================================ -->
-                <form id="reviewForm"
-                      method="post"
-                      asp-controller="Review"
-                      asp-action="Submit"
-                      class="review-form"
-                      novalidate>
-
-                    @Html.AntiForgeryToken()
-
-                    <!-- Hidden fields bound to the ViewModel -->
-                    <input type="hidden" name="ProductId" value="@(Model?.ProductId ?? 0)" />
-                    <input type="hidden" name="OrderId"   value="@(Model?.OrderId   ?? 0)" />
-
-                    <!-- ── STAR RATING SELECTOR ── -->
-                    <div class="form-section">
-                        <div class="section-label">
-                            <span class="section-label__num" aria-hidden="true">01</span>
-                            <span class="section-label__text">Your Rating</span>
-                        </div>
-
-                        <div class="rating-wrap">
-                            <!-- CSS-only interactive star rating (RTL trick) -->
-                            <!-- Radio inputs are hidden; labels render the stars -->
-                            <div class="star-selector" id="starSelector" role="radiogroup" aria-label="Rate this product from 1 to 5 stars">
-
-                                <input type="radio" id="star5" name="Rating" value="5" required>
-                                <label for="star5" aria-label="5 stars">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                </label>
-
-                                <input type="radio" id="star4" name="Rating" value="4">
-                                <label for="star4" aria-label="4 stars">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                </label>
-
-                                <input type="radio" id="star3" name="Rating" value="3">
-                                <label for="star3" aria-label="3 stars">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                </label>
-
-                                <input type="radio" id="star2" name="Rating" value="2">
-                                <label for="star2" aria-label="2 stars">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                </label>
-
-                                <input type="radio" id="star1" name="Rating" value="1">
-                                <label for="star1" aria-label="1 star">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                </label>
-                            </div>
-
-                            <!-- Dynamic label that updates via JS -->
-                            <p class="rating-label" id="ratingLabel" aria-live="polite">Select a rating</p>
-                        </div>
-                    </div>
-
-                    <div class="section-rule" aria-hidden="true"></div>
-
-                    <!-- ── COMMENT TEXTAREA ── -->
-                    <div class="form-section">
-                        <div class="section-label">
-                            <span class="section-label__num" aria-hidden="true">02</span>
-                            <span class="section-label__text">Your Review</span>
-                        </div>
-
-                        <div class="field-group">
-                            <label for="comment" class="field-label">Tell us about your experience</label>
-                            <div class="field-wrap textarea-wrap">
-                                <svg class="field-icon field-icon--top" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                                </svg>
-                                <textarea class="field-input field-textarea"
-                                          id="comment"
-                                          name="Comment"
-                                          rows="5"
-                                          maxlength="1000"
-                                          placeholder="Describe the quality, fit, performance, and anything else riders should know…"
-                                          required></textarea>
-                                <div class="field-line" aria-hidden="true"></div>
-                            </div>
-                            <!-- Character counter -->
-                            <div class="char-counter">
-                                <span id="charCount">0</span> / 1000
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ── SUBMIT ── -->
-                    <button type="submit" class="btn-submit" id="submitBtn">
-                        <span class="btn-submit__text">Submit Review</span>
-                        <span class="btn-submit__arrow" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                <line x1="5" y1="12" x2="19" y2="12"/>
-                                <polyline points="12 5 19 12 12 19"/>
-                            </svg>
-                        </span>
-                        <span class="btn-submit__loader" aria-hidden="true"></span>
-                    </button>
-
-                    <div class="form-footer">
-                        <span class="form-footer__text">Changed your mind?</span>
-                        <a href="/Customer/Orders" class="form-footer__link">Back to Orders &rarr;</a>
-                    </div>
-
-                </form>
-
-                <!-- ============================================================
-                     EXISTING REVIEWS FEED
-                     Rendered from ExistingReviews on the ViewModel
-                     ============================================================ -->
-                @if (Model?.ExistingReviews != null && Model.ExistingReviews.Any())
-                {
-                    <div class="reviews-feed" id="reviewsFeed">
-
-                        <div class="reviews-feed__header">
-                            <div class="section-label">
-                                <span class="section-label__num" aria-hidden="true">—</span>
-                                <span class="section-label__text">What Others Are Saying</span>
-                            </div>
-                            <span class="reviews-feed__count">
-                                @Model.ExistingReviews.Count() review@(Model.ExistingReviews.Count() == 1 ? "" : "s")
-                            </span>
-                        </div>
-
-                        <div class="review-list">
-                            @foreach (var review in Model.ExistingReviews.OrderByDescending(r => r.CreatedAt))
+                    <div class="p-4 bg-light-gray dark:bg-white/5 rounded-xl">
+                        <span class="cal-badge cal-badge-success mb-3">✓ Verified Purchase</span>
+                        <p class="text-xs text-mid-gray uppercase tracking-wider mb-1">
+                            @(Model?.ProductCategory ?? "Category")
+                        </p>
+                        <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white leading-tight">
+                            @(Model?.ProductName ?? "Product Name")
+                        </h2>
+                        <div class="flex items-center gap-2 mt-2 text-sm text-mid-gray">
+                            <span>@(Model?.BrandName ?? "Brand")</span>
+                            @if (!string.IsNullOrEmpty(Model?.SKU))
                             {
-                                <article class="review-card">
-                                    <header class="review-card__header">
-                                        <!-- Avatar initials -->
-                                        <div class="review-card__avatar" aria-hidden="true">
-                                            @(string.IsNullOrEmpty(review.UserName) ? "?" : review.UserName.Substring(0, 1).ToUpper())
-                                        </div>
-                                        <div class="review-card__meta">
-                                            <span class="review-card__name">@(review.UserName ?? "Anonymous Rider")</span>
-                                            <time class="review-card__date"
-                                                  datetime="@review.CreatedAt.ToString("yyyy-MM-dd")">
-                                                @review.CreatedAt.ToString("MMM dd, yyyy")
-                                            </time>
-                                        </div>
-                                        <!-- Star display -->
-                                        <div class="review-card__stars" aria-label="@review.Rating out of 5 stars">
-                                            @for (int i = 1; i <= 5; i++)
-                                            {
-                                                <svg class="review-star @(i <= review.Rating ? "review-star--filled" : "")"
-                                                     viewBox="0 0 24 24"
-                                                     aria-hidden="true">
-                                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                                </svg>
-                                            }
-                                        </div>
-                                    </header>
-                                    @if (!string.IsNullOrWhiteSpace(review.Comment))
-                                    {
-                                        <p class="review-card__comment">@review.Comment</p>
-                                    }
-                                </article>
+                                <span>· @Model.SKU</span>
                             }
                         </div>
 
+                        @* Star display that syncs with form selection *@
+                        <div class="flex gap-0.5 mt-3" id="cardStars" aria-hidden="true">
+                            @for (int i = 0; i < 5; i++)
+                            {
+                                <span class="text-lg cal-star">★</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mt-5 space-y-2">
+                        <a asp-controller="Product" asp-action="List"
+                           class="flex items-center gap-2 text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                            Back to Catalog
+                        </a>
+                        <a asp-controller="Order" asp-action="History"
+                           class="flex items-center gap-2 text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            My Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            @* ── RIGHT: Review form + Existing reviews ── *@
+            <div>
+                <div class="mb-6" data-reveal>
+                    <p class="text-sm font-medium tracking-widest uppercase text-mid-gray mb-2">Share Your Experience</p>
+                    <h1 class="font-display text-3xl font-semibold text-charcoal dark:text-white">Write a Review</h1>
+                    <p class="text-sm text-mid-gray mt-2">Help other riders make the right choice</p>
+                </div>
+
+                @* ── FORM ── *@
+                <div class="cal-card-static p-6 mb-8" data-reveal="delay-1">
+                    <form id="reviewForm" method="post" asp-controller="Review" asp-action="Submit" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="ProductId" value="@(Model?.ProductId ?? 0)" />
+                        <input type="hidden" name="OrderId"   value="@(Model?.OrderId   ?? 0)" />
+
+                        @* Star rating *@
+                        <div class="mb-6">
+                            <p class="cal-label mb-3">Your Rating</p>
+                            <div class="cal-star-picker" id="starSelector" role="radiogroup" aria-label="Rate this product from 1 to 5 stars">
+                                @for (int i = 5; i >= 1; i--)
+                                {
+                                    <input type="radio" id="star@(i)" name="Rating" value="@i" class="cal-star-picker__input" required />
+                                    <label for="star@(i)" class="cal-star-picker__label" aria-label="@i star@(i != 1 ? "s" : "")">★</label>
+                                }
+                            </div>
+                            <p class="text-sm text-mid-gray mt-2" id="ratingLabel" aria-live="polite">Select a rating</p>
+                        </div>
+
+                        <hr class="cal-divider" />
+
+                        @* Comment *@
+                        <div class="mb-6">
+                            <label for="comment" class="cal-label">Tell us about your experience</label>
+                            <textarea class="cal-input cal-textarea" id="comment" name="Comment" rows="5"
+                                      maxlength="1000"
+                                      placeholder="Describe the quality, fit, performance, and anything else riders should know…"
+                                      required></textarea>
+                            <div class="flex justify-end mt-1">
+                                <span class="text-xs text-mid-gray"><span id="charCount">0</span> / 1000</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-dark btn-lg" id="submitBtn">
+                            Submit Review
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </button>
+
+                        <p class="text-xs text-mid-gray mt-3">
+                            Changed your mind?
+                            <a asp-controller="Order" asp-action="History" class="font-medium underline underline-offset-2 hover:text-charcoal dark:hover:text-white">Back to Orders →</a>
+                        </p>
+                    </form>
+                </div>
+
+                @* ── EXISTING REVIEWS ── *@
+                @if (Model?.ExistingReviews != null && Model.ExistingReviews.Any())
+                {
+                    <div data-reveal="delay-2">
+                        <div class="flex items-center justify-between mb-5">
+                            <h2 class="font-display text-xl font-semibold text-charcoal dark:text-white">What Others Are Saying</h2>
+                            <span class="cal-badge cal-badge-muted">@Model.ExistingReviews.Count() review@(Model.ExistingReviews.Count() == 1 ? "" : "s")</span>
+                        </div>
+
+                        <div class="space-y-4">
+                            @foreach (var review in Model.ExistingReviews.OrderByDescending(r => r.CreatedAt))
+                            {
+                                <div class="cal-card-static p-5">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-charcoal/[0.06] dark:bg-white/10 flex items-center justify-center text-sm font-semibold text-charcoal dark:text-white">
+                                            @(string.IsNullOrEmpty(review.UserName) ? "?" : review.UserName.Substring(0, 1).ToUpper())
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-charcoal dark:text-white">@(review.UserName ?? "Anonymous Rider")</p>
+                                            <time class="text-xs text-mid-gray" datetime="@review.CreatedAt.ToString("yyyy-MM-dd")">
+                                                @review.CreatedAt.ToString("MMM dd, yyyy")
+                                            </time>
+                                        </div>
+                                        <div class="flex gap-0.5" aria-label="@review.Rating out of 5 stars">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <span class="text-sm @(i <= review.Rating ? "cal-star--filled" : "cal-star")">★</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    @if (!string.IsNullOrWhiteSpace(review.Comment))
+                                    {
+                                        <p class="text-sm text-charcoal/80 dark:text-neutral-300 leading-relaxed">@review.Comment</p>
+                                    }
+                                </div>
+                            }
+                        </div>
                     </div>
                 }
+            </div>
 
-            </div><!-- /.form-panel__inner -->
-        </div><!-- /.form-panel -->
+        </div>
+    </div>
+</div>
 
-    </div><!-- /.review-split -->
-</div><!-- /.review-page -->
-
+@section Scripts {
 <script>
 (function () {
-
-    /* ── Star rating: update label + sync product-card stars ── */
-    var radios      = document.querySelectorAll('.star-selector input[type="radio"]');
+    /* Star rating: update label + sync product-card stars */
+    var radios      = document.querySelectorAll('#starSelector input[type="radio"]');
     var ratingLabel = document.getElementById('ratingLabel');
-    var cardStars   = document.querySelectorAll('#cardStars svg');
+    var cardStars   = document.querySelectorAll('#cardStars span');
 
     var ratingText = {
         1: 'Poor — needs improvement',
@@ -342,76 +185,41 @@
 
     function updateCardStars(rating) {
         cardStars.forEach(function (star, i) {
-            star.classList.toggle('card-star--filled', i < rating);
+            star.classList.toggle('cal-star--filled', i < rating);
+            star.classList.toggle('cal-star', i >= rating);
         });
     }
 
     radios.forEach(function (radio) {
         radio.addEventListener('change', function () {
             var val = parseInt(this.value, 10);
-            if (ratingLabel) {
-                ratingLabel.textContent = ratingText[val] || '';
-                ratingLabel.setAttribute('data-rating', val);
-            }
+            if (ratingLabel) ratingLabel.textContent = ratingText[val] || '';
             updateCardStars(val);
         });
     });
 
-    /* ── Textarea character counter ── */
+    /* Textarea character counter */
     var textarea  = document.getElementById('comment');
     var charCount = document.getElementById('charCount');
-
     if (textarea && charCount) {
         textarea.addEventListener('input', function () {
-            var len = this.value.length;
-            charCount.textContent = len;
-            charCount.classList.toggle('char-counter__num--warn', len >= 900);
+            charCount.textContent = this.value.length;
         });
     }
 
-    /* ── Submit: loading state ── */
+    /* Submit: validation */
     var reviewForm = document.getElementById('reviewForm');
     var submitBtn  = document.getElementById('submitBtn');
-
     if (reviewForm && submitBtn) {
         reviewForm.addEventListener('submit', function (e) {
-            /* Basic client-side validation: ensure a star is selected */
-            var selected = document.querySelector('.star-selector input[type="radio"]:checked');
+            var selected = document.querySelector('#starSelector input[type="radio"]:checked');
             if (!selected) {
                 e.preventDefault();
-                if (ratingLabel) {
-                    ratingLabel.textContent = 'Please select a star rating to continue.';
-                    ratingLabel.setAttribute('data-rating', 'error');
-                }
+                if (ratingLabel) ratingLabel.textContent = 'Please select a star rating to continue.';
                 document.getElementById('starSelector').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return;
             }
-            submitBtn.classList.add('loading');
         });
     }
-
-    /* ── Review card entrance animation on scroll ── */
-    var cards = document.querySelectorAll('.review-card');
-
-    if ('IntersectionObserver' in window && cards.length) {
-        var observer = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry, i) {
-                if (entry.isIntersecting) {
-                    setTimeout(function () {
-                        entry.target.classList.add('review-card--visible');
-                    }, i * 80);
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
-
-        cards.forEach(function (card) { observer.observe(card); });
-    } else {
-        cards.forEach(function (c) { c.classList.add('review-card--visible'); });
-    }
-
 })();
 </script>
-
-</body>
-</html>
+}

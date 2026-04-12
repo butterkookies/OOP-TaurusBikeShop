@@ -1,229 +1,130 @@
-@* WebApplication/Views/Payment/Payment.cshtml *@
+@* WebApplication/Views/Customer/Payment.cshtml *@
 @model WebApplication.BusinessLogic.Interfaces.PaymentDetailDto
 @{
-    ViewData["Title"] = $"Payment — {Model.OrderNumber}";
-    bool isGCash       = Model.PaymentMethod == WebApplication.Models.Entities.PaymentMethods.GCash;
-    bool isBankTransfer= Model.PaymentMethod == WebApplication.Models.Entities.PaymentMethods.BankTransfer;
+    ViewData["Title"] = "Upload Payment";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/payment.css" asp-append-version="true" />
-}
+<div class="bg-light-gray dark:bg-midnight min-h-[calc(100vh-160px)]">
+    <div class="max-w-[600px] mx-auto px-6 py-12 md:py-16">
 
-<div class="tbs-payment-page">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 col-lg-7">
+        <ol class="cal-breadcrumb">
+            <li><a asp-controller="Order" asp-action="History">Orders</a></li>
+            <li><a asp-controller="Order" asp-action="Detail" asp-route-orderId="@Model.OrderId">@Model.OrderNumber</a></li>
+            <li>Upload Payment</li>
+        </ol>
 
-                @* Order summary header *@
-                <div class="tbs-payment-header">
-                    <div class="tbs-payment-header__order">
-                        <p class="tbs-payment-header__label">Order</p>
-                        <p class="tbs-payment-header__number">@Model.OrderNumber</p>
+        <h1 class="font-display text-2xl md:text-3xl font-semibold text-charcoal dark:text-white mb-2" data-reveal>Upload Payment Proof</h1>
+        <p class="text-sm text-mid-gray mb-8" data-reveal>
+            Order <strong class="text-charcoal dark:text-white">@Model.OrderNumber</strong> &middot;
+            Total: <strong class="text-charcoal dark:text-white">₱@Model.GrandTotal.ToString("N2")</strong>
+        </p>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="mb-6 p-3 bg-error/10 border border-error/20 rounded-lg text-sm text-error" role="alert">
+                <div asp-validation-summary="All"></div>
+            </div>
+        }
+
+        @if (Model.PaymentMethod == "GCash")
+        {
+            <form asp-action="SubmitGCash" asp-controller="Payment" method="post" enctype="multipart/form-data" novalidate>
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="orderId" value="@Model.OrderId" />
+
+                <div class="cal-card-static p-6 mb-6" data-reveal="delay-1">
+                    <div class="mb-5 p-4 bg-light-gray dark:bg-white/5 rounded-xl">
+                        <p class="text-sm font-medium text-charcoal dark:text-white mb-1">Payment via GCash</p>
+                        <p class="text-xs text-mid-gray">Send ₱@Model.GrandTotal.ToString("N2") to the GCash number provided in your order confirmation.</p>
                     </div>
-                    <div class="tbs-payment-header__amount">
-                        <p class="tbs-payment-header__label">Amount Due</p>
-                        <p class="tbs-payment-header__total">₱@Model.GrandTotal.ToString("N2")</p>
+
+                    <div class="mb-5">
+                        <label class="cal-label">GCash Number</label>
+                        <input type="text" name="gcashNumber" class="cal-input" placeholder="09xxxxxxxxx" />
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="cal-label">Reference Number</label>
+                        <input type="text" name="referenceNumber" class="cal-input" placeholder="GCash reference number" />
+                    </div>
+
+                    <div>
+                        <label class="cal-label">Payment Screenshot</label>
+                        <div class="cal-file-drop" id="file-drop-zone">
+                            <input type="file" name="screenshotFile" accept="image/*"
+                                   class="cal-file-drop__input" id="payment-file-input" required />
+                            <div class="text-mid-gray">
+                                <svg class="mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <p class="text-sm font-medium text-charcoal dark:text-white">Drop file or click to upload</p>
+                                <p class="text-xs mt-1">PNG, JPG, up to 10 MB</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                @* Already submitted — show proof and status *@
-                @if (Model.HasExistingPayment)
-                {
-                    <div class="tbs-payment-submitted">
-                        <div class="tbs-payment-submitted__status
-                            @(Model.PaymentStatus == WebApplication.Models.Entities.PaymentStatuses.Completed ? "tbs-payment-submitted__status--verified" : "tbs-payment-submitted__status--pending")">
-                            @if (Model.PaymentStatus == WebApplication.Models.Entities.PaymentStatuses.Completed)
-                            {
-                                <span>✓ Payment Verified</span>
-                            }
-                            else if (Model.PaymentStatus == WebApplication.Models.Entities.PaymentStatuses.VerificationRejected)
-                            {
-                                <span>✗ Payment Rejected — please resubmit</span>
-                            }
-                            else
-                            {
-                                <span>⏳ Awaiting Verification</span>
-                            }
-                        </div>
+                <button type="submit" class="btn-dark btn-lg btn-full" data-reveal="delay-2">
+                    Submit GCash Payment
+                </button>
+            </form>
+        }
+        else
+        {
+            <form asp-action="SubmitBankTransfer" asp-controller="Payment" method="post" enctype="multipart/form-data" novalidate>
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="orderId" value="@Model.OrderId" />
 
-                        @if (Model.ProofImageUrl != null)
-                        {
-                            <p class="tbs-payment-submitted__proof-label">Submitted Proof</p>
-                            <img src="@Model.ProofImageUrl"
-                                 alt="Payment proof"
-                                 class="tbs-payment-submitted__proof-img"
-                                 loading="lazy" />
-                        }
-
-                        @if (Model.VerificationDeadline.HasValue &&
-                             Model.PaymentStatus == WebApplication.Models.Entities.PaymentStatuses.VerificationPending)
-                        {
-                            <p class="tbs-payment-submitted__deadline">
-                                Verification deadline:
-                                <strong>@Model.VerificationDeadline.Value.ToString("MMMM d, yyyy h:mm tt") UTC</strong>
-                            </p>
-                        }
-
-                        <a asp-controller="Order" asp-action="Detail"
-                           asp-route-orderId="@Model.OrderId"
-                           class="btn tbs-btn-outline mt-3">
-                            View Order
-                        </a>
+                <div class="cal-card-static p-6 mb-6" data-reveal="delay-1">
+                    <div class="mb-5 p-4 bg-light-gray dark:bg-white/5 rounded-xl">
+                        <p class="text-sm font-medium text-charcoal dark:text-white mb-1">Payment via Bank Transfer (BPI)</p>
+                        <p class="text-xs text-mid-gray">Transfer ₱@Model.GrandTotal.ToString("N2") to the BPI account provided in your order confirmation.</p>
                     </div>
-                }
 
-                @* GCash upload form *@
-                else if (isGCash)
-                {
-                    <div class="tbs-payment-card">
-                        <div class="tbs-payment-card__method-badge tbs-payment-card__method-badge--gcash">
-                            GCash Payment
-                        </div>
-
-                        <div class="tbs-payment-card__instructions">
-                            <h2 class="tbs-payment-card__title">Send Payment via GCash</h2>
-                            <ol class="tbs-payment-card__steps">
-                                <li>Open GCash and send <strong>₱@Model.GrandTotal.ToString("N2")</strong> to our account.</li>
-                                <li>Take a screenshot of the completed transaction screen.</li>
-                                <li>Enter the GCash reference number and upload the screenshot below.</li>
-                            </ol>
-                            <div class="tbs-payment-card__account">
-                                <span class="tbs-payment-card__account-label">GCash Number</span>
-                                <span class="tbs-payment-card__account-number">09XX-XXX-XXXX</span>
-                                <span class="tbs-payment-card__account-name">Taurus Bike Shop</span>
-                            </div>
-                        </div>
-
-                        <form asp-action="SubmitGCash" asp-controller="Payment"
-                              method="post" enctype="multipart/form-data" novalidate>
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="orderId" value="@Model.OrderId" />
-
-                            <div class="tbs-form-group">
-                                <label class="tbs-label">GCash Reference Number</label>
-                                <input type="text"
-                                       name="gcashRefNumber"
-                                       class="tbs-input"
-                                       placeholder="e.g. 2024-XXXX-XXXX"
-                                       maxlength="100"
-                                       required
-                                       autocomplete="off" />
-                            </div>
-
-                            <div class="tbs-form-group">
-                                <label class="tbs-label">Payment Screenshot</label>
-                                <div class="tbs-file-drop" id="gcash-drop-zone">
-                                    <input type="file"
-                                           name="screenshot"
-                                           id="gcash-file-input"
-                                           class="tbs-file-drop__input"
-                                           accept="image/jpeg,image/png,image/webp"
-                                           required />
-                                    <div class="tbs-file-drop__label">
-                                        <span class="tbs-file-drop__icon" aria-hidden="true">📸</span>
-                                        <span class="tbs-file-drop__text">
-                                            Click to upload or drag and drop<br />
-                                            <small>JPG, PNG, WebP — max 5 MB</small>
-                                        </span>
-                                    </div>
-                                    <div class="tbs-file-drop__preview" id="gcash-preview"
-                                         style="display:none"></div>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn tbs-btn-accent tbs-btn-full">
-                                Submit GCash Payment
-                            </button>
-                        </form>
+                    <div class="mb-5">
+                        <label class="cal-label">Depositor Name</label>
+                        <input type="text" name="depositorName" class="cal-input" placeholder="Full name on account" required />
                     </div>
-                }
 
-                @* Bank Transfer upload form *@
-                else if (isBankTransfer)
-                {
-                    <div class="tbs-payment-card">
-                        <div class="tbs-payment-card__method-badge tbs-payment-card__method-badge--bank">
-                            Bank Transfer (BPI)
-                        </div>
+                    <div class="mb-5">
+                        <label class="cal-label">BPI Reference Number <span class="cal-label-opt">(optional)</span></label>
+                        <input type="text" name="bpiReferenceNumber" class="cal-input" placeholder="BPI transaction reference" />
+                    </div>
 
-                        <div class="tbs-payment-card__instructions">
-                            <h2 class="tbs-payment-card__title">Transfer via BPI</h2>
-                            <ol class="tbs-payment-card__steps">
-                                <li>Transfer <strong>₱@Model.GrandTotal.ToString("N2")</strong> to our BPI account.</li>
-                                <li>Save the transaction confirmation as an image or PDF.</li>
-                                <li>Enter the BPI reference number and upload your proof below.</li>
-                            </ol>
-                            <div class="tbs-payment-card__account">
-                                <span class="tbs-payment-card__account-label">BPI Account Number</span>
-                                <span class="tbs-payment-card__account-number">XXXX-XXXX-XX</span>
-                                <span class="tbs-payment-card__account-name">Taurus Bike Shop Inc.</span>
-                            </div>
-                            <div class="tbs-payment-card__deadline-note">
-                                ⚠️ Proof must be submitted within
-                                <strong>24 hours</strong> or your order will be placed on hold.
+                    <div>
+                        <label class="cal-label">Deposit Slip / Screenshot</label>
+                        <div class="cal-file-drop" id="file-drop-zone">
+                            <input type="file" name="depositSlipFile" accept="image/*,.pdf"
+                                   class="cal-file-drop__input" id="payment-file-input" required />
+                            <div class="text-mid-gray">
+                                <svg class="mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <p class="text-sm font-medium text-charcoal dark:text-white">Drop file or click to upload</p>
+                                <p class="text-xs mt-1">PNG, JPG, PDF — up to 10 MB</p>
                             </div>
                         </div>
-
-                        <form asp-action="SubmitBankTransfer" asp-controller="Payment"
-                              method="post" enctype="multipart/form-data" novalidate>
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="orderId" value="@Model.OrderId" />
-
-                            <div class="tbs-form-group">
-                                <label class="tbs-label">BPI Reference Number</label>
-                                <input type="text"
-                                       name="bpiReferenceNumber"
-                                       class="tbs-input"
-                                       placeholder="e.g. BPI-XXXXXXXX"
-                                       maxlength="100"
-                                       required
-                                       autocomplete="off" />
-                            </div>
-
-                            <div class="tbs-form-group">
-                                <label class="tbs-label">Proof of Transfer</label>
-                                <div class="tbs-file-drop" id="bank-drop-zone">
-                                    <input type="file"
-                                           name="proofFile"
-                                           id="bank-file-input"
-                                           class="tbs-file-drop__input"
-                                           accept="image/jpeg,image/png,image/webp,application/pdf"
-                                           required />
-                                    <div class="tbs-file-drop__label">
-                                        <span class="tbs-file-drop__icon" aria-hidden="true">📄</span>
-                                        <span class="tbs-file-drop__text">
-                                            Click to upload or drag and drop<br />
-                                            <small>JPG, PNG, WebP, PDF — max 5 MB</small>
-                                        </span>
-                                    </div>
-                                    <div class="tbs-file-drop__preview" id="bank-preview"
-                                         style="display:none"></div>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn tbs-btn-accent tbs-btn-full">
-                                Submit Bank Transfer Proof
-                            </button>
-                        </form>
                     </div>
-                }
+                </div>
 
-                else
-                {
-                    <div class="tbs-payment-card">
-                        <p class="text-center text-muted">
-                            No payment method on record for this order.
-                            <a asp-controller="Support" asp-action="Create">Contact support.</a>
-                        </p>
-                    </div>
-                }
+                <button type="submit" class="btn-dark btn-lg btn-full" data-reveal="delay-2">
+                    Submit Bank Transfer Proof
+                </button>
+            </form>
+        }
 
-            </div>
-        </div>
+        <p class="text-xs text-mid-gray text-center mt-3">
+            Payment will be reviewed within 24 hours.
+        </p>
+
     </div>
 </div>
 
 @section Scripts {
-    <script src="~/js/payment.js" asp-append-version="true"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        const zone = document.getElementById('file-drop-zone');
+        const input = document.getElementById('payment-file-input');
+        if (zone) {
+            ['dragenter','dragover'].forEach(e => zone.addEventListener(e, ev => { ev.preventDefault(); zone.style.borderColor = '#242424'; }));
+            ['dragleave','drop'].forEach(e => zone.addEventListener(e, ev => { ev.preventDefault(); zone.style.borderColor = ''; }));
+            zone.addEventListener('drop', ev => { input.files = ev.dataTransfer.files; });
+        }
+    </script>
 }
