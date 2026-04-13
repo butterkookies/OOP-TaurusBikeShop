@@ -312,8 +312,9 @@ public sealed class CartService : ICartService
             VariantName = ci.Variant?.VariantName == "Default" ? null : ci.Variant?.VariantName,
             ImageUrl    = ci.Product?.Images?.FirstOrDefault(i => i.IsPrimary)?.ImageUrl
                        ?? ci.Product?.Images?.FirstOrDefault()?.ImageUrl,
-            Quantity    = ci.Quantity,
-            UnitPrice   = ci.PriceAtAdd
+            Quantity      = ci.Quantity,
+            StockQuantity = ci.Variant?.StockQuantity ?? 0,
+            UnitPrice     = ci.PriceAtAdd
         }).ToList();
 
         decimal subTotal = items.Sum(i => i.LineTotal);

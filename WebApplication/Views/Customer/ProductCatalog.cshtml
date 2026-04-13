@@ -29,79 +29,70 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8">
+        @* ══════════ FILTER BAR (top) ══════════ *@
+        <div class="cal-card-static p-5 mb-8" id="filter-sidebar" aria-label="Product filters" data-reveal>
 
-            @* ══════════ FILTER SIDEBAR ══════════ *@
-            <aside class="cal-card-static p-5 h-fit sticky top-24" id="filter-sidebar" aria-label="Product filters">
-
-                <p class="font-display text-base font-semibold text-charcoal dark:text-white mb-5" style="letter-spacing:0.2px">Filters</p>
-
-                @* Search *@
-                <div class="mb-5">
-                    <label class="cal-label" for="search-input">Search</label>
-                    <div class="relative">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-mid-gray" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                             fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
-                        </svg>
-                        <input type="text" id="search-input" class="cal-input pl-9"
-                               placeholder="Search products…" value="@search" />
-                    </div>
+            @* Row 1: Search *@
+            <div class="mb-4">
+                <label class="cal-label" for="search-input">Search</label>
+                <div class="relative max-w-md">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-mid-gray" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                         fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
+                    </svg>
+                    <input type="text" id="search-input" class="cal-input pl-9"
+                           placeholder="Search products…" value="@search" />
                 </div>
+            </div>
+
+            @* Row 2: Category, Brand, Price — horizontal on desktop, stacked on mobile *@
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
 
                 @* Categories *@
-                <div class="mb-5">
-                    <p class="cal-label">Category</p>
-                    <ul class="space-y-1.5 mt-2" id="category-list">
-                        <li>
-                            <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors @(catId == null ? "bg-charcoal text-white dark:bg-white dark:text-midnight font-medium" : "text-charcoal hover:bg-charcoal/[0.04] dark:text-neutral-300 dark:hover:bg-white/5")">
-                                <input type="radio" name="categoryId" value="" @(catId == null ? "checked" : "") class="hidden" />
-                                All Categories
-                            </label>
-                        </li>
+                <div>
+                    <p class="cal-label mb-2">Category</p>
+                    <div class="flex flex-wrap gap-1.5" id="category-list">
+                        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors @(catId == null ? "bg-charcoal text-white dark:bg-white dark:text-midnight font-medium" : "text-charcoal hover:bg-charcoal/[0.04] dark:text-neutral-300 dark:hover:bg-white/5")">
+                            <input type="radio" name="categoryId" value="" @(catId == null ? "checked" : "") class="hidden" />
+                            All
+                        </label>
                         @foreach (Category cat in categories)
                         {
-                            <li>
-                                <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors @(catId == cat.CategoryId ? "bg-charcoal text-white dark:bg-white dark:text-midnight font-medium" : "text-charcoal hover:bg-charcoal/[0.04] dark:text-neutral-300 dark:hover:bg-white/5")">
-                                    <input type="radio" name="categoryId" value="@cat.CategoryId"
-                                           @(catId == cat.CategoryId ? "checked" : "") class="hidden" />
-                                    @cat.Name
-                                </label>
-                            </li>
+                            <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors @(catId == cat.CategoryId ? "bg-charcoal text-white dark:bg-white dark:text-midnight font-medium" : "text-charcoal hover:bg-charcoal/[0.04] dark:text-neutral-300 dark:hover:bg-white/5")">
+                                <input type="radio" name="categoryId" value="@cat.CategoryId"
+                                       @(catId == cat.CategoryId ? "checked" : "") class="hidden" />
+                                @cat.Name
+                            </label>
                         }
-                    </ul>
+                    </div>
                 </div>
 
                 @* Brands *@
                 @if (brands.Any())
                 {
-                    <div class="mb-5">
-                        <p class="cal-label">Brand</p>
-                        <ul class="space-y-1.5 mt-2" id="brand-list">
-                            <li>
-                                <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors @(brandId == null ? "bg-charcoal text-white dark:bg-white dark:text-midnight font-medium" : "text-charcoal hover:bg-charcoal/[0.04] dark:text-neutral-300 dark:hover:bg-white/5")">
-                                    <input type="radio" name="brandId" value="" @(brandId == null ? "checked" : "") class="hidden" />
-                                    All Brands
-                                </label>
-                            </li>
+                    <div>
+                        <p class="cal-label mb-2">Brand</p>
+                        <div class="flex flex-wrap gap-1.5" id="brand-list">
+                            <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors @(brandId == null ? "bg-charcoal text-white dark:bg-white dark:text-midnight font-medium" : "text-charcoal hover:bg-charcoal/[0.04] dark:text-neutral-300 dark:hover:bg-white/5")">
+                                <input type="radio" name="brandId" value="" @(brandId == null ? "checked" : "") class="hidden" />
+                                All
+                            </label>
                             @foreach (Brand brand in brands)
                             {
-                                <li>
-                                    <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors @(brandId == brand.BrandId ? "bg-charcoal text-white dark:bg-white dark:text-midnight font-medium" : "text-charcoal hover:bg-charcoal/[0.04] dark:text-neutral-300 dark:hover:bg-white/5")">
-                                        <input type="radio" name="brandId" value="@brand.BrandId"
-                                               @(brandId == brand.BrandId ? "checked" : "") class="hidden" />
-                                        @brand.BrandName
-                                    </label>
-                                </li>
+                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors @(brandId == brand.BrandId ? "bg-charcoal text-white dark:bg-white dark:text-midnight font-medium" : "text-charcoal hover:bg-charcoal/[0.04] dark:text-neutral-300 dark:hover:bg-white/5")">
+                                    <input type="radio" name="brandId" value="@brand.BrandId"
+                                           @(brandId == brand.BrandId ? "checked" : "") class="hidden" />
+                                    @brand.BrandName
+                                </label>
                             }
-                        </ul>
+                        </div>
                     </div>
                 }
 
                 @* Price range *@
-                <div class="mb-6">
-                    <p class="cal-label">Price Range (₱)</p>
-                    <div class="flex gap-2 mt-2 items-center">
+                <div>
+                    <p class="cal-label mb-2">Price Range (₱)</p>
+                    <div class="flex gap-2 items-center">
                         <input type="number" id="min-price" class="cal-input text-center"
                                placeholder="Min" value="@minPrice" min="0" step="100" />
                         <span class="text-mid-gray">—</span>
@@ -109,16 +100,17 @@
                                placeholder="Max" value="@maxPrice" min="0" step="100" />
                     </div>
                 </div>
+            </div>
 
-                @* Actions *@
-                <div class="flex flex-col gap-2">
-                    <button type="button" class="btn-dark btn-full" id="apply-filters-btn">Apply Filters</button>
-                    <a asp-action="List" asp-controller="Product" class="btn-ghost btn-full text-center">Clear All</a>
-                </div>
-            </aside>
+            @* Actions *@
+            <div class="flex gap-3">
+                <button type="button" class="btn-dark btn-sm" id="apply-filters-btn">Apply Filters</button>
+                <a asp-action="List" asp-controller="Product" class="btn-ghost btn-sm">Clear All</a>
+            </div>
+        </div>
 
-            @* ══════════ PRODUCT GRID ══════════ *@
-            <div>
+        @* ══════════ PRODUCT GRID ══════════ *@
+        <div>
                 @* Sort / results bar *@
                 <div class="flex items-center justify-between mb-5" data-reveal>
                     <span class="text-sm text-mid-gray">
@@ -198,7 +190,6 @@
                         </nav>
                     }
                 }
-            </div>
         </div>
     </div>
 </div>

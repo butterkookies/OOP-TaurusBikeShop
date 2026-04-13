@@ -1,7 +1,7 @@
 @* WebApplication/Views/Customer/Partials/_ProductCard.cshtml *@
 @model WebApplication.Models.ViewModels.ProductViewModel
 
-<div class="cal-card overflow-hidden group hover:-translate-y-0.5 @(Model.IsOutOfStock ? "opacity-70" : "")" data-product-id="@Model.ProductId">
+<div class="cal-card overflow-hidden group hover:-translate-y-0.5 flex flex-col @(Model.IsOutOfStock ? "opacity-70" : "")" data-product-id="@Model.ProductId">
 
     @* ── Image zone ── *@
     <div class="relative">
@@ -33,23 +33,25 @@
 
         @* Wishlist toggle *@
         <button type="button"
-                class="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 dark:bg-midnight/90 flex items-center justify-center text-mid-gray hover:text-error transition-colors shadow-sm @(Model.IsInWishlist ? "!text-error" : "")"
+                class="wishlist-toggle absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 dark:bg-midnight/90 flex items-center justify-center text-mid-gray hover:text-error transition-colors shadow-sm @(Model.IsInWishlist ? "!text-error is-active" : "")"
                 data-product-id="@Model.ProductId"
                 aria-label="@(Model.IsInWishlist ? "Remove from wishlist" : "Add to wishlist")"
                 aria-pressed="@(Model.IsInWishlist ? "true" : "false")">
             @if (Model.IsInWishlist)
             {
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <svg class="heart-filled" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <svg class="heart-outline hidden" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             }
             else
             {
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <svg class="heart-filled hidden" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <svg class="heart-outline" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             }
         </button>
     </div>
 
     @* ── Card body ── *@
-    <div class="p-4">
+    <div class="p-4 flex flex-col flex-1">
         <h3 class="text-sm font-medium text-charcoal dark:text-white line-clamp-2 mb-0.5">
             <a asp-controller="Product" asp-action="Detail" asp-route-id="@Model.ProductId"
                class="hover:underline">@Model.Name</a>
@@ -63,13 +65,13 @@
             <p class="text-xs text-mid-gray mt-1 line-clamp-2">@Model.ShortDescription</p>
         }
 
-        <div class="flex items-center justify-between mt-3">
+        <div class="flex items-center justify-between mt-auto pt-3">
             <span class="font-display text-base font-semibold text-charcoal dark:text-white">@Model.FormattedPrice</span>
 
             @if (!Model.IsOutOfStock)
             {
                 <button type="button"
-                        class="btn-dark btn-sm"
+                        class="btn-dark btn-sm catalog-add-to-cart"
                         data-product-id="@Model.ProductId"
                         aria-label="Add @Model.Name to cart">
                     Add to Cart

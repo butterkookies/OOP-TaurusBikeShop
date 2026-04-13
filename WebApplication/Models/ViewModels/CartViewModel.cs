@@ -89,6 +89,9 @@ public sealed class CartItemViewModel
     /// <summary>Quantity of this item in the cart.</summary>
     public int Quantity { get; set; }
 
+    /// <summary>Available stock for this item's variant. Used to cap the quantity stepper.</summary>
+    public int StockQuantity { get; set; }
+
     /// <summary>
     /// Price per unit at the time this item was added to the cart.
     /// This is a snapshot — does not change if the product price changes.

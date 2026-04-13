@@ -7,7 +7,7 @@
             @* ── Brand Column ── *@
             <div class="lg:col-span-1">
                 <a asp-controller="Home" asp-action="Index" class="inline-block mb-4">
-                    <img src="~/FULL-COLOR.png" alt="Taurus Bike Shop" class="h-10 w-auto" />
+                    <img src="~/FULL-COLOR.png" alt="Taurus Bike Shop" class="h-14 w-auto" />
                 </a>
                 <p class="text-sm text-mid-gray leading-relaxed">
                     Premium bikes and components for every rider — from trail to road, beginner to pro.
@@ -56,18 +56,36 @@
                     Account
                 </h6>
                 <ul class="space-y-2.5">
-                    <li>
-                        <a asp-controller="Customer" asp-action="Login"
-                           class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
-                            Sign In
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-controller="Customer" asp-action="Register"
-                           class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
-                            Register
-                        </a>
-                    </li>
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <li>
+                            <a asp-controller="Customer" asp-action="Dashboard"
+                               class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-controller="Customer" asp-action="Profile"
+                               class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                                Profile
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a asp-controller="Customer" asp-action="Login"
+                               class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                                Sign In
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-controller="Customer" asp-action="Register"
+                               class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">
+                                Register
+                            </a>
+                        </li>
+                    }
                     <li>
                         <a asp-controller="Order" asp-action="History"
                            class="text-sm text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white">

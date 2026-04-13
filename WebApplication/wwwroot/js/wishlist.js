@@ -1,6 +1,6 @@
 // WebApplication/wwwroot/js/wishlist.js
-// Handles remove and move-to-cart on the Wishlist page.
-// Depends on: utils.js
+// Handles remove and add-to-cart on the Wishlist page.
+// Depends on: utils.js, site.js
 
 'use strict';
 
@@ -10,88 +10,75 @@ document.addEventListener('DOMContentLoaded', () => {
     // REMOVE FROM WISHLIST
     // =========================================================================
     document.addEventListener('click', async e => {
-        const removeBtn = e.target.closest('.tbs-wishlist-card__remove-btn');
+        const removeBtn = e.target.closest('.wishlist-remove-btn');
         if (!removeBtn) return;
 
         const productId = removeBtn.dataset.productId;
-        const cardCol   = document.getElementById(`wishlist-card-${productId}`);
-
-        if (cardCol) {
-            const card = cardCol.querySelector('.tbs-wishlist-card');
-            card?.classList.add('tbs-wishlist-card--removing');
-            await sleep(260);
-        }
+        const card = removeBtn.closest('.cal-card');
 
         try {
             const data = await fetchWithCSRF('/Wishlist/Remove',
                 { productId: parseInt(productId, 10) });
 
             if (!data.success) {
-                showAlert('error', data.message ?? 'Could not remove item.');
-                cardCol?.querySelector('.tbs-wishlist-card')
-                    ?.classList.remove('tbs-wishlist-card--removing');
+                showToast('error', data.message ?? 'Could not remove item.');
                 return;
             }
 
-            cardCol?.remove();
+            // Animate card out and remove
+            if (card) {
+                card.style.transition = 'opacity 0.25s, transform 0.25s';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.95)';
+                await sleep(260);
+                card.remove();
+            }
+
             updateWishlistCount();
 
             // Show empty state if grid is now empty
-            const grid = document.getElementById('wishlist-grid');
+            const grid = document.querySelector('[data-reveal="delay-1"]');
             if (grid && grid.children.length === 0) {
-                showEmptyState();
+                window.location.reload();
             }
 
+            showToast('success', 'Removed from wishlist.');
+
         } catch {
-            showAlert('error', 'Could not remove item. Please try again.');
-            cardCol?.querySelector('.tbs-wishlist-card')
-                ?.classList.remove('tbs-wishlist-card--removing');
+            showToast('error', 'Could not remove item. Please try again.');
         }
     });
 
     // =========================================================================
-    // MOVE TO CART
+    // ADD TO CART FROM WISHLIST
     // =========================================================================
     document.addEventListener('click', async e => {
-        const moveBtn = e.target.closest('.tbs-wishlist-card__move-btn');
-        if (!moveBtn) return;
+        const cartBtn = e.target.closest('.wishlist-add-to-cart');
+        if (!cartBtn) return;
 
-        const productId = moveBtn.dataset.productId;
-        const cardCol   = document.getElementById(`wishlist-card-${productId}`);
+        const productId = cartBtn.dataset.productId;
 
-        moveBtn.disabled    = true;
-        moveBtn.textContent = 'Moving…';
+        cartBtn.disabled = true;
+        cartBtn.textContent = 'Adding…';
 
         try {
-            const data = await fetchWithCSRF('/Wishlist/MoveToCart',
-                { productId: parseInt(productId, 10) });
+            const data = await fetchWithCSRF('/Cart/AddToCart',
+                { productId: parseInt(productId, 10), qty: 1 });
 
-            if (!data.success) {
-                showAlert('error', data.message ?? 'Could not move to cart.');
-                moveBtn.disabled    = false;
-                moveBtn.textContent = 'Move to Cart';
-                return;
+            if (data.success) {
+                const count = data.data?.cartCount ?? '';
+                showToast('success', count
+                    ? `Added to cart! (${count} item${count !== 1 ? 's' : ''} in cart)`
+                    : 'Added to cart!');
+                refreshCartBadge();
+            } else {
+                showToast('error', data.message ?? 'Could not add to cart.');
             }
-
-            showAlert('success', 'Moved to cart!');
-            refreshCartBadge();
-
-            // Animate card out
-            const card = cardCol?.querySelector('.tbs-wishlist-card');
-            card?.classList.add('tbs-wishlist-card--removing');
-            await sleep(260);
-            cardCol?.remove();
-
-            updateWishlistCount();
-
-            if (!document.getElementById('wishlist-grid')?.children.length) {
-                showEmptyState();
-            }
-
         } catch {
-            showAlert('error', 'Could not move item. Please try again.');
-            moveBtn.disabled    = false;
-            moveBtn.textContent = 'Move to Cart';
+            showToast('error', 'Could not add to cart. Please try again.');
+        } finally {
+            cartBtn.disabled = false;
+            cartBtn.textContent = 'Add to Cart';
         }
     });
 
@@ -100,38 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
 
     function updateWishlistCount() {
-        const grid    = document.getElementById('wishlist-grid');
-        const count   = grid ? grid.children.length : 0;
-        const subtitle= document.querySelector('.tbs-page-header__subtitle');
+        const grid = document.querySelector('[data-reveal="delay-1"]');
+        const count = grid ? grid.children.length : 0;
+        const subtitle = document.querySelector('.mb-10 .text-base');
         if (subtitle) {
-            subtitle.textContent = count === 1 ? '1 saved item' : `${count} saved items`;
+            subtitle.textContent = count === 1 ? '1 item saved' : `${count} items saved`;
         }
-    }
-
-    function showEmptyState() {
-        const container = document.querySelector('.tbs-wishlist-page .container');
-        const grid      = document.getElementById('wishlist-grid');
-        const header    = document.querySelector('.tbs-page-header');
-
-        grid?.remove();
-        header?.querySelector('.tbs-section-link')?.remove();
-
-        const subtitle = header?.querySelector('.tbs-page-header__subtitle');
-        if (subtitle) subtitle.remove();
-
-        if (!container) return;
-
-        const empty = document.createElement('div');
-        empty.className = 'tbs-wishlist-page__empty';
-        empty.innerHTML = `
-            <div class="tbs-wishlist-page__empty-icon" aria-hidden="true">❤️</div>
-            <h2 class="tbs-wishlist-page__empty-title">Your wishlist is empty</h2>
-            <p class="tbs-wishlist-page__empty-text">
-                Save products you love by clicking the heart icon on any product.
-            </p>
-            <a href="/Product/List" class="btn tbs-btn-accent tbs-btn-lg">Browse Products</a>
-        `;
-        container.appendChild(empty);
     }
 
     function sleep(ms) {

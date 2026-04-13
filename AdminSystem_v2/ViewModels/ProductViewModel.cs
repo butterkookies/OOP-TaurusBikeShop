@@ -440,7 +440,7 @@ namespace AdminSystem_v2.ViewModels
                 await _productService.AddImageAsync(EditProduct.ProductId, NewImageUrl);
                 NewImageUrl = string.Empty;
                 await LoadImagesAsync(EditProduct.ProductId);
-                ShowSuccess("Image added.");
+                ShowSuccess($"Image added for '{EditProduct.Name}'. URL reference saved (stored externally via Cloudinary).");
             }
             catch (Exception ex)
             {

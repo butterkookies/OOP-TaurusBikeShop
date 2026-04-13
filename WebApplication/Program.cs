@@ -19,7 +19,11 @@ builder.Services.Configure<HostOptions>(options =>
 builder.Services.Configure<CloudinarySettings>(
 builder.Configuration.GetSection("CloudinarySettings"));
 
+builder.Services.Configure<WebApplication.Models.SmtpSettings>(
+    builder.Configuration.GetSection("SmtpSettings"));
+
 builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddScoped<IEmailSender, GmailEmailSender>();
 
 // =============================================================================
 // DATABASE
@@ -202,6 +206,7 @@ builder.Services.AddHostedService<WebApplication.BackgroundJobs.PendingOrderMoni
 builder.Services.AddHostedService<WebApplication.BackgroundJobs.PaymentTimeoutJob>();
 builder.Services.AddHostedService<WebApplication.BackgroundJobs.StockMonitorJob>();
 builder.Services.AddHostedService<WebApplication.BackgroundJobs.DeliveryStatusPollJob>();
+builder.Services.AddHostedService<WebApplication.BackgroundJobs.NotificationDispatchJob>();
 
 // =============================================================================
 // CORS

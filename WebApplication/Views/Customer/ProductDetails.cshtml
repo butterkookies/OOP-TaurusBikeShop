@@ -98,6 +98,7 @@
                                         class="cal-variant-btn @(v.ProductVariantId == Model.SelectedVariantId ? "cal-variant-btn--selected" : "") @(v.StockQuantity == 0 ? "cal-variant-btn--oos" : "")"
                                         data-variant-id="@v.ProductVariantId"
                                         data-additional-price="@v.AdditionalPrice"
+                                        data-stock="@v.StockQuantity"
                                         @(v.StockQuantity == 0 ? "disabled" : "")
                                         aria-pressed="@(v.ProductVariantId == Model.SelectedVariantId ? "true" : "false")">
                                     @v.VariantName
@@ -134,7 +135,7 @@
                         <div class="cal-qty">
                             <button type="button" class="cal-qty-btn" id="qty-minus" aria-label="Decrease quantity">−</button>
                             <input type="number" id="qty-input" class="cal-qty-val"
-                                   value="1" min="1" max="99" aria-label="Quantity" />
+                                   value="1" min="1" max="@Model.TotalStock" data-max-stock="@Model.TotalStock" aria-label="Quantity" />
                             <button type="button" class="cal-qty-btn" id="qty-plus" aria-label="Increase quantity">+</button>
                         </div>
 

@@ -5,13 +5,14 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     // ── Quantity buttons ───────────────────────────────────
-    document.querySelectorAll('.tbs-qty-btn').forEach(function (btn) {
+    document.querySelectorAll('.cal-qty-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
             var itemId  = btn.dataset.cartItemId;
             var action  = btn.dataset.action; // 'increase' or 'decrease'
-            var input   = document.querySelector('.tbs-qty-input[data-cart-item-id="' + itemId + '"]');
-            var current = parseInt(input ? input.value : 1, 10);
-            var newQty  = action === 'increase' ? current + 1 : Math.max(1, current - 1);
+            var input   = document.querySelector('.cal-qty-val[data-cart-item-id="' + itemId + '"]');
+            var current  = parseInt(input ? input.value : 1, 10);
+            var maxStock = parseInt(input ? input.getAttribute('max') : 99, 10) || 99;
+            var newQty   = action === 'increase' ? Math.min(current + 1, maxStock) : Math.max(1, current - 1);
             if (newQty === current) return;
 
             btn.disabled = true;
@@ -48,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ── Remove item ────────────────────────────────────────
-    document.querySelectorAll('.tbs-cart-item__remove').forEach(function (btn) {
+    document.querySelectorAll('.cart-item-remove').forEach(function (btn) {
         btn.addEventListener('click', function () {
             var itemId = btn.dataset.cartItemId;
             confirmAction('Remove this item from your cart?', function () {

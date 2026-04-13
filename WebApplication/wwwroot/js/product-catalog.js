@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // WISHLIST TOGGLE — both catalog cards and product detail page
     // =========================================================================
     document.addEventListener('click', async e => {
-        const wishlistBtn = e.target.closest('.tbs-product-card__wishlist, .tbs-wishlist-toggle');
+        const wishlistBtn = e.target.closest('.wishlist-toggle');
         if (!wishlistBtn) return;
 
         const productId = wishlistBtn.dataset.productId;
@@ -81,15 +81,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Toggle active state on all wishlist buttons for this product
             document.querySelectorAll(
-                `.tbs-product-card__wishlist[data-product-id="${productId}"],
-                 .tbs-wishlist-toggle[data-product-id="${productId}"]`
+                `.wishlist-toggle[data-product-id="${productId}"]`
             ).forEach(btn => {
                 const isNowInWishlist = data.data?.isInWishlist ?? false;
                 btn.classList.toggle('is-active', isNowInWishlist);
+                btn.classList.toggle('!text-error', isNowInWishlist);
                 btn.setAttribute('aria-pressed', isNowInWishlist ? 'true' : 'false');
                 btn.setAttribute('aria-label',
                     isNowInWishlist ? 'Remove from wishlist' : 'Add to wishlist');
+
+                // Swap heart SVG icons
+                const filled  = btn.querySelector('.heart-filled');
+                const outline = btn.querySelector('.heart-outline');
+                if (filled && outline) {
+                    filled.classList.toggle('hidden', !isNowInWishlist);
+                    outline.classList.toggle('hidden', isNowInWishlist);
+                }
             });
+
+            showToast('success', data.message ?? 'Wishlist updated.');
 
         } catch {
             showToast('error', 'Unable to update wishlist. Please try again.');
@@ -100,11 +110,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // QUICK ADD TO CART — from catalog product cards
     // =========================================================================
     document.addEventListener('click', async e => {
-        const cartBtn = e.target.closest('.tbs-product-card__cart-btn');
+        const cartBtn = e.target.closest('.catalog-add-to-cart');
         if (!cartBtn) return;
 
-        const card = cartBtn.closest('.tbs-product-card');
-        const productId = card?.dataset.productId;
+        const productId = cartBtn.dataset.productId;
         if (!productId) return;
 
         cartBtn.disabled = true;
@@ -145,6 +154,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const variantId = btn.dataset.variantId;
             if (addToCartBtn) addToCartBtn.dataset.variantId = variantId;
+
+            // Update qty max to this variant's stock
+            const variantStock = parseInt(btn.dataset.stock || '0', 10);
+            const qtyIn = document.getElementById('qty-input');
+            if (qtyIn) {
+                qtyIn.setAttribute('max', variantStock);
+                qtyIn.dataset.maxStock = variantStock;
+                if (parseInt(qtyIn.value, 10) > variantStock)
+                    qtyIn.value = Math.max(1, variantStock);
+            }
 
             try {
                 const response = await fetch(`/Product/GetVariantPrice?variantId=${variantId}`);
@@ -200,8 +219,18 @@ document.addEventListener('DOMContentLoaded', () => {
             qtyInput.value = parseInt(qtyInput.value, 10) - 1;
     });
     document.getElementById('qty-plus')?.addEventListener('click', () => {
-        if (qtyInput && parseInt(qtyInput.value, 10) < 99)
+        if (!qtyInput) return;
+        const maxStock = parseInt(qtyInput.getAttribute('max') || '99', 10);
+        if (parseInt(qtyInput.value, 10) < maxStock)
             qtyInput.value = parseInt(qtyInput.value, 10) + 1;
+    });
+    // Clamp on manual input
+    qtyInput?.addEventListener('change', () => {
+        const maxStock = parseInt(qtyInput.getAttribute('max') || '99', 10);
+        let val = parseInt(qtyInput.value, 10);
+        if (isNaN(val) || val < 1) val = 1;
+        if (val > maxStock) val = maxStock;
+        qtyInput.value = val;
     });
 
     // =========================================================================

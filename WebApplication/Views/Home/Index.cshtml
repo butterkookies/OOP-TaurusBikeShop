@@ -253,8 +253,10 @@
 </section>
 
 @* ═══════════════════════════════════════════════════════════════
-   CTA — Final push
+   CTA — Final push (only shown to guests)
    ═══════════════════════════════════════════════════════════════ *@
+@if (!(User.Identity?.IsAuthenticated ?? false))
+{
 <section class="bg-charcoal dark:bg-neutral-900 py-20 md:py-28">
     <div class="max-w-[1200px] mx-auto px-6">
         <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
@@ -301,3 +303,4 @@
         </div>
     </div>
 </section>
+}
