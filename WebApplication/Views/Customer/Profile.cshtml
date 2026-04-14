@@ -2,6 +2,8 @@
 @model WebApplication.Models.ViewModels.ProfileViewModel
 @{
     ViewData["Title"] = "Profile";
+    bool reopenAddressModal = TempData["ReopenAddressModal"] is true;
+    string? addressFormJson = TempData["AddressForm"] as string;
 }
 
 @Html.AntiForgeryToken()
@@ -47,32 +49,40 @@
             </form>
         </div>
 
-        @* ── Change Password ── *@
+        @* ── Change Password (collapsed by default — isolated from address UI) ── *@
         <div class="cal-card-static p-6 mb-6" data-reveal="delay-2">
-            <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white mb-5" style="letter-spacing:0.2px">Change Password</h2>
+            <div class="flex items-center justify-between">
+                <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white" style="letter-spacing:0.2px">Change Password</h2>
+                <button type="button" id="toggle-password-form" class="btn-ghost btn-sm"
+                        onclick="document.getElementById('password-form-section').toggleAttribute('hidden'); this.textContent = document.getElementById('password-form-section').hidden ? 'Change' : 'Cancel';">
+                    Change
+                </button>
+            </div>
 
-            <form asp-action="ChangePassword" asp-controller="Customer" method="post" novalidate>
-                @Html.AntiForgeryToken()
+            <div id="password-form-section" hidden>
+                <form asp-action="ChangePassword" asp-controller="Customer" method="post" novalidate class="mt-5">
+                    @Html.AntiForgeryToken()
 
-                <div class="space-y-4 max-w-sm">
-                    <div>
-                        <label asp-for="ChangePassword.CurrentPassword" class="cal-label">Current Password</label>
-                        <input asp-for="ChangePassword.CurrentPassword" class="cal-input" type="password" autocomplete="current-password" />
-                        <span asp-validation-for="ChangePassword.CurrentPassword" class="cal-field-error"></span>
+                    <div class="space-y-4 max-w-sm">
+                        <div>
+                            <label asp-for="ChangePassword.CurrentPassword" class="cal-label">Current Password</label>
+                            <input asp-for="ChangePassword.CurrentPassword" class="cal-input" type="password" autocomplete="current-password" />
+                            <span asp-validation-for="ChangePassword.CurrentPassword" class="cal-field-error"></span>
+                        </div>
+                        <div>
+                            <label asp-for="ChangePassword.NewPassword" class="cal-label">New Password</label>
+                            <input asp-for="ChangePassword.NewPassword" class="cal-input" type="password" autocomplete="new-password" />
+                            <span asp-validation-for="ChangePassword.NewPassword" class="cal-field-error"></span>
+                        </div>
+                        <div>
+                            <label asp-for="ChangePassword.ConfirmNewPassword" class="cal-label">Confirm New Password</label>
+                            <input asp-for="ChangePassword.ConfirmNewPassword" class="cal-input" type="password" autocomplete="new-password" />
+                            <span asp-validation-for="ChangePassword.ConfirmNewPassword" class="cal-field-error"></span>
+                        </div>
                     </div>
-                    <div>
-                        <label asp-for="ChangePassword.NewPassword" class="cal-label">New Password</label>
-                        <input asp-for="ChangePassword.NewPassword" class="cal-input" type="password" autocomplete="new-password" />
-                        <span asp-validation-for="ChangePassword.NewPassword" class="cal-field-error"></span>
-                    </div>
-                    <div>
-                        <label asp-for="ChangePassword.ConfirmNewPassword" class="cal-label">Confirm New Password</label>
-                        <input asp-for="ChangePassword.ConfirmNewPassword" class="cal-input" type="password" autocomplete="new-password" />
-                        <span asp-validation-for="ChangePassword.ConfirmNewPassword" class="cal-field-error"></span>
-                    </div>
-                </div>
-                <button type="submit" class="btn-dark btn-sm mt-4">Update Password</button>
-            </form>
+                    <button type="submit" class="btn-dark btn-sm mt-4">Update Password</button>
+                </form>
+            </div>
         </div>
 
         @* ── Shipping Addresses ── *@
@@ -171,7 +181,9 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="cal-label" for="NewAddress_PostalCode">Postal Code</label>
-                        <input type="text" name="NewAddress.PostalCode" id="NewAddress_PostalCode" class="cal-input" required placeholder="e.g. 1100" />
+                        <input type="text" name="NewAddress.PostalCode" id="NewAddress_PostalCode" class="cal-input" required
+                               placeholder="e.g. 1100" maxlength="4" pattern="\d{4}" inputmode="numeric"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)" />
                     </div>
                     <div>
                         <label class="cal-label" for="NewAddress_Country">Country</label>
@@ -191,4 +203,23 @@
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
     <script src="~/js/customer.js" asp-append-version="true"></script>
+    @if (reopenAddressModal)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                openModal('add-address-modal');
+                @if (addressFormJson != null)
+                {
+                    <text>
+                    const data = @Html.Raw(addressFormJson);
+                    if (data.Label)      document.getElementById('NewAddress_Label').value = data.Label;
+                    if (data.Street)     document.getElementById('NewAddress_Street').value = data.Street;
+                    if (data.City)       document.getElementById('NewAddress_City').value = data.City;
+                    if (data.Province)   document.getElementById('NewAddress_Province').value = data.Province;
+                    if (data.PostalCode) document.getElementById('NewAddress_PostalCode').value = data.PostalCode;
+                    </text>
+                }
+            });
+        </script>
+    }
 }

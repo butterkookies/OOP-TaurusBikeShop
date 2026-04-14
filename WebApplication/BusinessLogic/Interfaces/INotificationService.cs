@@ -71,4 +71,35 @@ public interface INotificationService
         int? orderId = null,
         int? ticketId = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns a paginated list of notifications for the given user,
+    /// ordered by most recent first.
+    /// </summary>
+    Task<(IReadOnlyList<Models.Entities.Notification> Items, int TotalCount)>
+        GetNotificationsForUserAsync(
+            int userId, int page, int pageSize,
+            CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns the number of unread notifications for the given user.
+    /// </summary>
+    Task<int> GetUnreadCountAsync(
+        int userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Marks a single notification as read. Only succeeds if the
+    /// notification belongs to the given user.
+    /// </summary>
+    Task MarkAsReadAsync(
+        int notificationId, int userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Marks all unread notifications as read for the given user.
+    /// </summary>
+    Task MarkAllAsReadAsync(
+        int userId,
+        CancellationToken cancellationToken = default);
 }

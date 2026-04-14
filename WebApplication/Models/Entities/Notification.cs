@@ -115,6 +115,12 @@ public sealed class Notification
     /// <summary>UTC timestamp when this notification row was created.</summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    /// <summary>Whether the customer has seen this notification in the UI.</summary>
+    public bool IsRead { get; set; } = false;
+
+    /// <summary>UTC timestamp when the notification was marked as read. NULL until read.</summary>
+    public DateTime? ReadAt { get; set; }
+
     // -------------------------------------------------------------------------
     // Navigation properties
     // -------------------------------------------------------------------------

@@ -48,9 +48,10 @@ public sealed class VoucherController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Validate(
-        string code,
+        [FromBody] VoucherApplyRequest request,
         CancellationToken cancellationToken = default)
     {
+        string? code = request?.Code;
         if (string.IsNullOrWhiteSpace(code))
             return Json(ApiResponse.Fail("Please enter a voucher code."));
 

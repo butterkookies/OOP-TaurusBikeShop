@@ -11,6 +11,9 @@ namespace AdminSystem_v2.ViewModels
         private readonly IVoucherService _svc;
         private readonly IDialogService  _dialog;
 
+        /// <summary>True when the current user can create/edit/delete vouchers (Admin or Manager).</summary>
+        public bool CanEdit => RoleGuard.IsAdminOrManager(App.CurrentUser?.Role ?? string.Empty);
+
         // ── Active tab ────────────────────────────────────────────────────────
 
         private string _activeTab = "Vouchers";

@@ -23,6 +23,7 @@ public sealed class CustomerController : Controller
     private readonly IWishlistService _wishlistService;
     private readonly IReviewService _reviewService;
     private readonly ISupportService _supportService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<CustomerController> _logger;
 
     private const string TempDataRegisterVm  = "RegisterViewModel";
@@ -35,14 +36,16 @@ public sealed class CustomerController : Controller
         IWishlistService wishlistService,
         IReviewService reviewService,
         ISupportService supportService,
+        INotificationService notificationService,
         ILogger<CustomerController> logger)
     {
-        _userService     = userService     ?? throw new ArgumentNullException(nameof(userService));
-        _orderService    = orderService    ?? throw new ArgumentNullException(nameof(orderService));
-        _wishlistService = wishlistService ?? throw new ArgumentNullException(nameof(wishlistService));
-        _reviewService   = reviewService   ?? throw new ArgumentNullException(nameof(reviewService));
-        _supportService  = supportService  ?? throw new ArgumentNullException(nameof(supportService));
-        _logger          = logger          ?? throw new ArgumentNullException(nameof(logger));
+        _userService          = userService          ?? throw new ArgumentNullException(nameof(userService));
+        _orderService         = orderService         ?? throw new ArgumentNullException(nameof(orderService));
+        _wishlistService      = wishlistService      ?? throw new ArgumentNullException(nameof(wishlistService));
+        _reviewService        = reviewService        ?? throw new ArgumentNullException(nameof(reviewService));
+        _supportService       = supportService       ?? throw new ArgumentNullException(nameof(supportService));
+        _notificationService  = notificationService  ?? throw new ArgumentNullException(nameof(notificationService));
+        _logger               = logger               ?? throw new ArgumentNullException(nameof(logger));
     }
 
     // =========================================================================
@@ -432,12 +435,14 @@ public sealed class CustomerController : Controller
     [Authorize]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddAddress(
-        ProfileViewModel.NewAddressModel model,
+        [Bind(Prefix = "NewAddress")] ProfileViewModel.NewAddressModel model,
         CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
             TempData["error"] = "Please correct the address form errors.";
+            TempData["ReopenAddressModal"] = true;
+            TempData["AddressForm"] = System.Text.Json.JsonSerializer.Serialize(model);
             return RedirectToAction(nameof(Profile));
         }
 
@@ -446,13 +451,23 @@ public sealed class CustomerController : Controller
         try
         {
             ServiceResult result = await _userService.AddAddressAsync(userId, model, cancellationToken);
-            TempData[result.IsSuccess ? "success" : "error"] =
-                result.IsSuccess ? "Address added successfully." : result.Error;
+            if (!result.IsSuccess)
+            {
+                TempData["error"] = result.Error;
+                TempData["ReopenAddressModal"] = true;
+                TempData["AddressForm"] = System.Text.Json.JsonSerializer.Serialize(model);
+            }
+            else
+            {
+                TempData["success"] = "Address added successfully.";
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "AddAddress failed for user {UserId}.", userId);
             TempData["error"] = "An unexpected error occurred.";
+            TempData["ReopenAddressModal"] = true;
+            TempData["AddressForm"] = System.Text.Json.JsonSerializer.Serialize(model);
         }
 
         return RedirectToAction(nameof(Profile));
@@ -506,6 +521,81 @@ public sealed class CustomerController : Controller
         }
 
         return RedirectToAction(nameof(Profile));
+    }
+
+    // =========================================================================
+    // Notifications
+    // =========================================================================
+
+    /// <summary>GET /Customer/Notifications — paginated notification history.</summary>
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> Notifications(
+        int page = 1, CancellationToken cancellationToken = default)
+    {
+        int userId = GetCurrentUserId();
+        const int pageSize = 20;
+
+        (IReadOnlyList<Models.Entities.Notification> items, int totalCount) =
+            await _notificationService.GetNotificationsForUserAsync(
+                userId, page, pageSize, cancellationToken);
+
+        int unreadCount = await _notificationService.GetUnreadCountAsync(
+            userId, cancellationToken);
+
+        NotificationListViewModel vm = new()
+        {
+            Notifications = items.Select(n => new NotificationViewModel
+            {
+                NotificationId = n.NotificationId,
+                NotifType      = n.NotifType,
+                Subject        = n.Subject,
+                Body           = n.Body,
+                Status         = n.Status,
+                IsRead         = n.IsRead,
+                CreatedAt      = n.CreatedAt,
+                OrderId        = n.OrderId,
+                TicketId       = n.TicketId
+            }).ToList().AsReadOnly(),
+            TotalCount   = totalCount,
+            CurrentPage  = page,
+            PageSize     = pageSize,
+            UnreadCount  = unreadCount
+        };
+
+        ViewData["Title"] = "Notifications";
+        return View(vm);
+    }
+
+    /// <summary>GET /Customer/NotificationCount — JSON endpoint for AJAX badge.</summary>
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> NotificationCount(CancellationToken cancellationToken)
+    {
+        int userId = GetCurrentUserId();
+        int count = await _notificationService.GetUnreadCountAsync(userId, cancellationToken);
+        return Json(new { count });
+    }
+
+    /// <summary>POST /Customer/MarkNotificationRead — marks a single notification as read.</summary>
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> MarkNotificationRead(
+        int notificationId, CancellationToken cancellationToken)
+    {
+        int userId = GetCurrentUserId();
+        await _notificationService.MarkAsReadAsync(notificationId, userId, cancellationToken);
+        return RedirectToAction(nameof(Notifications));
+    }
+
+    /// <summary>POST /Customer/MarkAllNotificationsRead — marks all notifications as read.</summary>
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> MarkAllNotificationsRead(CancellationToken cancellationToken)
+    {
+        int userId = GetCurrentUserId();
+        await _notificationService.MarkAllAsReadAsync(userId, cancellationToken);
+        return RedirectToAction(nameof(Notifications));
     }
 
     // =========================================================================

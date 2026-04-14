@@ -67,6 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const wishlistBtn = e.target.closest('.wishlist-toggle');
         if (!wishlistBtn) return;
 
+        e.stopPropagation();
+        e.preventDefault();
+
         const productId = wishlistBtn.dataset.productId;
         if (!productId) return;
 
@@ -112,6 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', async e => {
         const cartBtn = e.target.closest('.catalog-add-to-cart');
         if (!cartBtn) return;
+
+        e.stopPropagation();
+        e.preventDefault();
 
         const productId = cartBtn.dataset.productId;
         if (!productId) return;

@@ -1,3 +1,4 @@
+using AdminSystem_v2.Helpers;
 using AdminSystem_v2.Models;
 using AdminSystem_v2.Repositories;
 
@@ -8,6 +9,8 @@ namespace AdminSystem_v2.Services
         private readonly IVoucherRepository _repo;
 
         public VoucherService(IVoucherRepository repo) => _repo = repo;
+
+        private static string CallerRole => App.CurrentUser?.Role ?? string.Empty;
 
         public Task<IEnumerable<VoucherListItem>> GetAllVouchersAsync()
             => _repo.GetAllAsync();
@@ -24,6 +27,8 @@ namespace AdminSystem_v2.Services
             DateTime? endDate,
             bool     isActive)
         {
+            RoleGuard.RequireAdminOrManager(CallerRole);
+
             var (valid, validationError) = Validate(
                 code, discountType, discountValue, startDate, endDate, 0);
             if (!valid) return (false, validationError);
@@ -50,6 +55,8 @@ namespace AdminSystem_v2.Services
             DateTime? endDate,
             bool     isActive)
         {
+            RoleGuard.RequireAdminOrManager(CallerRole);
+
             var (valid, validationError) = Validate(
                 code, discountType, discountValue, startDate, endDate, voucherId);
             if (!valid) return (false, validationError);
@@ -63,8 +70,17 @@ namespace AdminSystem_v2.Services
             return (true, string.Empty);
         }
 
-        public Task DeactivateVoucherAsync(int voucherId) => _repo.SetActiveAsync(voucherId, false);
-        public Task ActivateVoucherAsync(int voucherId)   => _repo.SetActiveAsync(voucherId, true);
+        public Task DeactivateVoucherAsync(int voucherId)
+        {
+            RoleGuard.RequireAdminOrManager(CallerRole);
+            return _repo.SetActiveAsync(voucherId, false);
+        }
+
+        public Task ActivateVoucherAsync(int voucherId)
+        {
+            RoleGuard.RequireAdminOrManager(CallerRole);
+            return _repo.SetActiveAsync(voucherId, true);
+        }
 
         public Task<IEnumerable<VoucherUserRow>> SearchUsersAsync(string search)
             => _repo.SearchUsersAsync(search);
@@ -79,6 +95,8 @@ namespace AdminSystem_v2.Services
             bool                        sendInApp,
             bool                        sendEmail)
         {
+            RoleGuard.RequireAdminOrManager(CallerRole);
+
             var userList = users.ToList();
             if (userList.Count == 0) return (0, "No customers selected.");
 

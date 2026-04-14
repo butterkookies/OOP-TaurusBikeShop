@@ -1,5 +1,6 @@
 // WebApplication/BusinessLogic/Services/NotificationService.cs
 
+using Microsoft.EntityFrameworkCore;
 using WebApplication.BusinessLogic.Interfaces;
 using WebApplication.DataAccess.Context;
 using WebApplication.Models.Entities;
@@ -77,5 +78,67 @@ public sealed class NotificationService : INotificationService
 
         await _context.Notifications.AddAsync(notification, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task<(IReadOnlyList<Notification> Items, int TotalCount)>
+        GetNotificationsForUserAsync(
+            int userId, int page, int pageSize,
+            CancellationToken cancellationToken = default)
+    {
+        IQueryable<Notification> query = _context.Notifications
+            .AsNoTracking()
+            .Where(n => n.UserId == userId)
+            .OrderByDescending(n => n.CreatedAt);
+
+        int totalCount = await query.CountAsync(cancellationToken);
+
+        IReadOnlyList<Notification> items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
+    }
+
+    /// <inheritdoc/>
+    public async Task<int> GetUnreadCountAsync(
+        int userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Notifications
+            .AsNoTracking()
+            .CountAsync(n => n.UserId == userId && !n.IsRead, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task MarkAsReadAsync(
+        int notificationId, int userId,
+        CancellationToken cancellationToken = default)
+    {
+        Notification? notification = await _context.Notifications
+            .FirstOrDefaultAsync(
+                n => n.NotificationId == notificationId && n.UserId == userId,
+                cancellationToken);
+
+        if (notification is null || notification.IsRead) return;
+
+        notification.IsRead = true;
+        notification.ReadAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task MarkAllAsReadAsync(
+        int userId,
+        CancellationToken cancellationToken = default)
+    {
+        await _context.Notifications
+            .Where(n => n.UserId == userId && !n.IsRead)
+            .ExecuteUpdateAsync(
+                s => s
+                    .SetProperty(n => n.IsRead, true)
+                    .SetProperty(n => n.ReadAt, DateTime.UtcNow),
+                cancellationToken);
     }
 }

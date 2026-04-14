@@ -19,6 +19,8 @@ public sealed class UserService : IUserService
 {
     private readonly UserRepository _userRepo;
     private readonly INotificationService _notifications;
+    private readonly IEmailSender _emailSender;
+    private readonly ILogger<UserService> _logger;
 
     private const int OTPExpiryMinutes = 10;
     private const int OTPLength = 6;
@@ -26,10 +28,14 @@ public sealed class UserService : IUserService
     /// <inheritdoc/>
     public UserService(
         UserRepository userRepo,
-        INotificationService notifications)
+        INotificationService notifications,
+        IEmailSender emailSender,
+        ILogger<UserService> logger)
     {
         _userRepo      = userRepo      ?? throw new ArgumentNullException(nameof(userRepo));
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        _emailSender   = emailSender   ?? throw new ArgumentNullException(nameof(emailSender));
+        _logger        = logger        ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <inheritdoc/>
@@ -54,10 +60,26 @@ public sealed class UserService : IUserService
         string code = GenerateOTPCode();
         DateTime expiresAt = DateTime.UtcNow.AddMinutes(OTPExpiryMinutes);
 
-        // Store the OTP in OTPVerification — delivery is handled
-        // exclusively through the OTPVerification table, not the
-        // Notification queue (Notification requires a valid UserId).
+        // Store the OTP in OTPVerification (Notification queue requires
+        // a valid UserId, which doesn't exist yet during registration).
         await _userRepo.CreateOTPAsync(vm.Email, code, expiresAt, cancellationToken);
+
+        // Send OTP code directly via Gmail SMTP
+        try
+        {
+            await _emailSender.SendAsync(
+                vm.Email,
+                "Your Taurus Bike Shop Verification Code",
+                $"<h2>Your verification code is: <strong>{code}</strong></h2>" +
+                $"<p>This code expires in {OTPExpiryMinutes} minutes.</p>" +
+                $"<p>If you did not request this code, please ignore this email.</p>",
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send OTP email to {Email}.", vm.Email);
+            return ServiceResult.Fail("Unable to send verification email. Please try again.");
+        }
 
         return ServiceResult.Ok();
     }
@@ -69,12 +91,22 @@ public sealed class UserService : IUserService
         RegisterViewModel vm,
         CancellationToken cancellationToken = default)
     {
-        // Verify OTP
-        bool valid = await _userRepo.VerifyOTPAsync(email, code, cancellationToken);
-        if (!valid)
+        // ── Step 1: Find and validate the OTP (read-only, no save yet) ────
+        var otp = await _userRepo.Context.OTPVerifications
+            .FirstOrDefaultAsync(
+                o => o.Email == email
+                  && o.OTPCode == code
+                  && !o.IsUsed
+                  && o.ExpiresAt > DateTime.UtcNow,
+                cancellationToken);
+
+        if (otp is null)
             return ServiceResult<User>.Fail("Invalid or expired verification code.");
 
-        // Create User
+        // Mark OTP as used — will be persisted in the single SaveChanges below
+        otp.IsUsed = true;
+
+        // ── Step 2: Create User (track only, no save yet) ─────────────────
         User user = new()
         {
             Email        = vm.Email,
@@ -87,12 +119,12 @@ public sealed class UserService : IUserService
             CreatedAt    = DateTime.UtcNow
         };
 
-        await _userRepo.AddAsync(user, cancellationToken);
+        await _userRepo.Context.Users.AddAsync(user, cancellationToken);
 
-        // Create default Address
+        // ── Step 3: Create default Address (track only, no save yet) ──────
         Address address = new()
         {
-            UserId     = user.UserId,
+            User       = user,
             Label      = AddressLabels.Home,
             Street     = vm.Street.Trim(),
             City       = vm.City.Trim(),
@@ -106,19 +138,29 @@ public sealed class UserService : IUserService
 
         await _userRepo.Context.Addresses.AddAsync(address, cancellationToken);
 
-        // Set default address FK
+        // ── Step 4: Single atomic save — OTP + User + Address ─────────────
+        await _userRepo.Context.SaveChangesAsync(cancellationToken);
+
+        // Set default address FK now that IDs are generated
         user.DefaultAddressId = address.AddressId;
         await _userRepo.Context.SaveChangesAsync(cancellationToken);
 
-        // Queue Welcome Email
-        await _notifications.QueueAsync(
-            channel:   NotifChannels.Email,
-            notifType: NotifTypes.WelcomeEmail,
-            recipient: user.Email!,
-            subject:   "Welcome to Taurus Bike Shop!",
-            body:      $"Hi {user.FirstName}, your account has been created successfully. Start shopping at Taurus Bike Shop!",
-            userId:    user.UserId,
-            cancellationToken: cancellationToken);
+        // ── Step 5: Queue Welcome Email (non-blocking — don't fail registration) ──
+        try
+        {
+            await _notifications.QueueAsync(
+                channel:   NotifChannels.Email,
+                notifType: NotifTypes.WelcomeEmail,
+                recipient: user.Email!,
+                subject:   "Welcome to Taurus Bike Shop!",
+                body:      $"Hi {user.FirstName}, your account has been created successfully. Start shopping at Taurus Bike Shop!",
+                userId:    user.UserId,
+                cancellationToken: cancellationToken);
+        }
+        catch
+        {
+            // Notification failure must not block successful registration
+        }
 
         return ServiceResult<User>.Ok(user);
     }
@@ -135,9 +177,25 @@ public sealed class UserService : IUserService
         string code = GenerateOTPCode();
         DateTime expiresAt = DateTime.UtcNow.AddMinutes(OTPExpiryMinutes);
 
-        // Store the new OTP in OTPVerification — delivery is handled
-        // exclusively through the OTPVerification table.
+        // Store the new OTP in OTPVerification
         await _userRepo.CreateOTPAsync(email, code, expiresAt, cancellationToken);
+
+        // Send OTP code directly via Gmail SMTP
+        try
+        {
+            await _emailSender.SendAsync(
+                email,
+                "Your Taurus Bike Shop Verification Code",
+                $"<h2>Your verification code is: <strong>{code}</strong></h2>" +
+                $"<p>This code expires in {OTPExpiryMinutes} minutes.</p>" +
+                $"<p>If you did not request this code, please ignore this email.</p>",
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to resend OTP email to {Email}.", email);
+            return ServiceResult.Fail("Unable to send verification email. Please try again.");
+        }
 
         return ServiceResult.Ok();
     }

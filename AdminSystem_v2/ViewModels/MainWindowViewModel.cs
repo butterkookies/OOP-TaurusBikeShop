@@ -19,10 +19,11 @@ namespace AdminSystem_v2.ViewModels
 
         // ── Session ───────────────────────────────────────────────────────
 
-        public string UserFullName { get; }
-        public string UserInitials { get; }
-        public string UserRole     { get; }
-        public bool   IsAdmin      => UserRole == RoleNames.Admin;
+        public string UserFullName    { get; }
+        public string UserInitials    { get; }
+        public string UserRole        { get; }
+        public bool   IsAdmin         => UserRole == RoleNames.Admin;
+        public bool   IsAdminOrManager => UserRole == RoleNames.Admin || UserRole == RoleNames.Manager;
 
         // ── Navigation State ──────────────────────────────────────────────
 

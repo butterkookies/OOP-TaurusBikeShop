@@ -67,7 +67,8 @@ public sealed class ProfileViewModel
         public string City { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Postal code is required.")]
-        [MaxLength(20)]
+        [RegularExpression(@"^\d{4}$", ErrorMessage = "Postal code must be exactly 4 digits.")]
+        [MaxLength(4)]
         [Display(Name = "Postal Code")]
         public string PostalCode { get; set; } = string.Empty;
 

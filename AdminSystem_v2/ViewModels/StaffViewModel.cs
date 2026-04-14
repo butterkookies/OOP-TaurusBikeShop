@@ -9,6 +9,7 @@ namespace AdminSystem_v2.ViewModels
     public class StaffViewModel : BaseViewModel
     {
         private readonly IUserService _userService;
+        private readonly IDialogService _dialog;
 
         // ── Master list ───────────────────────────────────────────────────────
 
@@ -84,6 +85,12 @@ namespace AdminSystem_v2.ViewModels
             private set => SetProperty(ref _isDetailVisible, value);
         }
 
+        /// <summary>True when the selected user is the currently logged-in admin (self).</summary>
+        public bool IsSelectedSelf =>
+            _selectedUser != null &&
+            App.CurrentUser != null &&
+            _selectedUser.UserId == App.CurrentUser.UserId;
+
         // ── Role edit (detail panel) ──────────────────────────────────────────
 
         private string _selectedRole = string.Empty;
@@ -146,9 +153,10 @@ namespace AdminSystem_v2.ViewModels
 
         // ── Constructor ───────────────────────────────────────────────────────
 
-        public StaffViewModel(IUserService userService)
+        public StaffViewModel(IUserService userService, IDialogService dialog)
         {
             _userService = userService;
+            _dialog = dialog;
 
             RefreshCommand        = new RelayCommand(async () => await LoadAsync());
             SelectRoleCommand     = new RelayCommand<string>(r => SelectedRoleFilter = r ?? "All");
@@ -194,6 +202,7 @@ namespace AdminSystem_v2.ViewModels
             SelectedRole     = user?.Role ?? string.Empty;
             NewPasswordText  = string.Empty;
             ClearMessages();
+            OnPropertyChanged(nameof(IsSelectedSelf));
         }
 
         // ── Create staff ──────────────────────────────────────────────────────
@@ -253,6 +262,9 @@ namespace AdminSystem_v2.ViewModels
         {
             if (_selectedUser == null) return;
 
+            if (!_dialog.PromptCredentials($"change {_selectedUser.FullName}'s role to {SelectedRole}"))
+                return;
+
             IsLoading = true;
             ClearMessages();
             try
@@ -291,6 +303,13 @@ namespace AdminSystem_v2.ViewModels
             if (_selectedUser == null) return;
 
             bool newState = !_selectedUser.IsActive;
+            string action = newState
+                ? $"activate {_selectedUser.FullName}'s account"
+                : $"deactivate {_selectedUser.FullName}'s account";
+
+            if (!_dialog.PromptCredentials(action))
+                return;
+
             IsLoading = true;
             ClearMessages();
             try
@@ -319,6 +338,9 @@ namespace AdminSystem_v2.ViewModels
             if (_selectedUser == null || string.IsNullOrWhiteSpace(NewPasswordText)) return;
             if (NewPasswordText.Length < 8)
             { ShowError("New password must be at least 8 characters."); return; }
+
+            if (!_dialog.PromptCredentials($"reset {_selectedUser.FullName}'s password"))
+                return;
 
             IsLoading = true;
             ClearMessages();

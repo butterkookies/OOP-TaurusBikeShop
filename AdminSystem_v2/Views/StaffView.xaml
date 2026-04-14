@@ -6,6 +6,7 @@
 
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolVis"/>
+        <converters:InverseBoolConverter      x:Key="InverseBool"/>
         <converters:EqualityConverter         x:Key="EqualityConverter"/>
 
         <!-- ── Role chip style ── -->
@@ -207,19 +208,29 @@
                 <!-- Search box -->
                 <Border Grid.Row="1" Background="#1F2937" Padding="10,8"
                         BorderBrush="#374151" BorderThickness="0,0,0,1">
-                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FormTextBox}"
-                             Tag="Search by name or email...">
-                        <TextBox.Resources>
-                            <Style TargetType="TextBox" BasedOn="{StaticResource FormTextBox}">
-                                <Style.Triggers>
-                                    <Trigger Property="Text" Value="">
-                                        <Setter Property="Background" Value="Transparent"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBox.Resources>
-                    </TextBox>
+                    <Grid>
+                        <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource FormTextBox}"
+                                 x:Name="StaffSearchBox"/>
+                        <TextBlock Text="Search by name or email..."
+                                   Foreground="#4B5563" FontSize="13"
+                                   Margin="12,0" VerticalAlignment="Center"
+                                   IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SearchText}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SearchText}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
                 </Border>
 
                 <!-- User list -->
@@ -403,6 +414,12 @@
                                 Margin="0,0,0,16" BorderThickness="1" BorderBrush="#374151">
                             <StackPanel>
                                 <TextBlock Text="ROLE" Style="{StaticResource SectionLabel}"/>
+                                <!-- Self-edit warning -->
+                                <TextBlock Text="You cannot change your own role."
+                                           Foreground="#FBBF24" FontSize="12" Margin="0,0,0,8"
+                                           Visibility="{Binding DataContext.IsSelectedSelf,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl},
+                                                        Converter={StaticResource BoolVis}}"/>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -414,12 +431,18 @@
                                                             RelativeSource={RelativeSource AncestorType=UserControl}}"
                                               SelectedItem="{Binding DataContext.SelectedRole,
                                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                              Style="{StaticResource FormComboBox}"/>
+                                              Style="{StaticResource FormComboBox}"
+                                              IsEnabled="{Binding DataContext.IsSelectedSelf,
+                                                          RelativeSource={RelativeSource AncestorType=UserControl},
+                                                          Converter={StaticResource InverseBool}}"/>
                                     <Button Grid.Column="2"
                                             Content="Save Role"
                                             Command="{Binding DataContext.SaveRoleCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            Style="{StaticResource PrimaryButton}"/>
+                                            Style="{StaticResource PrimaryButton}"
+                                            IsEnabled="{Binding DataContext.IsSelectedSelf,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl},
+                                                        Converter={StaticResource InverseBool}}"/>
                                 </Grid>
                             </StackPanel>
                         </Border>
@@ -466,9 +489,20 @@
                                     </StackPanel>
                                 </StackPanel>
 
+                                <!-- Self-deactivation warning -->
+                                <TextBlock Grid.Column="1"
+                                           Text="You cannot deactivate your own account."
+                                           Foreground="#FBBF24" FontSize="12"
+                                           VerticalAlignment="Center" Margin="0,0,8,0"
+                                           Visibility="{Binding DataContext.IsSelectedSelf,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl},
+                                                        Converter={StaticResource BoolVis}}"/>
                                 <Button Grid.Column="1"
                                         Command="{Binding DataContext.ToggleActiveCommand,
                                                   RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        IsEnabled="{Binding DataContext.IsSelectedSelf,
+                                                    RelativeSource={RelativeSource AncestorType=UserControl},
+                                                    Converter={StaticResource InverseBool}}"
                                         VerticalAlignment="Center">
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
@@ -491,6 +525,12 @@
                                 Margin="0,0,0,16" BorderThickness="1" BorderBrush="#374151">
                             <StackPanel>
                                 <TextBlock Text="RESET PASSWORD" Style="{StaticResource SectionLabel}"/>
+                                <!-- Self-reset warning -->
+                                <TextBlock Text="You cannot reset your own password from here."
+                                           Foreground="#FBBF24" FontSize="12" Margin="0,0,0,8"
+                                           Visibility="{Binding DataContext.IsSelectedSelf,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl},
+                                                        Converter={StaticResource BoolVis}}"/>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -502,12 +542,18 @@
                                                     RelativeSource={RelativeSource AncestorType=UserControl},
                                                     UpdateSourceTrigger=PropertyChanged}"
                                              Style="{StaticResource FormTextBox}"
-                                             Tag="New password (min. 8 chars)"/>
+                                             Tag="New password (min. 8 chars)"
+                                             IsEnabled="{Binding DataContext.IsSelectedSelf,
+                                                         RelativeSource={RelativeSource AncestorType=UserControl},
+                                                         Converter={StaticResource InverseBool}}"/>
                                     <Button Grid.Column="2"
                                             Content="Reset Password"
                                             Command="{Binding DataContext.ResetPasswordCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            Style="{StaticResource DangerButton}"/>
+                                            Style="{StaticResource DangerButton}"
+                                            IsEnabled="{Binding DataContext.IsSelectedSelf,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl},
+                                                        Converter={StaticResource InverseBool}}"/>
                                 </Grid>
                             </StackPanel>
                         </Border>

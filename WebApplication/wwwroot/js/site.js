@@ -49,6 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshCartBadge();
 
     // =========================================================================
+    // Notification badge — load count on every page + poll every 60s
+    // =========================================================================
+    refreshNotificationBadge();
+    setInterval(refreshNotificationBadge, 60000);
+
+    // =========================================================================
     // Anti-forgery token meta tag for fetchWithCSRF
     // Injects a standalone CSRF token on pages that have no visible form,
     // so AJAX calls still work correctly.
@@ -79,6 +85,30 @@ async function refreshCartBadge() {
         const count = data?.data?.count ?? 0;
         badge.textContent = count > 0 ? count : '';
         badge.style.display = count > 0 ? '' : 'none';
+    } catch {
+        // Non-fatal — badge stays at its last known value
+    }
+}
+
+// =============================================================================
+// Notification badge refresh
+// Calls CustomerController.NotificationCount and updates #notification-badge.
+// Called on page load and then polled every 60 seconds.
+// =============================================================================
+async function refreshNotificationBadge() {
+    const badge = document.getElementById('notification-badge');
+    if (!badge) return;
+
+    try {
+        const response = await fetch('/Customer/NotificationCount', {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        const count = data?.count ?? 0;
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.classList.toggle('hidden', count <= 0);
     } catch {
         // Non-fatal — badge stays at its last known value
     }

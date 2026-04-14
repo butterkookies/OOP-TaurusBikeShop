@@ -214,11 +214,30 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Search box -->
-                        <TextBox Grid.Column="0"
-                                 Text="{Binding ListSearch, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource FormTextBox}"
-                                 Height="40"/>
+                        <!-- Search box with placeholder overlay -->
+                        <Grid Grid.Column="0">
+                            <TextBox Text="{Binding ListSearch, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource FormTextBox}"
+                                     x:Name="VoucherListSearch"/>
+                            <TextBlock Text="Search vouchers by code..."
+                                       Foreground="#4B5563" FontSize="13"
+                                       Margin="12,0" VerticalAlignment="Center"
+                                       IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ListSearch}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ListSearch}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
 
                         <Button Grid.Column="1"
                                 Command="{Binding RefreshCommand}"
@@ -632,9 +651,28 @@
                                 <StackPanel Grid.Row="0">
                                     <TextBlock Text="SEARCH CUSTOMERS" Style="{StaticResource FieldLabel}"/>
                                     <Grid>
-                                        <TextBox Text="{Binding UserSearch, UpdateSourceTrigger=PropertyChanged}"
-                                                 Style="{StaticResource FormTextBox}"
-                                                 Height="38"/>
+                                        <Grid>
+                                            <TextBox Text="{Binding UserSearch, UpdateSourceTrigger=PropertyChanged}"
+                                                     Style="{StaticResource FormTextBox}"/>
+                                            <TextBlock Text="Search users..."
+                                                       Foreground="#4B5563" FontSize="13"
+                                                       Margin="12,0" VerticalAlignment="Center"
+                                                       IsHitTestVisible="False">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding UserSearch}" Value="">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding UserSearch}" Value="{x:Null}">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
                                         <!-- Dropdown results -->
                                         <Border Margin="0,38,0,0" Panel.ZIndex="20"
                                                 Background="#1F2937" BorderBrush="#374151"

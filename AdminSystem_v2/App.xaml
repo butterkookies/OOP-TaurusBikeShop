@@ -50,8 +50,10 @@
             <Setter Property="SelectionOpacity"  Value="0.3"/>
             <Setter Property="BorderBrush"       Value="#374151"/>
             <Setter Property="BorderThickness"   Value="1"/>
-            <Setter Property="Padding"           Value="10,8"/>
-            <Setter Property="FontSize"          Value="13"/>
+            <Setter Property="Padding"           Value="12,10"/>
+            <Setter Property="FontSize"          Value="14"/>
+            <Setter Property="FontFamily"        Value="Segoe UI, Inter, Arial"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
@@ -60,14 +62,13 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="6"
-                                SnapsToDevicePixels="True">
+                                SnapsToDevicePixels="True"
+                                Padding="{TemplateBinding Padding}">
                             <ScrollViewer x:Name="PART_ContentHost"
                                           Focusable="False"
                                           HorizontalScrollBarVisibility="Hidden"
                                           VerticalScrollBarVisibility="Hidden"
-                                          Margin="{TemplateBinding Padding}"
-                                          VerticalAlignment="Stretch"
-                                          HorizontalAlignment="Stretch"/>
+                                          VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
@@ -75,6 +76,9 @@
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="#4B5563"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.5"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -151,6 +155,101 @@
                     </Style>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <!-- ── DatePicker (dark theme) ──────────────────────────────────── -->
+        <Style TargetType="DatePickerTextBox">
+            <Setter Property="Background"  Value="#111827"/>
+            <Setter Property="Foreground"  Value="#F9FAFB"/>
+            <Setter Property="CaretBrush"  Value="#3B82F6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"     Value="4,2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DatePickerTextBox">
+                        <Grid>
+                            <Grid.Resources>
+                                <SolidColorBrush x:Key="WatermarkBrush" Color="#6B7280"/>
+                            </Grid.Resources>
+                            <Border Background="{TemplateBinding Background}"
+                                    Padding="{TemplateBinding Padding}">
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              HorizontalScrollBarVisibility="Hidden"
+                                              VerticalScrollBarVisibility="Hidden"
+                                              VerticalAlignment="Center"/>
+                            </Border>
+                            <ContentControl x:Name="PART_Watermark"
+                                            Focusable="False" IsHitTestVisible="False"
+                                            Opacity="0" Padding="4,2"
+                                            VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="DatePicker">
+            <Setter Property="Background"      Value="#111827"/>
+            <Setter Property="Foreground"      Value="#F9FAFB"/>
+            <Setter Property="BorderBrush"     Value="#374151"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"         Value="6,4"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="CalendarStyle"   Value="{DynamicResource DarkCalendarStyle}"/>
+        </Style>
+
+        <!-- Calendar popup — white/light background so numbers are visible -->
+        <Style x:Key="DarkCalendarStyle" TargetType="Calendar">
+            <Setter Property="Background"  Value="White"/>
+            <Setter Property="Foreground"  Value="#1F2937"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+        </Style>
+
+        <Style TargetType="Calendar">
+            <Setter Property="Background"  Value="White"/>
+            <Setter Property="Foreground"  Value="#1F2937"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+        </Style>
+
+        <Style TargetType="CalendarDayButton">
+            <Setter Property="Background"  Value="Transparent"/>
+            <Setter Property="Foreground"  Value="#1F2937"/>
+            <Setter Property="FontSize"    Value="12"/>
+            <Style.Triggers>
+                <Trigger Property="IsToday" Value="True">
+                    <Setter Property="Background" Value="#DBEAFE"/>
+                    <Setter Property="Foreground" Value="#1E40AF"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#3B82F6"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsBlackedOut" Value="True">
+                    <Setter Property="Foreground" Value="#D1D5DB"/>
+                </Trigger>
+                <Trigger Property="IsInactive" Value="True">
+                    <Setter Property="Foreground" Value="#9CA3AF"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E5E7EB"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="CalendarButton">
+            <Setter Property="Background"  Value="Transparent"/>
+            <Setter Property="Foreground"  Value="#1F2937"/>
+            <Setter Property="FontSize"    Value="12"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E5E7EB"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="CalendarItem">
+            <Setter Property="Background"  Value="White"/>
+            <Setter Property="Foreground"  Value="#1F2937"/>
         </Style>
 
         <!-- ── Button styles ────────────────────────────────────────────── -->

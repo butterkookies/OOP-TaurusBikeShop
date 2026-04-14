@@ -76,7 +76,7 @@ namespace AdminSystem_v2
             var productVm   = new ProductViewModel(productSvc);
             var orderVm     = new OrderViewModel(orderSvc, dialogSvc);
             var reportVm    = new ReportViewModel(reportSvc);
-            var staffVm     = new StaffViewModel(userSvc);
+            var staffVm     = new StaffViewModel(userSvc, dialogSvc);
             var posVm       = new POSViewModel(posSvc);
             var voucherVm   = new VoucherViewModel(voucherSvc, dialogSvc);
 

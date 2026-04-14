@@ -1,7 +1,9 @@
 // WebApplication/BusinessLogic/Services/SupportService.cs
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using WebApplication.BusinessLogic.Interfaces;
+using WebApplication.DataAccess.Context;
 using WebApplication.DataAccess.Repositories;
 using WebApplication.Models.Entities;
 using WebApplication.Models.ViewModels;
@@ -17,14 +19,20 @@ public sealed class SupportService : ISupportService
 {
     private readonly SupportRepository       _supportRepo;
     private readonly FileUploadHelper?       _fileUpload;
+    private readonly INotificationService    _notifications;
+    private readonly AppDbContext            _context;
     private readonly ILogger<SupportService> _logger;
 
     public SupportService(
-        SupportRepository supportRepo, FileUploadHelper? fileUpload, ILogger<SupportService> logger)
+        SupportRepository supportRepo, FileUploadHelper? fileUpload,
+        INotificationService notifications, AppDbContext context,
+        ILogger<SupportService> logger)
     {
-        _supportRepo = supportRepo ?? throw new ArgumentNullException(nameof(supportRepo));
-        _fileUpload  = fileUpload; // null when GCS credentials are not configured locally
-        _logger      = logger      ?? throw new ArgumentNullException(nameof(logger));
+        _supportRepo   = supportRepo   ?? throw new ArgumentNullException(nameof(supportRepo));
+        _fileUpload    = fileUpload; // null when GCS credentials are not configured locally
+        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        _context       = context       ?? throw new ArgumentNullException(nameof(context));
+        _logger        = logger        ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<IReadOnlyList<SupportTicketListItemViewModel>> GetUserTicketsAsync(
@@ -164,6 +172,34 @@ public sealed class SupportService : ISupportService
             };
 
             await _supportRepo.AddReplyAsync(reply, cancellationToken);
+
+            // Queue SupportTicketReply notification (non-critical)
+            try
+            {
+                User? user = await _context.Users.AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
+                if (user?.Email != null)
+                {
+                    await _notifications.QueueAsync(
+                        channel:   NotifChannels.Email,
+                        notifType: NotifTypes.SupportTicketReply,
+                        recipient: user.Email,
+                        subject:   $"Reply sent — Ticket #{ticketId}: {ticket.Subject}",
+                        body:      $"Hi {user.FirstName}, your reply to support ticket \"" +
+                                   $"{ticket.Subject}\" has been recorded. Our team will " +
+                                   $"respond as soon as possible.\n\n— Taurus Bike Shop",
+                        userId:    userId,
+                        ticketId:  ticketId,
+                        cancellationToken: cancellationToken);
+                }
+            }
+            catch (Exception notifEx)
+            {
+                _logger.LogWarning(notifEx,
+                    "Failed to queue SupportTicketReply notification for ticket {TicketId}.",
+                    ticketId);
+            }
+
             return ServiceResult.Ok();
         }
         catch (Exception ex)
@@ -216,6 +252,36 @@ public sealed class SupportService : ISupportService
             };
 
             SupportTicket created = await _supportRepo.CreateTicketAsync(ticket, cancellationToken);
+
+            // Queue SupportTicketCreated notification (non-critical)
+            try
+            {
+                User? user = await _context.Users.AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
+                if (user?.Email != null)
+                {
+                    await _notifications.QueueAsync(
+                        channel:   NotifChannels.Email,
+                        notifType: NotifTypes.SupportTicketCreated,
+                        recipient: user.Email,
+                        subject:   $"Support ticket created — #{created.TicketId}: {subject.Trim()}",
+                        body:      $"Hi {user.FirstName}, your support ticket has been created " +
+                                   $"and our team will review it shortly.\n\n" +
+                                   $"Category: {category.Trim()}\n" +
+                                   $"Subject: {subject.Trim()}\n\n" +
+                                   $"— Taurus Bike Shop",
+                        userId:    userId,
+                        ticketId:  created.TicketId,
+                        cancellationToken: cancellationToken);
+                }
+            }
+            catch (Exception notifEx)
+            {
+                _logger.LogWarning(notifEx,
+                    "Failed to queue SupportTicketCreated notification for ticket {TicketId}.",
+                    created.TicketId);
+            }
+
             return ServiceResult<int>.Ok(created.TicketId);
         }
         catch (InvalidOperationException ex)

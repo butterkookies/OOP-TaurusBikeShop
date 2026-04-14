@@ -1,3 +1,4 @@
+using AdminSystem_v2.Helpers;
 using AdminSystem_v2.Models;
 using AdminSystem_v2.Repositories;
 
@@ -12,6 +13,8 @@ namespace AdminSystem_v2.Services
             _productRepo = productRepo;
         }
 
+        private static string CallerRole => App.CurrentUser?.Role ?? string.Empty;
+
         public Task<IEnumerable<Product>> GetAllAsync()
             => _productRepo.GetAllAsync();
 
@@ -25,13 +28,22 @@ namespace AdminSystem_v2.Services
             => _productRepo.GetTotalCountAsync();
 
         public Task<int> CreateAsync(Product product)
-            => _productRepo.InsertAsync(product);
+        {
+            RoleGuard.RequireAdminOrManager(CallerRole);
+            return _productRepo.InsertAsync(product);
+        }
 
         public Task UpdateAsync(Product product)
-            => _productRepo.UpdateAsync(product);
+        {
+            RoleGuard.RequireAdminOrManager(CallerRole);
+            return _productRepo.UpdateAsync(product);
+        }
 
         public Task DeactivateAsync(int productId)
-            => _productRepo.DeleteAsync(productId);
+        {
+            RoleGuard.RequireAdminOrManager(CallerRole);
+            return _productRepo.DeleteAsync(productId);
+        }
 
         public Task AdjustStockAsync(int variantId, int qty,
             string changeType, string? notes = null)
@@ -45,6 +57,7 @@ namespace AdminSystem_v2.Services
 
         public Task AddVariantAsync(ProductVariant variant)
         {
+            RoleGuard.RequireAdminOrManager(CallerRole);
             if (string.IsNullOrWhiteSpace(variant.VariantName))
                 throw new ArgumentException("Variant name is required.");
             if (variant.StockQuantity < 0)
@@ -53,7 +66,10 @@ namespace AdminSystem_v2.Services
         }
 
         public Task UpdateVariantAsync(ProductVariant variant)
-            => _productRepo.UpdateVariantAsync(variant);
+        {
+            RoleGuard.RequireAdminOrManager(CallerRole);
+            return _productRepo.UpdateVariantAsync(variant);
+        }
 
         public Task<IEnumerable<Category>> GetAllCategoriesAsync()
             => _productRepo.GetAllCategoriesAsync();
@@ -66,12 +82,16 @@ namespace AdminSystem_v2.Services
 
         public Task<int> AddImageAsync(int productId, string imageUrl)
         {
+            RoleGuard.RequireAdminOrManager(CallerRole);
             if (string.IsNullOrWhiteSpace(imageUrl))
                 throw new ArgumentException("Image URL cannot be empty.");
             return _productRepo.AddImageAsync(productId, imageUrl.Trim());
         }
 
         public Task DeleteImageAsync(int imageId)
-            => _productRepo.DeleteImageAsync(imageId);
+        {
+            RoleGuard.RequireAdminOrManager(CallerRole);
+            return _productRepo.DeleteImageAsync(imageId);
+        }
     }
 }

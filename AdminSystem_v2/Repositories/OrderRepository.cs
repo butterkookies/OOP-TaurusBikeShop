@@ -1,3 +1,4 @@
+using System.Data.Common;
 using AdminSystem_v2.Helpers;
 using AdminSystem_v2.Models;
 using Dapper;
@@ -91,11 +92,29 @@ namespace AdminSystem_v2.Repositories
         }
 
         public async Task UpdateOrderStatusAsync(int orderId, string status)
-            => await ExecuteAsync(
-                @"UPDATE [Order]
-                  SET OrderStatus = @Status, UpdatedAt = GETUTCDATE()
-                  WHERE OrderId = @OrderId",
-                new { OrderId = orderId, Status = status });
+        {
+            await using var conn = GetConnection();
+            await using var tx   = await conn.BeginTransactionAsync();
+            try
+            {
+                // 1 — Update order status
+                await conn.ExecuteAsync(
+                    @"UPDATE [Order]
+                      SET OrderStatus = @Status, UpdatedAt = GETUTCDATE()
+                      WHERE OrderId = @OrderId",
+                    new { OrderId = orderId, Status = status }, tx);
+
+                // 2 — Queue a notification for the customer
+                await QueueOrderNotificationAsync(conn, tx, orderId, status);
+
+                await tx.CommitAsync();
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
+        }
 
         public async Task MarkReadyForPickupAsync(int orderId)
         {
@@ -121,6 +140,9 @@ namespace AdminSystem_v2.Repositories
                               PickupExpiresAt = DATEADD(DAY, 7, GETUTCDATE())
                           WHERE OrderId = @OrderId",
                     new { OrderId = orderId }, tx);
+
+                // Queue notification
+                await QueueOrderNotificationAsync(conn, tx, orderId, OrderStatuses.ReadyForPickup);
 
                 await tx.CommitAsync();
             }
@@ -148,6 +170,9 @@ namespace AdminSystem_v2.Repositories
                       SET PickupConfirmedAt = GETUTCDATE()
                       WHERE OrderId = @OrderId",
                     new { OrderId = orderId }, tx);
+
+                // Queue notification
+                await QueueOrderNotificationAsync(conn, tx, orderId, OrderStatuses.PickedUp);
 
                 await tx.CommitAsync();
             }
@@ -177,6 +202,71 @@ namespace AdminSystem_v2.Repositories
         {
             public string OrderStatus { get; set; } = string.Empty;
             public int    Cnt         { get; set; }
+        }
+
+        /// <summary>
+        /// Inserts a Notification row for the customer who owns the order.
+        /// Runs inside the caller's existing transaction so the notification
+        /// is committed atomically with the status change.
+        /// </summary>
+        private static async Task QueueOrderNotificationAsync(
+            DbConnection conn, DbTransaction tx, int orderId, string status)
+        {
+            // Look up customer details for this order
+            var info = await conn.QueryFirstOrDefaultAsync<OrderOwnerInfo>(
+                @"SELECT o.UserId, u.Email, o.OrderNumber
+                  FROM [Order] o
+                  INNER JOIN [User] u ON o.UserId = u.UserId
+                  WHERE o.OrderId = @OrderId",
+                new { OrderId = orderId }, tx);
+
+            if (info is null) return;
+
+            string notifType = status switch
+            {
+                OrderStatuses.ReadyForPickup => "ReadyForPickup",
+                OrderStatuses.PickedUp       => "DeliveryConfirmation",
+                OrderStatuses.Shipped        => "TrackingUpdate",
+                OrderStatuses.Delivered      => "DeliveryConfirmation",
+                OrderStatuses.Cancelled      => "TrackingUpdate",
+                _                            => "TrackingUpdate",
+            };
+
+            string subject = $"Order {info.OrderNumber} — {status}";
+            string body = status switch
+            {
+                OrderStatuses.Processing     => $"Your order {info.OrderNumber} is now being processed.",
+                OrderStatuses.ReadyForPickup => $"Your order {info.OrderNumber} is ready for pickup.",
+                OrderStatuses.PickedUp       => $"Your order {info.OrderNumber} has been picked up.",
+                OrderStatuses.Shipped        => $"Your order {info.OrderNumber} has been shipped.",
+                OrderStatuses.Delivered      => $"Your order {info.OrderNumber} has been delivered.",
+                OrderStatuses.Cancelled      => $"Your order {info.OrderNumber} has been cancelled.",
+                _                            => $"Your order {info.OrderNumber} status changed to {status}.",
+            };
+
+            await conn.ExecuteAsync(
+                @"INSERT INTO Notification
+                    (UserId, OrderId, Channel, NotifType, Recipient,
+                     Subject, Body, Status, RetryCount, CreatedAt, IsRead)
+                  VALUES
+                    (@UserId, @OrderId, 'Email', @NotifType, @Email,
+                     @Subject, @Body, 'Pending', 0, GETUTCDATE(), 0)",
+                new
+                {
+                    info.UserId,
+                    OrderId = orderId,
+                    NotifType = notifType,
+                    info.Email,
+                    Subject = subject,
+                    Body = body,
+                }, tx);
+        }
+
+        private sealed class OrderOwnerInfo
+        {
+            public int    UserId      { get; set; }
+            public string Email       { get; set; } = string.Empty;
+            public string OrderNumber { get; set; } = string.Empty;
         }
     }
 }

@@ -43,7 +43,12 @@ namespace AdminSystem_v2.Repositories
                 @"SELECT TOP 1 r.RoleName
                   FROM UserRole ur
                   INNER JOIN Role r ON ur.RoleId = r.RoleId
-                  WHERE ur.UserId = @UserId",
+                  WHERE ur.UserId = @UserId
+                    AND r.RoleName IN ('Admin', 'Manager', 'Staff')
+                  ORDER BY CASE r.RoleName
+                      WHEN 'Admin'   THEN 1
+                      WHEN 'Manager' THEN 2
+                      WHEN 'Staff'   THEN 3 END",
                 new { UserId = userId }) ?? string.Empty;
         }
 

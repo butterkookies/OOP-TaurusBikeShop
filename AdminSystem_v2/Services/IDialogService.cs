@@ -7,5 +7,11 @@ namespace AdminSystem_v2.Services
 
         /// <summary>Shows a modal info message.</summary>
         void ShowInfo(string message, string title);
+
+        /// <summary>
+        /// Prompts the admin to re-enter their password before a sensitive operation.
+        /// Returns true if the credentials were verified successfully.
+        /// </summary>
+        bool PromptCredentials(string actionDescription);
     }
 }

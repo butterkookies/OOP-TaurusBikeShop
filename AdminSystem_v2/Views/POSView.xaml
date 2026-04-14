@@ -96,7 +96,8 @@
                  ───────────────────────────────────────── -->
             <Grid Grid.Column="0" Background="#111827">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>  <!-- header + search -->
+                    <RowDefinition Height="Auto"/>  <!-- header -->
+                    <RowDefinition Height="Auto"/>  <!-- search -->
                     <RowDefinition Height="*"/>     <!-- results -->
                 </Grid.RowDefinitions>
 
@@ -136,7 +137,7 @@
                 </Border>
 
                 <!-- Search box -->
-                <Border Grid.Row="1" VerticalAlignment="Top"
+                <Border Grid.Row="1"
                         Background="#1F2937" Padding="10,8"
                         BorderBrush="#374151" BorderThickness="0,0,0,1">
                     <Grid>
@@ -144,13 +145,32 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0"
-                                 Style="{StaticResource FormTextBox}"
-                                 Text="{Binding ProductSearch, UpdateSourceTrigger=PropertyChanged}"
-                                 Height="40"/>
+                        <Grid Grid.Column="0">
+                            <TextBox Style="{StaticResource FormTextBox}"
+                                     Text="{Binding ProductSearch, UpdateSourceTrigger=PropertyChanged}"
+                                     x:Name="POSProductSearchBox"/>
+                            <TextBlock Text="Search by name, variant, or SKU..."
+                                       Foreground="#4B5563" FontSize="13"
+                                       Margin="12,0" VerticalAlignment="Center"
+                                       IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ProductSearch}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ProductSearch}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
                         <Button Grid.Column="1"
                                 Style="{StaticResource SecondaryButton}"
-                                Width="40" Height="40" Padding="0"
+                                MinWidth="40" Padding="0"
                                 ToolTip="Clear search"
                                 Margin="6,0,0,0"
                                 Click="ClearProductSearch_Click">
@@ -161,8 +181,7 @@
                 </Border>
 
                 <!-- Results list -->
-                <ScrollViewer Grid.Row="1"
-                              Margin="0,57,0,0"
+                <ScrollViewer Grid.Row="2"
                               VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled"
                               Padding="16,0,16,16">
@@ -222,7 +241,7 @@
 
                                         <Button Grid.Column="1"
                                                 Style="{StaticResource PrimaryButton}"
-                                                Width="72" Height="34"
+                                                MinWidth="72"
                                                 Command="{Binding DataContext.AddToCartCommand,
                                                     RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}"
@@ -295,12 +314,36 @@
                                       Visibility="{Binding IsCustomerDropdownOpen,
                                           Converter={StaticResource BoolToVis}}"
                                       Margin="0,4,0,0">
-                                    <StackPanel>
-                                        <TextBox Style="{StaticResource FormTextBox}"
-                                                 Height="38"
-                                                 Text="{Binding CustomerSearch, UpdateSourceTrigger=PropertyChanged}"
-                                                 x:Name="CustomerSearchBox"/>
-                                        <Border Background="#111827"
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0">
+                                            <TextBox Style="{StaticResource FormTextBox}"
+                                                     Text="{Binding CustomerSearch, UpdateSourceTrigger=PropertyChanged}"
+                                                     x:Name="CustomerSearchBox"/>
+                                            <TextBlock Text="Search customers..."
+                                                       Foreground="#4B5563" FontSize="13"
+                                                       Margin="12,0" VerticalAlignment="Center"
+                                                       IsHitTestVisible="False">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding CustomerSearch}" Value="">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding CustomerSearch}" Value="{x:Null}">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
+                                        <Border Grid.Row="1"
+                                                Background="#111827"
                                                 BorderBrush="#374151"
                                                 BorderThickness="1"
                                                 CornerRadius="0,0,6,6"
@@ -359,7 +402,7 @@
                                                 </StackPanel>
                                             </ScrollViewer>
                                         </Border>
-                                    </StackPanel>
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         </StackPanel>
@@ -483,7 +526,7 @@
                                          x:Name="VoucherCodeBox"
                                          Style="{StaticResource FormTextBox}"
                                          Text="{Binding VoucherCodeInput, UpdateSourceTrigger=PropertyChanged}"
-                                         Height="30" Padding="8,4"
+                                         Padding="8,4"
                                          FontSize="12"
                                          CharacterCasing="Upper"
                                          GotFocus="VoucherInput_GotFocus"
@@ -495,7 +538,7 @@
                                 <!-- Applied badge (visible when voucher applied) -->
                                 <Border Grid.Column="0"
                                         Background="#064E3B" CornerRadius="4"
-                                        Padding="8,4" Height="30"
+                                        Padding="8,4" MinHeight="30"
                                         VerticalAlignment="Center"
                                         Visibility="{Binding HasVoucherApplied,
                                             Converter={StaticResource BoolToVis}}">
@@ -514,7 +557,7 @@
                                 <!-- Apply button (visible when no voucher applied) -->
                                 <Button Grid.Column="1" Margin="4,0,0,0"
                                         Style="{StaticResource PayBtn}"
-                                        Height="30" Padding="10,0"
+                                        Padding="10,0" MinHeight="30"
                                         Command="{Binding ApplyVoucherCommand}"
                                         Visibility="{Binding HasVoucherApplied,
                                             Converter={StaticResource BoolToVis},
@@ -524,7 +567,7 @@
 
                                 <!-- Remove button (visible when voucher applied) -->
                                 <Button Grid.Column="1" Margin="4,0,0,0"
-                                        Height="30" Padding="10,0"
+                                        MinHeight="30" Padding="10,0"
                                         Background="#7F1D1D" Foreground="#FCA5A5"
                                         BorderThickness="0" Cursor="Hand"
                                         Command="{Binding RemoveVoucherCommand}"
@@ -779,7 +822,7 @@
                             <TextBox Grid.Column="1"
                                      Style="{StaticResource FormTextBox}"
                                      Text="{Binding CashReceivedText, UpdateSourceTrigger=PropertyChanged}"
-                                     Height="32" Padding="8,4" FontSize="12"
+                                     Padding="8,4" FontSize="12"
                                      TextAlignment="Right"/>
                         </Grid>
 
@@ -800,7 +843,7 @@
                         </Grid>
 
                         <!-- Complete Sale -->
-                        <Button Height="44" FontSize="14"
+                        <Button MinHeight="44" FontSize="14"
                                 Command="{Binding CompleteSaleCommand}"
                                 IsEnabled="{Binding IsNotLoading}">
                             <Button.Style>

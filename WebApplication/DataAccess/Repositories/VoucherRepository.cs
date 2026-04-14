@@ -34,7 +34,8 @@ public sealed class VoucherRepository : Repository<Voucher>
 
         return await Context.Vouchers
             .AsNoTracking()
-            .FirstOrDefaultAsync(v => v.Code == code, cancellationToken);
+            .FirstOrDefaultAsync(
+                v => v.Code.ToUpper() == code.ToUpper(), cancellationToken);
     }
 
     /// <summary>

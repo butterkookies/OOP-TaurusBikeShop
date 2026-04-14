@@ -15,13 +15,15 @@ namespace AdminSystem_v2.Services
 
         public Task SetUserRoleAsync(int userId, string roleName, string callerRole)
         {
-            RequireAdmin(callerRole);
+            RoleGuard.RequireAdmin(callerRole);
+            RejectSelfModification(userId);
             return _repo.SetUserRoleAsync(userId, roleName);
         }
 
         public Task ToggleActiveAsync(int userId, bool isActive, string callerRole)
         {
-            RequireAdmin(callerRole);
+            RoleGuard.RequireAdmin(callerRole);
+            RejectSelfModification(userId);
             return _repo.ToggleActiveAsync(userId, isActive);
         }
 
@@ -31,7 +33,7 @@ namespace AdminSystem_v2.Services
             string roleName, string plainPassword,
             string callerRole)
         {
-            RequireAdmin(callerRole);
+            RoleGuard.RequireAdmin(callerRole);
 
             var existing = await _repo.FindByEmailAsync(email);
             if (existing != null)
@@ -54,15 +56,16 @@ namespace AdminSystem_v2.Services
 
         public Task ResetPasswordAsync(int userId, string newPlainPassword, string callerRole)
         {
-            RequireAdmin(callerRole);
+            RoleGuard.RequireAdmin(callerRole);
+            RejectSelfModification(userId);
             string hash = PasswordHelper.Hash(newPlainPassword);
             return _repo.ResetPasswordAsync(userId, hash);
         }
 
-        private static void RequireAdmin(string callerRole)
+        private static void RejectSelfModification(int targetUserId)
         {
-            if (callerRole != RoleNames.Admin)
-                throw new UnauthorizedAccessException("Only admins can perform this operation.");
+            if (App.CurrentUser != null && App.CurrentUser.UserId == targetUserId)
+                throw new InvalidOperationException("You cannot modify your own account.");
         }
     }
 }

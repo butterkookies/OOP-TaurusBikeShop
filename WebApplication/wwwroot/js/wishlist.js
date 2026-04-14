@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const removeBtn = e.target.closest('.wishlist-remove-btn');
         if (!removeBtn) return;
 
+        e.stopPropagation();
+        e.preventDefault();
+
         const productId = removeBtn.dataset.productId;
         const card = removeBtn.closest('.cal-card');
 
@@ -55,6 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', async e => {
         const cartBtn = e.target.closest('.wishlist-add-to-cart');
         if (!cartBtn) return;
+
+        e.stopPropagation();
+        e.preventDefault();
 
         const productId = cartBtn.dataset.productId;
 

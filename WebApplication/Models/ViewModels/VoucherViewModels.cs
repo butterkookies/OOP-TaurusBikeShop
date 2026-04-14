@@ -3,6 +3,15 @@
 namespace WebApplication.Models.ViewModels;
 
 /// <summary>
+/// JSON request body sent by the voucher input widget when applying a code.
+/// </summary>
+public sealed class VoucherApplyRequest
+{
+    /// <summary>The voucher code entered by the user.</summary>
+    public string? Code { get; set; }
+}
+
+/// <summary>
 /// Result returned to the client after a voucher validation attempt.
 /// Used as the JSON payload from <c>VoucherController.Validate</c>.
 /// </summary>

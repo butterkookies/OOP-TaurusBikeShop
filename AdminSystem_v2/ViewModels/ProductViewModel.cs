@@ -10,6 +10,9 @@ namespace AdminSystem_v2.ViewModels
     {
         private readonly IProductService _productService;
 
+        /// <summary>True when the current user can create/edit/delete products (Admin or Manager).</summary>
+        public bool CanEdit => RoleGuard.IsAdminOrManager(App.CurrentUser?.Role ?? string.Empty);
+
         // ── List / search ─────────────────────────────────────────────────
         private ObservableCollection<Product> _products = new();
         public  ObservableCollection<Product> Products
