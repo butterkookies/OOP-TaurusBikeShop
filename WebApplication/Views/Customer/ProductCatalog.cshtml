@@ -29,69 +29,67 @@
             </p>
         </div>
 
-        @* ══════════ FILTER BAR (top) ══════════ *@
-        <div class="cal-card-static p-5 mb-8" id="filter-sidebar" aria-label="Product filters" data-reveal>
+        @* ══════════ FILTER BAR (single line) ══════════ *@
+        <div class="cal-card-static p-4 mb-8" id="filter-sidebar" aria-label="Product filters" data-reveal>
+            <div class="flex flex-wrap items-end gap-3">
 
-            @* Row 1: Search *@
-            <div class="mb-4">
-                <label class="cal-label" for="search-input">Search</label>
-                <div class="relative max-w-md">
-                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-mid-gray" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                         fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
-                    </svg>
-                    <input type="text" id="search-input" class="cal-input pl-9"
-                           placeholder="Search products…" value="@search" />
-                </div>
-            </div>
-
-            @* Row 2: Category, Brand, Price — horizontal on desktop, stacked on mobile *@
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-
-                @* Categories *@
-                <div>
-                    <p class="cal-label mb-2">Category</p>
-                    <div class="flex flex-wrap gap-1.5" id="category-list">
-                        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors @(catId == null ? "bg-charcoal text-white dark:bg-white dark:text-midnight font-medium" : "text-charcoal hover:bg-charcoal/[0.04] dark:text-neutral-300 dark:hover:bg-white/5")">
-                            <input type="radio" name="categoryId" value="" @(catId == null ? "checked" : "") class="hidden" />
-                            All
-                        </label>
-                        @foreach (Category cat in categories)
-                        {
-                            <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors @(catId == cat.CategoryId ? "bg-charcoal text-white dark:bg-white dark:text-midnight font-medium" : "text-charcoal hover:bg-charcoal/[0.04] dark:text-neutral-300 dark:hover:bg-white/5")">
-                                <input type="radio" name="categoryId" value="@cat.CategoryId"
-                                       @(catId == cat.CategoryId ? "checked" : "") class="hidden" />
-                                @cat.Name
-                            </label>
-                        }
+                @* Search *@
+                <div class="flex-1 min-w-[180px]">
+                    <label class="cal-label" for="search-input">Search</label>
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-mid-gray" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                             fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
+                        </svg>
+                        <input type="text" id="search-input" class="cal-input pl-9"
+                               placeholder="Search products…" value="@search" />
                     </div>
                 </div>
 
-                @* Brands *@
+                @* Category dropdown *@
+                <div class="min-w-[150px]">
+                    <label class="cal-label" for="category-select">Category</label>
+                    <select id="category-select" name="categoryId" class="cal-input">
+                        <option value="">All Categories</option>
+                        @foreach (Category cat in categories)
+                        {
+                            if (catId == cat.CategoryId)
+                            {
+                                <option value="@cat.CategoryId" selected>@cat.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@cat.CategoryId">@cat.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                @* Brand dropdown *@
                 @if (brands.Any())
                 {
-                    <div>
-                        <p class="cal-label mb-2">Brand</p>
-                        <div class="flex flex-wrap gap-1.5" id="brand-list">
-                            <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors @(brandId == null ? "bg-charcoal text-white dark:bg-white dark:text-midnight font-medium" : "text-charcoal hover:bg-charcoal/[0.04] dark:text-neutral-300 dark:hover:bg-white/5")">
-                                <input type="radio" name="brandId" value="" @(brandId == null ? "checked" : "") class="hidden" />
-                                All
-                            </label>
+                    <div class="min-w-[150px]">
+                        <label class="cal-label" for="brand-select">Brand</label>
+                        <select id="brand-select" name="brandId" class="cal-input">
+                            <option value="">All Brands</option>
                             @foreach (Brand brand in brands)
                             {
-                                <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-colors @(brandId == brand.BrandId ? "bg-charcoal text-white dark:bg-white dark:text-midnight font-medium" : "text-charcoal hover:bg-charcoal/[0.04] dark:text-neutral-300 dark:hover:bg-white/5")">
-                                    <input type="radio" name="brandId" value="@brand.BrandId"
-                                           @(brandId == brand.BrandId ? "checked" : "") class="hidden" />
-                                    @brand.BrandName
-                                </label>
+                                if (brandId == brand.BrandId)
+                                {
+                                    <option value="@brand.BrandId" selected>@brand.BrandName</option>
+                                }
+                                else
+                                {
+                                    <option value="@brand.BrandId">@brand.BrandName</option>
+                                }
                             }
-                        </div>
+                        </select>
                     </div>
                 }
 
-                @* Price range *@
-                <div>
-                    <p class="cal-label mb-2">Price Range (₱)</p>
+                @* Price range — inline *@
+                <div class="min-w-[200px]">
+                    <label class="cal-label">Price (₱)</label>
                     <div class="flex gap-2 items-center">
                         <input type="number" id="min-price" class="cal-input text-center"
                                placeholder="Min" value="@minPrice" min="0" step="100" />
@@ -100,12 +98,12 @@
                                placeholder="Max" value="@maxPrice" min="0" step="100" />
                     </div>
                 </div>
-            </div>
 
-            @* Actions *@
-            <div class="flex gap-3">
-                <button type="button" class="btn-dark btn-sm" id="apply-filters-btn">Apply Filters</button>
-                <a asp-action="List" asp-controller="Product" class="btn-ghost btn-sm">Clear All</a>
+                @* Actions *@
+                <div class="flex gap-2 items-end">
+                    <button type="button" class="btn-dark btn-sm" id="apply-filters-btn">Apply</button>
+                    <a asp-action="List" asp-controller="Product" class="btn-ghost btn-sm">Clear</a>
+                </div>
             </div>
         </div>
 

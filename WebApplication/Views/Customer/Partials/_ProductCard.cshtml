@@ -6,12 +6,12 @@
     @* ── Image zone ── *@
     <div class="relative">
         <a asp-controller="Product" asp-action="Detail" asp-route-id="@Model.ProductId"
-           class="block aspect-square bg-light-gray dark:bg-neutral-800 overflow-hidden" tabindex="-1" aria-hidden="true">
+           class="block aspect-square bg-light-gray dark:bg-neutral-800 overflow-hidden flex items-center justify-center" tabindex="-1" aria-hidden="true">
             @if (Model.PrimaryImageUrl != null)
             {
                 <img src="@Model.PrimaryImageUrl" alt="@Model.Name"
                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                     loading="lazy" />
+                     loading="lazy" decoding="async" />
             }
             else
             {

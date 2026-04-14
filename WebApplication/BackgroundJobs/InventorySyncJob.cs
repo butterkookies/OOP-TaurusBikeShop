@@ -31,6 +31,11 @@ public sealed class InventorySyncJob : BackgroundService
     // across cycles and controls the SystemLog write throttle.
     private DateTime _nextSummaryLogAt = DateTime.MinValue;
 
+    // Exponential backoff: tracks consecutive failures to avoid log flooding
+    // when the database is unavailable.
+    private int _consecutiveFailures;
+    private static readonly TimeSpan MaxBackoff = TimeSpan.FromMinutes(2);
+
     public InventorySyncJob(
         IServiceScopeFactory      scopeFactory,
         ILogger<InventorySyncJob> logger)
@@ -47,13 +52,22 @@ public sealed class InventorySyncJob : BackgroundService
             try
             {
                 await RunCycleAsync(stoppingToken);
+                _consecutiveFailures = 0;
             }
             catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogError(ex, "{Job} unhandled exception — will retry next cycle.",
-                    GetType().Name);
+                _consecutiveFailures++;
+                _logger.LogError(ex, "{Job} unhandled exception (failure #{Count}) — will retry next cycle.",
+                    GetType().Name, _consecutiveFailures);
             }
-            await Task.Delay(CycleInterval, stoppingToken).ConfigureAwait(false);
+
+            // Exponential backoff: delay increases with consecutive failures,
+            // capped at MaxBackoff to avoid flooding logs when DB is down.
+            TimeSpan delay = _consecutiveFailures > 0
+                ? TimeSpan.FromSeconds(Math.Min(MaxBackoff.TotalSeconds,
+                    CycleInterval.TotalSeconds * Math.Pow(2, _consecutiveFailures - 1)))
+                : CycleInterval;
+            await Task.Delay(delay, stoppingToken).ConfigureAwait(false);
         }
         _logger.LogInformation("InventorySyncJob stopping.");
     }
@@ -99,19 +113,27 @@ public sealed class InventorySyncJob : BackgroundService
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _logger.LogError(ex, "InventorySyncJob cycle failed.");
-            try
+
+            // Skip DB error-logging when the failure is itself a DB connectivity
+            // problem — writing to the DB would fail again and double the noise.
+            bool isDbError = ex is Microsoft.EntityFrameworkCore.Storage.RetryLimitExceededException
+                          || ex.InnerException is Microsoft.Data.SqlClient.SqlException;
+            if (!isDbError)
             {
-                await using AsyncServiceScope err = _scopeFactory.CreateAsyncScope();
-                AppDbContext ec = err.ServiceProvider.GetRequiredService<AppDbContext>();
-                await ec.SystemLogs.AddAsync(new SystemLog
+                try
                 {
-                    EventType        = SystemLogEvents.BackgroundJobError,
-                    EventDescription = $"{nameof(InventorySyncJob)} error: {ex.Message[..Math.Min(ex.Message.Length, 200)]}",
-                    CreatedAt        = DateTime.UtcNow
-                }, cancellationToken);
-                await ec.SaveChangesAsync(cancellationToken);
+                    await using AsyncServiceScope err = _scopeFactory.CreateAsyncScope();
+                    AppDbContext ec = err.ServiceProvider.GetRequiredService<AppDbContext>();
+                    await ec.SystemLogs.AddAsync(new SystemLog
+                    {
+                        EventType        = SystemLogEvents.BackgroundJobError,
+                        EventDescription = $"{nameof(InventorySyncJob)} error: {ex.Message[..Math.Min(ex.Message.Length, 200)]}",
+                        CreatedAt        = DateTime.UtcNow
+                    }, cancellationToken);
+                    await ec.SaveChangesAsync(cancellationToken);
+                }
+                catch (Exception logEx) { _logger.LogError(logEx, "Failed to write error log for InventorySyncJob."); }
             }
-            catch (Exception logEx) { _logger.LogError(logEx, "Failed to write error log for InventorySyncJob."); }
         }
     }
 }

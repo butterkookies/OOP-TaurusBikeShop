@@ -555,11 +555,43 @@
                             <StackPanel>
 
                                 <TextBlock Text="SELECT VOUCHER" Style="{StaticResource FieldLabel}"/>
-                                <ComboBox ItemsSource="{Binding Vouchers}"
-                                          SelectedItem="{Binding AssignVoucher}"
-                                          Style="{StaticResource FormComboBox}"
-                                          DisplayMemberPath="Code"
-                                          Margin="0,0,0,6"/>
+                                <Grid Margin="0,0,0,6">
+                                    <ComboBox ItemsSource="{Binding Vouchers}"
+                                              SelectedItem="{Binding AssignVoucher}"
+                                              Style="{StaticResource FormComboBox}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Foreground="#E5E7EB" FontSize="12">
+                                                    <Run Text="{Binding Code, Mode=OneWay}" FontWeight="SemiBold"/>
+                                                    <Run Text="  —  " Foreground="#4B5563"/>
+                                                    <Run Text="{Binding DiscountDisplay, Mode=OneWay}" Foreground="#34D399"/>
+                                                    <Run Text="  |  Used: " Foreground="#6B7280"/>
+                                                    <Run Text="{Binding TimesUsed, Mode=OneWay}"/>
+                                                    <Run Text="/" Foreground="#6B7280"/>
+                                                    <Run Text="{Binding MaxUsesDisplay, Mode=OneWay}"/>
+                                                    <Run Text="  |  " Foreground="#6B7280"/>
+                                                    <Run Text="{Binding StatusDisplay, Mode=OneWay}"/>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                    <!-- Placeholder when nothing selected -->
+                                    <TextBlock Text="Select Voucher"
+                                               Foreground="#4B5563" FontSize="13"
+                                               Margin="12,0" VerticalAlignment="Center"
+                                               IsHitTestVisible="False">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding AssignVoucher}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
 
                                 <!-- Voucher details preview -->
                                 <Border Background="#111827" CornerRadius="6" Padding="12,8"

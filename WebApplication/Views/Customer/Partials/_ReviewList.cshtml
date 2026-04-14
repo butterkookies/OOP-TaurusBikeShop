@@ -5,6 +5,9 @@
 @foreach (WebApplication.Models.ViewModels.ReviewItemViewModel review in Model)
 {
     <div class="tbs-review-card">
+        <div class="tbs-review-card__meta" style="margin-bottom:0.25rem">
+            <strong>@review.UserName</strong>
+        </div>
         <div class="tbs-review-card__header">
             <div class="tbs-stars tbs-stars--sm" aria-label="@review.Rating out of 5">
                 @for (int i = 1; i <= 5; i++)
@@ -19,7 +22,6 @@
             <p class="tbs-review-card__comment">@review.Comment</p>
         }
         <div class="tbs-review-card__meta">
-            <strong>@review.UserName</strong>
             <span>@review.CreatedAt</span>
         </div>
     </div>

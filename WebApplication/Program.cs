@@ -2,6 +2,7 @@
 
 using Google.Cloud.Storage.V1;
 using AppWebApplication = Microsoft.AspNetCore.Builder.WebApplication;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WebApplication.BusinessLogic.Interfaces;
@@ -43,6 +44,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
             maxRetryCount: 3,
             maxRetryDelay: TimeSpan.FromSeconds(5),
             errorNumbersToAdd: null);
+
+        // Use split queries by default for multi-collection Includes to avoid
+        // the CartesianExplosion / MultipleCollectionIncludeWarning.
+        sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
     });
 });
 
@@ -276,6 +281,14 @@ app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
+
+// Antiforgery token endpoint — serves a token for AJAX calls on pages that
+// have no visible <form> (site.js fetches /antiforgery/token on load).
+app.MapGet("/antiforgery/token", (IAntiforgery antiforgery, HttpContext context) =>
+{
+    AntiforgeryTokenSet tokens = antiforgery.GetAndStoreTokens(context);
+    return Results.Ok(new { token = tokens.RequestToken });
+});
 
 // =============================================================================
 // ROUTES

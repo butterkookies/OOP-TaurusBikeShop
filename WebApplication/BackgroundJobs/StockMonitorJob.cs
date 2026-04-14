@@ -51,6 +51,11 @@ public sealed class StockMonitorJob : BackgroundService
     private readonly IServiceScopeFactory     _scopeFactory;
     private readonly ILogger<StockMonitorJob> _logger;
 
+    // Exponential backoff: tracks consecutive failures to avoid log flooding
+    // when the database is unavailable.
+    private int _consecutiveFailures;
+    private static readonly TimeSpan MaxBackoff = TimeSpan.FromMinutes(2);
+
     public StockMonitorJob(
         IServiceScopeFactory     scopeFactory,
         ILogger<StockMonitorJob> logger)
@@ -71,13 +76,20 @@ public sealed class StockMonitorJob : BackgroundService
             try
             {
                 await RunCycleAsync(stoppingToken);
+                _consecutiveFailures = 0;
             }
             catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogError(ex, "{Job} unhandled exception — will retry next cycle.",
-                    GetType().Name);
+                _consecutiveFailures++;
+                _logger.LogError(ex, "{Job} unhandled exception (failure #{Count}) — will retry next cycle.",
+                    GetType().Name, _consecutiveFailures);
             }
-            await Task.Delay(CycleInterval, stoppingToken).ConfigureAwait(false);
+
+            TimeSpan delay = _consecutiveFailures > 0
+                ? TimeSpan.FromSeconds(Math.Min(MaxBackoff.TotalSeconds,
+                    CycleInterval.TotalSeconds * Math.Pow(2, _consecutiveFailures - 1)))
+                : CycleInterval;
+            await Task.Delay(delay, stoppingToken).ConfigureAwait(false);
         }
         _logger.LogInformation("StockMonitorJob stopping.");
     }
@@ -297,25 +309,28 @@ public sealed class StockMonitorJob : BackgroundService
         {
             _logger.LogError(ex, "StockMonitorJob cycle failed.");
 
-            // Best-effort error log — open a fresh scope so a dirty context
-            // (e.g. a failed SaveChanges) does not prevent writing the error row.
-            try
+            bool isDbError = ex is Microsoft.EntityFrameworkCore.Storage.RetryLimitExceededException
+                          || ex.InnerException is Microsoft.Data.SqlClient.SqlException;
+            if (!isDbError)
             {
-                await using AsyncServiceScope err = _scopeFactory.CreateAsyncScope();
-                AppDbContext ec = err.ServiceProvider.GetRequiredService<AppDbContext>();
-                await ec.SystemLogs.AddAsync(new SystemLog
+                try
                 {
-                    EventType        = SystemLogEvents.BackgroundJobError,
-                    EventDescription =
-                        $"{nameof(StockMonitorJob)} error: " +
-                        ex.Message[..Math.Min(ex.Message.Length, 200)],
-                    CreatedAt = DateTime.UtcNow
-                }, cancellationToken);
-                await ec.SaveChangesAsync(cancellationToken);
-            }
-            catch (Exception logEx)
-            {
-                _logger.LogError(logEx, "Failed to write error log for StockMonitorJob.");
+                    await using AsyncServiceScope err = _scopeFactory.CreateAsyncScope();
+                    AppDbContext ec = err.ServiceProvider.GetRequiredService<AppDbContext>();
+                    await ec.SystemLogs.AddAsync(new SystemLog
+                    {
+                        EventType        = SystemLogEvents.BackgroundJobError,
+                        EventDescription =
+                            $"{nameof(StockMonitorJob)} error: " +
+                            ex.Message[..Math.Min(ex.Message.Length, 200)],
+                        CreatedAt = DateTime.UtcNow
+                    }, cancellationToken);
+                    await ec.SaveChangesAsync(cancellationToken);
+                }
+                catch (Exception logEx)
+                {
+                    _logger.LogError(logEx, "Failed to write error log for StockMonitorJob.");
+                }
             }
         }
     }

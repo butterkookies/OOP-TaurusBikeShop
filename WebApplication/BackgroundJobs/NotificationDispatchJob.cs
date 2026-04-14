@@ -25,6 +25,11 @@ public sealed class NotificationDispatchJob : BackgroundService
     private const int MaxRetryCount = 3;
     private const int BatchSize = 10;
 
+    // Exponential backoff: tracks consecutive failures to avoid log flooding
+    // when the database is unavailable.
+    private int _consecutiveFailures;
+    private static readonly TimeSpan MaxBackoff = TimeSpan.FromMinutes(2);
+
     public NotificationDispatchJob(
         IServiceScopeFactory scopeFactory,
         ILogger<NotificationDispatchJob> logger)
@@ -42,13 +47,20 @@ public sealed class NotificationDispatchJob : BackgroundService
             try
             {
                 await DispatchPendingAsync(stoppingToken);
+                _consecutiveFailures = 0;
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                _logger.LogError(ex, "NotificationDispatchJob encountered an error.");
+                _consecutiveFailures++;
+                _logger.LogError(ex, "NotificationDispatchJob encountered an error (failure #{Count}).",
+                    _consecutiveFailures);
             }
 
-            await Task.Delay(PollInterval, stoppingToken);
+            TimeSpan delay = _consecutiveFailures > 0
+                ? TimeSpan.FromSeconds(Math.Min(MaxBackoff.TotalSeconds,
+                    PollInterval.TotalSeconds * Math.Pow(2, _consecutiveFailures - 1)))
+                : PollInterval;
+            await Task.Delay(delay, stoppingToken);
         }
     }
 

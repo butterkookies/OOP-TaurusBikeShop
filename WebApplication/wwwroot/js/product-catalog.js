@@ -17,16 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
         applyBtn.addEventListener('click', applyFilters);
     }
 
-    // Update pill active class immediately when a radio is clicked
-    document.querySelectorAll('.cat-filter-radio').forEach(radio => {
-        radio.addEventListener('change', () => {
-            document.querySelectorAll(`input[name="${radio.name}"]`).forEach(r => {
-                r.closest('.cat-filter-pill')
-                    ?.classList.toggle('cat-filter-pill--active', r.checked);
-            });
-        });
-    });
-
     if (searchInput) {
         searchInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') applyFilters();
@@ -39,13 +29,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyFilters() {
         const params = new URLSearchParams();
 
-        // Category
-        const catRadio = document.querySelector('input[name="categoryId"]:checked');
-        if (catRadio?.value) params.set('categoryId', catRadio.value);
+        // Category (dropdown or radio fallback)
+        const catSelect = document.getElementById('category-select');
+        const catRadio  = document.querySelector('input[name="categoryId"]:checked');
+        const catVal    = catSelect?.value ?? catRadio?.value;
+        if (catVal) params.set('categoryId', catVal);
 
-        // Brand
-        const brandRadio = document.querySelector('input[name="brandId"]:checked');
-        if (brandRadio?.value) params.set('brandId', brandRadio.value);
+        // Brand (dropdown or radio fallback)
+        const brandSelect = document.getElementById('brand-select');
+        const brandRadio  = document.querySelector('input[name="brandId"]:checked');
+        const brandVal    = brandSelect?.value ?? brandRadio?.value;
+        if (brandVal) params.set('brandId', brandVal);
 
         // Price
         const minPrice = document.getElementById('min-price')?.value;
@@ -251,6 +245,55 @@ document.addEventListener('DOMContentLoaded', () => {
             thumb.classList.add('tbs-gallery__thumb--active');
         });
     });
+
+    // =========================================================================
+    // PRODUCT DETAIL PAGE — Buy Now button + modal
+    // =========================================================================
+    const buyNowBtn   = document.getElementById('buy-now-btn');
+    const buyNowModal = document.getElementById('buy-now-modal');
+
+    if (buyNowBtn && buyNowModal) {
+        const closeModal = () => buyNowModal.classList.add('hidden');
+
+        buyNowBtn.addEventListener('click', async () => {
+            const productId = buyNowBtn.dataset.productId;
+            const variantId = buyNowBtn.dataset.variantId;
+            const qty = parseInt(document.getElementById('qty-input')?.value ?? '1', 10);
+
+            buyNowBtn.disabled = true;
+            buyNowBtn.textContent = 'Adding…';
+
+            try {
+                const data = await fetchWithCSRF('/Cart/AddToCart', {
+                    productId: parseInt(productId, 10),
+                    variantId: variantId ? parseInt(variantId, 10) : null,
+                    qty
+                });
+
+                if (data.success) {
+                    refreshCartBadge();
+                    buyNowModal.classList.remove('hidden');
+                } else {
+                    showToast('error', data.message ?? 'Could not add to cart.');
+                }
+            } catch {
+                showToast('error', 'Could not add to cart. Please try again.');
+            } finally {
+                buyNowBtn.disabled = false;
+                buyNowBtn.textContent = 'Buy Now';
+            }
+        });
+
+        document.getElementById('buy-now-checkout')?.addEventListener('click', () => {
+            window.location.href = '/Checkout';
+        });
+
+        document.getElementById('buy-now-close')?.addEventListener('click', closeModal);
+
+        buyNowModal.addEventListener('click', e => {
+            if (e.target === buyNowModal) closeModal();
+        });
+    }
 
     // =========================================================================
     // PRODUCT DETAIL PAGE — tabs

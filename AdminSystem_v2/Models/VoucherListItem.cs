@@ -51,5 +51,8 @@ namespace AdminSystem_v2.Models
 
         /// <summary>True when end date is in the past regardless of IsActive.</summary>
         public bool IsExpired => EndDate.HasValue && EndDate.Value < DateTime.Now;
+
+        public override string ToString()
+            => $"{Code}  —  {DiscountDisplay}  |  Used: {TimesUsed}/{MaxUsesDisplay}  |  {StatusDisplay}";
     }
 }

@@ -540,7 +540,8 @@ namespace AdminSystem_v2.ViewModels
             }
             catch (Exception ex)
             {
-                ShowError("Assignment failed. Check your database connection.");
+                string detail = ex.InnerException?.Message ?? ex.Message;
+                ShowError($"Assignment failed: {detail}");
                 System.Diagnostics.Debug.WriteLine($"[Vouchers/Assign] {ex}");
             }
             finally

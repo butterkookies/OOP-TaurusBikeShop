@@ -128,7 +128,7 @@
                     }
                 </div>
 
-                @* Add to cart / Wishlist *@
+                @* Add to cart / Buy Now / Wishlist *@
                 <div class="flex items-center gap-3 mt-6">
                     @if (!Model.IsOutOfStock)
                     {
@@ -145,6 +145,14 @@
                                 data-variant-id="@Model.SelectedVariantId">
                             Add to Cart
                         </button>
+
+                        <button type="button"
+                                class="btn-lg flex-1 font-semibold rounded-lg border-2 border-charcoal dark:border-white text-charcoal dark:text-white hover:bg-charcoal hover:text-white dark:hover:bg-white dark:hover:text-midnight transition-colors"
+                                id="buy-now-btn"
+                                data-product-id="@Model.ProductId"
+                                data-variant-id="@Model.SelectedVariantId">
+                            Buy Now
+                        </button>
                     }
 
                     <button type="button"
@@ -156,6 +164,33 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none" class="heart-filled"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                     </button>
                 </div>
+
+                @* ── Buy Now Modal ── *@
+                @if (!Model.IsOutOfStock)
+                {
+                    <div id="buy-now-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+                        <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl max-w-md w-full mx-4 p-8">
+                            <h3 class="font-display text-xl font-semibold text-charcoal dark:text-white mb-2">Ready to buy?</h3>
+                            <p class="text-sm text-mid-gray mb-6">
+                                <strong class="text-charcoal dark:text-white">@Model.Name</strong> will be added to your cart.
+                            </p>
+                            <div class="flex flex-col gap-3">
+                                <button type="button" id="buy-now-checkout" class="btn-dark btn-lg w-full">
+                                    Proceed to Checkout
+                                </button>
+                                <a asp-controller="Product" asp-action="List"
+                                   class="btn-lg w-full text-center font-semibold rounded-lg border border-border-ring dark:border-white/15 text-charcoal dark:text-white hover:bg-light-gray dark:hover:bg-white/5 transition-colors">
+                                    Continue Browsing
+                                </a>
+                            </div>
+                            <button type="button" id="buy-now-close"
+                                    class="absolute top-4 right-4 text-mid-gray hover:text-charcoal dark:hover:text-white transition-colors"
+                                    aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                }
 
             </div>
         </div>
@@ -244,21 +279,21 @@
                         @foreach (WebApplication.Models.ViewModels.ProductReviewViewModel review in Model.Reviews)
                         {
                             <div class="cal-card-static p-5">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <div class="flex gap-0.5" aria-label="@review.Rating out of 5">
-                                        @for (int i = 1; i <= 5; i++)
-                                        {
-                                            <span class="text-sm @(i <= review.Rating ? "cal-star--filled" : "cal-star")">★</span>
-                                        }
-                                    </div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <strong class="text-sm text-charcoal dark:text-white">@review.ReviewerName</strong>
                                     @if (review.IsVerifiedPurchase)
                                     {
                                         <span class="cal-badge cal-badge-success">✓ Verified Purchase</span>
                                     }
                                 </div>
+                                <div class="flex gap-0.5 mb-2" aria-label="@review.Rating out of 5">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <span class="text-sm @(i <= review.Rating ? "cal-star--filled" : "cal-star")">★</span>
+                                    }
+                                </div>
                                 <p class="text-sm text-charcoal dark:text-neutral-200 leading-relaxed">@review.Comment</p>
-                                <div class="flex items-center gap-2 mt-3 text-xs text-mid-gray">
-                                    <strong class="text-charcoal dark:text-white">@review.ReviewerName</strong>
+                                <div class="mt-3 text-xs text-mid-gray">
                                     <span>@review.CreatedAt</span>
                                 </div>
                             </div>

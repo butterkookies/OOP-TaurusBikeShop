@@ -30,6 +30,11 @@ public sealed class PendingOrderMonitorJob : BackgroundService
     private readonly IServiceScopeFactory            _scopeFactory;
     private readonly ILogger<PendingOrderMonitorJob> _logger;
 
+    // Exponential backoff: tracks consecutive failures to avoid log flooding
+    // when the database is unavailable.
+    private int _consecutiveFailures;
+    private static readonly TimeSpan MaxBackoff = TimeSpan.FromMinutes(2);
+
     public PendingOrderMonitorJob(
         IServiceScopeFactory            scopeFactory,
         ILogger<PendingOrderMonitorJob> logger)
@@ -46,13 +51,20 @@ public sealed class PendingOrderMonitorJob : BackgroundService
             try
             {
                 await RunCycleAsync(stoppingToken);
+                _consecutiveFailures = 0;
             }
             catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogError(ex, "{Job} unhandled exception — will retry next cycle.",
-                    GetType().Name);
+                _consecutiveFailures++;
+                _logger.LogError(ex, "{Job} unhandled exception (failure #{Count}) — will retry next cycle.",
+                    GetType().Name, _consecutiveFailures);
             }
-            await Task.Delay(CycleInterval, stoppingToken).ConfigureAwait(false);
+
+            TimeSpan delay = _consecutiveFailures > 0
+                ? TimeSpan.FromSeconds(Math.Min(MaxBackoff.TotalSeconds,
+                    CycleInterval.TotalSeconds * Math.Pow(2, _consecutiveFailures - 1)))
+                : CycleInterval;
+            await Task.Delay(delay, stoppingToken).ConfigureAwait(false);
         }
         _logger.LogInformation("PendingOrderMonitorJob stopping.");
     }
@@ -187,19 +199,25 @@ public sealed class PendingOrderMonitorJob : BackgroundService
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _logger.LogError(ex, "PendingOrderMonitorJob cycle failed.");
-            try
+
+            bool isDbError = ex is Microsoft.EntityFrameworkCore.Storage.RetryLimitExceededException
+                          || ex.InnerException is Microsoft.Data.SqlClient.SqlException;
+            if (!isDbError)
             {
-                await using AsyncServiceScope err = _scopeFactory.CreateAsyncScope();
-                AppDbContext ec = err.ServiceProvider.GetRequiredService<AppDbContext>();
-                await ec.SystemLogs.AddAsync(new SystemLog
+                try
                 {
-                    EventType        = SystemLogEvents.BackgroundJobError,
-                    EventDescription = $"{nameof(PendingOrderMonitorJob)} error: {ex.Message[..Math.Min(ex.Message.Length, 200)]}",
-                    CreatedAt        = DateTime.UtcNow
-                }, cancellationToken);
-                await ec.SaveChangesAsync(cancellationToken);
+                    await using AsyncServiceScope err = _scopeFactory.CreateAsyncScope();
+                    AppDbContext ec = err.ServiceProvider.GetRequiredService<AppDbContext>();
+                    await ec.SystemLogs.AddAsync(new SystemLog
+                    {
+                        EventType        = SystemLogEvents.BackgroundJobError,
+                        EventDescription = $"{nameof(PendingOrderMonitorJob)} error: {ex.Message[..Math.Min(ex.Message.Length, 200)]}",
+                        CreatedAt        = DateTime.UtcNow
+                    }, cancellationToken);
+                    await ec.SaveChangesAsync(cancellationToken);
+                }
+                catch (Exception logEx) { _logger.LogError(logEx, "Failed to write error log for PendingOrderMonitorJob."); }
             }
-            catch (Exception logEx) { _logger.LogError(logEx, "Failed to write error log for PendingOrderMonitorJob."); }
         }
     }
 }

@@ -37,7 +37,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" data-reveal="delay-1">
                 @foreach (var item in Model.Items)
                 {
-                    <div class="cal-card overflow-hidden group hover:-translate-y-0.5">
+                    <div class="cal-card overflow-hidden group hover:-translate-y-0.5 flex flex-col h-full">
                         <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.ProductId">
                             <div class="aspect-square bg-light-gray dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
                                 @if (item.PrimaryImageUrl != null)
@@ -51,14 +51,14 @@
                                 }
                             </div>
                         </a>
-                        <div class="p-4">
+                        <div class="p-4 flex flex-col flex-1">
                             <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.ProductId"
                                class="text-sm font-medium text-charcoal dark:text-white line-clamp-2 hover:underline">
                                 @item.Name
                             </a>
                             <p class="font-display text-lg font-semibold text-charcoal dark:text-white mt-2">@item.FormattedPrice</p>
 
-                            <div class="flex gap-2 mt-3">
+                            <div class="flex gap-2 mt-auto pt-3">
                                 <button type="button"
                                         class="btn-dark btn-sm flex-1 wishlist-add-to-cart"
                                         data-product-id="@item.ProductId">

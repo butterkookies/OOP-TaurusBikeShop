@@ -58,7 +58,7 @@ public sealed class Notification
     public string Channel { get; set; } = string.Empty;
 
     /// <summary>
-    /// The type of notification. Constrained by CK_Notif_Type to 16 valid values.
+    /// The type of notification. Constrained by CK_Notif_Type to 17 valid values.
     /// Use <see cref="NotifTypes"/> constants instead of magic strings.
     /// </summary>
     [Required]
@@ -172,7 +172,7 @@ public static class NotifStatuses
 
 /// <summary>
 /// Compile-time constants for all valid notification type values.
-/// Mirrors the CK_Notif_Type CHECK constraint in the database (16 values).
+/// Mirrors the CK_Notif_Type CHECK constraint in the database (17 values).
 /// Use these instead of magic strings in all calls to
 /// <c>INotificationService.QueueAsync</c>.
 /// <para>
@@ -229,4 +229,7 @@ public static class NotifTypes
 
     /// <summary>An online order has been pending for more than 24 hours.</summary>
     public const string PendingOrderAlert = "PendingOrderAlert";
+
+    /// <summary>A voucher has been assigned to a customer by an admin.</summary>
+    public const string VoucherAssigned = "VoucherAssigned";
 }
