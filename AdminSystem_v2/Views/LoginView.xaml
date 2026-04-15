@@ -215,12 +215,18 @@
                         </Button.Content>
                     </Button>
 
-                    <!-- CONNECTION ERROR -->
-                    <TextBlock Text="{Binding ErrorMessage}"
-                               Style="{StaticResource ErrorText}"
-                               Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}"
-                               HorizontalAlignment="Center"
-                               Margin="0,10,0,0"/>
+                    <!-- LOGIN ERROR -->
+                    <Border Background="#7F991B1B"
+                            CornerRadius="6"
+                            Padding="12,8"
+                            Margin="0,12,0,0"
+                            Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="#FCA5A5"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"/>
+                    </Border>
 
                 </StackPanel>
             </Border>

@@ -361,7 +361,17 @@ public sealed class CustomerController : Controller
         ProfileViewModel vm,
         CancellationToken cancellationToken)
     {
-        // Only validate the top-level profile fields, not sub-models
+        // Only validate the top-level profile fields, not sub-models.
+        // The ChangePassword and NewAddress sub-models live on the same ViewModel
+        // but are submitted by separate forms — strip their validation errors.
+        foreach (var key in ModelState.Keys
+                     .Where(k => k.StartsWith("ChangePassword", StringComparison.OrdinalIgnoreCase)
+                              || k.StartsWith("NewAddress", StringComparison.OrdinalIgnoreCase))
+                     .ToList())
+        {
+            ModelState.Remove(key);
+        }
+
         if (!ModelState.IsValid)
         {
             ViewData["Title"] = "My Profile";

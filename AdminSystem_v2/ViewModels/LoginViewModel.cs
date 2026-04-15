@@ -94,8 +94,8 @@ namespace AdminSystem_v2.ViewModels
                 LoginResult result = await _authService.LoginAsync(Email, Password);
                 if (!result.Success)
                 {
-                    PasswordError = result.ErrorMessage;
-                    Password      = string.Empty;
+                    ShowError(result.ErrorMessage);
+                    Password = string.Empty;
                     return;
                 }
                 LoginSucceeded?.Invoke();

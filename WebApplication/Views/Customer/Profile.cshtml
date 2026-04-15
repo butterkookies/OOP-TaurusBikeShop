@@ -17,7 +17,7 @@
         <div class="cal-card-static p-6 mb-6" data-reveal="delay-1">
             <h2 class="font-display text-lg font-semibold text-charcoal dark:text-white mb-5" style="letter-spacing:0.2px">Account Information</h2>
 
-            <form asp-action="UpdateProfile" asp-controller="Customer" method="post" novalidate>
+            <form asp-action="Profile" asp-controller="Customer" method="post" novalidate>
                 @Html.AntiForgeryToken()
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
