@@ -1,0 +1,525 @@
+erDiagram
+
+    %% =========================================================
+    %% TAURUS BIKE SHOP — ENTITY RELATIONSHIP DIAGRAM
+    %% Full schema — 39 application tables
+    %% =========================================================
+
+    %% ── IDENTITY & ACCESS ─────────────────────────────────────
+
+    USER {
+        int     UserId PK
+        nvarchar Email
+        nvarchar PasswordHash
+        nvarchar FirstName
+        nvarchar LastName
+        nvarchar PhoneNumber
+        int     DefaultAddressId FK
+        bit     IsActive
+        bit     IsWalkIn
+        datetime CreatedAt
+        datetime LastLoginAt
+        int     FailedLoginAttempts
+        datetime LockoutUntil
+    }
+
+    ROLE {
+        int     RoleId PK
+        nvarchar RoleName
+        nvarchar Description
+        datetime CreatedAt
+    }
+
+    USER_ROLE {
+        int     UserRoleId PK
+        int     UserId FK
+        int     RoleId FK
+        datetime AssignedAt
+    }
+
+    ADDRESS {
+        int     AddressId PK
+        int     UserId FK
+        nvarchar Label
+        nvarchar Street
+        nvarchar City
+        nvarchar PostalCode
+        nvarchar Province
+        nvarchar Country
+        bit     IsDefault
+        bit     IsSnapshot
+        datetime CreatedAt
+    }
+
+    GUEST_SESSION {
+        int     GuestSessionId PK
+        nvarchar SessionToken
+        nvarchar Email
+        nvarchar PhoneNumber
+        int     ConvertedToUserId FK
+        datetime ExpiresAt
+        datetime CreatedAt
+    }
+
+    OTP_VERIFICATION {
+        int     OTPId PK
+        nvarchar Email
+        nvarchar OTPCode
+        bit     IsUsed
+        datetime ExpiresAt
+        datetime CreatedAt
+    }
+
+    POS_SESSION {
+        int     POSSessionId PK
+        int     UserId FK
+        nvarchar TerminalName
+        datetime ShiftStart
+        datetime ShiftEnd
+        decimal TotalSales
+        datetime CreatedAt
+    }
+
+    %% ── PRODUCT CATALOG ───────────────────────────────────────
+
+    CATEGORY {
+        int     CategoryId PK
+        varchar CategoryCode
+        nvarchar Name
+        nvarchar Description
+        int     ParentCategoryId FK
+        bit     IsActive
+        int     DisplayOrder
+    }
+
+    BRAND {
+        int     BrandId PK
+        nvarchar BrandName
+        nvarchar Country
+        nvarchar Website
+        nvarchar Description
+        bit     IsActive
+        datetime CreatedAt
+    }
+
+    PRODUCT {
+        int     ProductId PK
+        int     CategoryId FK
+        int     BrandId FK
+        varchar SKU
+        nvarchar Name
+        nvarchar ShortDescription
+        nvarchar Description
+        decimal Price
+        char    Currency
+        nvarchar WheelSize
+        nvarchar BrakeType
+        nvarchar Material
+        nvarchar Color
+        bit     IsActive
+        bit     IsFeatured
+        datetime CreatedAt
+        datetime UpdatedAt
+    }
+
+    PRODUCT_VARIANT {
+        int     ProductVariantId PK
+        int     ProductId FK
+        nvarchar VariantName
+        nvarchar SKU
+        decimal AdditionalPrice
+        int     StockQuantity
+        int     ReorderThreshold
+        bit     IsActive
+        datetime CreatedAt
+        datetime UpdatedAt
+    }
+
+    PRODUCT_IMAGE {
+        int     ProductImageId PK
+        int     ProductId FK
+        int     UploadedByUserId FK
+        nvarchar StorageBucket
+        nvarchar StoragePath
+        nvarchar ImageUrl
+        nvarchar ImageType
+        bit     IsPrimary
+        int     DisplayOrder
+        nvarchar AltText
+        datetime CreatedAt
+    }
+
+    PRICE_HISTORY {
+        int     PriceHistoryId PK
+        int     ProductId FK
+        int     ChangedByUserId FK
+        decimal OldPrice
+        decimal NewPrice
+        datetime ChangedAt
+        nvarchar Notes
+    }
+
+    %% ── SHOPPING ──────────────────────────────────────────────
+
+    CART {
+        int     CartId PK
+        int     UserId FK
+        int     GuestSessionId FK
+        datetime CreatedAt
+    }
+
+    CART_ITEM {
+        int     CartItemId PK
+        int     CartId FK
+        int     ProductId FK
+        int     ProductVariantId FK
+        int     Quantity
+        decimal PriceAtAdd
+        datetime AddedAt
+    }
+
+    WISHLIST {
+        int     WishlistId PK
+        int     UserId FK
+        int     ProductId FK
+        datetime AddedAt
+    }
+
+    %% ── ORDERS ────────────────────────────────────────────────
+
+    ORDER {
+        int     OrderId PK
+        int     UserId FK
+        int     ShippingAddressId FK
+        nvarchar OrderNumber
+        datetime OrderDate
+        nvarchar OrderStatus
+        decimal SubTotal
+        decimal DiscountAmount
+        decimal ShippingFee
+        nvarchar ContactPhone
+        bit     IsWalkIn
+        datetime CreatedAt
+        datetime UpdatedAt
+    }
+
+    ORDER_ITEM {
+        int     OrderItemId PK
+        int     OrderId FK
+        int     ProductId FK
+        int     ProductVariantId FK
+        int     Quantity
+        decimal UnitPrice
+    }
+
+    ORDER_STATUS_AUDIT {
+        int     AuditId PK
+        int     OrderId FK
+        nvarchar FromStatus
+        nvarchar ToStatus
+        bit     Success
+        nvarchar Reason
+        datetime CreatedAt
+    }
+
+    %% ── PAYMENTS ──────────────────────────────────────────────
+
+    PAYMENT {
+        int     PaymentId PK
+        int     OrderId FK
+        nvarchar PaymentMethod
+        nvarchar PaymentStage
+        nvarchar PaymentStatus
+        decimal Amount
+        datetime PaymentDate
+        datetime CreatedAt
+    }
+
+    GCASH_PAYMENT {
+        int     PaymentId PK
+        nvarchar GcashTransactionId
+        nvarchar ScreenshotUrl
+        nvarchar StorageBucket
+        nvarchar StoragePath
+        datetime SubmittedAt
+    }
+
+    BANK_TRANSFER_PAYMENT {
+        int     PaymentId PK
+        int     VerifiedByUserId FK
+        nvarchar BpiReferenceNumber
+        nvarchar ProofUrl
+        nvarchar VerificationNotes
+        datetime VerifiedAt
+        datetime VerificationDeadline
+        datetime SubmittedAt
+    }
+
+    %% ── FULFILLMENT ───────────────────────────────────────────
+
+    DELIVERY {
+        int     DeliveryId PK
+        int     OrderId FK
+        nvarchar Courier
+        nvarchar DeliveryStatus
+        bit     IsDelayed
+        datetime DelayedUntil
+        datetime EstimatedDeliveryTime
+        datetime ActualDeliveryTime
+        datetime CreatedAt
+    }
+
+    LBC_DELIVERY {
+        int     DeliveryId PK
+        nvarchar TrackingNumber
+    }
+
+    LALAMOVE_DELIVERY {
+        int     DeliveryId PK
+        nvarchar BookingRef
+        nvarchar DriverName
+        nvarchar DriverPhone
+    }
+
+    PICKUP_ORDER {
+        int     PickupOrderId PK
+        int     OrderId FK
+        datetime PickupReadyAt
+        datetime PickupExpiresAt
+        datetime PickupConfirmedAt
+    }
+
+    %% ── PROCUREMENT ───────────────────────────────────────────
+
+    SUPPLIER {
+        int     SupplierId PK
+        nvarchar Name
+        nvarchar ContactPerson
+        nvarchar PhoneNumber
+        nvarchar Email
+        nvarchar Address
+        bit     IsActive
+        datetime CreatedAt
+    }
+
+    PURCHASE_ORDER {
+        int     PurchaseOrderId PK
+        int     SupplierId FK
+        int     CreatedByUserId FK
+        datetime OrderDate
+        datetime ExpectedDeliveryDate
+        nvarchar Status
+        datetime CreatedAt
+    }
+
+    PURCHASE_ORDER_ITEM {
+        int     PurchaseOrderItemId PK
+        int     PurchaseOrderId FK
+        int     ProductId FK
+        int     ProductVariantId FK
+        int     Quantity
+        decimal UnitPrice
+    }
+
+    %% ── INVENTORY ─────────────────────────────────────────────
+
+    INVENTORY_LOG {
+        int     InventoryLogId PK
+        int     ProductId FK
+        int     ProductVariantId FK
+        int     OrderId FK
+        int     PurchaseOrderId FK
+        int     ChangedByUserId FK
+        int     ChangeQuantity
+        nvarchar ChangeType
+        nvarchar Notes
+        datetime CreatedAt
+    }
+
+    %% ── PROMOTIONS ────────────────────────────────────────────
+
+    VOUCHER {
+        int     VoucherId PK
+        nvarchar Code
+        nvarchar Description
+        nvarchar DiscountType
+        decimal DiscountValue
+        decimal MinimumOrderAmount
+        int     MaxUses
+        int     MaxUsesPerUser
+        datetime ExpiresAt
+        datetime CreatedAt
+    }
+
+    USER_VOUCHER {
+        int     UserVoucherId PK
+        int     UserId FK
+        int     VoucherId FK
+        datetime AssignedAt
+        datetime ExpiresAt
+    }
+
+    VOUCHER_USAGE {
+        int     VoucherUsageId PK
+        int     VoucherId FK
+        int     UserId FK
+        int     OrderId FK
+        decimal DiscountAmount
+        datetime UsedAt
+    }
+
+    %% ── SUPPORT ───────────────────────────────────────────────
+
+    SUPPORT_TICKET {
+        int     TicketId PK
+        int     UserId FK
+        int     OrderId FK
+        int     AssignedToUserId FK
+        nvarchar TicketSource
+        nvarchar TicketCategory
+        nvarchar Subject
+        nvarchar Description
+        nvarchar TicketStatus
+        datetime ResolvedAt
+        datetime CreatedAt
+        datetime UpdatedAt
+    }
+
+    SUPPORT_TICKET_REPLY {
+        int     ReplyId PK
+        int     TicketId FK
+        int     UserId FK
+        bit     IsAdminReply
+        nvarchar Message
+        nvarchar AttachmentUrl
+        datetime CreatedAt
+    }
+
+    SUPPORT_TASK {
+        int     TaskId PK
+        int     TicketId FK
+        int     AssignedToUserId FK
+        nvarchar TaskType
+        nvarchar TaskStatus
+        datetime DueDate
+        nvarchar Notes
+        datetime CreatedAt
+        datetime CompletedAt
+    }
+
+    %% ── OBSERVABILITY ─────────────────────────────────────────
+
+    NOTIFICATION {
+        int     NotificationId PK
+        int     UserId FK
+        int     OrderId FK
+        int     TicketId FK
+        nvarchar Channel
+        nvarchar NotifType
+        nvarchar Recipient
+        nvarchar Subject
+        nvarchar Body
+        nvarchar Status
+        int     RetryCount
+        datetime SentAt
+        bit     IsRead
+        datetime CreatedAt
+    }
+
+    SYSTEM_LOG {
+        int     SystemLogId PK
+        int     UserId FK
+        nvarchar EventType
+        nvarchar EventDescription
+        datetime CreatedAt
+    }
+
+    REVIEW {
+        int     ReviewId PK
+        int     UserId FK
+        int     ProductId FK
+        int     OrderId FK
+        int     Rating
+        nvarchar Comment
+        bit     IsVerifiedPurchase
+        datetime CreatedAt
+    }
+
+    %% =========================================================
+    %% RELATIONSHIPS
+    %% =========================================================
+
+    USER                ||--o{ ADDRESS                 : "has"
+    USER                ||--o{ USER_ROLE               : "assigned"
+    ROLE                ||--o{ USER_ROLE               : "grants"
+    USER                ||--o| ADDRESS                 : "default address"
+    GUEST_SESSION       }o--o| USER                    : "converted to"
+    USER                ||--o{ POS_SESSION             : "operates"
+
+    CATEGORY            ||--o{ CATEGORY                : "parent of"
+    CATEGORY            ||--o{ PRODUCT                 : "classifies"
+    BRAND               ||--o{ PRODUCT                 : "manufactures"
+    PRODUCT             ||--o{ PRODUCT_VARIANT         : "has"
+    PRODUCT             ||--o{ PRODUCT_IMAGE           : "shown by"
+    PRODUCT             ||--o{ PRICE_HISTORY           : "tracks"
+    USER                ||--o{ PRODUCT_IMAGE           : "uploaded by"
+    USER                ||--o{ PRICE_HISTORY           : "changed by"
+
+    USER                ||--o{ CART                    : "owns"
+    GUEST_SESSION       ||--o| CART                    : "owns"
+    CART                ||--o{ CART_ITEM               : "contains"
+    PRODUCT             ||--o{ CART_ITEM               : "in"
+    PRODUCT_VARIANT     ||--o{ CART_ITEM               : "specified by"
+    USER                ||--o{ WISHLIST                : "saves"
+    PRODUCT             ||--o{ WISHLIST                : "saved in"
+
+    USER                ||--o{ ORDER                   : "places"
+    ADDRESS             ||--o{ ORDER                   : "ships to"
+    ORDER               ||--o{ ORDER_ITEM              : "contains"
+    PRODUCT             ||--o{ ORDER_ITEM              : "ordered as"
+    PRODUCT_VARIANT     ||--o{ ORDER_ITEM              : "variant of"
+    ORDER               ||--o{ ORDER_STATUS_AUDIT      : "transitions"
+
+    ORDER               ||--o{ PAYMENT                 : "paid via"
+    PAYMENT             ||--o| GCASH_PAYMENT           : "detail (GCash)"
+    PAYMENT             ||--o| BANK_TRANSFER_PAYMENT   : "detail (Bank)"
+    USER                ||--o{ BANK_TRANSFER_PAYMENT   : "verified by"
+
+    ORDER               ||--o{ DELIVERY                : "shipped via"
+    DELIVERY            ||--o| LBC_DELIVERY            : "detail (LBC)"
+    DELIVERY            ||--o| LALAMOVE_DELIVERY       : "detail (Lalamove)"
+    ORDER               ||--o| PICKUP_ORDER            : "picked up as"
+
+    SUPPLIER            ||--o{ PURCHASE_ORDER          : "receives"
+    USER                ||--o{ PURCHASE_ORDER          : "created by"
+    PURCHASE_ORDER      ||--o{ PURCHASE_ORDER_ITEM     : "contains"
+    PRODUCT             ||--o{ PURCHASE_ORDER_ITEM     : "restocked via"
+    PRODUCT_VARIANT     ||--o{ PURCHASE_ORDER_ITEM     : "variant in"
+
+    PRODUCT             ||--o{ INVENTORY_LOG           : "stock tracked"
+    PRODUCT_VARIANT     ||--o{ INVENTORY_LOG           : "variant tracked"
+    ORDER               ||--o{ INVENTORY_LOG           : "triggers"
+    PURCHASE_ORDER      ||--o{ INVENTORY_LOG           : "triggers"
+    USER                ||--o{ INVENTORY_LOG           : "changed by"
+
+    VOUCHER             ||--o{ USER_VOUCHER            : "assigned via"
+    USER                ||--o{ USER_VOUCHER            : "holds"
+    VOUCHER             ||--o{ VOUCHER_USAGE           : "used in"
+    USER                ||--o{ VOUCHER_USAGE           : "redeemed by"
+    ORDER               ||--o{ VOUCHER_USAGE           : "discounted by"
+
+    USER                ||--o{ SUPPORT_TICKET          : "raises"
+    USER                ||--o{ SUPPORT_TICKET          : "assigned to"
+    ORDER               ||--o{ SUPPORT_TICKET          : "referenced in"
+    SUPPORT_TICKET      ||--o{ SUPPORT_TICKET_REPLY    : "has"
+    USER                ||--o{ SUPPORT_TICKET_REPLY    : "replies"
+    SUPPORT_TICKET      ||--o{ SUPPORT_TASK            : "spawns"
+    USER                ||--o{ SUPPORT_TASK            : "assigned to"
+
+    USER                ||--o{ NOTIFICATION            : "receives"
+    ORDER               ||--o{ NOTIFICATION            : "triggers"
+    SUPPORT_TICKET      ||--o{ NOTIFICATION            : "triggers"
+    USER                ||--o{ SYSTEM_LOG              : "actor"
+    USER                ||--o{ REVIEW                  : "writes"
+    PRODUCT             ||--o{ REVIEW                  : "reviewed in"
+    ORDER               ||--o{ REVIEW                  : "verified by"
