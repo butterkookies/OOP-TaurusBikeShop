@@ -76,12 +76,12 @@ public interface IOrderService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Confirms that a shipped delivery order has been physically received
-    /// by the customer. Transitions the order from <c>Shipped</c> to
+    /// Confirms that an out-for-delivery order has been physically received
+    /// by the customer. Transitions the order from <c>OutForDelivery</c> to
     /// <c>Delivered</c> and finalises inventory by writing paired
     /// <c>Unlock</c> + <c>Sale</c> InventoryLog entries per line item.
     /// <para>
-    /// Only valid for orders in <c>Shipped</c> status that are not walk-in
+    /// Only valid for orders in <c>OutForDelivery</c> status that are not walk-in
     /// POS orders and not store-pickup orders.
     /// </para>
     /// <para>

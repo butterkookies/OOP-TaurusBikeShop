@@ -20,7 +20,9 @@ namespace AdminSystem_v2.Repositories
                 CASE WHEN po.PickupOrderId IS NOT NULL THEN 'Pickup' ELSE 'Delivery' END
                                                  AS DeliveryType,
                 (SELECT COUNT(*) FROM vw_OrderItemDetail vi WHERE vi.OrderId = o.OrderId)
-                                                 AS ItemCount
+                                                 AS ItemCount,
+                (SELECT TOP 1 p.PaymentMethod FROM Payment p WHERE p.OrderId = o.OrderId
+                 ORDER BY p.CreatedAt DESC)      AS ActualPaymentMethod
               FROM [Order] o
               INNER JOIN [User]         u  ON o.UserId  = u.UserId
               LEFT  JOIN PickupOrder    po ON o.OrderId = po.OrderId
@@ -28,19 +30,28 @@ namespace AdminSystem_v2.Repositories
 
         // ── Public methods ────────────────────────────────────────────────────
 
-        public async Task<IEnumerable<Order>> GetOrdersAsync(string? statusFilter = null)
+        public async Task<IEnumerable<Order>> GetOrdersAsync(string? statusFilter = null,
+                                                              string? typeFilter = null)
         {
-            bool applyFilter = !string.IsNullOrEmpty(statusFilter)
-                            && statusFilter != "All";
+            bool applyStatusFilter = !string.IsNullOrEmpty(statusFilter)
+                                  && statusFilter != "All";
+            bool applyTypeFilter   = !string.IsNullOrEmpty(typeFilter)
+                                  && typeFilter != "All";
 
             string sql = OrderListSelect
-                       + (applyFilter ? " AND o.OrderStatus = @Status" : string.Empty)
+                       + (applyStatusFilter ? " AND o.OrderStatus = @Status" : string.Empty)
                        + " ORDER BY o.OrderDate DESC";
 
             await using var conn = GetConnection();
-            return await conn.QueryAsync<Order>(
+            var orders = await conn.QueryAsync<Order>(
                 sql,
-                applyFilter ? new { Status = statusFilter } : null);
+                applyStatusFilter ? new { Status = statusFilter } : null);
+
+            // Apply type filter in-memory (derived from LEFT JOIN, not a direct column)
+            if (applyTypeFilter)
+                orders = orders.Where(o => o.DeliveryType == typeFilter);
+
+            return orders;
         }
 
         public async Task<Order?> GetOrderDetailAsync(int orderId)
@@ -64,7 +75,7 @@ namespace AdminSystem_v2.Repositories
                 new { Id = orderId })).ToList();
 
             // 3 — delivery record (if delivery order)
-            if (order.DeliveryType == "Delivery")
+            if (order.DeliveryType == OrderTypes.Delivery)
             {
                 order.Delivery = await conn.QueryFirstOrDefaultAsync<DeliveryDetail>(
                     @"SELECT DeliveryId, OrderId, Courier, DeliveryStatus,
@@ -78,7 +89,7 @@ namespace AdminSystem_v2.Repositories
             }
 
             // 4 — pickup record (if pickup order)
-            if (order.DeliveryType == "Pickup")
+            if (order.DeliveryType == OrderTypes.Pickup)
             {
                 order.Pickup = await conn.QueryFirstOrDefaultAsync<PickupOrder>(
                     @"SELECT PickupOrderId, OrderId, PickupReadyAt,
@@ -91,21 +102,42 @@ namespace AdminSystem_v2.Repositories
             return order;
         }
 
-        public async Task UpdateOrderStatusAsync(int orderId, string status)
+        public async Task UpdateOrderStatusAsync(int orderId, string newStatus)
         {
             await using var conn = GetConnection();
             await using var tx   = await conn.BeginTransactionAsync();
             try
             {
-                // 1 — Update order status
+                // 1 — Read current status (server-side validation)
+                string? currentStatus = await conn.QueryFirstOrDefaultAsync<string>(
+                    "SELECT OrderStatus FROM [Order] WHERE OrderId = @OrderId",
+                    new { OrderId = orderId }, tx);
+
+                if (currentStatus == null)
+                    throw new InvalidOperationException($"Order {orderId} not found.");
+
+                // 2 — Validate transition against allowed forward-only map
+                if (!OrderStatuses.IsValidTransition(currentStatus, newStatus))
+                {
+                    // Log the rejected transition for audit
+                    await LogStatusTransitionAsync(conn, tx, orderId, currentStatus, newStatus,
+                                                   success: false, "Transition rejected by validation");
+                    throw new InvalidStatusTransitionException(orderId, currentStatus, newStatus);
+                }
+
+                // 3 — Apply the status change
                 await conn.ExecuteAsync(
                     @"UPDATE [Order]
                       SET OrderStatus = @Status, UpdatedAt = GETUTCDATE()
                       WHERE OrderId = @OrderId",
-                    new { OrderId = orderId, Status = status }, tx);
+                    new { OrderId = orderId, Status = newStatus }, tx);
 
-                // 2 — Queue a notification for the customer
-                await QueueOrderNotificationAsync(conn, tx, orderId, status);
+                // 4 — Queue a notification for the customer
+                await QueueOrderNotificationAsync(conn, tx, orderId, newStatus);
+
+                // 5 — Log successful transition for audit trail
+                await LogStatusTransitionAsync(conn, tx, orderId, currentStatus, newStatus,
+                                               success: true, null);
 
                 await tx.CommitAsync();
             }
@@ -122,6 +154,21 @@ namespace AdminSystem_v2.Repositories
             await using var tx   = await conn.BeginTransactionAsync();
             try
             {
+                // Validate transition server-side
+                string? currentStatus = await conn.QueryFirstOrDefaultAsync<string>(
+                    "SELECT OrderStatus FROM [Order] WHERE OrderId = @OrderId",
+                    new { OrderId = orderId }, tx);
+
+                if (currentStatus == null)
+                    throw new InvalidOperationException($"Order {orderId} not found.");
+
+                if (!OrderStatuses.IsValidTransition(currentStatus, OrderStatuses.ReadyForPickup))
+                {
+                    await LogStatusTransitionAsync(conn, tx, orderId, currentStatus,
+                        OrderStatuses.ReadyForPickup, success: false, "Transition rejected by validation");
+                    throw new InvalidStatusTransitionException(orderId, currentStatus, OrderStatuses.ReadyForPickup);
+                }
+
                 // Update order status
                 await conn.ExecuteAsync(
                     @"UPDATE [Order]
@@ -144,6 +191,10 @@ namespace AdminSystem_v2.Repositories
                 // Queue notification
                 await QueueOrderNotificationAsync(conn, tx, orderId, OrderStatuses.ReadyForPickup);
 
+                // Audit trail
+                await LogStatusTransitionAsync(conn, tx, orderId, currentStatus,
+                    OrderStatuses.ReadyForPickup, success: true, null);
+
                 await tx.CommitAsync();
             }
             catch
@@ -159,6 +210,21 @@ namespace AdminSystem_v2.Repositories
             await using var tx   = await conn.BeginTransactionAsync();
             try
             {
+                // Validate transition server-side
+                string? currentStatus = await conn.QueryFirstOrDefaultAsync<string>(
+                    "SELECT OrderStatus FROM [Order] WHERE OrderId = @OrderId",
+                    new { OrderId = orderId }, tx);
+
+                if (currentStatus == null)
+                    throw new InvalidOperationException($"Order {orderId} not found.");
+
+                if (!OrderStatuses.IsValidTransition(currentStatus, OrderStatuses.PickedUp))
+                {
+                    await LogStatusTransitionAsync(conn, tx, orderId, currentStatus,
+                        OrderStatuses.PickedUp, success: false, "Transition rejected by validation");
+                    throw new InvalidStatusTransitionException(orderId, currentStatus, OrderStatuses.PickedUp);
+                }
+
                 await conn.ExecuteAsync(
                     @"UPDATE [Order]
                       SET OrderStatus = @Status, UpdatedAt = GETUTCDATE()
@@ -173,6 +239,10 @@ namespace AdminSystem_v2.Repositories
 
                 // Queue notification
                 await QueueOrderNotificationAsync(conn, tx, orderId, OrderStatuses.PickedUp);
+
+                // Audit trail
+                await LogStatusTransitionAsync(conn, tx, orderId, currentStatus,
+                    OrderStatuses.PickedUp, success: true, null);
 
                 await tx.CommitAsync();
             }
@@ -226,7 +296,7 @@ namespace AdminSystem_v2.Repositories
             {
                 OrderStatuses.ReadyForPickup => "ReadyForPickup",
                 OrderStatuses.PickedUp       => "DeliveryConfirmation",
-                OrderStatuses.Shipped        => "TrackingUpdate",
+                OrderStatuses.OutForDelivery => "TrackingUpdate",
                 OrderStatuses.Delivered      => "DeliveryConfirmation",
                 OrderStatuses.Cancelled      => "TrackingUpdate",
                 _                            => "TrackingUpdate",
@@ -238,7 +308,7 @@ namespace AdminSystem_v2.Repositories
                 OrderStatuses.Processing     => $"Your order {info.OrderNumber} is now being processed.",
                 OrderStatuses.ReadyForPickup => $"Your order {info.OrderNumber} is ready for pickup.",
                 OrderStatuses.PickedUp       => $"Your order {info.OrderNumber} has been picked up.",
-                OrderStatuses.Shipped        => $"Your order {info.OrderNumber} has been shipped.",
+                OrderStatuses.OutForDelivery => $"Your order {info.OrderNumber} is out for delivery.",
                 OrderStatuses.Delivered      => $"Your order {info.OrderNumber} has been delivered.",
                 OrderStatuses.Cancelled      => $"Your order {info.OrderNumber} has been cancelled.",
                 _                            => $"Your order {info.OrderNumber} status changed to {status}.",
@@ -260,6 +330,40 @@ namespace AdminSystem_v2.Repositories
                     Subject = subject,
                     Body = body,
                 }, tx);
+        }
+
+        /// <summary>
+        /// Logs every status transition attempt (successful or rejected) to the
+        /// OrderStatusAudit table for accountability and debugging.
+        /// </summary>
+        private static async Task LogStatusTransitionAsync(
+            DbConnection conn, DbTransaction tx,
+            int orderId, string fromStatus, string toStatus,
+            bool success, string? reason)
+        {
+            try
+            {
+                await conn.ExecuteAsync(
+                    @"IF OBJECT_ID('OrderStatusAudit', 'U') IS NOT NULL
+                      INSERT INTO OrderStatusAudit
+                          (OrderId, FromStatus, ToStatus, Success, Reason, CreatedAt)
+                      VALUES
+                          (@OrderId, @FromStatus, @ToStatus, @Success, @Reason, GETUTCDATE())",
+                    new
+                    {
+                        OrderId    = orderId,
+                        FromStatus = fromStatus,
+                        ToStatus   = toStatus,
+                        Success    = success,
+                        Reason     = reason,
+                    }, tx);
+            }
+            catch
+            {
+                // Audit logging is best-effort — never block the primary operation
+                System.Diagnostics.Debug.WriteLine(
+                    $"[Audit] Failed to log status transition: {orderId} {fromStatus} → {toStatus}");
+            }
         }
 
         private sealed class OrderOwnerInfo

@@ -161,8 +161,8 @@ public sealed class OrderController : Controller
     // =========================================================================
 
     /// <summary>
-    /// Customer confirms they have physically received their shipped order.
-    /// Transitions status Shipped → Delivered and finalises inventory.
+    /// Customer confirms they have physically received their order (out for delivery).
+    /// Transitions status OutForDelivery → Delivered and finalises inventory.
     /// Flowchart: Part 6 — D26 (Confirm Order Received) → D28A / D28B.
     /// </summary>
     [HttpPost]

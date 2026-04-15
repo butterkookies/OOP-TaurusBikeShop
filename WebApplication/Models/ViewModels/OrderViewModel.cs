@@ -31,7 +31,7 @@ public sealed class OrderViewModel
     /// <summary>
     /// True when the customer can confirm receipt of this order.
     /// Only set for delivery orders (not pickup, not walk-in) in
-    /// <c>Shipped</c> status. Drives the "Confirm Delivery" button on the
+    /// <c>OutForDelivery</c> status. Drives the "Confirm Delivery" button on the
     /// order detail page. Flowchart: Part 6 — D26.
     /// </summary>
     public bool IsDeliveryConfirmable  { get; set; }

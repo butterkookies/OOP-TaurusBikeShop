@@ -68,11 +68,12 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="56"/>   <!-- Toolbar       -->
-            <RowDefinition Height="Auto"/> <!-- Messages      -->
-            <RowDefinition Height="Auto"/> <!-- Status badges -->
-            <RowDefinition Height="Auto"/> <!-- Bulk bar      -->
-            <RowDefinition Height="*"/>    <!-- Main content  -->
+            <RowDefinition Height="56"/>   <!-- Toolbar         -->
+            <RowDefinition Height="Auto"/> <!-- Messages        -->
+            <RowDefinition Height="Auto"/> <!-- Status badges   -->
+            <RowDefinition Height="Auto"/> <!-- Type filter     -->
+            <RowDefinition Height="Auto"/> <!-- Bulk bar        -->
+            <RowDefinition Height="*"/>    <!-- Main content    -->
         </Grid.RowDefinitions>
 
         <!-- ══════════════════════════════════════
@@ -111,7 +112,8 @@
         </Border>
         <Border Grid.Row="1" Background="#3B1010" Padding="20,8"
                 Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}">
-            <TextBlock Text="{Binding ErrorMessage}" Foreground="#FCA5A5" FontSize="13"/>
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="#FCA5A5" FontSize="13"
+                       TextWrapping="Wrap"/>
         </Border>
 
         <!-- ══════════════════════════════════════
@@ -185,10 +187,132 @@
         </Border>
 
         <!-- ══════════════════════════════════════
-             ROW 3 — BULK ACTION BAR
+             ROW 3 — ORDER TYPE FILTER (Delivery / Pickup)
+             Persistent tabs to segregate order views.
+             ══════════════════════════════════════ -->
+        <Border Grid.Row="3" Background="#111827" Padding="16,8"
+                BorderBrush="#374151" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Order Type:" Foreground="#6B7280" FontSize="12"
+                           VerticalAlignment="Center" Margin="0,0,12,0"/>
+
+                <!-- All Orders -->
+                <Button Command="{Binding SelectTypeCommand}" CommandParameter="All"
+                        Background="Transparent" BorderThickness="0" Cursor="Hand"
+                        Padding="0" Margin="0,0,6,0" FocusVisualStyle="{x:Null}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <ContentPresenter/>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <Border CornerRadius="6" Padding="12,6">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#1F2937"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <MultiBinding Converter="{StaticResource EqualityConverter}">
+                                                <Binding Path="DataContext.SelectedTypeFilter"
+                                                         RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                <Binding Source="All"/>
+                                            </MultiBinding>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="BorderBrush" Value="#60A5FA"/>
+                                        <Setter Property="Background" Value="#1E3A5F"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="All Types" Foreground="#D1D5DB" FontSize="12" FontWeight="SemiBold"/>
+                    </Border>
+                </Button>
+
+                <!-- Delivery -->
+                <Button Command="{Binding SelectTypeCommand}" CommandParameter="Delivery"
+                        Background="Transparent" BorderThickness="0" Cursor="Hand"
+                        Padding="0" Margin="0,0,6,0" FocusVisualStyle="{x:Null}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <ContentPresenter/>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <Border CornerRadius="6" Padding="12,6">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#1F2937"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <MultiBinding Converter="{StaticResource EqualityConverter}">
+                                                <Binding Path="DataContext.SelectedTypeFilter"
+                                                         RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                <Binding Source="Delivery"/>
+                                            </MultiBinding>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="BorderBrush" Value="#5EEAD4"/>
+                                        <Setter Property="Background" Value="#134E4A"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8" Fill="#5EEAD4" Margin="0,0,6,0"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Text="Delivery" Foreground="#D1D5DB" FontSize="12" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
+                </Button>
+
+                <!-- Pickup -->
+                <Button Command="{Binding SelectTypeCommand}" CommandParameter="Pickup"
+                        Background="Transparent" BorderThickness="0" Cursor="Hand"
+                        Padding="0" Margin="0,0,6,0" FocusVisualStyle="{x:Null}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <ContentPresenter/>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <Border CornerRadius="6" Padding="12,6">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#1F2937"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <MultiBinding Converter="{StaticResource EqualityConverter}">
+                                                <Binding Path="DataContext.SelectedTypeFilter"
+                                                         RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                <Binding Source="Pickup"/>
+                                            </MultiBinding>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="BorderBrush" Value="#A5B4FC"/>
+                                        <Setter Property="Background" Value="#312E81"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8" Fill="#A5B4FC" Margin="0,0,6,0"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Text="Pickup" Foreground="#D1D5DB" FontSize="12" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <!-- ══════════════════════════════════════
+             ROW 4 — BULK ACTION BAR
              Visible when at least one row is checked.
              ══════════════════════════════════════ -->
-        <Border Grid.Row="3" Background="#1E3A5F" Padding="16,8"
+        <Border Grid.Row="4" Background="#1E3A5F" Padding="16,8"
                 BorderBrush="#3B82F6" BorderThickness="0,0,0,1"
                 Visibility="{Binding HasSelection, Converter={StaticResource BoolToVis}}">
             <DockPanel>
@@ -231,22 +355,22 @@
                         <Run Text=" selected"/>
                     </TextBlock>
 
-                    <Button Content="→ Processing"
+                    <Button Content="&#x2192; Processing"
                             Command="{Binding BulkUpdateStatusCommand}"
                             CommandParameter="Processing"
                             Style="{StaticResource SecondaryButton}"
                             Margin="0,0,6,0"/>
-                    <Button Content="→ Ready for Pickup"
+                    <Button Content="&#x2192; Ready for Pickup"
                             Command="{Binding BulkUpdateStatusCommand}"
                             CommandParameter="ReadyForPickup"
                             Style="{StaticResource SecondaryButton}"
                             Margin="0,0,6,0"/>
-                    <Button Content="→ Shipped"
+                    <Button Content="&#x2192; Out for Delivery"
                             Command="{Binding BulkUpdateStatusCommand}"
-                            CommandParameter="Shipped"
+                            CommandParameter="OutForDelivery"
                             Style="{StaticResource SecondaryButton}"
                             Margin="0,0,6,0"/>
-                    <Button Content="→ Delivered"
+                    <Button Content="&#x2192; Delivered"
                             Command="{Binding BulkUpdateStatusCommand}"
                             CommandParameter="Delivered"
                             Style="{StaticResource PrimaryButton}"
@@ -256,10 +380,10 @@
         </Border>
 
         <!-- ══════════════════════════════════════
-             ROW 4 — MAIN CONTENT
+             ROW 5 — MAIN CONTENT
              DataGrid (fills all available width) | auto-collapsing detail pane
              ══════════════════════════════════════ -->
-        <Grid Grid.Row="4">
+        <Grid Grid.Row="5">
             <Grid.ColumnDefinitions>
                 <!-- Col 0: list — always fills remaining width -->
                 <ColumnDefinition Width="*" MinWidth="400"/>
@@ -346,17 +470,18 @@
                         <!-- ── Date + Time ── -->
                         <DataGridTextColumn Header="Date"
                                             Binding="{Binding Order.OrderDate, StringFormat='MMM d, yyyy  h:mm tt'}"
-                                            Width="160"
+                                            Width="165"
                                             ElementStyle="{StaticResource GridCellText}"/>
 
                         <!-- ── Items count ── -->
                         <DataGridTextColumn Header="Items"
                                             Binding="{Binding Order.ItemCount}"
-                                            Width="60"
+                                            Width="55"
                                             ElementStyle="{StaticResource GridCellText}"/>
 
                         <!-- ── Delivery type badge ── -->
-                        <DataGridTemplateColumn Header="Type" Width="100">
+                        <DataGridTemplateColumn Header="Type" Width="95"
+                                                SortMemberPath="Order.DeliveryType">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border CornerRadius="4" Padding="7,3"
@@ -389,10 +514,10 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <!-- ── Payment method ── -->
+                        <!-- ── Payment method (structured: Online > GCash) ── -->
                         <DataGridTextColumn Header="Payment"
-                                            Binding="{Binding Order.PaymentMethod}"
-                                            Width="90"
+                                            Binding="{Binding Order.PaymentMethodDisplay}"
+                                            Width="140"
                                             ElementStyle="{StaticResource GridCellText}"/>
 
                         <!-- ── Status badge ── -->
@@ -517,7 +642,7 @@
                                 <TextBlock Text="{Binding CustomerEmail}"   Style="{StaticResource FieldValue}"/>
 
                                 <TextBlock Text="Phone" Style="{StaticResource FieldLabel}"/>
-                                <TextBlock Text="{Binding ContactPhone, TargetNullValue='—'}"
+                                <TextBlock Text="{Binding ContactPhone, TargetNullValue='&#x2014;'}"
                                            Style="{StaticResource FieldValue}"/>
                             </StackPanel>
 
@@ -526,24 +651,29 @@
                                 <TextBlock Text="TOTALS" Style="{StaticResource SectionLabel}"/>
 
                                 <TextBlock Text="Subtotal"  Style="{StaticResource FieldLabel}"/>
-                                <TextBlock Text="{Binding SubTotal, StringFormat='₱{0:N2}'}"
+                                <TextBlock Text="{Binding SubTotal, StringFormat='&#x20B1;{0:N2}'}"
                                            Style="{StaticResource FieldValue}"/>
 
                                 <TextBlock Text="Discount"  Style="{StaticResource FieldLabel}"/>
-                                <TextBlock Text="{Binding DiscountAmount, StringFormat='−₱{0:N2}'}"
+                                <TextBlock Text="{Binding DiscountAmount, StringFormat='&#x2212;&#x20B1;{0:N2}'}"
                                            Style="{StaticResource FieldValue}"/>
 
                                 <TextBlock Text="Shipping"  Style="{StaticResource FieldLabel}"/>
-                                <TextBlock Text="{Binding ShippingFee, StringFormat='₱{0:N2}'}"
+                                <TextBlock Text="{Binding ShippingFee, StringFormat='&#x20B1;{0:N2}'}"
                                            Style="{StaticResource FieldValue}"/>
 
                                 <Separator Background="#374151" Margin="0,0,0,8"/>
                                 <TextBlock Text="Grand Total" Style="{StaticResource FieldLabel}"/>
-                                <TextBlock Text="{Binding GrandTotal, StringFormat='₱{0:N2}'}"
+                                <TextBlock Text="{Binding GrandTotal, StringFormat='&#x20B1;{0:N2}'}"
                                            Foreground="#34D399" FontSize="14" FontWeight="Bold"
                                            Margin="0,0,0,12"/>
                             </StackPanel>
                         </Grid>
+
+                        <!-- ── Payment info ── -->
+                        <TextBlock Text="Payment" Style="{StaticResource FieldLabel}"/>
+                        <TextBlock Text="{Binding PaymentMethodDisplay}" Style="{StaticResource FieldValue}"
+                                   FontWeight="SemiBold"/>
 
                         <!-- ── Delivery / Pickup info ── -->
                         <Border Background="#1F2937" CornerRadius="8" Padding="14"
@@ -628,12 +758,12 @@
                                         </StackPanel>
                                         <StackPanel Grid.Column="1">
                                             <TextBlock Text="Courier Status" Style="{StaticResource FieldLabel}"/>
-                                            <TextBlock Text="{Binding DeliveryStatus, TargetNullValue='—'}"
+                                            <TextBlock Text="{Binding DeliveryStatus, TargetNullValue='&#x2014;'}"
                                                        Style="{StaticResource FieldValue}"/>
                                         </StackPanel>
                                     </Grid>
                                     <TextBlock Text="Tracking"     Style="{StaticResource FieldLabel}"/>
-                                    <TextBlock Text="{Binding TrackingInfo, TargetNullValue='—'}"
+                                    <TextBlock Text="{Binding TrackingInfo, TargetNullValue='&#x2014;'}"
                                                Style="{StaticResource FieldValue}"/>
                                     <TextBlock Text="Est. Delivery" Style="{StaticResource FieldLabel}"/>
                                     <TextBlock Style="{StaticResource FieldValue}">
@@ -724,10 +854,10 @@
                                                     Binding="{Binding Quantity}"
                                                     Width="48"/>
                                 <DataGridTextColumn Header="Unit Price"
-                                                    Binding="{Binding UnitPrice, StringFormat='₱{0:N2}'}"
+                                                    Binding="{Binding UnitPrice, StringFormat='&#x20B1;{0:N2}'}"
                                                     Width="90"/>
                                 <DataGridTextColumn Header="Subtotal"
-                                                    Binding="{Binding Subtotal, StringFormat='₱{0:N2}'}"
+                                                    Binding="{Binding Subtotal, StringFormat='&#x20B1;{0:N2}'}"
                                                     Width="90"/>
                             </DataGrid.Columns>
                         </DataGrid>
@@ -755,10 +885,10 @@
                                             Style="{StaticResource PrimaryButton}"
                                             Margin="0,0,8,8"/>
 
-                                    <Button Content="Mark as Shipped"
-                                            Command="{Binding DataContext.MarkShippedCommand,
+                                    <Button Content="Mark as Out for Delivery"
+                                            Command="{Binding DataContext.MarkOutForDeliveryCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            IsEnabled="{Binding DataContext.CanMarkShipped,
+                                            IsEnabled="{Binding DataContext.CanMarkOutForDelivery,
                                                         RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             Style="{StaticResource PrimaryButton}"
                                             Margin="0,0,8,8"/>
@@ -774,6 +904,8 @@
                                     <Button Content="Cancel Order"
                                             Command="{Binding DataContext.CancelOrderCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            IsEnabled="{Binding DataContext.CanCancelOrder,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             Style="{StaticResource DangerButton}"
                                             Margin="0,0,8,8"/>
 

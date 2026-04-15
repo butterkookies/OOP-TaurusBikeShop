@@ -4,9 +4,19 @@ namespace AdminSystem_v2.Services
 {
     public interface IOrderService
     {
-        Task<IEnumerable<Order>> GetOrdersAsync(string? statusFilter = null);
+        /// <summary>
+        /// Returns online orders, optionally filtered by status and/or order type (Delivery/Pickup).
+        /// </summary>
+        Task<IEnumerable<Order>> GetOrdersAsync(string? statusFilter = null, string? typeFilter = null);
+
         Task<Order?> GetOrderDetailAsync(int orderId);
+
+        /// <summary>
+        /// Updates order status after validating the transition.
+        /// Throws <see cref="InvalidStatusTransitionException"/> on invalid transitions.
+        /// </summary>
         Task UpdateOrderStatusAsync(int orderId, string status);
+
         Task MarkReadyForPickupAsync(int orderId);
         Task ConfirmPickupAsync(int orderId);
 

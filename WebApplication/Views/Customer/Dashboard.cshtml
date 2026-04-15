@@ -138,7 +138,7 @@
                                 <p class="text-xs text-mid-gray mt-0.5">@order.OrderDate.ToString("MMM d, yyyy") &middot; @order.ItemCount item@(order.ItemCount != 1 ? "s" : "")</p>
                             </div>
 
-                            <div class="hidden sm:block">
+                            <div class="hidden sm:flex items-center shrink-0">
                                 @await Html.PartialAsync("~/Views/Customer/Partials/_OrderStatusBadge.cshtml", order.OrderStatus)
                             </div>
 

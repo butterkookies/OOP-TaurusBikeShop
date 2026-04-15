@@ -9,8 +9,8 @@ namespace AdminSystem_v2.Services
 
         public OrderService(IOrderRepository repo) => _repo = repo;
 
-        public Task<IEnumerable<Order>> GetOrdersAsync(string? statusFilter = null)
-            => _repo.GetOrdersAsync(statusFilter);
+        public Task<IEnumerable<Order>> GetOrdersAsync(string? statusFilter = null, string? typeFilter = null)
+            => _repo.GetOrdersAsync(statusFilter, typeFilter);
 
         public Task<Order?> GetOrderDetailAsync(int orderId)
             => _repo.GetOrderDetailAsync(orderId);

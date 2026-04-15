@@ -462,7 +462,7 @@ public sealed class OrderService : IOrderService
         if (order.OrderStatus == OrderStatuses.Delivered)
             return ServiceResult.Fail("This order has already been confirmed as delivered.");
 
-        if (order.OrderStatus != OrderStatuses.Shipped)
+        if (order.OrderStatus != OrderStatuses.OutForDelivery)
             return ServiceResult.Fail(
                 "Only orders that are out for delivery can be confirmed. " +
                 "Please contact support if you believe this is an error.");
@@ -534,7 +534,7 @@ public sealed class OrderService : IOrderService
                     EventType        = SystemLogEvents.OrderStatusChange,
                     EventDescription =
                         $"Order #{order.OrderNumber} confirmed delivered by customer. " +
-                        $"Status: {OrderStatuses.Shipped} → {OrderStatuses.Delivered}.",
+                        $"Status: {OrderStatuses.OutForDelivery} → {OrderStatuses.Delivered}.",
                     CreatedAt = DateTime.UtcNow
                 }, cancellationToken);
 
@@ -651,10 +651,10 @@ public sealed class OrderService : IOrderService
             Deliveries            = (order.Deliveries ?? []).ToList().AsReadOnly(),
             IsCancellable         = CancellableStatuses.Contains(order.OrderStatus),
             // Delivery confirmation is only available for courier-delivery orders
-            // (not pickup, not walk-in) that are currently in Shipped status.
+            // (not pickup, not walk-in) that are currently in OutForDelivery status.
             IsDeliveryConfirmable = !order.IsWalkIn
                                     && !isPickup
-                                    && order.OrderStatus == OrderStatuses.Shipped
+                                    && order.OrderStatus == OrderStatuses.OutForDelivery
         };
     }
 

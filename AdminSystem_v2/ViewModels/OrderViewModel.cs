@@ -48,7 +48,7 @@ namespace AdminSystem_v2.ViewModels
             OrderStatuses.Processing,
             OrderStatuses.ReadyForPickup,
             OrderStatuses.PickedUp,
-            OrderStatuses.Shipped,
+            OrderStatuses.OutForDelivery,
             OrderStatuses.Delivered,
             OrderStatuses.Cancelled,
         };
@@ -60,6 +60,25 @@ namespace AdminSystem_v2.ViewModels
             private set
             {
                 if (SetProperty(ref _selectedStatusFilter, value))
+                    _ = LoadAsync();
+            }
+        }
+
+        // ── Order type filter (Delivery / Pickup / All) ───────────────────────
+
+        /// <summary>All available order-type filter values.</summary>
+        public IReadOnlyList<string> TypeFilters { get; } = new List<string>
+        {
+            "All", OrderTypes.Delivery, OrderTypes.Pickup
+        };
+
+        private string _selectedTypeFilter = "All";
+        public  string SelectedTypeFilter
+        {
+            get => _selectedTypeFilter;
+            private set
+            {
+                if (SetProperty(ref _selectedTypeFilter, value))
                     _ = LoadAsync();
             }
         }
@@ -130,28 +149,40 @@ namespace AdminSystem_v2.ViewModels
         }
 
         // ── Single-order action availability ─────────────────────────────────
+        //    Only the immediate next valid status is enabled.
+        //    Terminal states disable all actions.
 
         public bool CanMarkReadyForPickup =>
-            SelectedOrder is { DeliveryType: "Pickup" }
-            && SelectedOrder.OrderStatus is OrderStatuses.Pending or OrderStatuses.Processing;
+            SelectedOrder is { DeliveryType: OrderTypes.Pickup } so
+            && !OrderStatuses.TerminalStatuses.Contains(so.OrderStatus)
+            && OrderStatuses.IsValidTransition(so.OrderStatus, OrderStatuses.ReadyForPickup);
 
         public bool CanConfirmPickup =>
-            SelectedOrder is { DeliveryType: "Pickup", OrderStatus: OrderStatuses.ReadyForPickup };
+            SelectedOrder is { DeliveryType: OrderTypes.Pickup } so
+            && OrderStatuses.IsValidTransition(so.OrderStatus, OrderStatuses.PickedUp);
 
-        public bool CanMarkShipped =>
-            SelectedOrder is { DeliveryType: "Delivery" }
-            && SelectedOrder.OrderStatus is OrderStatuses.Pending or OrderStatuses.Processing;
+        public bool CanMarkOutForDelivery =>
+            SelectedOrder is { DeliveryType: OrderTypes.Delivery } so
+            && !OrderStatuses.TerminalStatuses.Contains(so.OrderStatus)
+            && OrderStatuses.IsValidTransition(so.OrderStatus, OrderStatuses.OutForDelivery);
 
         public bool CanMarkDelivered =>
-            SelectedOrder is { DeliveryType: "Delivery", OrderStatus: OrderStatuses.Shipped };
+            SelectedOrder is { DeliveryType: OrderTypes.Delivery } so
+            && OrderStatuses.IsValidTransition(so.OrderStatus, OrderStatuses.Delivered);
+
+        public bool CanCancelOrder =>
+            SelectedOrder != null
+            && !OrderStatuses.TerminalStatuses.Contains(SelectedOrder.OrderStatus)
+            && OrderStatuses.IsValidTransition(SelectedOrder.OrderStatus, OrderStatuses.Cancelled);
 
         // ── Commands ──────────────────────────────────────────────────────────
 
         public ICommand RefreshCommand             { get; }
         public ICommand SelectStatusCommand        { get; }
+        public ICommand SelectTypeCommand          { get; }
         public ICommand MarkReadyForPickupCommand  { get; }
         public ICommand ConfirmPickupCommand       { get; }
-        public ICommand MarkShippedCommand         { get; }
+        public ICommand MarkOutForDeliveryCommand   { get; }
         public ICommand MarkDeliveredCommand       { get; }
         public ICommand CancelOrderCommand         { get; }
         public ICommand BulkUpdateStatusCommand    { get; }
@@ -167,13 +198,12 @@ namespace AdminSystem_v2.ViewModels
 
             RefreshCommand            = new RelayCommand(async () => await LoadAsync());
             SelectStatusCommand       = new RelayCommand<string>(s => SelectedStatusFilter = s ?? "All");
+            SelectTypeCommand         = new RelayCommand<string>(t => SelectedTypeFilter = t ?? "All");
             MarkReadyForPickupCommand = new RelayCommand(async () => await MarkReadyForPickupAsync(),  () => CanMarkReadyForPickup);
             ConfirmPickupCommand      = new RelayCommand(async () => await ConfirmPickupAsync(),       () => CanConfirmPickup);
-            MarkShippedCommand        = new RelayCommand(async () => await MarkShippedAsync(),         () => CanMarkShipped);
+            MarkOutForDeliveryCommand = new RelayCommand(async () => await MarkOutForDeliveryAsync(),  () => CanMarkOutForDelivery);
             MarkDeliveredCommand      = new RelayCommand(async () => await MarkDeliveredAsync(),       () => CanMarkDelivered);
-            CancelOrderCommand        = new RelayCommand(async () => await CancelOrderAsync(),
-                                            () => SelectedOrder?.OrderStatus
-                                                    is OrderStatuses.Pending or OrderStatuses.Processing);
+            CancelOrderCommand        = new RelayCommand(async () => await CancelOrderAsync(),         () => CanCancelOrder);
             BulkUpdateStatusCommand   = new RelayCommand<string>(async s => await BulkUpdateStatusAsync(s), _ => HasSelection);
             BulkCancelCommand         = new RelayCommand(async () => await BulkCancelAsync(),          () => HasSelection);
             DeselectAllCommand        = new RelayCommand(() => IsAllSelected = false,                  () => HasSelection);
@@ -191,8 +221,10 @@ namespace AdminSystem_v2.ViewModels
             ClearMessages();
             try
             {
-                string? filter   = SelectedStatusFilter == "All" ? null : SelectedStatusFilter;
-                var orders = await _orderService.GetOrdersAsync(filter);
+                string? statusFilter = SelectedStatusFilter == "All" ? null : SelectedStatusFilter;
+                string? typeFilter   = SelectedTypeFilter   == "All" ? null : SelectedTypeFilter;
+
+                var orders = await _orderService.GetOrdersAsync(statusFilter, typeFilter);
                 var counts = await _orderService.GetStatusCountsAsync();
 
                 int? previousId  = _selectedRow?.Order.OrderId;
@@ -282,7 +314,7 @@ namespace AdminSystem_v2.ViewModels
                 Badge(OrderStatuses.Processing,     "Processing",       counts.GetValueOrDefault(OrderStatuses.Processing),     0x1F,0x12,0x00, 0xF9,0x73,0x16),
                 Badge(OrderStatuses.ReadyForPickup, "Ready for Pickup", counts.GetValueOrDefault(OrderStatuses.ReadyForPickup), 0x0F,0x1E,0x3D, 0x60,0xA5,0xFA),
                 Badge(OrderStatuses.PickedUp,       "Picked Up",        counts.GetValueOrDefault(OrderStatuses.PickedUp),       0x0A,0x1F,0x0E, 0x34,0xD3,0x99),
-                Badge(OrderStatuses.Shipped,        "Shipped",          counts.GetValueOrDefault(OrderStatuses.Shipped),        0x1A,0x0A,0x3D, 0xA7,0x8B,0xFA),
+                Badge(OrderStatuses.OutForDelivery, "Out for Delivery", counts.GetValueOrDefault(OrderStatuses.OutForDelivery),  0x1A,0x0A,0x3D, 0xA7,0x8B,0xFA),
                 Badge(OrderStatuses.Delivered,      "Delivered",        counts.GetValueOrDefault(OrderStatuses.Delivered),      0x0A,0x1F,0x0E, 0x34,0xD3,0x99),
                 Badge(OrderStatuses.Cancelled,      "Cancelled",        counts.GetValueOrDefault(OrderStatuses.Cancelled),      0x1F,0x00,0x00, 0xF8,0x71,0x71),
             };
@@ -359,12 +391,12 @@ namespace AdminSystem_v2.ViewModels
                 $"Pickup confirmed for order {SelectedOrder.OrderNumber}.");
         }
 
-        private async Task MarkShippedAsync()
+        private async Task MarkOutForDeliveryAsync()
         {
             if (SelectedOrder == null) return;
             await ExecuteOrderActionAsync(
-                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.Shipped),
-                $"Order {SelectedOrder.OrderNumber} marked as Shipped.");
+                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.OutForDelivery),
+                $"Order {SelectedOrder.OrderNumber} marked as Out for Delivery.");
         }
 
         private async Task MarkDeliveredAsync()
@@ -394,14 +426,29 @@ namespace AdminSystem_v2.ViewModels
             var targets = Orders.Where(o => o.IsSelected).Select(o => o.Order).ToList();
             if (targets.Count == 0) return;
 
-            if (!_dialog.Confirm(
-                    $"Update {targets.Count} order(s) to '{status}'?",
-                    "Bulk Update Status")) return;
+            // Pre-validate: filter to only orders where the transition is valid
+            var valid   = targets.Where(o => OrderStatuses.IsValidTransition(o.OrderStatus, status)).ToList();
+            int skipped = targets.Count - valid.Count;
+
+            if (valid.Count == 0)
+            {
+                ShowError($"None of the {targets.Count} selected order(s) can transition to '{status}'. " +
+                          "Reverting status is not allowed.");
+                return;
+            }
+
+            string message = skipped > 0
+                ? $"Update {valid.Count} order(s) to '{status}'? ({skipped} order(s) will be skipped — invalid transition.)"
+                : $"Update {valid.Count} order(s) to '{status}'?";
+
+            if (!_dialog.Confirm(message, "Bulk Update Status")) return;
 
             await ExecuteBulkActionAsync(
                 o => _orderService.UpdateOrderStatusAsync(o.OrderId, status),
-                targets,
-                $"{targets.Count} order(s) updated to '{status}'.");
+                valid,
+                skipped > 0
+                    ? $"{valid.Count} order(s) updated to '{status}'. {skipped} skipped (invalid transition)."
+                    : $"{valid.Count} order(s) updated to '{status}'.");
         }
 
         private async Task BulkCancelAsync()
@@ -409,14 +456,29 @@ namespace AdminSystem_v2.ViewModels
             var targets = Orders.Where(o => o.IsSelected).Select(o => o.Order).ToList();
             if (targets.Count == 0) return;
 
-            if (!_dialog.Confirm(
-                    $"Cancel {targets.Count} order(s)? This cannot be undone.",
-                    "Bulk Cancel Orders")) return;
+            // Pre-validate: only orders that can be cancelled
+            var valid   = targets.Where(o => OrderStatuses.IsValidTransition(o.OrderStatus, OrderStatuses.Cancelled)).ToList();
+            int skipped = targets.Count - valid.Count;
+
+            if (valid.Count == 0)
+            {
+                ShowError($"None of the {targets.Count} selected order(s) can be cancelled. " +
+                          "Orders in terminal states cannot be modified.");
+                return;
+            }
+
+            string message = skipped > 0
+                ? $"Cancel {valid.Count} order(s)? This cannot be undone. ({skipped} order(s) will be skipped — already in terminal state.)"
+                : $"Cancel {valid.Count} order(s)? This cannot be undone.";
+
+            if (!_dialog.Confirm(message, "Bulk Cancel Orders")) return;
 
             await ExecuteBulkActionAsync(
                 o => _orderService.UpdateOrderStatusAsync(o.OrderId, OrderStatuses.Cancelled),
-                targets,
-                $"{targets.Count} order(s) cancelled.");
+                valid,
+                skipped > 0
+                    ? $"{valid.Count} order(s) cancelled. {skipped} skipped (terminal state)."
+                    : $"{valid.Count} order(s) cancelled.");
         }
 
         // ── Shared action helpers ─────────────────────────────────────────────
@@ -430,6 +492,11 @@ namespace AdminSystem_v2.ViewModels
                 await action();
                 ShowSuccess(successMessage);
                 await LoadAsync();
+            }
+            catch (InvalidStatusTransitionException ex)
+            {
+                ShowError(ex.Message);
+                System.Diagnostics.Debug.WriteLine($"[Orders] Rejected transition: {ex}");
             }
             catch (Exception ex)
             {
@@ -452,6 +519,11 @@ namespace AdminSystem_v2.ViewModels
                 foreach (var order in targets)
                 {
                     try   { await action(order); }
+                    catch (InvalidStatusTransitionException)
+                    {
+                        // Already validated client-side; race condition with another admin
+                        failed++;
+                    }
                     catch { failed++; }
                 }
 
@@ -476,8 +548,9 @@ namespace AdminSystem_v2.ViewModels
         {
             OnPropertyChanged(nameof(CanMarkReadyForPickup));
             OnPropertyChanged(nameof(CanConfirmPickup));
-            OnPropertyChanged(nameof(CanMarkShipped));
+            OnPropertyChanged(nameof(CanMarkOutForDelivery));
             OnPropertyChanged(nameof(CanMarkDelivered));
+            OnPropertyChanged(nameof(CanCancelOrder));
         }
     }
 }

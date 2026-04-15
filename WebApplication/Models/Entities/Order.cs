@@ -21,7 +21,7 @@ namespace WebApplication.Models.Entities;
 /// <para>
 /// <b>OrderStatus flow:</b>
 /// <list type="bullet">
-///   <item>Online delivery: Pending → PendingVerification → Processing → Shipped → Delivered</item>
+///   <item>Online delivery: Pending → PendingVerification → Processing → OutForDelivery → Delivered</item>
 ///   <item>Store pickup: Pending → ReadyForPickup → PickedUp</item>
 ///   <item>Payment hold: Pending → OnHold</item>
 ///   <item>Cancellation: any non-terminal state → Cancelled</item>
@@ -246,10 +246,10 @@ public static class OrderStatuses
     public const string PickedUp = "PickedUp";
 
     /// <summary>
-    /// Order has been handed to the courier (Lalamove or LBC) for delivery.
+    /// Order has been picked up by the courier (Lalamove or LBC) and is out for delivery.
     /// Set by AdminSystem after courier booking is confirmed.
     /// </summary>
-    public const string Shipped = "Shipped";
+    public const string OutForDelivery = "OutForDelivery";
 
     /// <summary>
     /// Order has been successfully delivered to the customer.
