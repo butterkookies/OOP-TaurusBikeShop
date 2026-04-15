@@ -217,7 +217,7 @@
                         <!-- Search box with placeholder overlay -->
                         <Grid Grid.Column="0">
                             <TextBox Text="{Binding ListSearch, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}"
+
                                      x:Name="VoucherListSearch"/>
                             <TextBlock Text="Search vouchers by code..."
                                        Foreground="#4B5563" FontSize="13"
@@ -401,7 +401,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0"
                                          Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource FormTextBox}"
+
                                          CharacterCasing="Upper"/>
                                 <Button Grid.Column="2"
                                         Command="{Binding GenerateCodeCommand}"
@@ -412,7 +412,7 @@
                             <!-- Description -->
                             <TextBlock Text="DESCRIPTION (optional)" Style="{StaticResource FieldLabel}"/>
                             <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}"
+
                                      Height="72" TextWrapping="Wrap"
                                      AcceptsReturn="True"
                                      Margin="0,0,0,14"/>
@@ -421,7 +421,7 @@
                             <TextBlock Text="DISCOUNT TYPE" Style="{StaticResource FieldLabel}"/>
                             <ComboBox ItemsSource="{Binding DiscountTypes}"
                                       SelectedItem="{Binding DiscountType}"
-                                      Style="{StaticResource FormComboBox}"
+
                                       Margin="0,0,0,14"/>
 
                             <!-- Discount Value -->
@@ -439,13 +439,13 @@
                                 </TextBlock.Style>
                             </TextBlock>
                             <TextBox Text="{Binding DiscountValueText, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}"
+
                                      Margin="0,0,0,14"/>
 
                             <!-- Min Order Amount -->
                             <TextBlock Text="MINIMUM ORDER AMOUNT (optional)" Style="{StaticResource FieldLabel}"/>
                             <TextBox Text="{Binding MinOrderText, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}"
+
                                      Margin="0,0,0,14"/>
 
                             <!-- Max Uses / Per User -->
@@ -458,13 +458,13 @@
                                 <StackPanel Grid.Column="0">
                                     <TextBlock Text="MAX TOTAL USES" Style="{StaticResource FieldLabel}"/>
                                     <TextBox Text="{Binding MaxUsesText, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource FormTextBox}"
+
                                              Tag="Unlimited"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="2">
                                     <TextBlock Text="MAX PER USER" Style="{StaticResource FieldLabel}"/>
                                     <TextBox Text="{Binding MaxUsesPerUserText, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource FormTextBox}"
+
                                              Tag="Unlimited"/>
                                 </StackPanel>
                             </Grid>
@@ -558,7 +558,7 @@
                                 <Grid Margin="0,0,0,6">
                                     <ComboBox ItemsSource="{Binding Vouchers}"
                                               SelectedItem="{Binding AssignVoucher}"
-                                              Style="{StaticResource FormComboBox}">
+>
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <TextBlock Foreground="#E5E7EB" FontSize="12">
@@ -685,7 +685,7 @@
                                     <Grid>
                                         <Grid>
                                             <TextBox Text="{Binding UserSearch, UpdateSourceTrigger=PropertyChanged}"
-                                                     Style="{StaticResource FormTextBox}"/>
+/>
                                             <TextBlock Text="Search users..."
                                                        Foreground="#4B5563" FontSize="13"
                                                        Margin="12,0" VerticalAlignment="Center"

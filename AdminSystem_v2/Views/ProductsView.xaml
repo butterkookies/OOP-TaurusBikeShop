@@ -24,7 +24,7 @@
                 <!-- Search box with placeholder overlay -->
                 <Grid Grid.Column="0" VerticalAlignment="Center">
                     <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FormTextBox}"
+
                              x:Name="ProductSearchBox"/>
                     <TextBlock Text="Search products by name..."
                                Foreground="#4B5563" FontSize="13"
@@ -233,17 +233,17 @@
                     <!-- Name -->
                     <TextBlock Text="Product Name *" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding EditProduct.Name, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FormTextBox}" Margin="0,0,0,12"/>
+ Margin="0,0,0,12"/>
 
                     <!-- Short description -->
                     <TextBlock Text="Short Description" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding EditProduct.ShortDescription, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FormTextBox}" Margin="0,0,0,12"/>
+ Margin="0,0,0,12"/>
 
                     <!-- Full description -->
                     <TextBlock Text="Description" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding EditProduct.Description, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FormTextBox}" Height="80"
+ Height="80"
                              TextWrapping="Wrap" AcceptsReturn="True"
                              VerticalScrollBarVisibility="Auto"
                              Margin="0,0,0,12"/>
@@ -259,7 +259,7 @@
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="Price (PHP) *" Style="{StaticResource FieldLabel}"/>
                             <TextBox Text="{Binding EditProduct.Price, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}"/>
+/>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
@@ -268,7 +268,7 @@
                                       SelectedValuePath="CategoryId"
                                       SelectedValue="{Binding EditProduct.CategoryId}"
                                       DisplayMemberPath="Name"
-                                      Style="{StaticResource FormComboBox}"/>
+/>
                         </StackPanel>
                     </Grid>
 
@@ -286,7 +286,7 @@
                                       SelectedValuePath="BrandId"
                                       SelectedValue="{Binding EditProduct.BrandId}"
                                       DisplayMemberPath="BrandName"
-                                      Style="{StaticResource FormComboBox}"/>
+/>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
@@ -436,7 +436,7 @@
                             <!-- TextBox with overlay placeholder -->
                             <Grid Grid.Column="0">
                                 <TextBox Text="{Binding NewImageUrl, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource FormTextBox}"/>
+/>
                                 <TextBlock Text="Paste Cloudinary image URL..."
                                            Foreground="#4B5563" FontSize="13"
                                            Margin="12,0" VerticalAlignment="Center"
@@ -562,16 +562,16 @@
                     <TextBlock Text="Change Quantity (negative to reduce)"
                                Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding AdjustQty, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FormTextBox}" Margin="0,0,0,12"/>
+ Margin="0,0,0,12"/>
 
                     <TextBlock Text="Change Type" Style="{StaticResource FieldLabel}"/>
                     <ComboBox ItemsSource="{Binding AdjustTypes}"
                               SelectedItem="{Binding AdjustType}"
-                              Style="{StaticResource FormComboBox}" Margin="0,0,0,12"/>
+ Margin="0,0,0,12"/>
 
                     <TextBlock Text="Notes (optional)" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding AdjustNotes, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FormTextBox}" Margin="0,0,0,20"/>
+ Margin="0,0,0,20"/>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Content="Cancel" Command="{Binding CancelAdjustCommand}"
@@ -596,11 +596,11 @@
 
                     <TextBlock Text="Variant Name *" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding NewVariant.VariantName, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FormTextBox}" Margin="0,0,0,12"/>
+ Margin="0,0,0,12"/>
 
                     <TextBlock Text="SKU" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding NewVariant.SKU, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FormTextBox}" Margin="0,0,0,12"/>
+ Margin="0,0,0,12"/>
 
                     <Grid Margin="0,0,0,12">
                         <Grid.ColumnDefinitions>
@@ -611,12 +611,12 @@
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="Initial Stock" Style="{StaticResource FieldLabel}"/>
                             <TextBox Text="{Binding NewVariant.StockQuantity, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}"/>
+/>
                         </StackPanel>
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="Reorder At" Style="{StaticResource FieldLabel}"/>
                             <TextBox Text="{Binding NewVariant.ReorderThreshold, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}"/>
+/>
                         </StackPanel>
                     </Grid>
 

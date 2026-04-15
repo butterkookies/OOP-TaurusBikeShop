@@ -146,7 +146,7 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0">
-                            <TextBox Style="{StaticResource FormTextBox}"
+                            <TextBox
                                      Text="{Binding ProductSearch, UpdateSourceTrigger=PropertyChanged}"
                                      x:Name="POSProductSearchBox"/>
                             <TextBlock Text="Search by name, variant, or SKU..."
@@ -320,7 +320,7 @@
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
                                         <Grid Grid.Row="0">
-                                            <TextBox Style="{StaticResource FormTextBox}"
+                                            <TextBox
                                                      Text="{Binding CustomerSearch, UpdateSourceTrigger=PropertyChanged}"
                                                      x:Name="CustomerSearchBox"/>
                                             <TextBlock Text="Search customers..."
@@ -524,7 +524,7 @@
                                 <!-- Input (visible when no voucher applied) -->
                                 <TextBox Grid.Column="0"
                                          x:Name="VoucherCodeBox"
-                                         Style="{StaticResource FormTextBox}"
+
                                          Text="{Binding VoucherCodeInput, UpdateSourceTrigger=PropertyChanged}"
                                          Padding="8,4"
                                          FontSize="12"
@@ -820,7 +820,7 @@
                                        Foreground="#9CA3AF" FontSize="12"
                                        VerticalAlignment="Center"/>
                             <TextBox Grid.Column="1"
-                                     Style="{StaticResource FormTextBox}"
+
                                      Text="{Binding CashReceivedText, UpdateSourceTrigger=PropertyChanged}"
                                      Padding="8,4" FontSize="12"
                                      TextAlignment="Right"/>

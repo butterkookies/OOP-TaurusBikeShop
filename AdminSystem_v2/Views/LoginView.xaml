@@ -18,9 +18,9 @@
             <Setter Property="Foreground"   Value="#F9FAFB"/>
             <Setter Property="BorderBrush"  Value="#374151"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"      Value="10,0"/>
+            <Setter Property="Padding"      Value="8,0"/>
             <Setter Property="FontSize"     Value="13"/>
-            <Setter Property="Height"       Value="40"/>
+            <Setter Property="Height"       Value="36"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="CaretBrush"   Value="#F9FAFB"/>
         </Style>
@@ -30,9 +30,10 @@
             <Setter Property="Foreground"   Value="#F9FAFB"/>
             <Setter Property="BorderBrush"  Value="#374151"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"      Value="10,0"/>
+            <Setter Property="Padding"      Value="8,0"/>
             <Setter Property="FontSize"     Value="13"/>
-            <Setter Property="Height"       Value="40"/>
+            <Setter Property="Height"       Value="36"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
         <!-- Primary button -->

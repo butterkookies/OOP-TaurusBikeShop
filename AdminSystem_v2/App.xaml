@@ -42,7 +42,7 @@
         </Style>
 
         <!-- ── Shared form controls ─────────────────────────────────────── -->
-        <Style x:Key="FormTextBox" TargetType="TextBox">
+        <Style TargetType="TextBox">
             <Setter Property="Background"        Value="#111827"/>
             <Setter Property="Foreground"        Value="#F9FAFB"/>
             <Setter Property="CaretBrush"        Value="#3B82F6"/>
@@ -50,7 +50,8 @@
             <Setter Property="SelectionOpacity"  Value="0.3"/>
             <Setter Property="BorderBrush"       Value="#374151"/>
             <Setter Property="BorderThickness"   Value="1"/>
-            <Setter Property="Padding"           Value="12,10"/>
+            <Setter Property="Height"            Value="36"/>
+            <Setter Property="Padding"           Value="8,0"/>
             <Setter Property="FontSize"          Value="14"/>
             <Setter Property="FontFamily"        Value="Segoe UI, Inter, Arial"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -86,14 +87,60 @@
             </Setter>
         </Style>
 
-        <Style x:Key="FormComboBox" TargetType="ComboBox">
+        <Style TargetType="PasswordBox">
+            <Setter Property="Background"        Value="#111827"/>
+            <Setter Property="Foreground"        Value="#F9FAFB"/>
+            <Setter Property="CaretBrush"        Value="#3B82F6"/>
+            <Setter Property="SelectionBrush"    Value="#3B82F6"/>
+            <Setter Property="SelectionOpacity"  Value="0.3"/>
+            <Setter Property="BorderBrush"       Value="#374151"/>
+            <Setter Property="BorderThickness"   Value="1"/>
+            <Setter Property="Height"            Value="36"/>
+            <Setter Property="Padding"           Value="8,0"/>
+            <Setter Property="FontSize"          Value="14"/>
+            <Setter Property="FontFamily"        Value="Segoe UI, Inter, Arial"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                SnapsToDevicePixels="True"
+                                Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4B5563"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ComboBox">
             <Setter Property="Background"      Value="#111827"/>
             <Setter Property="Foreground"      Value="White"/>
             <Setter Property="BorderBrush"     Value="#374151"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"         Value="10,8"/>
-            <Setter Property="FontSize"        Value="13"/>
-            <Setter Property="Height"          Value="38"/>
+            <Setter Property="Padding"         Value="8,0"/>
+            <Setter Property="FontSize"        Value="14"/>
+            <Setter Property="Height"          Value="36"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBox">

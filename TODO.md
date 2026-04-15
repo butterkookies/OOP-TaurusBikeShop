@@ -1,61 +1,97 @@
-AdminSystem_v2 – Orders Module Fix List
-	1.	Status Progression Lock (Non-Reversible)
+Use this prompt. It is structured to force deep inspection, strict criticism, and alignment with your actual system.
 
-	•	Enforce one-directional status flow (e.g., Pending → Processing → Completed).
-	•	Disallow reverting to any previous status (e.g., Processing → Pending = blocked).
-	•	Treat terminal states (e.g., Cancelled, Completed) as permanent.
+---
 
-	2.	Automatic Validation on Update
+**PROMPT:**
 
-	•	On every status change, validate against allowed forward transitions.
-	•	Reject invalid transitions at backend level (not UI-only).
+You are a senior database architect and software auditor. Your task is to perform a strict, production-level review of a SQL schema and identify all structural, logical, and implementation flaws.
 
-	3.	Disable Invalid Status Actions (UI Guardrail)
+### Context
 
-	•	Disable all buttons representing previous statuses once advanced.
-	•	Disable all actions if order is in a terminal state.
-	•	Only allow the immediate next valid status.
+* The system is a full-stack application (Admin + Customer system).
+* Tech stack includes .NET (WPF + Web), likely using SQL Server.
+* The schema is intended for real-world production use (not academic).
+* The system includes features like orders, users, payments, inventory, and possibly delivery vs pickup logic.
 
-	4.	Clear Error Handling
+### Task Instructions
 
-	•	Return explicit system message on invalid attempts (e.g., “Reverting status is not allowed”).
-	•	Log rejected transitions for audit.
+1. **Load and Analyze Schema**
 
-	5.	Order Type Segregation (Delivery vs Pickup)
+   * Read the SQL file from this relative path:
 
-	•	Separate views or tabs:
-	•	Delivery Orders
-	•	In-Store Pickup Orders
-	•	Ensure filtering is persistent and clear to admin.
-	•	Prevent visual mixing of order types.
+     ```
+     SQL\Schema\Taurus_schema_8.1.sql
+     ```
+   * Parse all tables, constraints, relationships, indexes, and data types.
 
-	6.	Admin Workflow Optimization
+2. **Strict Structural Review**
+   Identify and explain:
 
-	•	Add labels/tags per order type (Delivery / Pickup) visible in list.
-	•	Ensure POS view aligns with pickup flow only.
+   * Missing or incorrect primary keys
+   * Foreign key issues (missing, incorrect references, cascade problems)
+   * Improper normalization (1NF, 2NF, 3NF violations)
+   * Redundant or duplicated data
+   * Inconsistent naming conventions
+   * Bad data types (e.g., using NVARCHAR where INT/DATE is appropriate)
+   * Nullability issues (columns that should/shouldn’t allow NULL)
 
-	7.	Payment Column Fix
+3. **Logic and Business Rule Validation**
+   Evaluate whether the schema properly supports:
 
-	•	Replace generic “Online” with structured display:
-	•	Format: Online > GCash
-	•	Format: Online > Bank Transfer
-	•	Ensure mapping reflects actual payment method used.
-	•	Normalize values from database (no inconsistent strings).
+   * Separation or unification of Admin vs Customer users
+   * Order flows (online delivery vs in-store pickup)
+   * Payment methods (e.g., GCash, bank transfer, cash)
+   * Inventory tracking and stock consistency
+   * Audit/history tracking where needed
 
-	8.	Data Consistency Enforcement
+   Identify:
 
-	•	Standardize enums/values for:
-	•	Order Status
-	•	Order Type (Delivery / Pickup)
-	•	Payment Method (GCash, Bank Transfer, etc.)
-	•	Prevent free-text inconsistencies.
+   * Missing tables or relationships
+   * Incorrect assumptions in schema design
+   * Logical inconsistencies that will break real system behavior
 
-	9.	UI Layout Stability
+4. **Security Review**
 
-	•	Ensure columns (Status, Payment, Order Type) do not overlap or truncate.
-	•	Maintain consistent alignment and spacing across Orders table.
+   * Detect unsafe practices (e.g., storing plaintext passwords)
+   * Evaluate use of sensitive fields
+   * Suggest improvements (hashing, salting, secrets handling)
 
-	10.	Audit Trail (Optional but Recommended)
+5. **Performance Review**
 
-	•	Track status changes with timestamp and admin ID.
-	•	Useful for debugging and accountability.
+   * Missing indexes on frequently queried fields
+   * Over-indexing
+   * Inefficient relationships or table structures
+   * Potential query bottlenecks
+
+6. **Scalability Assessment**
+
+   * Will this schema scale with thousands/millions of records?
+   * Identify design decisions that will fail under load
+
+7. **Real System Reflection**
+
+   * Based on the schema, infer how the actual system behaves
+   * Point out mismatches between expected system behavior and schema design
+   * Example: If delivery vs pickup exists in UI but not properly modeled in DB, flag it
+
+8. **Output Format**
+   Structure your response as:
+
+   * **Critical Issues (Must Fix)**
+   * **Major Design Flaws**
+   * **Minor Issues / Improvements**
+   * **Security Risks**
+   * **Performance Concerns**
+   * **Scalability Risks**
+   * **Mismatch Between Schema and Real System**
+   * **Recommended Refactored Design (if necessary)**
+
+9. **Tone Requirement**
+
+   * Be brutally honest
+   * Do not soften criticism
+   * Treat this as a production system that could fail
+
+---
+
+This forces the AI to behave like a real auditor instead of giving surface-level feedback.

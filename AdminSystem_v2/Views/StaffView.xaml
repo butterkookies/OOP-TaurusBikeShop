@@ -210,7 +210,7 @@
                         BorderBrush="#374151" BorderThickness="0,0,0,1">
                     <Grid>
                         <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource FormTextBox}"
+
                                  x:Name="StaffSearchBox"/>
                         <TextBlock Text="Search by name or email..."
                                    Foreground="#4B5563" FontSize="13"
@@ -431,7 +431,7 @@
                                                             RelativeSource={RelativeSource AncestorType=UserControl}}"
                                               SelectedItem="{Binding DataContext.SelectedRole,
                                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                              Style="{StaticResource FormComboBox}"
+
                                               IsEnabled="{Binding DataContext.IsSelectedSelf,
                                                           RelativeSource={RelativeSource AncestorType=UserControl},
                                                           Converter={StaticResource InverseBool}}"/>
@@ -541,7 +541,7 @@
                                              Text="{Binding DataContext.NewPasswordText,
                                                     RelativeSource={RelativeSource AncestorType=UserControl},
                                                     UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource FormTextBox}"
+
                                              Tag="New password (min. 8 chars)"
                                              IsEnabled="{Binding DataContext.IsSelectedSelf,
                                                          RelativeSource={RelativeSource AncestorType=UserControl},
@@ -631,38 +631,38 @@
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="First Name" Style="{StaticResource FieldLabel}"/>
                             <TextBox Text="{Binding NewFirstName, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}"/>
+/>
                         </StackPanel>
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="Last Name" Style="{StaticResource FieldLabel}"/>
                             <TextBox Text="{Binding NewLastName, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource FormTextBox}"/>
+/>
                         </StackPanel>
                     </Grid>
 
                     <!-- Email -->
                     <TextBlock Text="Email" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding NewEmail, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FormTextBox}"
+
                              Margin="0,0,0,14"/>
 
                     <!-- Phone -->
                     <TextBlock Text="Phone (optional)" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding NewPhone, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FormTextBox}"
+
                              Margin="0,0,0,14"/>
 
                     <!-- Role -->
                     <TextBlock Text="Role" Style="{StaticResource FieldLabel}"/>
                     <ComboBox ItemsSource="{Binding StaffRoleNames}"
                               SelectedItem="{Binding NewRole}"
-                              Style="{StaticResource FormComboBox}"
+
                               Margin="0,0,0,14"/>
 
                     <!-- Password -->
                     <TextBlock Text="Password (min. 8 chars)" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding NewPassword, UpdateSourceTrigger=PropertyChanged}"
-                             Style="{StaticResource FormTextBox}"
+
                              Margin="0,0,0,24"/>
 
                     <!-- Action buttons -->

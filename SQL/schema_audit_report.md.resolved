@@ -1,0 +1,79 @@
+# Taurus Bike Shop Database Schema 8.1 - Audit Report
+
+**Prepared By:** Senior Database Architect & Software Auditor
+**Target Schema:** [SQL\Schema\Taurus_schema_8.1.sql](file:///c:/Andrei.dev/Projects/OOP-TaurusBikeShop/SQL/Schema/Taurus_schema_8.1.sql)
+**Database Environment:** SQL Server 2026 / .NET 8 WPF + Web
+
+---
+
+## 1. Critical Issues (Must Fix)
+
+### Guest Checkout is Structurally Broken
+The `[Order]` table defines `UserId [int] NOT NULL` (Line 549). While `GuestSession` exists to handle unauthenticated carts, the moment a guest converts their cart to an order, the system is forced by the schema to attach a registered `UserId`. Unless the application creates "shadow" users for every guest, a true guest checkout without an account will crash with an INSERT violation.
+
+### Order Entity Duplication (Delivery vs Pickup)
+There is no structural enforcement preventing an order from being assigned **both** a `Delivery` record and a `PickupOrder` record. This will inevitably lead to corrupt fulfillment states where a package is marked for both LBC tracking and waiting at the counter.
+*Fix: Add a `DeliveryMethod` column on `Order` and trigger checks, or use an exclusive arc.*
+
+### Missing Unique Constraint on GCash Transaction ID
+While `Product.SKU` and `Voucher.Code` successfully have `UNIQUE NONCLUSTERED` indexes, `GCashPayment.GcashTransactionId` **does not have a unique constraint**. Duplicate transaction IDs can be submitted, creating a severe double-spend vulnerability if the application logic fails to check it under concurrent load.
+
+### Unsafe Guest Token Length & Handling
+`GuestSession.SessionToken` is `NVARCHAR(100)`. If these tokens are guessable or sequentially generated, session hijacking is trivial. The DB cannot enforce randomness, but a UUID type `UNIQUEIDENTIFIER` would forcefully guarantee secure entropy compared to a generic string.
+
+---
+
+## 2. Major Design Flaws
+
+### E-Commerce Identity Over-Unification (Admin / Customer / Walk-In)
+The `User` table tightly unifies Customers, Staff, Admins, and Walk-In POS ghosts. Because "Walk-In" POS users do not have emails or passwords, `Email` and `PasswordHash` are entirely nullable. 
+**Flaw:** Without a `CHECK` constraint enforcing `IsWalkIn = 1 OR (Email IS NOT NULL AND PasswordHash IS NOT NULL)`, a standard online customer can easily be saved into the database without login credentials due to an application bug, silently breaking their account access forever.
+
+### Circular Data Dependencies in Orders
+The `Order` table computes `SubTotal`, `DiscountAmount`, and `ShippingFee`. However, `Subtotal` is technically derivable from `SUM(OrderItem.Quantity * OrderItem.UnitPrice)`. Since it is stored physically on the `Order`, there is no database-level enforcement that keeps the `Order` aggregate perfectly synced with the `OrderItem` lines.
+
+### Loss of `Cart` Lineage
+The `Order` table lacks a `CartId` FK. Once a cart is checked out (`IsCheckedOut = 1`), there is no definitive, auditable line tying `Order 1234` back to `Cart 5678`. This destroys data analytics for abandoned cart conversions and checkout funneling.
+
+---
+
+## 3. Minor Issues / Improvements
+
+*   **Denormalized Hardware Specs:** The `Product` table has rigid columns for `WheelSize`, `SpeedCompatibility`, `BrakeType`, etc. If Taurus begins selling helmets, gloves, or nutrition, these columns instantly become dead weight. Consider migrating to a JSON column (`ProductSpecs NVARCHAR(MAX) ISJSON`) or a normalized EAV structure for flexibility.
+*   **OTP Verification State:** `OTPVerification.OTPCode` is raw text. It sits in the database waiting to be read. It should ideally be hashed `SHA256` similar to a password.
+*   **Delivery Address is Stale:** There is no snapshotting of the shipping address details physically on the `Order` table. It relies on `ShippingAddressId` FK linking back to `Address`. Although `Address` implements `IsSnapshot = 1` logic, querying historical orders requires navigating a cumbersome address versioning model.
+
+---
+
+## 4. Security Risks
+
+*   **Plaintext Sensitive Data:** The `OTPCode` in `OTPVerification` is fully plaintext and easily compromised via SQL injection or rogue admin reads.
+*   **Missing API Security Columns:** There are no API keys, Refresh Tokens, or hardware IDs managed in the schema. For a dual WPF + Web architecture, managing JWT revocations usually requires a `RefreshToken` or `Session` log that is notably absent structure-wise.
+*   **Soft Deletion Missing:** Data deletion relies completely on EF Core cascading physical `DELETE` instructions (seen extensively via `ON DELETE CASCADE`), destroying financial auditability. Standard production systems utilize `IsDeleted` flags instead.
+
+---
+
+## 5. Performance Concerns
+
+*   **TPT (Table-Per-Type) Join Overhead:** `Payment` has two subtypes (`GCashMeasurement`, `BankTransferPayment`). `Delivery` has two subtypes (`LalamoveDelivery`, `LBCDelivery`). In Entity Framework, reading these entities mandates multiple `LEFT JOIN` layers exactly like `vw_PaymentDetail` models it. While highly normalized, this pattern becomes an I/O bottleneck on e-commerce transaction grids if row counts swell into the millions.
+*   **Massive Index Build-Up:** The schema includes a phenomenal number of non-clustered indexes. While excellent for read-speeds, inserting into heavily indexed tables like `Target`, `InventoryLog` and `SystemLog` introduces a penalty overhead.
+
+---
+
+## 6. Scalability Risks
+
+*   **Integer Overflow in Boundless Audit Logs:** 
+    `SystemLog`, `InventoryLog`, `OrderStatusAudit`, and `SupportTicketReply` map their primary keys to `[int] IDENTITY(1,1)`. A signed 32-bit `INT` maximum is 2,147,483,647. High-velocity IoT or user-log e-commerce telemetry tables easily blow through `INT` caps in a few years. These must be upgraded to `BIGINT`.
+*   **Missing Table Partitioning Strategy:** With telemetry (`SystemLog`) growing indefinitely without archival date partitioning boundaries, scanning and shrinking these files under load will become impossible.
+
+---
+
+## 7. Mismatch Between Schema and Real System
+
+*   **Delivery Tracking vs POS:** A POS walk-in transaction immediately completes the exchange of goods. However, the exact state transitions for an `Order` (`Order.IsWalkIn = 1`) skipping the `Delivery` requirement completely is entirely implicit to application logic. A missing `CHECK` constraining `Delivery` existence specifically to non-walk-in orders is a blindspot.
+*   **TotalSales on POS_Session:** `POS_Session.TotalSales` is physically stored but doesn't reconcile cleanly using FK validation. Without triggers to recalculate it dynamically upon every new `Order`, this value is almost mathematically guaranteed to fall out of baseline sync.
+
+---
+
+### End of Audit
+*Action required: Address Critical Issues immediately in the next EF Core migration, and prioritize upgrading Log Primary Keys to BIGINT before deployment to Production.*
