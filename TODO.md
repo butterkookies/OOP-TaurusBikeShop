@@ -1,97 +1,178 @@
-Use this prompt. It is structured to force deep inspection, strict criticism, and alignment with your actual system.
+Use this. It is tightened based on the actual failure patterns in your files (constraint drift, audit fields, insert order, filtered indexes).
 
 ---
 
-**PROMPT:**
+**PROMPT FOR CLAUDE OPUS 4.6**
 
-You are a senior database architect and software auditor. Your task is to perform a strict, production-level review of a SQL schema and identify all structural, logical, and implementation flaws.
+You are a senior SQL Server database engineer specializing in schema evolution, migrations, and deterministic data seeding.
 
-### Context
+I will provide three SQL files:
 
-* The system is a full-stack application (Admin + Customer system).
-* Tech stack includes .NET (WPF + Web), likely using SQL Server.
-* The schema is intended for real-world production use (not academic).
-* The system includes features like orders, users, payments, inventory, and possibly delivery vs pickup logic.
+1. Seed script
+   `SQL\Seed\Taurus_seed_v7.1.sql`
 
-### Task Instructions
+2. Base schema
+   `SQL\Schema\Taurus_schema_8.1.sql`
 
-1. **Load and Analyze Schema**
-
-   * Read the SQL file from this relative path:
-
-     ```
-     SQL\Schema\Taurus_schema_8.1.sql
-     ```
-   * Parse all tables, constraints, relationships, indexes, and data types.
-
-2. **Strict Structural Review**
-   Identify and explain:
-
-   * Missing or incorrect primary keys
-   * Foreign key issues (missing, incorrect references, cascade problems)
-   * Improper normalization (1NF, 2NF, 3NF violations)
-   * Redundant or duplicated data
-   * Inconsistent naming conventions
-   * Bad data types (e.g., using NVARCHAR where INT/DATE is appropriate)
-   * Nullability issues (columns that should/shouldn’t allow NULL)
-
-3. **Logic and Business Rule Validation**
-   Evaluate whether the schema properly supports:
-
-   * Separation or unification of Admin vs Customer users
-   * Order flows (online delivery vs in-store pickup)
-   * Payment methods (e.g., GCash, bank transfer, cash)
-   * Inventory tracking and stock consistency
-   * Audit/history tracking where needed
-
-   Identify:
-
-   * Missing tables or relationships
-   * Incorrect assumptions in schema design
-   * Logical inconsistencies that will break real system behavior
-
-4. **Security Review**
-
-   * Detect unsafe practices (e.g., storing plaintext passwords)
-   * Evaluate use of sensitive fields
-   * Suggest improvements (hashing, salting, secrets handling)
-
-5. **Performance Review**
-
-   * Missing indexes on frequently queried fields
-   * Over-indexing
-   * Inefficient relationships or table structures
-   * Potential query bottlenecks
-
-6. **Scalability Assessment**
-
-   * Will this schema scale with thousands/millions of records?
-   * Identify design decisions that will fail under load
-
-7. **Real System Reflection**
-
-   * Based on the schema, infer how the actual system behaves
-   * Point out mismatches between expected system behavior and schema design
-   * Example: If delivery vs pickup exists in UI but not properly modeled in DB, flag it
-
-8. **Output Format**
-   Structure your response as:
-
-   * **Critical Issues (Must Fix)**
-   * **Major Design Flaws**
-   * **Minor Issues / Improvements**
-   * **Security Risks**
-   * **Performance Concerns**
-   * **Scalability Risks**
-   * **Mismatch Between Schema and Real System**
-   * **Recommended Refactored Design (if necessary)**
-
-9. **Tone Requirement**
-
-   * Be brutally honest
-   * Do not soften criticism
-   * Treat this as a production system that could fail
+3. Patch / migration
+   `SQL\Schema\Taurus_schema_8.2_audit_fixes.sql`
 
 ---
 
-This forces the AI to behave like a real auditor instead of giving surface-level feedback.
+## Objective
+
+Rewrite the seed script so it is **fully compatible with the FINAL schema state after applying 8.1 + 8.2**.
+
+The current seed is outdated and WILL FAIL due to:
+
+* Column mismatches
+* New NOT NULL constraints
+* Foreign key dependencies
+* Audit-related fields introduced in 8.2
+* Filtered indexes requiring proper SET options
+
+---
+
+## Required Process (Do NOT skip steps)
+
+### 1. Reconstruct Final Schema
+
+* Parse 8.1 schema
+* Apply 8.2 patch logically
+* Build the exact final structure:
+
+  * Tables
+  * Columns (including added/removed/renamed)
+  * Data types
+  * PK, FK, UNIQUE, CHECK constraints
+  * Identity columns
+  * Default constraints
+  * Filtered indexes and their conditions
+
+---
+
+### 2. Deep Analysis of Seed Script
+
+Analyze `Taurus_seed_v7.1.sql` and detect ALL incompatibilities:
+
+* Invalid or removed columns
+* Missing required columns (especially NOT NULL)
+* Foreign key violations
+* Insert order violations (child before parent)
+* Duplicate key risks
+* Identity misuse (missing or incorrect `IDENTITY_INSERT`)
+* Missing audit fields (e.g., created_at, updated_at, created_by, status, etc.)
+* Violations caused by filtered indexes
+
+---
+
+### 3. Produce Structured Audit Report
+
+Output:
+
+**A. Schema Changes Impacting Seed**
+
+* List only changes from 8.2 that break the seed
+
+**B. Table-by-Table Issues**
+For each table:
+
+* Problem
+* Root cause
+* Required fix
+
+---
+
+### 4. Generate Fully Corrected Seed Script (PRIMARY OUTPUT)
+
+Rewrite the ENTIRE seed script.
+
+Strict requirements:
+
+* Must run on a clean DB after:
+
+  1. `Taurus_schema_8.1.sql`
+  2. `Taurus_schema_8.2_audit_fixes.sql`
+
+* Must execute with **ZERO ERRORS**
+
+---
+
+## Critical Constraints for the New Seed
+
+### A. Correct Insert Order (MANDATORY)
+
+Order inserts based on dependency graph:
+
+1. Lookup tables (roles, categories, statuses)
+2. Parent tables (users, suppliers)
+3. Core entities (products)
+4. Transaction tables (orders)
+5. Child tables (order_items, logs, audit tables)
+
+---
+
+### B. Column Alignment
+
+* Every INSERT must explicitly declare columns
+* Must match FINAL schema exactly
+* No missing NOT NULL fields
+
+---
+
+### C. Audit Field Compliance
+
+* Populate all required audit fields introduced in 8.2
+* Use consistent values (e.g., GETDATE(), system user IDs)
+
+---
+
+### D. Identity Handling
+
+* Prefer natural identity generation (no hardcoded IDs)
+* If explicit IDs are required:
+
+  * Use `SET IDENTITY_INSERT ON/OFF` correctly
+
+---
+
+### E. Constraint Safety
+
+* All FK references must point to valid inserted rows
+* No duplicate values for UNIQUE constraints
+* Respect CHECK constraints and filtered index conditions
+
+---
+
+### F. Required SET Options (MANDATORY AT TOP)
+
+Include:
+
+```
+SET ANSI_NULLS ON
+SET QUOTED_IDENTIFIER ON
+SET ANSI_WARNINGS ON
+```
+
+---
+
+### G. Deterministic Execution
+
+* Script must be re-runnable ONLY on a clean DB
+* No reliance on pre-existing data
+
+---
+
+## Output Format
+
+1. Summary of breaking schema changes
+2. Table-by-table issue breakdown
+3. **Final corrected seed SQL (clean, ordered, executable)**
+
+---
+
+## Final Requirement
+
+Do not give advice. Do not explain theory.
+
+Perform full reconciliation and output a **production-quality corrected seed script** that will run successfully on the updated schema.

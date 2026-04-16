@@ -77,6 +77,26 @@ public sealed class User
     /// </summary>
     public DateTime? LastLoginAt { get; set; }
 
+    /// <summary>
+    /// Number of consecutive failed login attempts since the last success.
+    /// Reset to 0 on successful login. Used to trigger account lockout.
+    /// Added in schema v8.2.
+    /// </summary>
+    public int FailedLoginAttempts { get; set; } = 0;
+
+    /// <summary>
+    /// UTC time until which the account is locked out due to too many failed
+    /// login attempts. NULL when the account is not locked.
+    /// Added in schema v8.2.
+    /// </summary>
+    public DateTime? LockoutUntil { get; set; }
+
+    /// <summary>
+    /// Soft-delete flag. When true, the account is treated as deleted but
+    /// the row is retained for audit purposes. Added in schema v8.2.
+    /// </summary>
+    public bool IsDeleted { get; set; } = false;
+
     // -------------------------------------------------------------------------
     // Navigation properties — all relationships configured via Fluent API
     // in AppDbContext.OnModelCreating, never via data annotations.

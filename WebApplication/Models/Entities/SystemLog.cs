@@ -20,8 +20,8 @@ namespace WebApplication.Models.Entities;
 /// </summary>
 public sealed class SystemLog
 {
-    /// <summary>Primary key — auto-increment identity.</summary>
-    public int SystemLogId { get; set; }
+    /// <summary>Primary key — auto-increment identity (BIGINT in database).</summary>
+    public long SystemLogId { get; set; }
 
     /// <summary>
     /// FK to the user who triggered this event.

@@ -152,6 +152,9 @@ public static class NotifChannels
 
     /// <summary>SMS text message notification.</summary>
     public const string SMS = "SMS";
+
+    /// <summary>In-app website notification.</summary>
+    public const string InApp = "InApp";
 }
 
 /// <summary>

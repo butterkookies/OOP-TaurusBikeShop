@@ -1,14 +1,23 @@
--- =============================================================================
+﻿-- =============================================================================
 -- Taurus Bike Shop  |  TaurusBikeShopDB
--- File    : Taurus_seed_v7.1.sql
+-- File    : Taurus_seed_v8.2.sql
 -- Purpose : Seed all product catalog data sourced from PARTS-PRICES.xlsx
--- Schema  : v7.0 + v7.1 patch (ReorderThreshold on ProductVariant)
+-- Schema  : v8.1 + v8.2 audit fixes
 -- Products: 150 (all products from Excel, no additions)
--- Run after: Taurus_schema.sql → Taurus_schema_v71_patch.sql
+-- Run after: Taurus_schema_8.1.sql → Taurus_schema_8.2_audit_fixes.sql
+--
+-- Reconciled from seed v7.1 to match final schema state (8.1 + 8.2).
+-- Changes from v7.1:
+--   * Added required SET options for filtered indexes & computed columns
+--   * Added USE [database] statement
+--   * All new NOT NULL columns (IsDeleted on User/Order/Payment,
+--     FulfillmentType on Order) handled via schema DEFAULT constraints
+--   * Computed column TotalAmount on [Order] is NOT inserted
+--   * datetime2(7) columns handled via SYSDATETIME() defaults
 --
 -- Seed sections:
 --   A. Role
---   B. User (admin + cashier + 2 customers)
+--   B. User (admin + cashier + 2 customers + walk-in)
 --   C. Address + DefaultAddressId update
 --   D. UserRole
 --   E. Category (13 from Excel + 1 parent)
@@ -19,6 +28,18 @@
 --   J. InventoryLog (opening Purchase entries per variant)
 -- =============================================================================
 
+USE [Taurus-bike-shop-sqlserver-2026]
+GO
+
+-- =============================================================================
+-- Required SET options for filtered indexes & computed columns (schema 8.2)
+-- =============================================================================
+SET ANSI_NULLS ON;
+SET ANSI_PADDING ON;
+SET ANSI_WARNINGS ON;
+SET ARITHABORT ON;
+SET CONCAT_NULL_YIELDS_NULL ON;
+SET QUOTED_IDENTIFIER ON;
 SET NOCOUNT ON;
 GO
 
@@ -1081,9 +1102,9 @@ GO
 -- SUMMARY
 -- =============================================================================
 PRINT '==============================================';
-PRINT 'Taurus_seed_v7.1.sql — Completed Successfully!';
+PRINT 'Taurus_seed_v8.2.sql — Completed Successfully!';
 PRINT '==============================================';
-PRINT 'Schema: v7.0 + v7.1 patch';
+PRINT 'Schema: v8.1 + v8.2 audit fixes';
 PRINT '----------------------------------------------';
 PRINT 'Role           :  5 rows';
 PRINT 'User           :  5 rows (admin, cashier, 2 customers, walk-in)';
@@ -1098,5 +1119,6 @@ PRINT 'InventoryLog   : 150 rows (opening Purchase entries)';
 PRINT '----------------------------------------------';
 PRINT 'All 150 products from PARTS-PRICES.xlsx included.';
 PRINT 'No extra products invented.';
+PRINT 'Reconciled for schema 8.1 + 8.2 (audit fixes).';
 PRINT '==============================================';
 GO

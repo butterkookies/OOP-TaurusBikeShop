@@ -79,6 +79,7 @@ public sealed partial class AppDbContext : DbContext
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<GCashPayment> GCashPayments => Set<GCashPayment>();
     public DbSet<BankTransferPayment> BankTransferPayments => Set<BankTransferPayment>();
+    public DbSet<StorePaymentAccount> StorePaymentAccounts => Set<StorePaymentAccount>();
 
     // Group 9 — Delivery
     public DbSet<Delivery> Deliveries => Set<Delivery>();
@@ -135,6 +136,7 @@ public sealed partial class AppDbContext : DbContext
         ConfigurePayment(modelBuilder);
         ConfigureGCashPayment(modelBuilder);
         ConfigureBankTransferPayment(modelBuilder);
+        ConfigureStorePaymentAccount(modelBuilder);
         ConfigureDelivery(modelBuilder);
         ConfigureLalamoveDelivery(modelBuilder);
         ConfigureLBCDelivery(modelBuilder);

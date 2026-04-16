@@ -69,5 +69,10 @@ public static class PasswordHelper
             // Hash is malformed — treat as verification failure, not an application error
             return false;
         }
+        catch (ArgumentOutOfRangeException)
+        {
+            // Hash string is too short/truncated for BCrypt to parse — treat as failure
+            return false;
+        }
     }
 }

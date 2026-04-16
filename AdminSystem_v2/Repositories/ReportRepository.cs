@@ -6,7 +6,7 @@ namespace AdminSystem_v2.Repositories
 {
     public class ReportRepository : Repository<DailySales>, IReportRepository
     {
-        private static readonly string[] ExcludedStatuses = { OrderStatuses.Cancelled };
+        private static readonly string[] ExcludedStatuses = { OrderStatuses.Cancelled, OrderStatuses.Pending };
 
         // ── Source filter helper ──────────────────────────────────────────────
         // Returns an empty string (no filter), "AND IsWalkIn = 0", or "AND IsWalkIn = 1"

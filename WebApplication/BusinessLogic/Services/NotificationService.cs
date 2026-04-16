@@ -88,7 +88,7 @@ public sealed class NotificationService : INotificationService
     {
         IQueryable<Notification> query = _context.Notifications
             .AsNoTracking()
-            .Where(n => n.UserId == userId)
+            .Where(n => n.UserId == userId && n.Channel == NotifChannels.InApp)
             .OrderByDescending(n => n.CreatedAt);
 
         int totalCount = await query.CountAsync(cancellationToken);
@@ -108,7 +108,7 @@ public sealed class NotificationService : INotificationService
     {
         return await _context.Notifications
             .AsNoTracking()
-            .CountAsync(n => n.UserId == userId && !n.IsRead, cancellationToken);
+            .CountAsync(n => n.UserId == userId && !n.IsRead && n.Channel == NotifChannels.InApp, cancellationToken);
     }
 
     /// <inheritdoc/>

@@ -58,35 +58,44 @@ public sealed class PaymentRepository : Repository<Payment>
     {
         ArgumentNullException.ThrowIfNull(payment);
 
-        await using IDbContextTransaction transaction =
-            await Context.Database.BeginTransactionAsync(cancellationToken);
+        // SqlServerRetryingExecutionStrategy (EnableRetryOnFailure) forbids
+        // manually-opened transactions unless wrapped in ExecuteAsync.
+        Microsoft.EntityFrameworkCore.Storage.IExecutionStrategy strategy =
+            Context.Database.CreateExecutionStrategy();
 
-        try
+        await strategy.ExecuteAsync(async () =>
         {
-            await Context.Payments.AddAsync(payment, cancellationToken);
-            await Context.SaveChangesAsync(cancellationToken);
+            await using IDbContextTransaction transaction =
+                await Context.Database.BeginTransactionAsync(cancellationToken);
 
-            if (subtype is GCashPayment gcash)
+            try
             {
-                gcash.PaymentId = payment.PaymentId;
-                await Context.GCashPayments.AddAsync(gcash, cancellationToken);
+                await Context.Payments.AddAsync(payment, cancellationToken);
                 await Context.SaveChangesAsync(cancellationToken);
-            }
-            else if (subtype is BankTransferPayment bankTransfer)
-            {
-                bankTransfer.PaymentId = payment.PaymentId;
-                await Context.BankTransferPayments.AddAsync(bankTransfer, cancellationToken);
-                await Context.SaveChangesAsync(cancellationToken);
-            }
 
-            await transaction.CommitAsync(cancellationToken);
-            return payment;
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+                if (subtype is GCashPayment gcash)
+                {
+                    gcash.PaymentId = payment.PaymentId;
+                    await Context.GCashPayments.AddAsync(gcash, cancellationToken);
+                    await Context.SaveChangesAsync(cancellationToken);
+                }
+                else if (subtype is BankTransferPayment bankTransfer)
+                {
+                    bankTransfer.PaymentId = payment.PaymentId;
+                    await Context.BankTransferPayments.AddAsync(bankTransfer, cancellationToken);
+                    await Context.SaveChangesAsync(cancellationToken);
+                }
+
+                await transaction.CommitAsync(cancellationToken);
+            }
+            catch
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw;
+            }
+        });
+
+        return payment;
     }
 
     /// <summary>

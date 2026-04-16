@@ -15,9 +15,23 @@ public sealed partial class AppDbContext
             e.ToTable("Order");
             e.HasKey(o => o.OrderId);
 
+            // Soft-delete: globally filter out logically-deleted orders from
+            // ALL queries. Use .IgnoreQueryFilters() when you intentionally
+            // need to include deleted rows (e.g. admin audit views).
+            e.HasQueryFilter(o => !o.IsDeleted);
+
+            // FulfillmentType — constrained to 20 chars matching CK_Order_FulfillmentType
+            e.Property(o => o.FulfillmentType).HasMaxLength(20);
+
             e.Property(o => o.DiscountAmount).HasPrecision(18, 2);
             e.Property(o => o.ShippingFee).HasPrecision(18, 2);
             e.Property(o => o.SubTotal).HasPrecision(18, 2);
+
+            // TotalAmount is a persisted computed column in the DB — EF must not
+            // try to write to it. Mark it as a computed column so it is read-only.
+            e.Property<decimal>("TotalAmount")
+                .HasComputedColumnSql("([SubTotal] - [DiscountAmount] + [ShippingFee])", stored: true)
+                .HasPrecision(18, 2);
 
             e.HasIndex(o => o.OrderNumber)
                 .IsUnique()

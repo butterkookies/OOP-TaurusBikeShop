@@ -101,4 +101,28 @@ public sealed class VoucherRepository : Repository<Voucher>
         await Context.VoucherUsages.AddAsync(usage, cancellationToken);
         await Context.SaveChangesAsync(cancellationToken);
     }
+
+    /// <summary>
+    /// Fetches all active vouchers assigned to the given user.
+    /// Filters out inactive vouchers and those outside their valid window.
+    /// Ordered by nearest expiration date first.
+    /// </summary>
+    /// <param name="userId">The user ID.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    public async Task<IReadOnlyList<UserVoucher>> GetActiveAssignedVouchersAsync(
+        int userId,
+        CancellationToken cancellationToken = default)
+    {
+        DateTime now = DateTime.Now; // Use Local Time to match Admin system's DatePicker
+        return await Context.UserVouchers
+            .Include(uv => uv.Voucher)
+            .AsNoTracking()
+            .Where(uv => uv.UserId == userId 
+                      && uv.Voucher.IsActive 
+                      && uv.Voucher.StartDate <= now
+                      && (uv.Voucher.EndDate == null || uv.Voucher.EndDate > now)
+                      && (uv.ExpiresAt == null || uv.ExpiresAt > now))
+            .OrderBy(uv => uv.ExpiresAt ?? uv.Voucher.EndDate)
+            .ToListAsync(cancellationToken);
+    }
 }

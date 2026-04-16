@@ -164,7 +164,12 @@ public sealed class OrderService : IOrderService
                     ShippingFee       = shippingFee,
                     DiscountAmount    = vm.DiscountAmount,
                     IsWalkIn          = false,
-                    CreatedAt         = DateTime.UtcNow
+                    CreatedAt         = DateTime.UtcNow,
+                    // Schema v8.2 columns
+                    FulfillmentType   = vm.DeliveryMethod == "Pickup"
+                        ? FulfillmentTypes.Pickup
+                        : FulfillmentTypes.Delivery,
+                    CartId            = cart.CartId
                 };
                 await _context.Orders.AddAsync(order, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -413,6 +418,7 @@ public sealed class OrderService : IOrderService
                 }
 
                 trackedOrder.OrderStatus = OrderStatuses.Cancelled;
+                trackedOrder.UpdatedAt   = DateTime.UtcNow;
 
                 SystemLog sysLog = new()
                 {
@@ -482,6 +488,7 @@ public sealed class OrderService : IOrderService
                         $"Order {orderId} not found for status update.");
 
                 trackedOrder.OrderStatus = OrderStatuses.Delivered;
+                trackedOrder.UpdatedAt   = DateTime.UtcNow;
 
                 // ── Inventory: Unlock + Sale pair per line item ────────────────
                 // Lock was applied at order creation (StockQuantity was already

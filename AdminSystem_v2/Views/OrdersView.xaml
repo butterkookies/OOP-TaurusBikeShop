@@ -594,6 +594,7 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="{Binding OrderNumber}"
@@ -604,7 +605,7 @@
                             </StackPanel>
                             <!-- Status badge (large) -->
                             <Border Grid.Column="1" CornerRadius="6" Padding="10,5"
-                                    Background="#1F2937" VerticalAlignment="Top">
+                                    Background="#1F2937" VerticalAlignment="Top" Margin="0,0,8,0">
                                 <StackPanel Orientation="Horizontal">
                                     <Ellipse Width="7" Height="7" Margin="0,0,6,0"
                                              VerticalAlignment="Center">
@@ -619,6 +620,30 @@
                                                FontSize="12" FontWeight="SemiBold"/>
                                 </StackPanel>
                             </Border>
+                            <!-- X close button -->
+                            <Button Grid.Column="2" VerticalAlignment="Top"
+                                    Command="{Binding DataContext.CloseDetailCommand,
+                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    Width="28" Height="28"
+                                    Background="Transparent" BorderThickness="0"
+                                    Cursor="Hand" FocusVisualStyle="{x:Null}"
+                                    ToolTip="Close">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}"
+                                                CornerRadius="6">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#374151"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                                <TextBlock Text="&#x2715;" Foreground="#9CA3AF" FontSize="13"
+                                           VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Button>
                         </Grid>
 
                         <Separator Background="#374151" Margin="0,0,0,16"/>
@@ -800,6 +825,33 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
+
+                                <!-- Delivery Instructions (optional — shown when non-empty) -->
+                                <StackPanel>
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <!-- Collapse when empty string -->
+                                                <DataTrigger Binding="{Binding DataContext.SelectedOrder.DeliveryInstructions,
+                                                             RelativeSource={RelativeSource AncestorType=UserControl},
+                                                             TargetNullValue=''}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                                <!-- Collapse when null -->
+                                                <DataTrigger Binding="{Binding DataContext.SelectedOrder.DeliveryInstructions,
+                                                             RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock Text="Delivery Instructions" Style="{StaticResource FieldLabel}" Margin="0,8,0,2"/>
+                                    <TextBlock Text="{Binding DataContext.SelectedOrder.DeliveryInstructions,
+                                               RelativeSource={RelativeSource AncestorType=UserControl},
+                                               TargetNullValue='&#x2014;'}"
+                                               Style="{StaticResource FieldValue}" TextWrapping="Wrap"/>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
 
@@ -862,12 +914,123 @@
                             </DataGrid.Columns>
                         </DataGrid>
 
+                        <!-- ── Payment Proof (visible only when a proof was submitted) ── -->
+                        <Border Margin="0,0,0,12" CornerRadius="8" Padding="14"
+                                BorderThickness="1" BorderBrush="#D97706" Background="#1C1408">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <!-- Default: visible. Collapse only when URL is null or empty. -->
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding PaymentProofUrl}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding PaymentProofUrl}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel>
+                                <TextBlock Text="PAYMENT PROOF" Style="{StaticResource SectionLabel}"
+                                           Foreground="#D97706"/>
+
+                                <!-- Method + Status row -->
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Method" Style="{StaticResource FieldLabel}"/>
+                                        <TextBlock Text="{Binding PaymentProofMethod, TargetNullValue='—'}"
+                                                   Style="{StaticResource FieldValue}" Margin="0"
+                                                   FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="Payment Status" Style="{StaticResource FieldLabel}"/>
+                                        <TextBlock Text="{Binding PaymentStatus, TargetNullValue='—'}"
+                                                   Foreground="#FCD34D" FontSize="13" FontWeight="SemiBold"
+                                                   Margin="0"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Thumbnail image (clicks to open lightbox) -->
+                                <Border CornerRadius="6" Margin="0,0,0,10"
+                                        Background="#111827" BorderThickness="1" BorderBrush="#374151"
+                                        HorizontalAlignment="Left">
+                                    <ToggleButton x:Name="ImageLightboxToggle" Cursor="Hand"
+                                                  ToolTip="Click to view full image">
+                                        <ToggleButton.Template>
+                                            <ControlTemplate TargetType="ToggleButton">
+                                                <Image MaxHeight="120" Stretch="Uniform"
+                                                       Source="{Binding PaymentProofUrl, TargetNullValue={x:Null}}">
+                                                    <Image.Style>
+                                                        <Style TargetType="Image">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding PaymentProofUrl}" Value="{x:Null}">
+                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding PaymentProofUrl}" Value="">
+                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Image.Style>
+                                                </Image>
+                                            </ControlTemplate>
+                                        </ToggleButton.Template>
+                                    </ToggleButton>
+                                </Border>
+
+                                <!-- PDF fallback label (when proof is PDF, Image won't render) -->
+                                <TextBlock Foreground="#9CA3AF" FontSize="12" TextWrapping="Wrap"
+                                           Margin="0,0,0,6"
+                                           Text="📄 PDF proof submitted. Open the URL in a browser to view it.">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding PaymentProofUrl}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <!-- Proof URL (copyable) -->
+                                <TextBlock Text="{Binding PaymentProofUrl}" Foreground="#60A5FA"
+                                           FontSize="10" TextWrapping="Wrap" TextTrimming="None"
+                                           Margin="0,0,0,4" Cursor="IBeam"
+                                           ToolTip="{Binding PaymentProofUrl}"/>
+                            </StackPanel>
+                        </Border>
+
                         <!-- ── Action buttons ── -->
                         <Border Background="#1F2937" CornerRadius="8" Padding="14"
                                 BorderThickness="1" BorderBrush="#374151">
                             <StackPanel>
                                 <TextBlock Text="ACTIONS" Style="{StaticResource SectionLabel}"/>
                                 <WrapPanel>
+
+                                    <Button Content="✓ Approve Payment"
+                                            Command="{Binding DataContext.ApprovePaymentCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            IsEnabled="{Binding DataContext.CanApprovePayment,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Style="{StaticResource PrimaryButton}"
+                                            Background="#065F46" BorderBrush="#34D399"
+                                            Margin="0,0,8,8"/>
+
+                                    <Button Content="✗ Reject Payment"
+                                            Command="{Binding DataContext.RejectPaymentCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            IsEnabled="{Binding DataContext.CanRejectPayment,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Style="{StaticResource DangerButton}"
+                                            Margin="0,0,8,8"/>
 
                                     <Button Content="Mark Ready for Pickup"
                                             Command="{Binding DataContext.MarkReadyForPickupCommand,
@@ -918,6 +1081,78 @@
             </Border>
 
         </Grid>
+
+    <!-- ══════════════════════════════════════
+         FULL-SCREEN IMAGE LIGHTBOX
+         ══════════════════════════════════════ -->
+    <Grid Grid.RowSpan="6" Panel.ZIndex="999"
+          Visibility="{Binding IsChecked, ElementName=ImageLightboxToggle, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
+        
+        <!-- Darkened/Blurred Background (Click to close) -->
+        <Border Background="#D8000000" Cursor="Hand">
+            <Border.InputBindings>
+                <MouseBinding MouseAction="LeftClick" 
+                              Command="{x:Static ApplicationCommands.NotACommand}"/>
+            </Border.InputBindings>
+        </Border>
+
+        <!-- Use a button spanning the full background to easily unset toggles -->
+        <Button Background="#E6000000" BorderThickness="0" Cursor="Hand"
+                FocusVisualStyle="{x:Null}">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}">
+                        <ContentPresenter/>
+                    </Border>
+                </ControlTemplate>
+            </Button.Template>
+            <Button.Style>
+                <Style TargetType="Button"/>
+            </Button.Style>
+        </Button>
+
+        <!-- A better WPF way: make the background itself a ToggleButton bound to the same state -->
+        <ToggleButton Background="#E6000000" BorderThickness="0" Cursor="Hand"
+                      IsChecked="{Binding IsChecked, ElementName=ImageLightboxToggle, Mode=TwoWay}"
+                      FocusVisualStyle="{x:Null}">
+            <ToggleButton.Template>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border Background="{TemplateBinding Background}"/>
+                </ControlTemplate>
+            </ToggleButton.Template>
+        </ToggleButton>
+
+        <!-- The Image itself (centered, ignored by clicks so clicking it doesn't close) -->
+        <Image Source="{Binding SelectedOrder.PaymentProofUrl, TargetNullValue={x:Null}}"
+               Stretch="Uniform" MaxWidth="1200" MaxHeight="800"
+               Margin="40" HorizontalAlignment="Center" VerticalAlignment="Center"
+               IsHitTestVisible="False">
+            <Image.Effect>
+                <DropShadowEffect BlurRadius="20" ShadowDepth="0" Color="Black" Opacity="0.8"/>
+            </Image.Effect>
+        </Image>
+        
+        <!-- Visible X Button at top right for clarity -->
+        <ToggleButton IsChecked="{Binding IsChecked, ElementName=ImageLightboxToggle, Mode=TwoWay}"
+                      HorizontalAlignment="Right" VerticalAlignment="Top"
+                      Margin="30" Width="40" Height="40"
+                      Background="#33FFFFFF" Cursor="Hand"
+                      FocusVisualStyle="{x:Null}">
+            <ToggleButton.Template>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="20">
+                        <TextBlock Text="&#x2715;" Foreground="White" FontSize="20" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#66FFFFFF"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </ToggleButton.Template>
+        </ToggleButton>
+    </Grid>
 
     </Grid>
 </UserControl>

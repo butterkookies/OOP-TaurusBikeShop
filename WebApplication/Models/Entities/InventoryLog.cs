@@ -31,8 +31,8 @@ namespace WebApplication.Models.Entities;
 /// </summary>
 public sealed class InventoryLog
 {
-    /// <summary>Primary key — auto-increment identity.</summary>
-    public int InventoryLogId { get; set; }
+    /// <summary>Primary key — auto-increment identity. BIGINT in DB (changed in schema v8.2).</summary>
+    public long InventoryLogId { get; set; }
 
     /// <summary>FK to the product whose stock changed.</summary>
     public int ProductId { get; set; }

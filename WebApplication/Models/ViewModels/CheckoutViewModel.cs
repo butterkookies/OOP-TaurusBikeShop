@@ -73,6 +73,12 @@ public sealed class CheckoutViewModel
     /// </summary>
     public decimal DiscountAmount { get; set; }
 
+    /// <summary>
+    /// Active vouchers explicitly assigned to this user.
+    /// Used to populate the quick-select combobox.
+    /// </summary>
+    public IReadOnlyList<AssignedVoucherViewModel> AssignedVouchers { get; set; } = [];
+
     // -------------------------------------------------------------------------
     // Order summary (read-only, populated by controller)
     // -------------------------------------------------------------------------

@@ -100,6 +100,18 @@ public interface IUserService
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Returns the raw <see cref="User"/> entity by ID.
+    /// Used after a profile update to reload the updated values for re-issuing
+    /// the auth cookie with fresh claims.
+    /// </summary>
+    /// <param name="userId">The authenticated user's ID.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The <see cref="User"/> entity, or <c>null</c> if not found.</returns>
+    Task<User?> GetUserByIdAsync(
+        int userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Updates a customer's personal information (name and phone number).
     /// Email cannot be changed.
     /// </summary>

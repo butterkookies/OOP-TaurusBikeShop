@@ -22,6 +22,7 @@ public sealed class CheckoutController : Controller
     private readonly IOrderService   _orderService;
     private readonly ICartService    _cartService;
     private readonly UserRepository  _userRepo;
+    private readonly IVoucherService _voucherService;
     private readonly ILogger<CheckoutController> _logger;
 
     private const string SessionKeyVoucherCode     = "checkout_voucher_code";
@@ -32,12 +33,14 @@ public sealed class CheckoutController : Controller
         IOrderService   orderService,
         ICartService    cartService,
         UserRepository  userRepo,
+        IVoucherService voucherService,
         ILogger<CheckoutController> logger)
     {
-        _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
-        _cartService  = cartService  ?? throw new ArgumentNullException(nameof(cartService));
-        _userRepo     = userRepo     ?? throw new ArgumentNullException(nameof(userRepo));
-        _logger       = logger       ?? throw new ArgumentNullException(nameof(logger));
+        _orderService   = orderService   ?? throw new ArgumentNullException(nameof(orderService));
+        _cartService    = cartService    ?? throw new ArgumentNullException(nameof(cartService));
+        _userRepo       = userRepo       ?? throw new ArgumentNullException(nameof(userRepo));
+        _voucherService = voucherService ?? throw new ArgumentNullException(nameof(voucherService));
+        _logger         = logger         ?? throw new ArgumentNullException(nameof(logger));
     }
 
     // =========================================================================
@@ -81,7 +84,8 @@ public sealed class CheckoutController : Controller
             SubTotal        = cart.SubTotal,
             VoucherCode     = voucherCode,
             DiscountAmount  = discountAmount,
-            SelectedAddressId = user?.DefaultAddressId
+            SelectedAddressId = user?.DefaultAddressId,
+            AssignedVouchers = await GetAssignedVoucherViewModelsAsync(userId, cancellationToken)
         };
 
         ViewData["Title"] = "Checkout";
@@ -125,6 +129,7 @@ public sealed class CheckoutController : Controller
                 .ThenBy(a => a.CreatedAt)
                 .ToList()
                 .AsReadOnly();
+            vm.AssignedVouchers = await GetAssignedVoucherViewModelsAsync(userId, cancellationToken);
 
             ViewData["Title"] = "Checkout";
             return View("~/Views/Customer/Checkout.cshtml", vm);
@@ -191,5 +196,28 @@ public sealed class CheckoutController : Controller
     {
         string? value = User.FindFirstValue(ClaimTypes.NameIdentifier);
         return int.TryParse(value, out int id) ? id : 0;
+    }
+
+    private async Task<IReadOnlyList<AssignedVoucherViewModel>> GetAssignedVoucherViewModelsAsync(int userId, CancellationToken cancellationToken)
+    {
+        var userVouchers = await _voucherService.GetActiveAssignedVouchersAsync(userId, cancellationToken);
+        return userVouchers.Select(uv => new AssignedVoucherViewModel
+        {
+            Code = uv.Voucher.Code,
+            Description = uv.Voucher.DiscountType == DiscountTypes.Percentage
+                ? $"{uv.Voucher.DiscountValue:0.##}% off"
+                : $"\u20b1{uv.Voucher.DiscountValue:N2} off",
+            TimeLeft = FormatTimeLeft(uv.ExpiresAt ?? uv.Voucher.EndDate)
+        }).ToList().AsReadOnly();
+    }
+
+    private static string FormatTimeLeft(DateTime? expiry)
+    {
+        if (!expiry.HasValue) return "No expiry";
+        TimeSpan diff = expiry.Value - DateTime.Now;
+        if (diff.TotalDays >= 1) return $"Expires in {Math.Floor(diff.TotalDays)} day(s)";
+        if (diff.TotalHours >= 1) return $"Expires in {Math.Floor(diff.TotalHours)} hour(s)";
+        if (diff.TotalMinutes >= 1) return $"Expires in {Math.Floor(diff.TotalMinutes)} min(s)";
+        return "Expires soon";
     }
 }

@@ -57,4 +57,11 @@ public interface IVoucherService
         int orderId,
         decimal discountAmount,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Fetches all active vouchers assigned to the user.
+    /// </summary>
+    Task<IReadOnlyList<WebApplication.Models.Entities.UserVoucher>> GetActiveAssignedVouchersAsync(
+        int userId,
+        CancellationToken cancellationToken = default);
 }

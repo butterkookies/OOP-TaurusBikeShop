@@ -45,7 +45,9 @@ namespace AdminSystem_v2.ViewModels
         {
             "All",
             OrderStatuses.Pending,
+            OrderStatuses.PendingVerification,
             OrderStatuses.Processing,
+            OrderStatuses.OnHold,
             OrderStatuses.ReadyForPickup,
             OrderStatuses.PickedUp,
             OrderStatuses.OutForDelivery,
@@ -175,6 +177,14 @@ namespace AdminSystem_v2.ViewModels
             && !OrderStatuses.TerminalStatuses.Contains(SelectedOrder.OrderStatus)
             && OrderStatuses.IsValidTransition(SelectedOrder.OrderStatus, OrderStatuses.Cancelled);
 
+        public bool CanApprovePayment =>
+            SelectedOrder?.OrderStatus == OrderStatuses.PendingVerification
+            && !string.IsNullOrEmpty(SelectedOrder.PaymentProofUrl);
+
+        public bool CanRejectPayment =>
+            SelectedOrder?.OrderStatus == OrderStatuses.PendingVerification
+            && !string.IsNullOrEmpty(SelectedOrder.PaymentProofUrl);
+
         // ── Commands ──────────────────────────────────────────────────────────
 
         public ICommand RefreshCommand             { get; }
@@ -185,9 +195,12 @@ namespace AdminSystem_v2.ViewModels
         public ICommand MarkOutForDeliveryCommand   { get; }
         public ICommand MarkDeliveredCommand       { get; }
         public ICommand CancelOrderCommand         { get; }
+        public ICommand ApprovePaymentCommand      { get; }
+        public ICommand RejectPaymentCommand       { get; }
         public ICommand BulkUpdateStatusCommand    { get; }
         public ICommand BulkCancelCommand          { get; }
         public ICommand DeselectAllCommand         { get; }
+        public ICommand CloseDetailCommand         { get; }
 
         // ── Constructor ───────────────────────────────────────────────────────
 
@@ -204,9 +217,18 @@ namespace AdminSystem_v2.ViewModels
             MarkOutForDeliveryCommand = new RelayCommand(async () => await MarkOutForDeliveryAsync(),  () => CanMarkOutForDelivery);
             MarkDeliveredCommand      = new RelayCommand(async () => await MarkDeliveredAsync(),       () => CanMarkDelivered);
             CancelOrderCommand        = new RelayCommand(async () => await CancelOrderAsync(),         () => CanCancelOrder);
+            ApprovePaymentCommand     = new RelayCommand(async () => await ApprovePaymentAsync(),      () => CanApprovePayment);
+            RejectPaymentCommand      = new RelayCommand(async () => await RejectPaymentAsync(),       () => CanRejectPayment);
             BulkUpdateStatusCommand   = new RelayCommand<string>(async s => await BulkUpdateStatusAsync(s), _ => HasSelection);
             BulkCancelCommand         = new RelayCommand(async () => await BulkCancelAsync(),          () => HasSelection);
             DeselectAllCommand        = new RelayCommand(() => IsAllSelected = false,                  () => HasSelection);
+            CloseDetailCommand        = new RelayCommand(() =>
+            {
+                SelectedOrder    = null;
+                _selectedRow     = null;
+                OnPropertyChanged(nameof(SelectedRow));
+                IsDetailVisible  = false;
+            });
         }
 
         // ── Load ──────────────────────────────────────────────────────────────
@@ -309,14 +331,16 @@ namespace AdminSystem_v2.ViewModels
             int total = counts.Values.Sum();
             StatusBadges = new List<StatusBadge>
             {
-                Badge("All",                        "All Orders",       total,                                         0x37,0x41,0x51, 0xD1,0xD5,0xDB),
-                Badge(OrderStatuses.Pending,        "Pending",          counts.GetValueOrDefault(OrderStatuses.Pending),        0x29,0x21,0x00, 0xF5,0x9E,0x0B),
-                Badge(OrderStatuses.Processing,     "Processing",       counts.GetValueOrDefault(OrderStatuses.Processing),     0x1F,0x12,0x00, 0xF9,0x73,0x16),
-                Badge(OrderStatuses.ReadyForPickup, "Ready for Pickup", counts.GetValueOrDefault(OrderStatuses.ReadyForPickup), 0x0F,0x1E,0x3D, 0x60,0xA5,0xFA),
-                Badge(OrderStatuses.PickedUp,       "Picked Up",        counts.GetValueOrDefault(OrderStatuses.PickedUp),       0x0A,0x1F,0x0E, 0x34,0xD3,0x99),
-                Badge(OrderStatuses.OutForDelivery, "Out for Delivery", counts.GetValueOrDefault(OrderStatuses.OutForDelivery),  0x1A,0x0A,0x3D, 0xA7,0x8B,0xFA),
-                Badge(OrderStatuses.Delivered,      "Delivered",        counts.GetValueOrDefault(OrderStatuses.Delivered),      0x0A,0x1F,0x0E, 0x34,0xD3,0x99),
-                Badge(OrderStatuses.Cancelled,      "Cancelled",        counts.GetValueOrDefault(OrderStatuses.Cancelled),      0x1F,0x00,0x00, 0xF8,0x71,0x71),
+                Badge("All",                              "All Orders",          total,                                                          0x37,0x41,0x51, 0xD1,0xD5,0xDB),
+                Badge(OrderStatuses.Pending,              "Pending",             counts.GetValueOrDefault(OrderStatuses.Pending),                 0x29,0x21,0x00, 0xF5,0x9E,0x0B),
+                Badge(OrderStatuses.PendingVerification,  "Pending Verification",counts.GetValueOrDefault(OrderStatuses.PendingVerification),     0x2D,0x1A,0x00, 0xFB,0x92,0x3C),
+                Badge(OrderStatuses.Processing,           "Processing",          counts.GetValueOrDefault(OrderStatuses.Processing),              0x1F,0x12,0x00, 0xF9,0x73,0x16),
+                Badge(OrderStatuses.OnHold,               "On Hold",             counts.GetValueOrDefault(OrderStatuses.OnHold),                  0x1A,0x10,0x2E, 0xC0,0x84,0xFC),
+                Badge(OrderStatuses.ReadyForPickup,       "Ready for Pickup",    counts.GetValueOrDefault(OrderStatuses.ReadyForPickup),          0x0F,0x1E,0x3D, 0x60,0xA5,0xFA),
+                Badge(OrderStatuses.PickedUp,             "Picked Up",           counts.GetValueOrDefault(OrderStatuses.PickedUp),                0x0A,0x1F,0x0E, 0x34,0xD3,0x99),
+                Badge(OrderStatuses.OutForDelivery,       "Out for Delivery",    counts.GetValueOrDefault(OrderStatuses.OutForDelivery),           0x1A,0x0A,0x3D, 0xA7,0x8B,0xFA),
+                Badge(OrderStatuses.Delivered,            "Delivered",           counts.GetValueOrDefault(OrderStatuses.Delivered),               0x0A,0x1F,0x0E, 0x34,0xD3,0x99),
+                Badge(OrderStatuses.Cancelled,            "Cancelled",           counts.GetValueOrDefault(OrderStatuses.Cancelled),               0x1F,0x00,0x00, 0xF8,0x71,0x71),
             };
         }
 
@@ -350,9 +374,12 @@ namespace AdminSystem_v2.ViewModels
                 var detail = await _orderService.GetOrderDetailAsync(order.OrderId);
                 if (detail != null)
                 {
-                    order.Items    = detail.Items;
-                    order.Delivery = detail.Delivery;
-                    order.Pickup   = detail.Pickup;
+                    order.Items              = detail.Items;
+                    order.Delivery           = detail.Delivery;
+                    order.Pickup             = detail.Pickup;
+                    order.PaymentProofUrl    = detail.PaymentProofUrl;
+                    order.PaymentProofMethod = detail.PaymentProofMethod;
+                    order.PaymentStatus      = detail.PaymentStatus;
                 }
 
                 // Cycle through null so WPF sees a genuine reference change and
@@ -405,6 +432,28 @@ namespace AdminSystem_v2.ViewModels
             await ExecuteOrderActionAsync(
                 () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.Delivered),
                 $"Order {SelectedOrder.OrderNumber} marked as Delivered.");
+        }
+
+        private async Task ApprovePaymentAsync()
+        {
+            if (SelectedOrder == null) return;
+            if (!_dialog.Confirm(
+                    $"Approve payment for order {SelectedOrder.OrderNumber}? This will move the order to Processing.",
+                    "Approve Payment")) return;
+            await ExecuteOrderActionAsync(
+                () => _orderService.ApprovePaymentAsync(SelectedOrder.OrderId),
+                $"Payment approved. Order {SelectedOrder.OrderNumber} is now Processing.");
+        }
+
+        private async Task RejectPaymentAsync()
+        {
+            if (SelectedOrder == null) return;
+            if (!_dialog.Confirm(
+                    $"Reject payment proof for order {SelectedOrder.OrderNumber}? The customer will be notified to resubmit.",
+                    "Reject Payment")) return;
+            await ExecuteOrderActionAsync(
+                () => _orderService.RejectPaymentAsync(SelectedOrder.OrderId),
+                $"Payment rejected. Order {SelectedOrder.OrderNumber} returned to Pending.");
         }
 
         private async Task CancelOrderAsync()
@@ -551,6 +600,8 @@ namespace AdminSystem_v2.ViewModels
             OnPropertyChanged(nameof(CanMarkOutForDelivery));
             OnPropertyChanged(nameof(CanMarkDelivered));
             OnPropertyChanged(nameof(CanCancelOrder));
+            OnPropertyChanged(nameof(CanApprovePayment));
+            OnPropertyChanged(nameof(CanRejectPayment));
         }
     }
 }

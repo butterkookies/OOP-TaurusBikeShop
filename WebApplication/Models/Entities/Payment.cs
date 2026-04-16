@@ -84,6 +84,24 @@ public sealed class Payment
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // -------------------------------------------------------------------------
+    // Store-account snapshot — captures which StorePaymentAccount the customer
+    // was asked to pay to, so a later admin-side rotation of the account number
+    // does not rewrite the historical record for disputes or audits.
+    // -------------------------------------------------------------------------
+
+    /// <summary>Snapshot of the store account holder name at submission time.</summary>
+    [MaxLength(150)]
+    public string? PaidToAccountName { get; set; }
+
+    /// <summary>Snapshot of the store account / mobile number at submission time.</summary>
+    [MaxLength(50)]
+    public string? PaidToAccountNumber { get; set; }
+
+    /// <summary>Snapshot of the bank name (BPI, etc.) — only set for BankTransfer.</summary>
+    [MaxLength(100)]
+    public string? PaidToBankName { get; set; }
+
+    // -------------------------------------------------------------------------
     // Navigation properties
     // -------------------------------------------------------------------------
 

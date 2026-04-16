@@ -6,7 +6,7 @@ namespace AdminSystem_v2.Models
     /// </summary>
     public class InventoryLog
     {
-        public int      InventoryLogId    { get; set; }
+        public long     InventoryLogId    { get; set; }
         public int      ProductId         { get; set; }
         public int?     ProductVariantId  { get; set; }
         public int?     OrderId           { get; set; }

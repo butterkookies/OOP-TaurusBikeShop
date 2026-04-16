@@ -16,6 +16,7 @@ namespace AdminSystem_v2.ViewModels
         private readonly StaffViewModel     _staffVm;
         private readonly POSViewModel       _posVm;
         private readonly VoucherViewModel   _voucherVm;
+        private readonly StorePaymentAccountViewModel _paymentAccountsVm;
 
         // ── Session ───────────────────────────────────────────────────────
 
@@ -65,17 +66,19 @@ namespace AdminSystem_v2.ViewModels
             StaffViewModel     staffVm,
             POSViewModel       posVm,
             VoucherViewModel   voucherVm,
+            StorePaymentAccountViewModel paymentAccountsVm,
             IDialogService     dialog)
         {
-            _authService  = authService;
-            _dialog       = dialog;
-            _dashboardVm  = dashboardVm;
-            _productVm    = productVm;
-            _orderVm      = orderVm;
-            _reportVm     = reportVm;
-            _staffVm      = staffVm;
-            _posVm        = posVm;
-            _voucherVm    = voucherVm;
+            _authService       = authService;
+            _dialog            = dialog;
+            _dashboardVm       = dashboardVm;
+            _productVm         = productVm;
+            _orderVm           = orderVm;
+            _reportVm          = reportVm;
+            _staffVm           = staffVm;
+            _posVm             = posVm;
+            _voucherVm         = voucherVm;
+            _paymentAccountsVm = paymentAccountsVm;
 
             User? user   = App.CurrentUser;
             UserFullName = user?.FullName ?? "Administrator";
@@ -100,14 +103,15 @@ namespace AdminSystem_v2.ViewModels
 
             CurrentViewModel = page switch
             {
-                PageNames.Dashboard => _dashboardVm,
-                PageNames.Products  => _productVm,
-                PageNames.Orders    => _orderVm,
-                PageNames.Reports   => _reportVm,
-                PageNames.Staff     => _staffVm,
-                PageNames.POS       => _posVm,
-                PageNames.Vouchers  => _voucherVm,
-                _                   => _dashboardVm
+                PageNames.Dashboard       => _dashboardVm,
+                PageNames.Products        => _productVm,
+                PageNames.Orders          => _orderVm,
+                PageNames.Reports         => _reportVm,
+                PageNames.Staff           => _staffVm,
+                PageNames.POS             => _posVm,
+                PageNames.Vouchers        => _voucherVm,
+                PageNames.PaymentAccounts => _paymentAccountsVm,
+                _                         => _dashboardVm
             };
 
             ActivePage = page;
@@ -129,6 +133,8 @@ namespace AdminSystem_v2.ViewModels
                 _ = _posVm.LoadAsync();
             else if (page == PageNames.Vouchers)
                 _ = _voucherVm.LoadAsync();
+            else if (page == PageNames.PaymentAccounts)
+                _ = _paymentAccountsVm.LoadAsync();
         }
 
         // ── Command Handlers ──────────────────────────────────────────────

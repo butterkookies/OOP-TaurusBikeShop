@@ -142,10 +142,34 @@
                             </div>
                         }
 
-                        <div class="flex gap-3 mt-3" id="voucher-input-row">
-                            <input type="text" id="voucher-code-input" class="cal-input flex-1"
-                                   placeholder="Enter voucher code" autocomplete="off" aria-label="Voucher code" />
-                            <button type="button" id="voucher-apply-btn" class="btn-ghost">Apply</button>
+                        <div id="voucher-inputs-wrapper" style="display:@(!string.IsNullOrWhiteSpace(Model.VoucherCode) ? "none" : "block")">
+                            
+                            <label for="voucher-code-input" class="block text-sm font-medium text-charcoal dark:text-white mb-2">
+                                Enter or select a voucher
+                            </label>
+
+                            <div class="flex gap-3" id="voucher-input-row">
+                                <input type="text" id="voucher-code-input" class="cal-input flex-1"
+                                       placeholder="Enter or select voucher code..." autocomplete="off" aria-label="Voucher code"
+                                       list="assigned-vouchers-list" />
+                                
+                                <datalist id="assigned-vouchers-list">
+                                    @if (Model.AssignedVouchers.Any())
+                                    {
+                                        @foreach (var v in Model.AssignedVouchers)
+                                        {
+                                            <option value="@v.Code">@v.Code — @v.Description (@v.TimeLeft)</option>
+                                        }
+                                    }
+                                </datalist>
+
+                                <button type="button" id="voucher-apply-btn" class="btn-ghost">Apply</button>
+                            </div>
+                            
+                            @if (!Model.AssignedVouchers.Any())
+                            {
+                                <p class="text-xs text-mid-gray mt-2">You currently have no assigned vouchers.</p>
+                            }
                         </div>
                         <p class="cal-field-error" id="voucher-error" style="display:none"></p>
 

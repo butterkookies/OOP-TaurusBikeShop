@@ -248,6 +248,14 @@ public sealed class UserService : IUserService
     }
 
     /// <inheritdoc/>
+    public async Task<User?> GetUserByIdAsync(
+        int userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _userRepo.GetByIdAsync(userId, cancellationToken);
+    }
+
+    /// <inheritdoc/>
     public async Task<ServiceResult> UpdateProfileAsync(
         int userId,
         ProfileViewModel vm,

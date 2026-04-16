@@ -35,7 +35,41 @@
                 <div class="cal-card-static p-6 mb-6" data-reveal="delay-1">
                     <div class="mb-5 p-4 bg-light-gray dark:bg-white/5 rounded-xl">
                         <p class="text-sm font-medium text-charcoal dark:text-white mb-1">Payment via GCash</p>
-                        <p class="text-xs text-mid-gray">Send ₱@Model.GrandTotal.ToString("N2") to the GCash number provided in your order confirmation.</p>
+                        <p class="text-xs text-mid-gray mb-4">
+                            Send <strong class="text-charcoal dark:text-white">exactly ₱@Model.GrandTotal.ToString("N2")</strong> to the store GCash account below, then upload your screenshot.
+                        </p>
+
+                        @if (!string.IsNullOrEmpty(Model.StoreAccountNumber))
+                        {
+                            <div class="grid @(string.IsNullOrEmpty(Model.StoreAccountQrImageUrl) ? "grid-cols-1" : "md:grid-cols-[1fr_auto]") gap-4 items-center">
+                                <div>
+                                    <p class="text-xs uppercase tracking-wide text-mid-gray mb-1">Send to</p>
+                                    <p class="text-sm font-semibold text-charcoal dark:text-white">@Model.StoreAccountName</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-base font-mono font-semibold text-charcoal dark:text-white select-all" id="store-account-number">@Model.StoreAccountNumber</span>
+                                        <button type="button"
+                                                class="btn-ghost btn-sm"
+                                                data-copy-target="store-account-number"
+                                                aria-label="Copy GCash number">Copy</button>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(Model.StoreAccountInstructions))
+                                    {
+                                        <p class="text-xs text-mid-gray mt-2">@Model.StoreAccountInstructions</p>
+                                    }
+                                    <p class="text-xs text-mid-gray mt-2">
+                                        Use <strong class="text-charcoal dark:text-white">@Model.OrderNumber</strong> as the message / note.
+                                    </p>
+                                </div>
+                                @if (!string.IsNullOrEmpty(Model.StoreAccountQrImageUrl))
+                                {
+                                    <img src="@Model.StoreAccountQrImageUrl" alt="GCash QR code" class="w-32 h-32 rounded-lg border border-white/10 object-contain bg-white p-1" />
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-xs text-error">GCash account details are not yet configured by the store. Please contact support before sending payment.</p>
+                        }
                     </div>
 
                     <div class="mb-5">
@@ -75,8 +109,40 @@
 
                 <div class="cal-card-static p-6 mb-6" data-reveal="delay-1">
                     <div class="mb-5 p-4 bg-light-gray dark:bg-white/5 rounded-xl">
-                        <p class="text-sm font-medium text-charcoal dark:text-white mb-1">Payment via Bank Transfer (BPI)</p>
-                        <p class="text-xs text-mid-gray">Transfer ₱@Model.GrandTotal.ToString("N2") to the BPI account provided in your order confirmation.</p>
+                        <p class="text-sm font-medium text-charcoal dark:text-white mb-1">Payment via Bank Transfer</p>
+                        <p class="text-xs text-mid-gray mb-4">
+                            Transfer <strong class="text-charcoal dark:text-white">exactly ₱@Model.GrandTotal.ToString("N2")</strong> to the store bank account below, then upload your deposit slip.
+                        </p>
+
+                        @if (!string.IsNullOrEmpty(Model.StoreAccountNumber))
+                        {
+                            <div>
+                                <p class="text-xs uppercase tracking-wide text-mid-gray mb-1">Transfer to</p>
+                                @if (!string.IsNullOrEmpty(Model.StoreAccountBankName))
+                                {
+                                    <p class="text-sm font-medium text-charcoal dark:text-white">@Model.StoreAccountBankName</p>
+                                }
+                                <p class="text-sm font-semibold text-charcoal dark:text-white">@Model.StoreAccountName</p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-base font-mono font-semibold text-charcoal dark:text-white select-all" id="store-account-number">@Model.StoreAccountNumber</span>
+                                    <button type="button"
+                                            class="btn-ghost btn-sm"
+                                            data-copy-target="store-account-number"
+                                            aria-label="Copy bank account number">Copy</button>
+                                </div>
+                                @if (!string.IsNullOrEmpty(Model.StoreAccountInstructions))
+                                {
+                                    <p class="text-xs text-mid-gray mt-2">@Model.StoreAccountInstructions</p>
+                                }
+                                <p class="text-xs text-mid-gray mt-2">
+                                    Use <strong class="text-charcoal dark:text-white">@Model.OrderNumber</strong> as the deposit note.
+                                </p>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-xs text-error">Bank account details are not yet configured by the store. Please contact support before sending payment.</p>
+                        }
                     </div>
 
                     <div class="mb-5">
@@ -119,12 +185,67 @@
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
     <script>
-        const zone = document.getElementById('file-drop-zone');
-        const input = document.getElementById('payment-file-input');
-        if (zone) {
-            ['dragenter','dragover'].forEach(e => zone.addEventListener(e, ev => { ev.preventDefault(); zone.style.borderColor = '#242424'; }));
-            ['dragleave','drop'].forEach(e => zone.addEventListener(e, ev => { ev.preventDefault(); zone.style.borderColor = ''; }));
-            zone.addEventListener('drop', ev => { input.files = ev.dataTransfer.files; });
-        }
+        (function () {
+            const zone  = document.getElementById('file-drop-zone');
+            const input = document.getElementById('payment-file-input');
+            if (!zone || !input) return;
+
+            // Update drop zone UI to show the selected file's name
+            function showFileInfo(file) {
+                if (!file) return;
+                const inner = zone.querySelector('div.text-mid-gray');
+                if (!inner) return;
+                inner.innerHTML =
+                    '<svg class="mx-auto mb-2 text-success" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+                    '<p class="text-sm font-medium text-charcoal dark:text-white" style="word-break:break-all">' + file.name + '</p>' +
+                    '<p class="text-xs mt-1 text-success">File attached — ready to submit</p>';
+                zone.style.borderColor = '#22c55e'; // success green
+            }
+
+            // Drag highlight
+            ['dragenter', 'dragover'].forEach(e =>
+                zone.addEventListener(e, ev => { ev.preventDefault(); zone.style.borderColor = '#242424'; }));
+
+            // Drop: wire file to input, then show info
+            zone.addEventListener('drop', ev => {
+                ev.preventDefault();
+                zone.style.borderColor = '';
+                input.files = ev.dataTransfer.files;
+                showFileInfo(input.files[0]);
+            });
+
+            zone.addEventListener('dragleave', ev => {
+                ev.preventDefault();
+                if (!input.files?.length) zone.style.borderColor = '';
+            });
+
+            // Regular file-picker selection
+            input.addEventListener('change', () => showFileInfo(input.files[0]));
+        })();
+
+        // Copy-to-clipboard for the store account number.
+        (function () {
+            document.querySelectorAll('[data-copy-target]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const targetId = btn.getAttribute('data-copy-target');
+                    const target = document.getElementById(targetId);
+                    if (!target) return;
+                    const value = target.innerText.trim();
+                    try {
+                        await navigator.clipboard.writeText(value);
+                    } catch {
+                        const r = document.createRange();
+                        r.selectNodeContents(target);
+                        const s = window.getSelection();
+                        s.removeAllRanges(); s.addRange(r);
+                        document.execCommand('copy'); s.removeAllRanges();
+                    }
+                    const original = btn.innerText;
+                    btn.innerText = 'Copied';
+                    btn.disabled = true;
+                    setTimeout(() => { btn.innerText = original; btn.disabled = false; }, 1500);
+                });
+            });
+        })();
     </script>
 }

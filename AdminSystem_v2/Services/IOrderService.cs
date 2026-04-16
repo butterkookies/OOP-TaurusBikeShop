@@ -22,5 +22,11 @@ namespace AdminSystem_v2.Services
 
         /// <summary>Returns order counts per status for the badge bar (single cheap query).</summary>
         Task<Dictionary<string, int>> GetStatusCountsAsync();
+
+        /// <summary>Approves the payment proof: transitions order to Processing, payment to Completed.</summary>
+        Task ApprovePaymentAsync(int orderId);
+
+        /// <summary>Rejects the payment proof: returns order to Pending, payment to VerificationRejected.</summary>
+        Task RejectPaymentAsync(int orderId);
     }
 }

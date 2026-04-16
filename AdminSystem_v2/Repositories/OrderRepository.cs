@@ -99,6 +99,26 @@ namespace AdminSystem_v2.Repositories
                     new { Id = orderId });
             }
 
+            // 5 — payment proof (GCash or BankTransfer, whichever was most recently submitted)
+            var proof = await conn.QueryFirstOrDefaultAsync<PaymentProofInfo>(
+                @"SELECT TOP 1
+                      p.PaymentMethod          AS PaymentProofMethod,
+                      p.PaymentStatus          AS PaymentStatus,
+                      COALESCE(g.ScreenshotUrl, bt.ProofUrl) AS PaymentProofUrl
+                  FROM Payment p
+                  LEFT JOIN GCashPayment       g  ON g.PaymentId       = p.PaymentId
+                  LEFT JOIN BankTransferPayment bt ON bt.PaymentId      = p.PaymentId
+                  WHERE p.OrderId = @Id
+                  ORDER BY p.CreatedAt DESC",
+                new { Id = orderId });
+
+            if (proof != null)
+            {
+                order.PaymentProofUrl    = proof.PaymentProofUrl;
+                order.PaymentProofMethod = proof.PaymentProofMethod;
+                order.PaymentStatus      = proof.PaymentStatus;
+            }
+
             return order;
         }
 
@@ -266,12 +286,117 @@ namespace AdminSystem_v2.Repositories
             return rows.ToDictionary(r => r.OrderStatus, r => r.Cnt);
         }
 
+        public async Task ApprovePaymentAsync(int orderId)
+        {
+            await using var conn = GetConnection();
+            await using var tx   = await conn.BeginTransactionAsync();
+            try
+            {
+                string? currentStatus = await conn.QueryFirstOrDefaultAsync<string>(
+                    "SELECT OrderStatus FROM [Order] WHERE OrderId = @OrderId",
+                    new { OrderId = orderId }, tx);
+
+                if (currentStatus == null)
+                    throw new InvalidOperationException($"Order {orderId} not found.");
+
+                if (!OrderStatuses.IsValidTransition(currentStatus, OrderStatuses.Processing))
+                {
+                    await LogStatusTransitionAsync(conn, tx, orderId, currentStatus,
+                        OrderStatuses.Processing, success: false, "Payment approval rejected by validation");
+                    throw new InvalidStatusTransitionException(orderId, currentStatus, OrderStatuses.Processing);
+                }
+
+                // Advance order to Processing
+                await conn.ExecuteAsync(
+                    @"UPDATE [Order]
+                      SET OrderStatus = @Status, UpdatedAt = GETUTCDATE()
+                      WHERE OrderId = @OrderId",
+                    new { OrderId = orderId, Status = OrderStatuses.Processing }, tx);
+
+                // Mark payment as Completed
+                await conn.ExecuteAsync(
+                    @"UPDATE Payment
+                      SET PaymentStatus = 'Completed', PaymentDate = GETUTCDATE()
+                      WHERE OrderId = @OrderId",
+                    new { OrderId = orderId }, tx);
+
+                // Notify customer
+                await QueueOrderNotificationAsync(conn, tx, orderId, OrderStatuses.Processing);
+
+                await LogStatusTransitionAsync(conn, tx, orderId, currentStatus,
+                    OrderStatuses.Processing, success: true, "Payment proof approved by admin");
+
+                await tx.CommitAsync();
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
+        }
+
+        public async Task RejectPaymentAsync(int orderId)
+        {
+            await using var conn = GetConnection();
+            await using var tx   = await conn.BeginTransactionAsync();
+            try
+            {
+                string? currentStatus = await conn.QueryFirstOrDefaultAsync<string>(
+                    "SELECT OrderStatus FROM [Order] WHERE OrderId = @OrderId",
+                    new { OrderId = orderId }, tx);
+
+                if (currentStatus == null)
+                    throw new InvalidOperationException($"Order {orderId} not found.");
+
+                if (!OrderStatuses.IsValidTransition(currentStatus, OrderStatuses.Pending))
+                {
+                    await LogStatusTransitionAsync(conn, tx, orderId, currentStatus,
+                        OrderStatuses.Pending, success: false, "Payment rejection rejected by validation");
+                    throw new InvalidStatusTransitionException(orderId, currentStatus, OrderStatuses.Pending);
+                }
+
+                // Return order to Pending
+                await conn.ExecuteAsync(
+                    @"UPDATE [Order]
+                      SET OrderStatus = @Status, UpdatedAt = GETUTCDATE()
+                      WHERE OrderId = @OrderId",
+                    new { OrderId = orderId, Status = OrderStatuses.Pending }, tx);
+
+                // Mark payment as VerificationRejected
+                await conn.ExecuteAsync(
+                    @"UPDATE Payment
+                      SET PaymentStatus = 'VerificationRejected'
+                      WHERE OrderId = @OrderId",
+                    new { OrderId = orderId }, tx);
+
+                // Notify customer — reuse 'Pending' key, body overridden in switch
+                await QueueOrderNotificationAsync(conn, tx, orderId, "PaymentRejected");
+
+                await LogStatusTransitionAsync(conn, tx, orderId, currentStatus,
+                    OrderStatuses.Pending, success: true, "Payment proof rejected by admin");
+
+                await tx.CommitAsync();
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
+        }
+
         // ── Private helpers ───────────────────────────────────────────────────
 
         private sealed class StatusCountRow
         {
             public string OrderStatus { get; set; } = string.Empty;
             public int    Cnt         { get; set; }
+        }
+
+        private sealed class PaymentProofInfo
+        {
+            public string? PaymentProofUrl    { get; set; }
+            public string? PaymentProofMethod { get; set; }
+            public string? PaymentStatus      { get; set; }
         }
 
         /// <summary>
@@ -305,12 +430,13 @@ namespace AdminSystem_v2.Repositories
             string subject = $"Order {info.OrderNumber} — {status}";
             string body = status switch
             {
-                OrderStatuses.Processing     => $"Your order {info.OrderNumber} is now being processed.",
+                OrderStatuses.Processing     => $"Your payment for order {info.OrderNumber} has been verified and approved. Your order is now being processed.",
                 OrderStatuses.ReadyForPickup => $"Your order {info.OrderNumber} is ready for pickup.",
                 OrderStatuses.PickedUp       => $"Your order {info.OrderNumber} has been picked up.",
                 OrderStatuses.OutForDelivery => $"Your order {info.OrderNumber} is out for delivery.",
                 OrderStatuses.Delivered      => $"Your order {info.OrderNumber} has been delivered.",
                 OrderStatuses.Cancelled      => $"Your order {info.OrderNumber} has been cancelled.",
+                "PaymentRejected"            => $"Your payment proof for order {info.OrderNumber} could not be verified. Please log in and resubmit your payment proof.",
                 _                            => $"Your order {info.OrderNumber} status changed to {status}.",
             };
 

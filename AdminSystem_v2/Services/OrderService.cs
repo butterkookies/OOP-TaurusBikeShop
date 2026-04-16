@@ -26,5 +26,11 @@ namespace AdminSystem_v2.Services
 
         public Task<Dictionary<string, int>> GetStatusCountsAsync()
             => _repo.GetStatusCountsAsync();
+
+        public Task ApprovePaymentAsync(int orderId)
+            => _repo.ApprovePaymentAsync(orderId);
+
+        public Task RejectPaymentAsync(int orderId)
+            => _repo.RejectPaymentAsync(orderId);
     }
 }

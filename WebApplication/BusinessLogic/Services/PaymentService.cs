@@ -5,44 +5,44 @@ using WebApplication.BusinessLogic.Interfaces;
 using WebApplication.DataAccess.Context;
 using WebApplication.DataAccess.Repositories;
 using WebApplication.Models.Entities;
-using WebApplication.Utilities;
+
 
 namespace WebApplication.BusinessLogic.Services;
 
 /// <summary>
 /// Implements <see cref="IPaymentService"/> — GCash and BankTransfer
-/// proof submission with GCS upload, status transitions, and notification queuing.
+/// proof submission with Cloudinary upload, status transitions, and notification queuing.
 /// Flowchart: Part 5 — Payment Processing.
 /// </summary>
 public sealed class PaymentService : IPaymentService
 {
-    private readonly AppDbContext          _context;
-    private readonly PaymentRepository     _paymentRepo;
-    private readonly OrderRepository       _orderRepo;
-    private readonly FileUploadHelper?     _fileUpload;
-    private readonly INotificationService  _notifications;
-    private readonly IConfiguration        _config;
-    private readonly ILogger<PaymentService> _logger;
+    private readonly AppDbContext                    _context;
+    private readonly PaymentRepository               _paymentRepo;
+    private readonly OrderRepository                 _orderRepo;
+    private readonly StorePaymentAccountRepository   _storeAccountRepo;
+    private readonly IPhotoService                   _photoService;
+    private readonly INotificationService            _notifications;
+    private readonly ILogger<PaymentService>         _logger;
 
     private const int BankTransferVerificationHours = 24;
 
     /// <inheritdoc/>
     public PaymentService(
-        AppDbContext         context,
-        PaymentRepository    paymentRepo,
-        OrderRepository      orderRepo,
-        FileUploadHelper?    fileUpload,
-        INotificationService notifications,
-        IConfiguration       config,
-        ILogger<PaymentService> logger)
+        AppDbContext                   context,
+        PaymentRepository              paymentRepo,
+        OrderRepository                orderRepo,
+        StorePaymentAccountRepository  storeAccountRepo,
+        IPhotoService                  photoService,
+        INotificationService           notifications,
+        ILogger<PaymentService>        logger)
     {
-        _context       = context       ?? throw new ArgumentNullException(nameof(context));
-        _paymentRepo   = paymentRepo   ?? throw new ArgumentNullException(nameof(paymentRepo));
-        _orderRepo     = orderRepo     ?? throw new ArgumentNullException(nameof(orderRepo));
-        _fileUpload    = fileUpload; // null when GCS credentials are not configured locally
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        _config        = config        ?? throw new ArgumentNullException(nameof(config));
-        _logger        = logger        ?? throw new ArgumentNullException(nameof(logger));
+        _context          = context          ?? throw new ArgumentNullException(nameof(context));
+        _paymentRepo      = paymentRepo      ?? throw new ArgumentNullException(nameof(paymentRepo));
+        _orderRepo        = orderRepo        ?? throw new ArgumentNullException(nameof(orderRepo));
+        _storeAccountRepo = storeAccountRepo ?? throw new ArgumentNullException(nameof(storeAccountRepo));
+        _photoService     = photoService     ?? throw new ArgumentNullException(nameof(photoService));
+        _notifications    = notifications    ?? throw new ArgumentNullException(nameof(notifications));
+        _logger           = logger           ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <inheritdoc/>
@@ -71,34 +71,36 @@ public sealed class PaymentService : IPaymentService
 
         try
         {
-            // Upload screenshot to GCS
-            if (_fileUpload is null)
-                return ServiceResult.Fail("File uploads are unavailable — Google Cloud Storage credentials are not configured.");
-
-            string folder = GetGCSFolder("payment-proofs", orderId);
-            UploadResult upload = await _fileUpload.UploadPaymentProofAsync(
-                screenshot, folder, cancellationToken);
+            // Upload screenshot to Cloudinary
+            string screenshotUrl = await _photoService.UploadPaymentProofAsync(screenshot, orderId);
 
             // Build amount from order
             decimal amount = await GetOrderGrandTotalAsync(orderId, cancellationToken);
 
+            // Snapshot the store GCash account the customer was told to pay to.
+            StorePaymentAccount? storeAccount = await _storeAccountRepo
+                .GetActiveForMethodAsync(PaymentMethods.GCash, cancellationToken);
+
             // Create Payment + GCashPayment subtype in one transaction
             Payment payment = new()
             {
-                OrderId       = orderId,
-                PaymentMethod = PaymentMethods.GCash,
-                PaymentStage  = PaymentStages.Upfront,
-                PaymentStatus = PaymentStatuses.VerificationPending,
-                Amount        = amount,
-                CreatedAt     = DateTime.UtcNow
+                OrderId             = orderId,
+                PaymentMethod       = PaymentMethods.GCash,
+                PaymentStage        = PaymentStages.Upfront,
+                PaymentStatus       = PaymentStatuses.VerificationPending,
+                Amount              = amount,
+                CreatedAt           = DateTime.UtcNow,
+                PaidToAccountName   = storeAccount?.AccountName,
+                PaidToAccountNumber = storeAccount?.AccountNumber,
+                PaidToBankName      = storeAccount?.BankName
             };
 
             GCashPayment gcash = new()
             {
                 GcashTransactionId = gcashRefNumber.Trim(),
-                ScreenshotUrl      = upload.ImageUrl,
-                StorageBucket      = upload.StorageBucket,
-                StoragePath        = upload.StoragePath,
+                ScreenshotUrl      = screenshotUrl,
+                StorageBucket      = "cloudinary",
+                StoragePath        = string.Empty,
                 SubmittedAt        = DateTime.UtcNow
             };
 
@@ -125,7 +127,7 @@ public sealed class PaymentService : IPaymentService
         }
         catch (InvalidOperationException ex)
         {
-            // File validation failures from FileUploadHelper
+            // File validation failures from IPhotoService
             return ServiceResult.Fail(ex.Message);
         }
         catch (Exception ex)
@@ -155,37 +157,40 @@ public sealed class PaymentService : IPaymentService
         if (alreadyPaid)
             return ServiceResult.Fail("A payment has already been submitted for this order.");
 
-        if (string.IsNullOrWhiteSpace(bpiReferenceNumber))
-            return ServiceResult.Fail("BPI reference number is required.");
+        // BPI reference number is optional — the customer may not have it at the time of
+        // submission.  Presence is not enforced here; admin can follow up during verification.
 
         try
         {
-            if (_fileUpload is null)
-                return ServiceResult.Fail("File uploads are unavailable — Google Cloud Storage credentials are not configured.");
-
-            string folder = GetGCSFolder("payment-proofs", orderId);
-            UploadResult upload = await _fileUpload.UploadPaymentProofAsync(
-                proofFile, folder, cancellationToken);
+            // Upload proof to Cloudinary
+            string proofUrl = await _photoService.UploadPaymentProofAsync(proofFile, orderId);
 
             decimal amount = await GetOrderGrandTotalAsync(orderId, cancellationToken);
             DateTime deadline = DateTime.UtcNow.AddHours(BankTransferVerificationHours);
 
+            // Snapshot the store BPI account the customer was told to pay to.
+            StorePaymentAccount? storeAccount = await _storeAccountRepo
+                .GetActiveForMethodAsync(PaymentMethods.BankTransfer, cancellationToken);
+
             Payment payment = new()
             {
-                OrderId       = orderId,
-                PaymentMethod = PaymentMethods.BankTransfer,
-                PaymentStage  = PaymentStages.Upfront,
-                PaymentStatus = PaymentStatuses.VerificationPending,
-                Amount        = amount,
-                CreatedAt     = DateTime.UtcNow
+                OrderId             = orderId,
+                PaymentMethod       = PaymentMethods.BankTransfer,
+                PaymentStage        = PaymentStages.Upfront,
+                PaymentStatus       = PaymentStatuses.VerificationPending,
+                Amount              = amount,
+                CreatedAt           = DateTime.UtcNow,
+                PaidToAccountName   = storeAccount?.AccountName,
+                PaidToAccountNumber = storeAccount?.AccountNumber,
+                PaidToBankName      = storeAccount?.BankName
             };
 
             BankTransferPayment bankTransfer = new()
             {
                 BpiReferenceNumber   = bpiReferenceNumber.Trim(),
-                ProofUrl             = upload.ImageUrl,
-                ProofStorageBucket   = upload.StorageBucket,
-                ProofStoragePath     = upload.StoragePath,
+                ProofUrl             = proofUrl,
+                ProofStorageBucket   = "cloudinary",
+                ProofStoragePath     = string.Empty,
                 VerificationDeadline = deadline,
                 SubmittedAt          = DateTime.UtcNow
             };
@@ -210,6 +215,7 @@ public sealed class PaymentService : IPaymentService
         }
         catch (InvalidOperationException ex)
         {
+            // File validation failures from IPhotoService
             return ServiceResult.Fail(ex.Message);
         }
         catch (Exception ex)
@@ -249,16 +255,47 @@ public sealed class PaymentService : IPaymentService
             verDeadline = existingPayment.BankTransferPayment.VerificationDeadline;
         }
 
+        // Carry the active store account info so the view can show
+        // "Pay to: …". For already-submitted payments, prefer the snapshot on
+        // Payment itself so the customer sees what they were actually asked
+        // to pay to even if admin later rotates the account.
+        string method = existingPayment?.PaymentMethod ?? string.Empty;
+
+        string? storeName   = existingPayment?.PaidToAccountName;
+        string? storeNumber = existingPayment?.PaidToAccountNumber;
+        string? storeBank   = existingPayment?.PaidToBankName;
+        string? storeQr     = null;
+        string? storeInstr  = null;
+
+        if (storeNumber is null && !string.IsNullOrEmpty(method))
+        {
+            StorePaymentAccount? active = await _storeAccountRepo
+                .GetActiveForMethodAsync(method, cancellationToken);
+            if (active is not null)
+            {
+                storeName   = active.AccountName;
+                storeNumber = active.AccountNumber;
+                storeBank   = active.BankName;
+                storeQr     = active.QrImageUrl;
+                storeInstr  = active.Instructions;
+            }
+        }
+
         return new PaymentDetailDto(
-            OrderId:              order.OrderId,
-            OrderNumber:          order.OrderNumber,
-            OrderStatus:          order.OrderStatus,
-            GrandTotal:           grandTotal,
-            PaymentMethod:        existingPayment?.PaymentMethod ?? string.Empty,
-            PaymentStatus:        paymentStatus,
-            ProofImageUrl:        proofUrl,
-            HasExistingPayment:   existingPayment != null,
-            VerificationDeadline: verDeadline);
+            OrderId:                 order.OrderId,
+            OrderNumber:             order.OrderNumber,
+            OrderStatus:             order.OrderStatus,
+            GrandTotal:              grandTotal,
+            PaymentMethod:           method,
+            PaymentStatus:           paymentStatus,
+            ProofImageUrl:           proofUrl,
+            HasExistingPayment:      existingPayment != null,
+            VerificationDeadline:    verDeadline,
+            StoreAccountName:        storeName,
+            StoreAccountNumber:      storeNumber,
+            StoreAccountBankName:    storeBank,
+            StoreAccountQrImageUrl:  storeQr,
+            StoreAccountInstructions: storeInstr);
     }
 
     // =========================================================================
@@ -300,12 +337,7 @@ public sealed class PaymentService : IPaymentService
         return sub - order.DiscountAmount + order.ShippingFee;
     }
 
-    private string GetGCSFolder(string prefix, int orderId)
-    {
-        string bucket = _config.GetValue<string>(
-            "GoogleCloudStorage:Folders:PaymentProofs") ?? "payment-proofs";
-        return $"{bucket}/order-{orderId}";
-    }
+    // GetGCSFolder removed — Cloudinary folder is built inside IPhotoService.UploadPaymentProofAsync.
 
     private async Task WriteSystemLogAsync(
         int userId, string eventType, string details, CancellationToken ct)

@@ -17,6 +17,9 @@ namespace AdminSystem_v2.Models
         public bool      IsWalkIn             { get; set; }
         public DateTime  CreatedAt            { get; set; }
         public DateTime? UpdatedAt            { get; set; }
+        // Schema v8.2 columns
+        public string    FulfillmentType      { get; set; } = FulfillmentTypes.Delivery;
+        public bool      IsDeleted            { get; set; }
 
         // ── Joined from User ──────────────────────────────────────────────────
         public string CustomerName  { get; set; } = string.Empty;
@@ -27,6 +30,11 @@ namespace AdminSystem_v2.Models
 
         // ── Actual payment method from Payment table (e.g. "GCash", "BankTransfer") ──
         public string? ActualPaymentMethod { get; set; }
+
+        // ── Payment proof (from GCashPayment or BankTransferPayment) ─────────
+        public string? PaymentProofUrl    { get; set; }
+        public string? PaymentProofMethod { get; set; }  // GCash or BankTransfer
+        public string? PaymentStatus      { get; set; }  // VerificationPending, Completed, etc.
 
         // ── Populated for detail view ─────────────────────────────────────────
         public List<OrderItem>  Items    { get; set; } = new();
@@ -65,13 +73,15 @@ namespace AdminSystem_v2.Models
     /// </summary>
     public static class OrderStatuses
     {
-        public const string Pending        = "Pending";
-        public const string Processing     = "Processing";
-        public const string ReadyForPickup = "ReadyForPickup";
-        public const string PickedUp       = "PickedUp";
-        public const string OutForDelivery = "OutForDelivery";
-        public const string Delivered      = "Delivered";
-        public const string Cancelled      = "Cancelled";
+        public const string Pending             = "Pending";
+        public const string PendingVerification = "PendingVerification";
+        public const string Processing          = "Processing";
+        public const string OnHold              = "OnHold";
+        public const string ReadyForPickup      = "ReadyForPickup";
+        public const string PickedUp            = "PickedUp";
+        public const string OutForDelivery      = "OutForDelivery";
+        public const string Delivered           = "Delivered";
+        public const string Cancelled           = "Cancelled";
 
         /// <summary>All statuses that represent a final, irreversible outcome.</summary>
         public static readonly IReadOnlySet<string> TerminalStatuses = new HashSet<string>
@@ -86,14 +96,16 @@ namespace AdminSystem_v2.Models
         public static readonly IReadOnlyDictionary<string, IReadOnlySet<string>> AllowedTransitions =
             new Dictionary<string, IReadOnlySet<string>>
             {
-                [Pending]         = new HashSet<string> { Processing, ReadyForPickup, OutForDelivery, Cancelled },
-                [Processing]      = new HashSet<string> { ReadyForPickup, OutForDelivery, Cancelled },
-                [ReadyForPickup]  = new HashSet<string> { PickedUp },
-                [OutForDelivery]  = new HashSet<string> { Delivered },
+                [Pending]             = new HashSet<string> { PendingVerification, Processing, ReadyForPickup, OutForDelivery, Cancelled },
+                [PendingVerification] = new HashSet<string> { Processing, OnHold, Pending, Cancelled },
+                [Processing]          = new HashSet<string> { ReadyForPickup, OutForDelivery, Cancelled },
+                [OnHold]              = new HashSet<string> { Processing, Cancelled },
+                [ReadyForPickup]      = new HashSet<string> { PickedUp },
+                [OutForDelivery]      = new HashSet<string> { Delivered },
                 // Terminal states — no further transitions allowed
-                [PickedUp]       = new HashSet<string>(),
-                [Delivered]      = new HashSet<string>(),
-                [Cancelled]      = new HashSet<string>(),
+                [PickedUp]            = new HashSet<string>(),
+                [Delivered]           = new HashSet<string>(),
+                [Cancelled]           = new HashSet<string>(),
             };
 
         /// <summary>
@@ -114,6 +126,16 @@ namespace AdminSystem_v2.Models
     {
         public const string Delivery = "Delivery";
         public const string Pickup   = "Pickup";
+    }
+
+    /// <summary>
+    /// Constants for the FulfillmentType column (schema v8.2).
+    /// </summary>
+    public static class FulfillmentTypes
+    {
+        public const string Delivery = "Delivery";
+        public const string Pickup   = "Pickup";
+        public const string WalkIn   = "WalkIn";
     }
 
     /// <summary>

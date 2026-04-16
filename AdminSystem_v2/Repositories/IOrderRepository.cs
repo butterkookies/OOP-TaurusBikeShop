@@ -36,5 +36,17 @@ namespace AdminSystem_v2.Repositories
         /// Used to populate the status badge bar without loading every row.
         /// </summary>
         Task<Dictionary<string, int>> GetStatusCountsAsync();
+
+        /// <summary>
+        /// Approves the payment proof for a PendingVerification order:
+        /// transitions order to Processing and payment to Completed.
+        /// </summary>
+        Task ApprovePaymentAsync(int orderId);
+
+        /// <summary>
+        /// Rejects the payment proof for a PendingVerification order:
+        /// transitions order back to Pending and payment to VerificationRejected.
+        /// </summary>
+        Task RejectPaymentAsync(int orderId);
     }
 }

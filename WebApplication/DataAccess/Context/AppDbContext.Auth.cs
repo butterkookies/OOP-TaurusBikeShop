@@ -15,6 +15,10 @@ public sealed partial class AppDbContext
             e.ToTable("User");
             e.HasKey(u => u.UserId);
 
+            // Soft-delete: globally filter out logically-deleted users.
+            // Use .IgnoreQueryFilters() in admin audit queries when needed.
+            e.HasQueryFilter(u => !u.IsDeleted);
+
             // Filtered unique index — email must be unique when non-NULL
             // (walk-in placeholder users have NULL email)
             e.HasIndex(u => u.Email)

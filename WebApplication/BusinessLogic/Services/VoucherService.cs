@@ -52,7 +52,7 @@ public sealed class VoucherService : IVoucherService
             return Fail("This voucher code does not exist or has been deactivated.");
 
         // ── Step 3: Date window ────────────────────────────────────────────
-        DateTime now = DateTime.UtcNow;
+        DateTime now = DateTime.Now; // Use Local Time to match Admin system's DatePicker
         if (now < voucher.StartDate)
             return Fail("This voucher is not yet active.");
         if (voucher.EndDate.HasValue && now > voucher.EndDate.Value)
@@ -129,6 +129,14 @@ public sealed class VoucherService : IVoucherService
 
         await _voucherRepo.WriteUsageAsync(
             voucher.VoucherId, userId, orderId, discountAmount, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<UserVoucher>> GetActiveAssignedVouchersAsync(
+        int userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _voucherRepo.GetActiveAssignedVouchersAsync(userId, cancellationToken);
     }
 
     // =========================================================================

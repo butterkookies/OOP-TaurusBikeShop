@@ -127,6 +127,46 @@ public sealed class Order
     /// <summary>UTC timestamp when this order row was created.</summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    /// <summary>
+    /// UTC timestamp of the last status change or any modification to this row.
+    /// NULL until the first update. Set by the service layer on every mutation.
+    /// Added in schema v8.2.
+    /// </summary>
+    public DateTime? UpdatedAt { get; set; }
+
+    /// <summary>
+    /// Logical-delete flag. When true the order is hidden from all queries.
+    /// Physical rows are never deleted. Set by admin soft-delete. Added in schema v8.2.
+    /// </summary>
+    public bool IsDeleted { get; set; } = false;
+
+    /// <summary>
+    /// How the order will be fulfilled. Constrained by CK_Order_FulfillmentType
+    /// to 'Delivery', 'Pickup', or 'WalkIn'. Added in schema v8.2.
+    /// Use <see cref="FulfillmentTypes"/> constants instead of magic strings.
+    /// </summary>
+    [Required]
+    [MaxLength(20)]
+    public string FulfillmentType { get; set; } = FulfillmentTypes.Delivery;
+
+    /// <summary>
+    /// FK to GuestSession for orders placed without a registered account.
+    /// NULL for all registered-user orders. Planned feature — added in schema v8.2.
+    /// </summary>
+    public int? GuestSessionId { get; set; }
+
+    /// <summary>
+    /// FK to the Cart that produced this order — used for cart-to-order lineage.
+    /// NULL when lineage is not recorded. Added in schema v8.2.
+    /// </summary>
+    public int? CartId { get; set; }
+
+    /// <summary>
+    /// FK to the POS_Session during which this walk-in order was created.
+    /// NULL for all online orders. Added in schema v8.2.
+    /// </summary>
+    public int? POSSessionId { get; set; }
+
     // -------------------------------------------------------------------------
     // Navigation properties
     // -------------------------------------------------------------------------
@@ -199,6 +239,22 @@ public sealed class Order
     /// TrackingUpdate, ReadyForPickup, DeliveryConfirmation).
     /// </summary>
     public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+}
+
+/// <summary>
+/// Compile-time constants for the FulfillmentType column on <see cref="Order"/>.
+/// Mirrors the CK_Order_FulfillmentType CHECK constraint added in schema v8.2.
+/// </summary>
+public static class FulfillmentTypes
+{
+    /// <summary>Courier delivery to the customer's address (default).</summary>
+    public const string Delivery = "Delivery";
+
+    /// <summary>Customer collects from the store.</summary>
+    public const string Pickup = "Pickup";
+
+    /// <summary>Walk-in POS sale — fulfilled immediately at the counter.</summary>
+    public const string WalkIn = "WalkIn";
 }
 
 /// <summary>

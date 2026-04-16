@@ -391,6 +391,13 @@ public sealed class CustomerController : Controller
                 return View(vm);
             }
 
+            // Re-issue the auth cookie so ClaimTypes.Name reflects the new name
+            // immediately — without this the navbar still shows the old name until
+            // the user logs out and back in.
+            User? updatedUser = await _userService.GetUserByIdAsync(userId, cancellationToken);
+            if (updatedUser != null)
+                await SignInUserAsync(updatedUser);
+
             TempData["success"] = "Profile updated successfully.";
             return RedirectToAction(nameof(Profile));
         }
@@ -407,7 +414,7 @@ public sealed class CustomerController : Controller
     [Authorize]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangePassword(
-        ProfileViewModel.ChangePasswordModel model,
+        [Bind(Prefix = "ChangePassword")] ProfileViewModel.ChangePasswordModel model,
         CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)

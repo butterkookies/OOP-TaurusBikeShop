@@ -24,6 +24,7 @@ namespace AdminSystem_v2
             IReportRepository    reportRepo    = new ReportRepository();
             IPOSRepository       posRepo       = new POSRepository();
             IVoucherRepository   voucherRepo  = new VoucherRepository();
+            IStorePaymentAccountRepository paymentAcctRepo = new StorePaymentAccountRepository();
 
             // Services
 
@@ -36,8 +37,9 @@ namespace AdminSystem_v2
             IDialogService    dialogSvc    = new DialogService();
             IPOSService       posSvc       = new POSService(posRepo);
             IVoucherService   voucherSvc   = new VoucherService(voucherRepo);
+            IStorePaymentAccountService paymentAcctSvc = new StorePaymentAccountService(paymentAcctRepo);
 
-            ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc, voucherSvc);
+            ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc, voucherSvc, paymentAcctSvc);
         }
 
         private void ShowLogin(IAuthService authSvc,
@@ -48,14 +50,15 @@ namespace AdminSystem_v2
                                IUserService userSvc,
                                IDialogService dialogSvc,
                                IPOSService posSvc,
-                               IVoucherService voucherSvc)
+                               IVoucherService voucherSvc,
+                               IStorePaymentAccountService paymentAcctSvc)
         {
             var loginVm   = new LoginViewModel(authSvc, dialogSvc);
             var loginView = new LoginView(loginVm);
 
             loginVm.LoginSucceeded += () =>
             {
-                ShowMain(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc, voucherSvc);
+                ShowMain(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc, voucherSvc, paymentAcctSvc);
                 loginView.Close();
             };
 
@@ -70,7 +73,8 @@ namespace AdminSystem_v2
                               IUserService userSvc,
                               IDialogService dialogSvc,
                               IPOSService posSvc,
-                              IVoucherService voucherSvc)
+                              IVoucherService voucherSvc,
+                              IStorePaymentAccountService paymentAcctSvc)
         {
             var dashboardVm = new DashboardViewModel(productSvc, inventorySvc);
             var productVm   = new ProductViewModel(productSvc);
@@ -79,14 +83,15 @@ namespace AdminSystem_v2
             var staffVm     = new StaffViewModel(userSvc, dialogSvc);
             var posVm       = new POSViewModel(posSvc);
             var voucherVm   = new VoucherViewModel(voucherSvc, dialogSvc);
+            var paymentAcctVm = new StorePaymentAccountViewModel(paymentAcctSvc, dialogSvc);
 
-            var mainVm   = new MainWindowViewModel(authSvc, dashboardVm, productVm, orderVm, reportVm, staffVm, posVm, voucherVm, dialogSvc);
+            var mainVm   = new MainWindowViewModel(authSvc, dashboardVm, productVm, orderVm, reportVm, staffVm, posVm, voucherVm, paymentAcctVm, dialogSvc);
             var mainView = new MainShell(mainVm);
 
             mainVm.SignOutRequested += () =>
             {
                 mainView.Close();
-                ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc, voucherSvc);
+                ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc, voucherSvc, paymentAcctSvc);
             };
 
             mainView.Show();

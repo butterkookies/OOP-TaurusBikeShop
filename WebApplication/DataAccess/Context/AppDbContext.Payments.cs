@@ -1,5 +1,5 @@
 // WebApplication/DataAccess/Context/AppDbContext.Payments.cs
-// Entity configurations: Payment, GCashPayment, BankTransferPayment
+// Entity configurations: Payment, GCashPayment, BankTransferPayment, StorePaymentAccount
 
 using Microsoft.EntityFrameworkCore;
 using WebApplication.Models.Entities;
@@ -88,6 +88,24 @@ public sealed partial class AppDbContext
                 .HasForeignKey(bt => bt.VerifiedByUserId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.NoAction);
+        });
+    }
+
+    private static void ConfigureStorePaymentAccount(ModelBuilder mb)
+    {
+        mb.Entity<StorePaymentAccount>(e =>
+        {
+            e.ToTable("StorePaymentAccount");
+            e.HasKey(a => a.StorePaymentAccountId);
+
+            // Filtered unique index — at most one active account per method.
+            e.HasIndex(a => a.PaymentMethod)
+                .HasFilter("[IsActive] = 1")
+                .IsUnique()
+                .HasDatabaseName("UX_StorePaymentAccount_ActivePerMethod");
+
+            e.HasIndex(a => new { a.PaymentMethod, a.DisplayOrder })
+                .HasDatabaseName("IX_StorePaymentAccount_Method");
         });
     }
 }

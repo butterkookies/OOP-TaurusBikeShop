@@ -247,12 +247,12 @@ namespace AdminSystem_v2.Repositories
                           (UserId, OrderNumber, OrderDate, OrderStatus,
                            SubTotal, DiscountAmount, ShippingFee,
                            ContactPhone, DeliveryInstructions, IsWalkIn,
-                           CreatedAt, UpdatedAt)
+                           FulfillmentType, CreatedAt, UpdatedAt)
                       VALUES
                           (@UserId, @OrderNumber, GETUTCDATE(), @Status,
                            @SubTotal, @Discount, 0,
                            NULL, NULL, 1,
-                           GETUTCDATE(), GETUTCDATE());
+                           'WalkIn', GETUTCDATE(), GETUTCDATE());
                       SELECT CAST(SCOPE_IDENTITY() AS INT);",
                     new
                     {

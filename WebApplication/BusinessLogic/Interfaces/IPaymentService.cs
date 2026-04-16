@@ -66,6 +66,11 @@ public interface IPaymentService
 
 /// <summary>
 /// Data transfer object carrying payment status information for the payment page.
+/// <para>
+/// The <c>StoreAccount*</c> fields carry the active store-side GCash / BPI
+/// account the customer should send money to, so the payment view can show
+/// "Pay to: …" without the controller touching the repo directly.
+/// </para>
 /// </summary>
 public sealed record PaymentDetailDto(
     int     OrderId,
@@ -76,4 +81,9 @@ public sealed record PaymentDetailDto(
     string? PaymentStatus,
     string? ProofImageUrl,
     bool    HasExistingPayment,
-    DateTime? VerificationDeadline);
+    DateTime? VerificationDeadline,
+    string? StoreAccountName,
+    string? StoreAccountNumber,
+    string? StoreAccountBankName,
+    string? StoreAccountQrImageUrl,
+    string? StoreAccountInstructions);

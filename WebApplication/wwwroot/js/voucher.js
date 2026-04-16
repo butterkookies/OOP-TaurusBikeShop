@@ -8,12 +8,14 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    const voucherInput  = document.getElementById('voucher-code-input');
-    const applyBtn      = document.getElementById('voucher-apply-btn');
-    const removeBtn     = document.getElementById('voucher-remove-btn');
-    const voucherError  = document.getElementById('voucher-error');
+    const voucherInput = document.getElementById('voucher-code-input');
+    const voucherCombo = document.getElementById('assigned-vouchers-select');
+    const wrapper = document.getElementById('voucher-inputs-wrapper');
+    const applyBtn = document.getElementById('voucher-apply-btn');
+    const removeBtn = document.getElementById('voucher-remove-btn');
+    const voucherError = document.getElementById('voucher-error');
     const appliedBanner = document.getElementById('voucher-applied-banner');
-    const appliedLabel  = document.getElementById('voucher-applied-label');
+    const appliedLabel = document.getElementById('voucher-applied-label');
 
     if (!voucherInput || !applyBtn) return;
 
@@ -35,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        applyBtn.disabled    = true;
+        applyBtn.disabled = true;
         applyBtn.textContent = 'Checking…';
         clearVoucherError();
 
@@ -53,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch {
             showVoucherError('Unable to validate voucher. Please try again.');
         } finally {
-            applyBtn.disabled    = false;
+            applyBtn.disabled = false;
             applyBtn.textContent = 'Apply';
         }
     }
@@ -75,34 +77,42 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyVoucherToSummary(result) {
         // Show the applied banner
         if (appliedBanner) appliedBanner.style.display = '';
-        if (appliedLabel)  appliedLabel.textContent = `${result.voucherCode} — ${result.description}`;
-
-        // Hide the input row, show the remove button
-        voucherInput.closest('.tbs-voucher-row')?.classList.add('tbs-voucher-row--applied');
+        if (appliedLabel) appliedLabel.textContent = `${result.voucherCode} — ${result.description}`;
 
         // Update discount line in order summary
-        updateOrderSummaryRow('checkout-discount-row',    `−₱${result.discountAmount.toFixed(2)}`);
+        const formattedDiscount = result.discountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        updateOrderSummaryRow('checkout-discount-row', `−₱${formattedDiscount}`);
         updateOrderSummaryRow('checkout-grand-total-row', result.formattedNewTotal);
 
+        const discountWrapper = document.getElementById('checkout-discount-row-wrapper');
+        if (discountWrapper) discountWrapper.classList.remove('hidden');
+
+        // Hide inputs wrapper
+        if (wrapper) wrapper.style.display = 'none';
+
         // Store on the hidden checkout form inputs if they exist
-        setHiddenInput('VoucherCode',     result.voucherCode);
-        setHiddenInput('DiscountAmount',  result.discountAmount.toString());
+        setHiddenInput('VoucherCode', result.voucherCode);
+        setHiddenInput('DiscountAmount', result.discountAmount.toString());
     }
 
     function clearAppliedVoucher() {
         if (appliedBanner) appliedBanner.style.display = 'none';
-        if (appliedLabel)  appliedLabel.textContent = '';
+        if (appliedLabel) appliedLabel.textContent = '';
         voucherInput.value = '';
-        voucherInput.closest('.tbs-voucher-row')?.classList.remove('tbs-voucher-row--applied');
+        if (voucherCombo) voucherCombo.value = '';
+        if (wrapper) wrapper.style.display = 'block';
 
         // Restore original subtotal as grand total
         const subtotalEl = document.getElementById('checkout-subtotal-value');
-        const grandEl    = document.getElementById('checkout-grand-total-row');
+        const grandEl = document.getElementById('checkout-grand-total-row');
         if (subtotalEl && grandEl) grandEl.textContent = subtotalEl.textContent;
 
         updateOrderSummaryRow('checkout-discount-row', '₱0.00');
 
-        setHiddenInput('VoucherCode',    '');
+        const discountWrapper = document.getElementById('checkout-discount-row-wrapper');
+        if (discountWrapper) discountWrapper.classList.add('hidden');
+
+        setHiddenInput('VoucherCode', '');
         setHiddenInput('DiscountAmount', '0');
     }
 
