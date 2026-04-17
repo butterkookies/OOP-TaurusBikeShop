@@ -28,6 +28,11 @@ public interface IOrderService
     /// </summary>
     /// <param name="userId">The authenticated user placing the order.</param>
     /// <param name="vm">The validated checkout form data.</param>
+    /// <param name="selectedCartItemIds">
+    /// Optional filter — when non-null, only cart items whose <c>CartItemId</c>
+    /// appears in the set are included in the order. Unselected items remain in
+    /// the cart for a later checkout. When null, the entire cart is consumed.
+    /// </param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>
     /// A <see cref="ServiceResult{T}"/> containing the new <c>OrderId</c> on success,
@@ -36,6 +41,7 @@ public interface IOrderService
     Task<ServiceResult<int>> CreateOrderAsync(
         int userId,
         CheckoutViewModel vm,
+        IReadOnlyCollection<int>? selectedCartItemIds = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>

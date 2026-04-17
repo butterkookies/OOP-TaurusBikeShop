@@ -8,7 +8,7 @@ using WebApplication.Models.Entities;
 namespace WebApplication.BackgroundJobs;
 
 /// <summary>
-/// Checks every 5 minutes for orders in PendingVerification whose bank-transfer
+/// Checks every 5 minutes for orders in PaymentVerification whose bank-transfer
 /// payment proof has passed its <c>BankTransferPayment.VerificationDeadline</c>.
 /// Moves them to OnHold and queues a PaymentHeld notification to the customer.
 /// Flowchart: Part 13 / J3 — "Every 5 Minutes", J3B — "Queue Alert".
@@ -123,7 +123,7 @@ public sealed class PaymentTimeoutJob : BackgroundService
                 .AsTracking() // Entities are modified (OrderStatus) then saved
                 .Include(o => o.Payments)
                 .Include(o => o.User)
-                .Where(o => o.OrderStatus == OrderStatuses.PendingVerification
+                .Where(o => o.OrderStatus == OrderStatuses.PaymentVerification
                          && o.Payments.Any(p => p.PaymentStatus == PaymentStatuses.VerificationPending
                                              && p.PaymentMethod == PaymentMethods.BankTransfer
                                              && p.BankTransferPayment != null
@@ -143,7 +143,7 @@ public sealed class PaymentTimeoutJob : BackgroundService
                 await context.SystemLogs.AddAsync(new SystemLog
                 {
                     EventType        = SystemLogEvents.OrderStatusChange,
-                    EventDescription = $"Order {order.OrderNumber} (ID {order.OrderId}): PendingVerification \u2192 OnHold (payment timeout).",
+                    EventDescription = $"Order {order.OrderNumber} (ID {order.OrderId}): PaymentVerification \u2192 OnHold (payment timeout).",
                     CreatedAt        = DateTime.UtcNow
                 }, cancellationToken);
                 timeoutCount++;

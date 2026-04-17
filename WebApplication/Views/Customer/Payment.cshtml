@@ -89,7 +89,7 @@
                         <div class="cal-file-drop" id="file-drop-zone">
                             <input type="file" name="screenshotFile" accept="image/*"
                                    class="cal-file-drop__input" id="payment-file-input"
-                                   style="display:none" required />
+                                   style="display:none" data-required="true" />
                             <!-- Default prompt (visible when no file attached) -->
                             <div class="cal-file-drop__prompt text-mid-gray">
                                 <svg class="mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -167,7 +167,7 @@
                         <div class="cal-file-drop" id="file-drop-zone">
                             <input type="file" name="depositSlipFile" accept="image/*,.pdf"
                                    class="cal-file-drop__input" id="payment-file-input"
-                                   style="display:none" required />
+                                   style="display:none" data-required="true" />
                             <!-- Default prompt (visible when no file attached) -->
                             <div class="cal-file-drop__prompt text-mid-gray">
                                 <svg class="mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -190,23 +190,6 @@
             Payment will be reviewed within 24 hours.
         </p>
 
-    </div>
-</div>
-
-@* ── Confirmation modal ─────────────────────────────────────────────────── *@
-<div id="confirm-modal" class="fixed inset-0 z-[9999] hidden">
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="confirm-backdrop"></div>
-    <div class="absolute inset-0 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-charcoal rounded-2xl shadow-2xl max-w-sm w-full p-6 relative" data-reveal>
-            <h3 class="font-display text-lg font-semibold text-charcoal dark:text-white mb-2">Confirm Submission</h3>
-            <p class="text-sm text-mid-gray mb-6">
-                Are you sure you want to submit this payment proof? Please double-check that you've uploaded the correct file and entered the right details.
-            </p>
-            <div class="flex gap-3">
-                <button type="button" id="confirm-cancel" class="btn-ghost btn-md flex-1">Go Back</button>
-                <button type="button" id="confirm-submit" class="btn-dark btn-md flex-1">Yes, Submit</button>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -304,7 +287,7 @@
                 infoEl.style.display = '';
 
                 zone.classList.add('has-file');
-                zone.classList.remove('is-dragover');
+                zone.classList.remove('is-dragover', 'is-invalid');
 
                 // Remove any old X, then create a fresh one
                 var oldBtn = zone.querySelector('.cal-file-drop__remove');
@@ -402,44 +385,37 @@
                 });
             });
 
-            // ── Confirmation modal ───────────────────────────────────────
-            var modal      = document.getElementById('confirm-modal');
-            var backdrop   = document.getElementById('confirm-backdrop');
-            var cancelBtn  = document.getElementById('confirm-cancel');
-            var confirmBtn = document.getElementById('confirm-submit');
-            var pendingForm = null;
-
-            function openModal(form) {
-                pendingForm = form;
-                modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-            }
-            function closeModal() {
-                modal.classList.add('hidden');
-                document.body.style.overflow = '';
-                pendingForm = null;
-            }
-
+            // ── Submit handler ───────────────────────────────────────────
             document.querySelectorAll('.payment-submit-btn').forEach(function (btn) {
                 btn.addEventListener('click', function () {
                     var form = btn.closest('form');
                     if (!form) return;
-                    if (!form.reportValidity()) return;
-                    openModal(form);
+
+                    // Validate the hidden file input manually — reportValidity()
+                    // silently fails on display:none required controls.
+                    var fileField = form.querySelector('input[type="file"][data-required="true"]');
+                    if (fileField && fileField.files.length === 0) {
+                        var dropZone = form.querySelector('.cal-file-drop');
+                        if (dropZone) {
+                            dropZone.classList.add('is-invalid');
+                            dropZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                        return;
+                    }
+
+                    // Let the browser validate the remaining visible fields.
+                    var otherInvalid = false;
+                    form.querySelectorAll('input, textarea, select').forEach(function (el) {
+                        if (el === fileField) return;
+                        if (!el.checkValidity()) otherInvalid = true;
+                    });
+                    if (otherInvalid && !form.reportValidity()) return;
+
+                    btn.disabled = true;
+                    btn.textContent = 'Submitting\u2026';
+                    form.submit();
                 });
             });
-
-            if (cancelBtn)  cancelBtn.addEventListener('click', closeModal);
-            if (backdrop)   backdrop.addEventListener('click', closeModal);
-            if (confirmBtn) {
-                confirmBtn.addEventListener('click', function () {
-                    if (pendingForm) {
-                        confirmBtn.disabled = true;
-                        confirmBtn.textContent = 'Submitting\u2026';
-                        pendingForm.submit();
-                    }
-                });
-            }
         })();
 
         // ── Copy-to-clipboard ────────────────────────────────────────

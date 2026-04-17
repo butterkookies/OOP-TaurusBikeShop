@@ -10,5 +10,6 @@ namespace AdminSystem_v2.Helpers
         public const string POS       = "POS";
         public const string Vouchers  = "Vouchers";
         public const string PaymentAccounts = "Payment Accounts";
+        public const string SupportTickets = "Support Tickets";
     }
 }

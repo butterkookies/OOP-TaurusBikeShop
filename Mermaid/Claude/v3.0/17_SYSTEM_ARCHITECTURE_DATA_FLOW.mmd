@@ -1,0 +1,156 @@
+%% =====================================================
+%% BIKE SHOP - PART 17: SYSTEM ARCHITECTURE & DATA FLOW
+%% =====================================================
+%% Detailed mapping of connections between Scripts, APIs,
+%% Session Management, Cookies, and Databases.
+%% =====================================================
+
+flowchart TD
+
+%% ================= CLOUD / DATABASES =================
+subgraph DATABASE_TIER["DATABASE & STORAGE (TaurusBikeShop DB)"]
+    direction TB
+    DB_AUTH[("Auth / Identity DB\nUser, OTPVerification,\nGuestSession")]
+    DB_CORE[("Core E-Commerce DB\nProduct, Category,\nCart, CartItem")]
+    DB_ORDER[("Order & Logistics DB\nOrder, Delivery, Payment,\nLalamoveDelivery, Notification")]
+    DB_ADMIN[("Admin DB\nPurchaseOrder, InventoryLog,\nSystemLog, Voucher")]
+end
+
+%% ================= WEB APPLICATION CLIENT =================
+subgraph WEB_APP_CLIENT["WEB APPLICATION CLIENT (HTML/JS)"]
+    direction TB
+    W_BROWSER[/"User Browser\n(Accepts HTML/Razor Views Form Inputs)"/]
+    
+    %% Session state
+    W_AUTH_COOKIE[("Auth Cookie\nClaims: NameIdentifier")]
+    W_GUEST_COOKIE[("Guest Cookie\ntbs_guest: GuestSessionId")]
+    W_HTTP_SESSION[("HTTP Session Cache\nVoucher Code, Checkout Selected Items")]
+    
+    W_BROWSER -->|Authenticates| W_AUTH_COOKIE
+    W_BROWSER -->|Unauthenticated| W_GUEST_COOKIE
+    W_BROWSER -->|Stores Temp Checkout State| W_HTTP_SESSION
+end
+
+%% ================= WEB APPLICATION BACKEND =================
+subgraph WEB_APP_SERVER["WEB APPLICATION MIDDLEWARE (ASP.NET MVC)"]
+    direction TB
+    
+    subgraph WEB_CONTROLLERS["MVC Script Controllers"]
+        CTRL_CUST["CustomerController\n(Handles OTPs, Profiles)"]
+        CTRL_CART["CartController\n(Handles Add/Remove/Merge Cart)"]
+        CTRL_CHECK["CheckoutController\n(Form Inputs -> Create Order)"]
+        CTRL_PROD["ProductController\n(AJAX Variant Pricing, Output Catalog)"]
+        CTRL_PAY["PaymentController\n(Proof image upload bounding)"]
+    end
+    
+    subgraph WEB_SERVICES["Business Logic Services"]
+        SRV_AUTH["UserService\nReads OTPs/Creates Users"]
+        SRV_CART["CartService\nResolves User vs Guest Carts"]
+        SRV_ORDER["OrderService\nGenerates Orders, Validates Cart"]
+    end
+    
+    subgraph WEB_REPOS["Entity Framework Repositories"]
+        REPO_USER["UserRepository"]
+        REPO_CART["CartRepository"]
+        REPO_ORDER["OrderRepository"]
+    end
+    
+    %% Connections within Web Server
+    CTRL_CUST --> SRV_AUTH
+    CTRL_CART --> SRV_CART
+    CTRL_CHECK --> SRV_ORDER
+    
+    SRV_AUTH --> REPO_USER
+    SRV_CART --> REPO_CART
+    SRV_ORDER --> REPO_ORDER
+end
+
+%% ================= ADMIN SYSTEM CLIENT =================
+subgraph ADMIN_CLIENT["ADMIN CLIENT (WPF App)"]
+    direction TB
+    A_UI[/"WPF Desktop Interface\n(Dashboard, Tables, Forms)"/]
+    
+    subgraph ADMIN_VIEWMODELS["XAML ViewModels"]
+        VM_ORDER["OrderViewModel\n(Accepts Manual Status Updates)"]
+        VM_POS["POSViewModel\n(Accepts Walk-in Orders)"]
+        VM_PROD["ProductViewModel\n(Inventory Logic)"]
+    end
+    
+    A_UI --> VM_ORDER
+    A_UI --> VM_POS
+    A_UI --> VM_PROD
+end
+
+%% ================= ADMIN SYSTEM BACKEND =================
+subgraph ADMIN_SERVER["ADMIN SYSTEM DATA ACCESS LAYER"]
+    direction TB
+    subgraph ADMIN_REPOS["Dapper SQL Repositories"]
+        D_ORDER["OrderRepository\n(Executes SQL Commands)"]
+        D_POS["POSRepository\n(Handles Cash/Card logic)"]
+    end
+    
+    VM_ORDER --> D_ORDER
+    VM_POS --> D_POS
+end
+
+%% ================= BACKGROUND JOBS =================
+subgraph BACKGROUND_JOBS["BACKGROUND SERVICE JOBS (Cron)"]
+    direction TB
+    JOB_SYNC["InventorySyncJob"]
+    JOB_DELIVERY["DeliveryStatusPollJob"]
+    JOB_PAYMENT["PaymentTimeoutJob"]
+end
+
+%% ================= EXTERNAL APIs =================
+subgraph EXTERNAL["EXTERNAL APIs & GATEWAYS"]
+    direction TB
+    API_SMS["Email / SMS Provider\n(SendGrid / Twilio)"]
+    API_PAY["GCash Payment Gateway\n(Verification API)"]
+    API_LOGISTIC["Courier APIs\n(Lalamove API, LBC API)"]
+    API_BANK["Bank Transfer Network\n(Manual + Automation)"]
+end
+
+%% ================= MAPPINGS & DATA FLOWS =================
+
+%% Sessions & Web State
+W_GUEST_COOKIE -->|Reads ID| CTRL_CART
+W_AUTH_COOKIE -.->|Creates Identity| CTRL_CUST
+
+%% Web Logic to DB
+REPO_USER <-->|Read/Write EF Objects| DB_AUTH
+REPO_CART <-->|Read/Write EF Objects| DB_CORE
+REPO_ORDER <-->|Read/Write EF Objects| DB_ORDER
+
+%% Admin Logic to DB
+D_ORDER <-->|Raw SQL / Stored Procs| DB_ORDER
+D_POS <-->|Raw SQL / Stored Procs| DB_ADMIN
+
+%% Jobs to DB
+JOB_SYNC -->|Polls DB| DB_CORE
+JOB_DELIVERY -->|Updates Delivered Status| DB_ORDER
+JOB_PAYMENT -->|Checks Expiry| DB_ORDER
+
+%% Web Integrations
+CTRL_PAY -->|Queries Status| API_PAY
+CTRL_PAY -->|Validates Payment Proof| API_BANK
+SRV_ORDER -->|Sends Confirmations| API_SMS
+
+%% Job Integrations
+JOB_DELIVERY -->|Polls Live Tracking| API_LOGISTIC
+
+%% Internal Linking to make visually clean Flow
+DB_ORDER -.->|Triggers Notifications| DB_AUTH
+WEB_APP_CLIENT -.->|HTTP POST/GET| WEB_APP_SERVER
+ADMIN_CLIENT -.->|XAML Binding| ADMIN_SERVER
+
+classDef startend fill:#7ED957,stroke:#2E7D32,stroke-width:2px,color:#000
+classDef process fill:#90CAF9,stroke:#1565C0,stroke-width:2px,color:#000
+classDef database fill:#CE93D8,stroke:#6A1B9A,stroke-width:2px,color:#000
+classDef external fill:#80DEEA,stroke:#00838F,stroke-width:2px,color:#000
+classDef session fill:#FFCC80,stroke:#EF6C00,stroke-width:2px,color:#000
+
+class W_BROWSER,A_UI startend
+class CTRL_CUST,CTRL_CART,CTRL_CHECK,CTRL_PROD,CTRL_PAY,SRV_AUTH,SRV_CART,SRV_ORDER,REPO_USER,REPO_CART,REPO_ORDER,VM_ORDER,VM_POS,VM_PROD,D_ORDER,D_POS,JOB_SYNC,JOB_DELIVERY,JOB_PAYMENT process
+class DB_AUTH,DB_CORE,DB_ORDER,DB_ADMIN database
+class API_SMS,API_PAY,API_LOGISTIC,API_BANK external
+class W_AUTH_COOKIE,W_GUEST_COOKIE,W_HTTP_SESSION session

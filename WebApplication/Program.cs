@@ -182,11 +182,12 @@ try
 catch (Exception ex) when (builder.Environment.IsDevelopment())
 {
     // GCS credentials not configured locally — log and continue.
-    // File upload features (payment proofs, support attachments, product images)
-    // will be unavailable until GOOGLE_APPLICATION_CREDENTIALS is set.
+    // Only support-ticket attachments depend on GCS. Payment proofs and
+    // product images go through Cloudinary (see PhotoService) with a
+    // local-disk fallback, so they keep working without GCS.
     Console.ForegroundColor = ConsoleColor.Yellow;
     Console.WriteLine($"[WARNING] Google Cloud Storage unavailable: {ex.Message}");
-    Console.WriteLine("[WARNING] File upload features will be disabled. Set GOOGLE_APPLICATION_CREDENTIALS to enable.");
+    Console.WriteLine("[WARNING] Support-ticket attachments will be disabled. Set GOOGLE_APPLICATION_CREDENTIALS to enable.");
     Console.ResetColor();
 }
 

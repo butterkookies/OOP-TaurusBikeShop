@@ -106,9 +106,9 @@ public sealed class PaymentService : IPaymentService
 
             await _paymentRepo.CreateWithSubtypeAsync(payment, gcash, cancellationToken);
 
-            // Transition order to PendingVerification
+            // Transition order to PaymentVerification
             await _orderRepo.UpdateStatusAsync(
-                orderId, OrderStatuses.PendingVerification, cancellationToken);
+                orderId, OrderStatuses.PaymentVerification, cancellationToken);
 
             // SystemLog
             await WriteSystemLogAsync(userId,
@@ -124,6 +124,10 @@ public sealed class PaymentService : IPaymentService
                 cancellationToken);
 
             return ServiceResult.Ok();
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+        {
+            return ServiceResult.Fail("This transaction ID has already been used. Please verify and try again.");
         }
         catch (InvalidOperationException ex)
         {
@@ -198,7 +202,7 @@ public sealed class PaymentService : IPaymentService
             await _paymentRepo.CreateWithSubtypeAsync(payment, bankTransfer, cancellationToken);
 
             await _orderRepo.UpdateStatusAsync(
-                orderId, OrderStatuses.PendingVerification, cancellationToken);
+                orderId, OrderStatuses.PaymentVerification, cancellationToken);
 
             await WriteSystemLogAsync(userId,
                 SystemLogEvents.PaymentProcessed,
@@ -212,6 +216,10 @@ public sealed class PaymentService : IPaymentService
                 cancellationToken);
 
             return ServiceResult.Ok();
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+        {
+            return ServiceResult.Fail("This reference number has already been used. Please verify and try again.");
         }
         catch (InvalidOperationException ex)
         {

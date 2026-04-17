@@ -55,7 +55,7 @@ public sealed class SupportListViewModel
 public sealed class SupportReplyViewModel
 {
     /// <summary>Reply primary key.</summary>
-    public int ReplyId { get; set; }
+    public long ReplyId { get; set; }
 
     /// <summary>
     /// Display name of the reply author.

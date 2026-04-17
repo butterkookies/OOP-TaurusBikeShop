@@ -5,13 +5,23 @@ namespace AdminSystem_v2.Repositories
 {
     public class UserRepository : Repository<User>, IUserRepository
     {
+        private const string UserColumns =
+            @"UserId, FirstName, LastName, Email, PhoneNumber, PasswordHash,
+              DefaultAddressId, IsActive, IsWalkIn, LastLoginAt, CreatedAt,
+              FailedLoginAttempts, LockoutUntil";
+
+        private const string UserColumnsU =
+            @"u.UserId, u.FirstName, u.LastName, u.Email, u.PhoneNumber, u.PasswordHash,
+              u.DefaultAddressId, u.IsActive, u.IsWalkIn, u.LastLoginAt, u.CreatedAt,
+              u.FailedLoginAttempts, u.LockoutUntil";
+
         public async Task<User?> GetByIdAsync(int id)
             => await QueryFirstOrDefaultAsync(
-                "SELECT * FROM [User] WHERE UserId = @Id", new { Id = id });
+                $"SELECT {UserColumns} FROM [User] WHERE UserId = @Id", new { Id = id });
 
         public async Task<IEnumerable<User>> GetAllAsync()
             => await QueryAsync(
-                "SELECT * FROM [User] ORDER BY LastName, FirstName");
+                $"SELECT {UserColumns} FROM [User] ORDER BY LastName, FirstName");
 
         public async Task<int> InsertAsync(User entity)
             => await ExecuteScalarAsync(
@@ -33,7 +43,7 @@ namespace AdminSystem_v2.Repositories
 
         public async Task<User?> FindByEmailAsync(string email)
             => await QueryFirstOrDefaultAsync(
-                "SELECT * FROM [User] WHERE Email=@Email AND IsActive=1",
+                $"SELECT {UserColumns} FROM [User] WHERE Email=@Email AND IsActive=1",
                 new { Email = email });
 
         public async Task<string> GetUserRoleAsync(int userId)
@@ -88,12 +98,12 @@ namespace AdminSystem_v2.Repositories
 
         public async Task<IEnumerable<User>> GetStaffUsersAsync()
             => await QueryAsync(
-                @"SELECT u.*, ISNULL(r.RoleName, '') AS Role
-                  FROM [User] u
-                  INNER JOIN UserRole ur ON u.UserId  = ur.UserId
-                  INNER JOIN Role     r  ON ur.RoleId = r.RoleId
-                  WHERE r.RoleName IN ('Admin', 'Manager', 'Staff')
-                  ORDER BY r.RoleName, u.LastName, u.FirstName");
+                $@"SELECT {UserColumnsU}, ISNULL(r.RoleName, '') AS Role
+                   FROM [User] u
+                   INNER JOIN UserRole ur ON u.UserId  = ur.UserId
+                   INNER JOIN Role     r  ON ur.RoleId = r.RoleId
+                   WHERE r.RoleName IN ('Admin', 'Manager', 'Staff')
+                   ORDER BY r.RoleName, u.LastName, u.FirstName");
 
         public async Task<IEnumerable<string>> GetAllRoleNamesAsync()
             => await QueryAsync<string>(

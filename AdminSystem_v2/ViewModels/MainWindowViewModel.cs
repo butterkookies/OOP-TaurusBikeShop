@@ -17,6 +17,7 @@ namespace AdminSystem_v2.ViewModels
         private readonly POSViewModel       _posVm;
         private readonly VoucherViewModel   _voucherVm;
         private readonly StorePaymentAccountViewModel _paymentAccountsVm;
+        private readonly SupportTicketsViewModel _supportTicketsVm;
 
         // ── Session ───────────────────────────────────────────────────────
 
@@ -67,6 +68,7 @@ namespace AdminSystem_v2.ViewModels
             POSViewModel       posVm,
             VoucherViewModel   voucherVm,
             StorePaymentAccountViewModel paymentAccountsVm,
+            SupportTicketsViewModel supportTicketsVm,
             IDialogService     dialog)
         {
             _authService       = authService;
@@ -79,6 +81,7 @@ namespace AdminSystem_v2.ViewModels
             _posVm             = posVm;
             _voucherVm         = voucherVm;
             _paymentAccountsVm = paymentAccountsVm;
+            _supportTicketsVm  = supportTicketsVm;
 
             User? user   = App.CurrentUser;
             UserFullName = user?.FullName ?? "Administrator";
@@ -111,6 +114,7 @@ namespace AdminSystem_v2.ViewModels
                 PageNames.POS             => _posVm,
                 PageNames.Vouchers        => _voucherVm,
                 PageNames.PaymentAccounts => _paymentAccountsVm,
+                PageNames.SupportTickets  => _supportTicketsVm,
                 _                         => _dashboardVm
             };
 
@@ -135,6 +139,8 @@ namespace AdminSystem_v2.ViewModels
                 _ = _voucherVm.LoadAsync();
             else if (page == PageNames.PaymentAccounts)
                 _ = _paymentAccountsVm.LoadAsync();
+            else if (page == PageNames.SupportTickets)
+                _ = _supportTicketsVm.LoadTicketsAsync();
         }
 
         // ── Command Handlers ──────────────────────────────────────────────

@@ -287,7 +287,7 @@ public static class OrderStatuses
     /// Bank transfer proof has been uploaded and is awaiting admin verification.
     /// Set by <c>PaymentService</c> after proof upload.
     /// </summary>
-    public const string PendingVerification = "PendingVerification";
+    public const string PaymentVerification = "PendingVerification";
 
     /// <summary>
     /// Order has been placed on hold — typically due to payment verification

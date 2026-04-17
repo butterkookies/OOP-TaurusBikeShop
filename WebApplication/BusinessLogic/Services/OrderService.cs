@@ -28,7 +28,7 @@ public sealed class OrderService : IOrderService
         new HashSet<string>
         {
             OrderStatuses.Pending,
-            OrderStatuses.PendingVerification
+            OrderStatuses.PaymentVerification
         };
 
     /// <inheritdoc/>
@@ -56,6 +56,7 @@ public sealed class OrderService : IOrderService
     public async Task<ServiceResult<int>> CreateOrderAsync(
         int userId,
         CheckoutViewModel vm,
+        IReadOnlyCollection<int>? selectedCartItemIds = null,
         CancellationToken cancellationToken = default)
     {
         // Load the active cart with all items, products, and variants
@@ -64,8 +65,22 @@ public sealed class OrderService : IOrderService
         if (cart is null || !cart.Items.Any())
             return ServiceResult<int>.Fail("Your cart is empty.");
 
+        // Filter to the customer's selection. Null selection → whole cart
+        // (preserves the pre-selection behaviour for any caller that doesn't
+        // pass a set). Non-null but empty → treated as "no items picked".
+        HashSet<int>? selectionSet = selectedCartItemIds is null
+            ? null
+            : new HashSet<int>(selectedCartItemIds);
+
+        List<CartItem> selectedItems = selectionSet is null
+            ? cart.Items.ToList()
+            : cart.Items.Where(i => selectionSet.Contains(i.CartItemId)).ToList();
+
+        if (selectedItems.Count == 0)
+            return ServiceResult<int>.Fail("Select at least one item to check out.");
+
         // Pre-flight: validate stock for every item before opening the transaction
-        foreach (CartItem item in cart.Items)
+        foreach (CartItem item in selectedItems)
         {
             if (item.ProductVariantId is null) continue;
 
@@ -145,7 +160,7 @@ public sealed class OrderService : IOrderService
                 orderNumber = await GenerateOrderNumberAsync(cancellationToken);
 
                 // ── 3. Calculate totals ────────────────────────────────────────
-                decimal subTotal = cart.Items.Sum(i => i.PriceAtAdd * i.Quantity);
+                decimal subTotal = selectedItems.Sum(i => i.PriceAtAdd * i.Quantity);
                 decimal shippingFee = vm.DeliveryMethod switch
                 {
                     "Lalamove" => CheckoutViewModel.LalamoveFee,
@@ -181,7 +196,7 @@ public sealed class OrderService : IOrderService
                 await _context.SaveChangesAsync(cancellationToken);
 
                 // ── 5. Create OrderItems ──────────────────────────────────────
-                foreach (CartItem cartItem in cart.Items)
+                foreach (CartItem cartItem in selectedItems)
                 {
                     OrderItem orderItem = new()
                     {
@@ -196,7 +211,7 @@ public sealed class OrderService : IOrderService
                 await _context.SaveChangesAsync(cancellationToken);
 
                 // ── 6. Lock inventory (InventoryLog Lock per variant) ─────────
-                foreach (CartItem cartItem in cart.Items)
+                foreach (CartItem cartItem in selectedItems)
                 {
                     if (cartItem.ProductVariantId is null) continue;
 
@@ -245,9 +260,12 @@ public sealed class OrderService : IOrderService
                         vm.DiscountAmount, cancellationToken);
                 }
 
-                // ── 9. Clear cart — delete all items and mark cart checked out ─
-                _context.CartItems.RemoveRange(cart.Items);
-                cart.IsCheckedOut  = true;
+                // ── 9. Clear cart — remove the selected items only. Unselected
+                // items stay in the cart for a future checkout. The cart is
+                // marked checked-out only when nothing remains.
+                _context.CartItems.RemoveRange(selectedItems);
+                bool cartFullyConsumed = selectedItems.Count == cart.Items.Count;
+                if (cartFullyConsumed) cart.IsCheckedOut = true;
                 cart.LastUpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync(cancellationToken);
 

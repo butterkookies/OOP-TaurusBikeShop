@@ -1,0 +1,892 @@
+# AdminSystem_v2 File Library
+This document outlines the purpose, functions, and responsibilities of every script within the AdminSystem_v2 folder.
+
+## ViewModels
+---
+
+### `BaseViewModel.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `OnPropertyChanged`
+- `ShowError`
+- `ShowSuccess`
+- `ClearMessages`
+
+### `DashboardViewModel.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `LoadAsync`
+
+### `LoginViewModel.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ExecuteLoginAsync`
+- `ExecuteForgotPassword`
+
+### `MainWindowViewModel.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `Navigate`
+- `ExecuteSignOut`
+- `ExecuteExit`
+
+### `OrderViewModel.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `LoadAsync`
+- `WireSelectionTracking`
+- `UnwireSelectionTracking`
+- `OnOrdersCollectionChanged`
+- `OnOrderSelectionChanged`
+- `RefreshSelectionState`
+- `BuildStatusBadges`
+- `Badge`
+- `OnOrderSelectedAsync`
+- `MarkProcessingAsync`
+- `MarkReadyForPickupAsync`
+- `ConfirmPickupAsync`
+- `MarkOutForDeliveryAsync`
+- `MarkDeliveredAsync`
+- `ApprovePaymentAsync`
+- `RejectPaymentAsync`
+- `CancelOrderAsync`
+- `BulkUpdateStatusAsync`
+- `BulkCancelAsync`
+- `ExecuteOrderActionAsync`
+- `ExecuteBulkActionAsync`
+- `NotifyActionAvailability`
+
+### `POSViewModel.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `LoadAsync`
+- `AddToCart`
+- `RemoveFromCart`
+- `IncrementQty`
+- `DecrementQty`
+- `OnCartItemChanged`
+- `RefreshTotals`
+- `LoadVoucherSuggestionsAsync`
+- `ApplyVoucherFilter`
+- `SelectVoucher`
+- `ApplyVoucherAsync`
+- `RemoveVoucher`
+- `RevalidateVoucherAsync`
+- `SelectCustomer`
+- `SetWalkIn`
+- `LoadProductsAsync`
+- `LoadCustomersAsync`
+- `CanCompleteSale`
+- `CompleteSaleAsync`
+- `StartNewSale`
+
+### `ProductViewModel.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `LoadAsync`
+- `SearchAsync`
+- `OnProductSelected`
+- `BeginAdd`
+- `SaveAsync`
+- `CancelEdit`
+- `DeactivateAsync`
+- `OpenAdjust`
+- `ConfirmAdjustAsync`
+- `OpenAddVariant`
+- `SaveVariantAsync`
+- `LoadImagesAsync`
+- `AddImageAsync`
+- `RemoveImageAsync`
+- `RefreshListAsync`
+- `CloneProduct`
+
+### `ReportViewModel.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ApplyPeriodDates`
+- `LoadAsync`
+- `SwitchTab`
+- `LoadSalesAsync`
+- `LoadInventoryAsync`
+- `BuildChartModel`
+- `AddLineSeries`
+
+### `SelectableOrder.cs`
+**Purpose:** Wraps an <see cref="Order"/> and adds a checkbox-selection flag for the bulk-action DataGrid, keeping selection state out of the domain model.
+
+**Functions / Methods:** None or simple data structure.
+
+### `StaffViewModel.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `LoadAsync`
+- `OnUserSelected`
+- `BeginCreate`
+- `SaveNewStaffAsync`
+- `SaveRoleAsync`
+- `ToggleActiveAsync`
+- `ResetPasswordAsync`
+
+### `StatusBadge.cs`
+**Purpose:** Presentation-only model for a status count badge in the Orders badge bar. Holds a pre-built Brush so no converter is needed in XAML.
+
+**Functions / Methods:** None or simple data structure.
+
+### `StorePaymentAccountViewModel.cs`
+**Purpose:** CRUD screen for <see cref="StorePaymentAccount"/>. Lets admin/manager rotate the store-side GCash / BPI account numbers that the customer website displays on its payment page.
+
+**Functions / Methods:**
+- `LoadAsync`
+- `LoadForm`
+- `StartNew`
+- `ResetForm`
+- `CancelEdit`
+- `SaveAsync`
+- `DeleteAsync`
+
+### `SupportTicketsViewModel.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `LoadTicketsAsync`
+- `LoadRepliesAsync`
+- `CanReply`
+- `ReplyAsync`
+- `CanMarkResolved`
+- `MarkResolvedAsync`
+
+### `VoucherViewModel.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `LoadAsync`
+- `SwitchTab`
+- `ApplyFilter`
+- `OpenNewForm`
+- `OpenEditForm`
+- `CloseForm`
+- `SaveAsync`
+- `ToggleActiveAsync`
+- `GenerateCode`
+- `SearchUsersAsync`
+- `AddUser`
+- `RemoveUser`
+- `AssignAndNotifyAsync`
+
+## Views
+---
+
+### `CredentialDialog.xaml`
+**Type:** XAML Interface
+**Purpose:** Defines the UI structure, data bindings, and visual layout.
+
+### `CredentialDialog.xaml.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `Confirm_Click`
+- `Cancel_Click`
+- `PasswordField_KeyDown`
+- `Verify`
+- `ShowError`
+
+### `DashboardView.xaml`
+**Type:** XAML Interface
+**Purpose:** Defines the UI structure, data bindings, and visual layout.
+
+### `DashboardView.xaml.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `LoginView.xaml`
+**Type:** XAML Interface
+**Purpose:** Defines the UI structure, data bindings, and visual layout.
+
+### `LoginView.xaml.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `MainWindow.xaml`
+**Type:** XAML Interface
+**Purpose:** Defines the UI structure, data bindings, and visual layout.
+
+### `MainWindow.xaml.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `Window_Closing`
+
+### `OrdersView.xaml`
+**Type:** XAML Interface
+**Purpose:** Defines the UI structure, data bindings, and visual layout.
+
+### `OrdersView.xaml.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `POSView.xaml`
+**Type:** XAML Interface
+**Purpose:** Defines the UI structure, data bindings, and visual layout.
+
+### `POSView.xaml.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ClearProductSearch_Click`
+- `CustomerDisplay_Click`
+- `WalkIn_Click`
+- `CustomerResult_Click`
+- `VoucherInput_GotFocus`
+- `VoucherInput_LostFocus`
+- `VoucherSuggestion_Click`
+
+### `ProductsView.xaml`
+**Type:** XAML Interface
+**Purpose:** Defines the UI structure, data bindings, and visual layout.
+
+### `ProductsView.xaml.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `ReportsView.xaml`
+**Type:** XAML Interface
+**Purpose:** Defines the UI structure, data bindings, and visual layout.
+
+### `ReportsView.xaml.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `StaffView.xaml`
+**Type:** XAML Interface
+**Purpose:** Defines the UI structure, data bindings, and visual layout.
+
+### `StaffView.xaml.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `StorePaymentAccountView.xaml`
+**Type:** XAML Interface
+**Purpose:** Defines the UI structure, data bindings, and visual layout.
+
+### `StorePaymentAccountView.xaml.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `AccountNumber_PreviewTextInput`
+- `AccountNumber_Pasting`
+
+### `SupportTicketsView.xaml`
+**Type:** XAML Interface
+**Purpose:** Defines the UI structure, data bindings, and visual layout.
+
+### `SupportTicketsView.xaml.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `VoucherView.xaml`
+**Type:** XAML Interface
+**Purpose:** Defines the UI structure, data bindings, and visual layout.
+
+### `VoucherView.xaml.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+## Models
+---
+
+### `Brand.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `Category.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `DailySales.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `DeliveryDetail.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `InvalidStatusTransitionException.cs`
+**Purpose:** Thrown when an order status change violates the allowed forward-only transition rules. Carries structured context for UI display and audit logging.
+
+**Functions / Methods:** None or simple data structure.
+
+### `InventoryLog.cs`
+**Purpose:** Append-only record of every stock movement. Never updated or deleted — each change adds a new row.
+
+**Functions / Methods:** None or simple data structure.
+
+### `InventoryReportItem.cs`
+**Purpose:** One row per active product variant — used by the Inventory Report tab. StockStatus is a computed string: "InStock", "LowStock", or "OutOfStock".
+
+**Functions / Methods:** None or simple data structure.
+
+### `LowStockVariant.cs`
+**Purpose:** A product variant whose current stock is at or below its reorder threshold. Read-only — used only for display, never written back to the database.
+
+**Functions / Methods:** None or simple data structure.
+
+### `Order.cs`
+**Purpose:** Structured payment display: "Online &gt; GCash", "Walk-in &gt; Cash", etc. Falls back to channel-only label when actual method is unknown.
+
+**Functions / Methods:**
+- `IsValidTransition`
+- `ToDisplayName`
+
+### `OrderItem.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `POSCartItem.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `OnPropertyChanged`
+
+### `POSCustomer.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ToString`
+
+### `POSOrderResult.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `POSPaymentMethods.cs`
+**Purpose:** POS-side payment method constants. References the centralised <see cref="PaymentMethods"/> class for consistency. Cash, GCash, and BankTransfer are fully active. Card is a placeholder — stored in the enum/UI but not yet processed.
+
+**Functions / Methods:** None or simple data structure.
+
+### `POSProductItem.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `POSVoucherResult.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `POSVoucherSuggestion.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `PickupOrder.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `Product.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `ProductImage.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `ProductVariant.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `SalesSummary.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `StorePaymentAccount.cs`
+**Purpose:** A single row of the <c>StorePaymentAccount</c> table — the store-owned GCash / BPI account the customer website displays on the payment page.
+
+**Functions / Methods:** None or simple data structure.
+
+### `SupportTicket.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `TopProduct.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `User.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `Ok`
+- `Fail`
+
+### `VoucherListItem.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ToString`
+
+### `VoucherUserRow.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ToString`
+
+## Repositories
+---
+
+### `IInventoryRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IOrderRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IPOSRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IProductRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IReportRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IStorePaymentAccountRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `ISupportTicketRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IUserRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IVoucherRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `InventoryRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetLowStockVariantsAsync`
+
+### `OrderRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetOrdersAsync`
+- `GetOrderDetailAsync`
+- `UpdateOrderStatusAsync`
+- `MarkReadyForPickupAsync`
+- `ConfirmPickupAsync`
+- `ApprovePaymentAsync`
+- `RejectPaymentAsync`
+- `QueueOrderNotificationAsync`
+- `LogStatusTransitionAsync`
+
+### `POSRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `SearchProductsAsync`
+- `SearchCustomersAsync`
+- `GetWalkInUserIdAsync`
+- `GetVoucherSuggestionsAsync`
+- `ValidateVoucherAsync`
+- `CreatePOSSaleAsync`
+
+### `ProductRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetByIdAsync`
+- `GetAllAsync`
+- `SearchAsync`
+- `GetTotalCountAsync`
+- `InsertAsync`
+- `UpdateAsync`
+- `DeleteAsync`
+- `AdjustStockAsync`
+- `AddVariantAsync`
+- `UpdateVariantAsync`
+- `GetAllCategoriesAsync`
+- `GetAllBrandsAsync`
+- `GetImagesAsync`
+- `AddImageAsync`
+- `DeleteImageAsync`
+- `PopulateVariantsAsync`
+
+### `ReportRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `WalkInClause`
+- `GetSalesSummaryAsync`
+- `GetDailySalesAsync`
+- `GetTopProductsAsync`
+- `GetChartDataAsync`
+- `GetInventoryReportAsync`
+
+### `Repository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetConnection`
+- `QueryAsync`
+- `QueryFirstOrDefaultAsync`
+- `ExecuteAsync`
+- `ExecuteScalarAsync`
+
+### `StorePaymentAccountRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetAllAsync`
+- `InsertAsync`
+- `UpdateAsync`
+- `DeleteAsync`
+- `DeactivateOtherActiveAsync`
+
+### `SupportTicketRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetAllTicketsAsync`
+- `GetTicketByIdAsync`
+- `GetRepliesAsync`
+- `UpdateTicketStatusAsync`
+- `ResolveTicketAsync`
+- `AddReplyAsync`
+
+### `UserRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetByIdAsync`
+- `GetAllAsync`
+- `InsertAsync`
+- `UpdateAsync`
+- `DeleteAsync`
+- `FindByEmailAsync`
+- `GetUserRoleAsync`
+- `UpdateLastLoginAsync`
+- `IncrementFailedLoginsAsync`
+- `ResetFailedLoginsAsync`
+- `HasRoleAsync`
+- `GetStaffUsersAsync`
+- `GetAllRoleNamesAsync`
+- `SetUserRoleAsync`
+- `ToggleActiveAsync`
+- `CreateStaffAsync`
+- `ResetPasswordAsync`
+
+### `VoucherRepository.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetAllAsync`
+- `InsertAsync`
+- `UpdateAsync`
+- `SetActiveAsync`
+- `IsCodeUniqueAsync`
+- `SearchUsersAsync`
+- `AssignAsync`
+- `QueueNotificationsAsync`
+
+## Services
+---
+
+### `AuthService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `LoginAsync`
+- `Logout`
+- `HasRoleAsync`
+
+### `DialogService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `Confirm`
+- `ShowInfo`
+- `PromptCredentials`
+
+### `IAuthService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IDialogService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IInventoryService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IOrderService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IPOSService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IProductService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IReportService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IStorePaymentAccountService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `ISupportTicketService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IUserService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `IVoucherService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `InventoryService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetLowStockVariantsAsync`
+
+### `OrderService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetOrdersAsync`
+- `GetOrderDetailAsync`
+- `UpdateOrderStatusAsync`
+- `MarkReadyForPickupAsync`
+- `ConfirmPickupAsync`
+- `ApprovePaymentAsync`
+- `RejectPaymentAsync`
+
+### `POSService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `SearchProductsAsync`
+- `SearchCustomersAsync`
+- `GetWalkInUserIdAsync`
+- `GetVoucherSuggestionsAsync`
+- `ValidateVoucherAsync`
+- `CreatePOSSaleAsync`
+
+### `ProductService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetAllAsync`
+- `SearchAsync`
+- `GetByIdAsync`
+- `GetTotalCountAsync`
+- `CreateAsync`
+- `UpdateAsync`
+- `DeactivateAsync`
+- `AdjustStockAsync`
+- `AddVariantAsync`
+- `UpdateVariantAsync`
+- `GetAllCategoriesAsync`
+- `GetAllBrandsAsync`
+- `GetImagesAsync`
+- `AddImageAsync`
+- `DeleteImageAsync`
+
+### `ReportService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetSalesSummaryAsync`
+- `GetDailySalesAsync`
+- `GetTopProductsAsync`
+- `GetChartDataAsync`
+- `GetInventoryReportAsync`
+
+### `StorePaymentAccountService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetAllAsync`
+- `DeleteAsync`
+
+### `SupportTicketService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetAllTicketsAsync`
+- `GetTicketByIdAsync`
+- `GetRepliesAsync`
+- `UpdateStatusAsync`
+- `ResolveTicketAsync`
+- `AddReplyAsync`
+
+### `UserService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetStaffUsersAsync`
+- `GetAllRoleNamesAsync`
+- `SetUserRoleAsync`
+- `ToggleActiveAsync`
+- `CreateStaffAsync`
+- `ResetPasswordAsync`
+- `RejectSelfModification`
+
+### `VoucherService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `GetAllVouchersAsync`
+- `DeactivateVoucherAsync`
+- `ActivateVoucherAsync`
+- `SearchUsersAsync`
+
+## Helpers
+---
+
+### `DatabaseHelper.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `LoadConnectionString`
+- `GetConnection`
+- `TestConnection`
+
+### `PageNames.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `PasswordHelper.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `Hash`
+- `Verify`
+
+### `RelayCommand.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `CanExecute`
+- `Execute`
+
+### `RoleGuard.cs`
+**Purpose:** Centralised role-hierarchy checks. Admin  ▸ full access (staff management, products, vouchers, etc.) Manager▸ products, vouchers, orders, POS, reports — NOT staff management Staff  ▸ POS, view orders/products/reports — NO create/edit/delete on products or vouchers
+
+**Functions / Methods:**
+- `IsAdmin`
+- `IsAdminOrManager`
+- `RequireAdmin`
+- `RequireAdminOrManager`
+
+## Converters
+---
+
+### `BoolToVisibilityConverter.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `Convert`
+- `ConvertBack`
+
+### `CurrencyConverter.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `Convert`
+- `ConvertBack`
+
+### `EqualityConverter.cs`
+**Purpose:** Returns <c>true</c> when both bound values are equal (string comparison). Used in DataTrigger.Binding via MultiBinding to work around the WPF restriction that DataTrigger.Value cannot itself be a Binding.
+
+**Functions / Methods:**
+- `Convert`
+- `ConvertBack`
+
+### `InverseBoolConverter.cs`
+**Purpose:** Returns the inverse of a boolean value. Use for IsEnabled bindings where you need !SomeFlag.
+
+**Functions / Methods:**
+- `Convert`
+- `ConvertBack`
+
+### `StatusToColorConverter.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `Convert`
+- `ConvertBack`
+

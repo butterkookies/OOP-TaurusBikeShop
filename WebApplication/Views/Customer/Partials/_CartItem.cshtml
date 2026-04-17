@@ -1,7 +1,14 @@
 @* WebApplication/Views/Cart/Partials/_CartItem.cshtml *@
 @model WebApplication.Models.ViewModels.CartItemViewModel
 
-<div class="flex items-center gap-4 px-5 py-4" id="cart-item-@Model.CartItemId" data-cart-item-id="@Model.CartItemId">
+<div class="flex items-center gap-4 px-5 py-4" id="cart-item-@Model.CartItemId" data-cart-item-id="@Model.CartItemId" data-unit-price="@Model.UnitPrice" data-quantity="@Model.Quantity">
+
+    @* Select checkbox *@
+    <input type="checkbox"
+           class="cart-item-select h-4 w-4 shrink-0 rounded border-border-ring accent-charcoal cursor-pointer dark:border-white/20"
+           data-cart-item-id="@Model.CartItemId"
+           checked
+           aria-label="Select @Model.ProductName for checkout" />
 
     @* Product image *@
     <div class="w-16 h-16 bg-light-gray dark:bg-neutral-800 rounded-lg overflow-hidden shrink-0">

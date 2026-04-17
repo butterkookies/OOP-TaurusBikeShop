@@ -44,6 +44,17 @@
                 @* ── Cart Items ── *@
                 <div>
                     <div class="cal-card-static overflow-hidden">
+                        @* Select-all row *@
+                        <label class="flex items-center gap-4 px-5 py-3 border-b border-border-ring dark:border-white/10 cursor-pointer">
+                            <input type="checkbox"
+                                   id="cart-select-all"
+                                   class="h-4 w-4 rounded border-border-ring accent-charcoal cursor-pointer dark:border-white/20"
+                                   checked
+                                   aria-label="Select all items" />
+                            <span class="text-sm font-medium text-charcoal dark:text-white">Select all</span>
+                            <span class="ml-auto text-xs text-mid-gray"><span id="cart-selected-count">@Model.Items.Count</span> of @Model.Items.Count selected</span>
+                        </label>
+
                         <div id="cart-items-list" class="divide-y divide-border-ring dark:divide-white/10">
                             @foreach (WebApplication.Models.ViewModels.CartItemViewModel item in Model.Items)
                             {
@@ -95,14 +106,14 @@
                             <span class="font-display text-xl font-semibold text-charcoal dark:text-white" id="cart-total">@Model.FormattedSubTotal</span>
                         </div>
 
-                        <a asp-controller="Checkout" asp-action="Index" class="btn-dark btn-full">
+                        <button type="button" id="proceed-to-checkout-btn" class="btn-dark btn-full">
                             Proceed to Checkout
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
                                  viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                  stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="9 18 15 12 9 6"/>
                             </svg>
-                        </a>
+                        </button>
 
                         <p class="text-xs text-mid-gray text-center mt-4">
                             Accepted: <strong class="text-charcoal dark:text-white">GCash</strong> &bull;

@@ -347,7 +347,7 @@
                         Style="{StaticResource DangerButton}"
                         Margin="8,0,0,0"/>
 
-                <!-- Left — selection count + status-update buttons -->
+                    <!-- Left — selection count + status-update buttons -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Foreground="#60A5FA" FontSize="13" FontWeight="SemiBold"
                                VerticalAlignment="Center" Margin="0,0,16,0">
@@ -355,24 +355,16 @@
                         <Run Text=" selected"/>
                     </TextBlock>
 
-                    <Button Content="&#x2192; Processing"
-                            Command="{Binding BulkUpdateStatusCommand}"
-                            CommandParameter="Processing"
-                            Style="{StaticResource SecondaryButton}"
-                            Margin="0,0,6,0"/>
-                    <Button Content="&#x2192; Ready for Pickup"
-                            Command="{Binding BulkUpdateStatusCommand}"
-                            CommandParameter="ReadyForPickup"
-                            Style="{StaticResource SecondaryButton}"
-                            Margin="0,0,6,0"/>
-                    <Button Content="&#x2192; Out for Delivery"
-                            Command="{Binding BulkUpdateStatusCommand}"
-                            CommandParameter="OutForDelivery"
-                            Style="{StaticResource SecondaryButton}"
-                            Margin="0,0,6,0"/>
-                    <Button Content="&#x2192; Delivered"
-                            Command="{Binding BulkUpdateStatusCommand}"
-                            CommandParameter="Delivered"
+                    <TextBlock Text="Update To:" Foreground="#9CA3AF" FontSize="12" 
+                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <ComboBox ItemsSource="{Binding BulkStatuses}"
+                              SelectedItem="{Binding SelectedBulkStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Width="140" Height="26" Margin="0,0,12,0"
+                              VerticalContentAlignment="Center" 
+                              ToolTip="Select target status"/>
+                    
+                    <Button Content="Apply Update"
+                            Command="{Binding ApplyBulkUpdateCommand}"
                             Style="{StaticResource PrimaryButton}"
                             Margin="0,0,6,0"/>
                 </StackPanel>
@@ -1015,11 +1007,20 @@
                                 <TextBlock Text="ACTIONS" Style="{StaticResource SectionLabel}"/>
                                 <WrapPanel>
 
+                                    <!-- Added "Process Order" button for Pending / On Hold -->
+                                    <Button Content="Mark as Processing"
+                                            Command="{Binding DataContext.MarkProcessingCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Visibility="{Binding DataContext.CanMarkProcessing,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}"
+                                            Style="{StaticResource PrimaryButton}"
+                                            Margin="0,0,8,8"/>
+
                                     <Button Content="✓ Approve Payment"
                                             Command="{Binding DataContext.ApprovePaymentCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            IsEnabled="{Binding DataContext.CanApprovePayment,
-                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Visibility="{Binding DataContext.CanApprovePayment,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}"
                                             Style="{StaticResource PrimaryButton}"
                                             Background="#065F46" BorderBrush="#34D399"
                                             Margin="0,0,8,8"/>
@@ -1027,48 +1028,48 @@
                                     <Button Content="✗ Reject Payment"
                                             Command="{Binding DataContext.RejectPaymentCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            IsEnabled="{Binding DataContext.CanRejectPayment,
-                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Visibility="{Binding DataContext.CanRejectPayment,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}"
                                             Style="{StaticResource DangerButton}"
                                             Margin="0,0,8,8"/>
 
                                     <Button Content="Mark Ready for Pickup"
                                             Command="{Binding DataContext.MarkReadyForPickupCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            IsEnabled="{Binding DataContext.CanMarkReadyForPickup,
-                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Visibility="{Binding DataContext.CanMarkReadyForPickup,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}"
                                             Style="{StaticResource PrimaryButton}"
                                             Margin="0,0,8,8"/>
 
                                     <Button Content="Confirm Pickup"
                                             Command="{Binding DataContext.ConfirmPickupCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            IsEnabled="{Binding DataContext.CanConfirmPickup,
-                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Visibility="{Binding DataContext.CanConfirmPickup,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}"
                                             Style="{StaticResource PrimaryButton}"
                                             Margin="0,0,8,8"/>
 
                                     <Button Content="Mark as Out for Delivery"
                                             Command="{Binding DataContext.MarkOutForDeliveryCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            IsEnabled="{Binding DataContext.CanMarkOutForDelivery,
-                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Visibility="{Binding DataContext.CanMarkOutForDelivery,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}"
                                             Style="{StaticResource PrimaryButton}"
                                             Margin="0,0,8,8"/>
 
                                     <Button Content="Mark as Delivered"
                                             Command="{Binding DataContext.MarkDeliveredCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            IsEnabled="{Binding DataContext.CanMarkDelivered,
-                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Visibility="{Binding DataContext.CanMarkDelivered,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}"
                                             Style="{StaticResource PrimaryButton}"
                                             Margin="0,0,8,8"/>
 
                                     <Button Content="Cancel Order"
                                             Command="{Binding DataContext.CancelOrderCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            IsEnabled="{Binding DataContext.CanCancelOrder,
-                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Visibility="{Binding DataContext.CanCancelOrder,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}"
                                             Style="{StaticResource DangerButton}"
                                             Margin="0,0,8,8"/>
 

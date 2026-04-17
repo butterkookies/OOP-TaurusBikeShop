@@ -1,0 +1,591 @@
+<UserControl x:Class="AdminSystem_v2.Views.SupportTicketsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:AdminSystem_v2.Converters"
+             Background="#111827">
+
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVis"/>
+
+        <!-- ── Detail typography ── -->
+        <Style x:Key="SectionLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#4B5563"/>
+            <Setter Property="FontSize"   Value="10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin"     Value="0,0,0,8"/>
+        </Style>
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#6B7280"/>
+            <Setter Property="FontSize"   Value="11"/>
+            <Setter Property="Margin"     Value="0,0,0,2"/>
+        </Style>
+
+        <!-- ── Ticket list item ── -->
+        <Style x:Key="TicketListItem" TargetType="ListViewItem">
+            <Setter Property="Background"        Value="Transparent"/>
+            <Setter Property="Foreground"        Value="#E5E7EB"/>
+            <Setter Property="BorderThickness"   Value="0"/>
+            <Setter Property="Padding"           Value="0"/>
+            <Setter Property="Margin"            Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Cursor"            Value="Hand"/>
+            <Setter Property="FocusVisualStyle"  Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#1F2937"
+                                BorderThickness="0,0,0,1"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1F2937"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1E3A5F"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ── Reply input TextBox (multi-line, dark) ── -->
+        <Style x:Key="ReplyTextBox" TargetType="TextBox">
+            <Setter Property="Background"        Value="#111827"/>
+            <Setter Property="Foreground"        Value="#F9FAFB"/>
+            <Setter Property="CaretBrush"        Value="#3B82F6"/>
+            <Setter Property="SelectionBrush"    Value="#3B82F6"/>
+            <Setter Property="SelectionOpacity"  Value="0.3"/>
+            <Setter Property="BorderBrush"       Value="#374151"/>
+            <Setter Property="BorderThickness"   Value="1"/>
+            <Setter Property="Padding"           Value="10,8"/>
+            <Setter Property="FontSize"          Value="13"/>
+            <Setter Property="FontFamily"        Value="Segoe UI, Inter, Arial"/>
+            <Setter Property="AcceptsReturn"     Value="True"/>
+            <Setter Property="TextWrapping"      Value="Wrap"/>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                SnapsToDevicePixels="True"
+                                Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Auto"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4B5563"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="360"/>
+            <ColumnDefinition Width="*" MinWidth="400"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ══════════════════════════════════════
+             COL 0 — TICKETS LIST
+             ══════════════════════════════════════ -->
+        <Border Grid.Column="0" Background="#1F2937"
+                BorderBrush="#374151" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="56"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- List header -->
+                <Border Grid.Row="0" Background="#1F2937"
+                        BorderBrush="#374151" BorderThickness="0,0,0,1" Padding="20,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Support Tickets" Foreground="#F9FAFB"
+                                       FontSize="14" FontWeight="SemiBold"
+                                       VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBlock Text="{Binding Tickets.Count, StringFormat='({0})'}"
+                                       Foreground="#6B7280" FontSize="12" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Button Grid.Column="1" Command="{Binding LoadTicketsCommand}"
+                                ToolTip="Refresh tickets"
+                                Background="Transparent" BorderThickness="0"
+                                Cursor="Hand" Padding="8,0">
+                            <TextBlock Text="&#x21BB;" Foreground="#9CA3AF"
+                                       FontSize="16" VerticalAlignment="Center"/>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- List -->
+                <ListView Grid.Row="1"
+                          ItemsSource="{Binding Tickets}"
+                          SelectedItem="{Binding SelectedTicket}"
+                          Background="#1F2937"
+                          BorderThickness="0"
+                          ItemContainerStyle="{StaticResource TicketListItem}"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="16,14">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Subject}"
+                                                   Foreground="#F9FAFB"
+                                                   FontWeight="SemiBold" FontSize="13"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding CreatedAt, StringFormat='MMM d'}"
+                                                   Foreground="#6B7280" FontSize="11"
+                                                   Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <TextBlock Text="{Binding UserFullName}"
+                                               Foreground="#9CA3AF" FontSize="12"
+                                               Margin="0,4,0,0"
+                                               TextTrimming="CharacterEllipsis"/>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                        <!-- Status pill -->
+                                        <Border CornerRadius="4" Padding="7,2">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#374151"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding TicketStatus}" Value="Open">
+                                                            <Setter Property="Background" Value="#3B1010"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding TicketStatus}" Value="AwaitingResponse">
+                                                            <Setter Property="Background" Value="#3B2A10"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding TicketStatus}" Value="InProgress">
+                                                            <Setter Property="Background" Value="#1E3A5F"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding TicketStatus}" Value="Resolved">
+                                                            <Setter Property="Background" Value="#1C3A2A"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding TicketStatus}" Value="Closed">
+                                                            <Setter Property="Background" Value="#1F2937"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock Text="{Binding TicketStatus}"
+                                                       FontSize="10" FontWeight="SemiBold">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#D1D5DB"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding TicketStatus}" Value="Open">
+                                                                <Setter Property="Foreground" Value="#FCA5A5"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding TicketStatus}" Value="AwaitingResponse">
+                                                                <Setter Property="Foreground" Value="#FCD34D"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding TicketStatus}" Value="InProgress">
+                                                                <Setter Property="Foreground" Value="#93C5FD"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding TicketStatus}" Value="Resolved">
+                                                                <Setter Property="Foreground" Value="#6EE7B7"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+
+                                        <!-- Category pill -->
+                                        <Border CornerRadius="4" Padding="7,2" Margin="6,0,0,0"
+                                                Background="#111827">
+                                            <TextBlock Text="{Binding TicketCategory}"
+                                                       Foreground="#9CA3AF" FontSize="10"/>
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <!-- Empty state -->
+                <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Tickets.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Text="&#x1F4AC;" FontSize="32"
+                               HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                    <TextBlock Text="No support tickets."
+                               Foreground="#4B5563" FontSize="13"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ══════════════════════════════════════
+             COL 1 — TICKET DETAIL + CONVERSATION
+             ══════════════════════════════════════ -->
+        <Grid Grid.Column="1" Background="#111827">
+
+            <!-- No selection placeholder -->
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsTicketSelected}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="&#x1F4E9;" FontSize="42"
+                           HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                <TextBlock Text="Select a ticket to view the conversation."
+                           Foreground="#4B5563" FontSize="13"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Detail pane -->
+            <Grid Visibility="{Binding IsTicketSelected, Converter={StaticResource BoolToVis}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Detail header -->
+                <Border Grid.Row="0" Background="#1F2937"
+                        BorderBrush="#374151" BorderThickness="0,0,0,1"
+                        Padding="24,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="{Binding SelectedTicket.Subject}"
+                                       Foreground="#F9FAFB"
+                                       FontSize="18" FontWeight="Bold"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                <TextBlock Text="From:" Foreground="#6B7280" FontSize="12"
+                                           VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="{Binding SelectedTicket.UserFullName}"
+                                           Foreground="#E5E7EB" FontSize="12" FontWeight="SemiBold"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding SelectedTicket.UserEmail, StringFormat=' ({0})'}"
+                                           Foreground="#6B7280" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <TextBlock Text="Category:" Foreground="#6B7280" FontSize="12"
+                                           VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="{Binding SelectedTicket.TicketCategory}"
+                                           Foreground="#E5E7EB" FontSize="12" FontWeight="SemiBold"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="   •   Source:" Foreground="#6B7280" FontSize="12"
+                                           VerticalAlignment="Center" Margin="6,0,6,0"/>
+                                <TextBlock Text="{Binding SelectedTicket.TicketSource}"
+                                           Foreground="#E5E7EB" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Status badge + Resolve button -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                            <!-- Status pill -->
+                            <Border CornerRadius="6" Padding="10,5" Margin="0,0,10,0"
+                                    VerticalAlignment="Top">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#374151"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="Open">
+                                                <Setter Property="Background" Value="#3B1010"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="AwaitingResponse">
+                                                <Setter Property="Background" Value="#3B2A10"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="InProgress">
+                                                <Setter Property="Background" Value="#1E3A5F"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="Resolved">
+                                                <Setter Property="Background" Value="#1C3A2A"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding SelectedTicket.TicketStatus}"
+                                           FontSize="12" FontWeight="SemiBold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#D1D5DB"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="Open">
+                                                    <Setter Property="Foreground" Value="#FCA5A5"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="AwaitingResponse">
+                                                    <Setter Property="Foreground" Value="#FCD34D"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="InProgress">
+                                                    <Setter Property="Foreground" Value="#93C5FD"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="Resolved">
+                                                    <Setter Property="Foreground" Value="#6EE7B7"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
+
+                            <Button Content="✓ Mark Resolved"
+                                    Command="{Binding MarkResolvedCommand}"
+                                    VerticalAlignment="Top">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                                        <Setter Property="Background" Value="#065F46"/>
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="Resolved">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="Closed">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Conversation scroll -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                              Background="#111827">
+                    <StackPanel Margin="24,20">
+
+                        <!-- Original description bubble (customer) -->
+                        <Border Background="#1F2937" Padding="14" CornerRadius="10"
+                                BorderBrush="#374151" BorderThickness="1"
+                                Margin="0,0,0,14" HorizontalAlignment="Left"
+                                MaxWidth="640">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding SelectedTicket.UserFullName}"
+                                               Foreground="#F9FAFB"
+                                               FontWeight="SemiBold" FontSize="13"/>
+                                    <TextBlock Text="•" Foreground="#4B5563"
+                                               Margin="8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding SelectedTicket.CreatedAt, StringFormat='MMM d, yyyy  h:mm tt'}"
+                                               Foreground="#6B7280" FontSize="11"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding SelectedTicket.Description}"
+                                           Foreground="#D1D5DB" FontSize="13"
+                                           TextWrapping="Wrap" Margin="0,8,0,0"/>
+
+                                <!-- Attachment -->
+                                <TextBlock Margin="0,10,0,0" Foreground="#60A5FA"
+                                           FontSize="11" TextWrapping="Wrap"
+                                           Text="{Binding SelectedTicket.AttachmentUrl, StringFormat='📎 {0}'}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedTicket.AttachmentUrl}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding SelectedTicket.AttachmentUrl}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Replies -->
+                        <ItemsControl ItemsSource="{Binding SelectedTicketReplies}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,14">
+
+                                        <!-- Customer reply (left, grey) -->
+                                        <Border Background="#1F2937" Padding="14" CornerRadius="10"
+                                                BorderBrush="#374151" BorderThickness="1"
+                                                HorizontalAlignment="Left" MaxWidth="640">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAdminReply}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding UserFullName}"
+                                                               Foreground="#F9FAFB"
+                                                               FontWeight="SemiBold" FontSize="13"/>
+                                                    <TextBlock Text="•" Foreground="#4B5563"
+                                                               Margin="8,0" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding CreatedAt, StringFormat='MMM d, yyyy  h:mm tt'}"
+                                                               Foreground="#6B7280" FontSize="11"
+                                                               VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding Message}"
+                                                           Foreground="#D1D5DB" FontSize="13"
+                                                           TextWrapping="Wrap" Margin="0,8,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Admin reply (right, blue) -->
+                                        <Border Background="#1E3A5F" Padding="14" CornerRadius="10"
+                                                BorderBrush="#3B82F6" BorderThickness="1"
+                                                HorizontalAlignment="Right" MaxWidth="640">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAdminReply}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Border CornerRadius="3" Padding="5,1"
+                                                            Background="#3B82F6" Margin="0,0,8,0"
+                                                            VerticalAlignment="Center">
+                                                        <TextBlock Text="STAFF" Foreground="White"
+                                                                   FontSize="9" FontWeight="Bold"/>
+                                                    </Border>
+                                                    <TextBlock Text="{Binding UserFullName}"
+                                                               Foreground="#F9FAFB"
+                                                               FontWeight="SemiBold" FontSize="13"
+                                                               VerticalAlignment="Center"/>
+                                                    <TextBlock Text="•" Foreground="#60A5FA"
+                                                               Margin="8,0" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding CreatedAt, StringFormat='MMM d, yyyy  h:mm tt'}"
+                                                               Foreground="#93C5FD" FontSize="11"
+                                                               VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding Message}"
+                                                           Foreground="#DBEAFE" FontSize="13"
+                                                           TextWrapping="Wrap" Margin="0,8,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Resolved banner -->
+                        <Border CornerRadius="8" Padding="14,10" Margin="0,4,0,0"
+                                Background="#1C3A2A" BorderBrush="#065F46" BorderThickness="1"
+                                HorizontalAlignment="Center">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="Resolved">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="✓" Foreground="#6EE7B7" FontSize="14"
+                                           FontWeight="Bold" VerticalAlignment="Center"
+                                           Margin="0,0,8,0"/>
+                                <TextBlock Text="This ticket has been resolved."
+                                           Foreground="#6EE7B7" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Reply composer -->
+                <Border Grid.Row="2" Background="#1F2937"
+                        BorderBrush="#374151" BorderThickness="0,1,0,0"
+                        Padding="24,16">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="Resolved">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding SelectedTicket.TicketStatus}" Value="Closed">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0"
+                                 Style="{StaticResource ReplyTextBox}"
+                                 Text="{Binding ReplyMessage, UpdateSourceTrigger=PropertyChanged}"
+                                 Height="84"
+                                 VerticalContentAlignment="Top"/>
+
+                        <Button Grid.Column="1"
+                                Command="{Binding ReplyCommand}"
+                                Content="Send Reply"
+                                Style="{StaticResource PrimaryButton}"
+                                MinWidth="110"
+                                Margin="10,0,0,0"
+                                VerticalAlignment="Bottom"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     label.textContent = 'In Stock';
                 } else if (stock > 0) {
                     dot.classList.add('low-stock');
-                    label.textContent = 'Only ' + stock + ' left';
+                    label.textContent = 'Low Stock';
                 } else {
                     dot.classList.add('out-of-stock');
                     label.textContent = 'Out of Stock';

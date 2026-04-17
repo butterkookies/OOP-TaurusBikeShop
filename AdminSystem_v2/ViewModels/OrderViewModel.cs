@@ -45,7 +45,7 @@ namespace AdminSystem_v2.ViewModels
         {
             "All",
             OrderStatuses.Pending,
-            OrderStatuses.PendingVerification,
+            OrderStatuses.PaymentVerification,
             OrderStatuses.Processing,
             OrderStatuses.OnHold,
             OrderStatuses.ReadyForPickup,
@@ -178,18 +178,60 @@ namespace AdminSystem_v2.ViewModels
             && OrderStatuses.IsValidTransition(SelectedOrder.OrderStatus, OrderStatuses.Cancelled);
 
         public bool CanApprovePayment =>
-            SelectedOrder?.OrderStatus == OrderStatuses.PendingVerification
+            SelectedOrder?.OrderStatus == OrderStatuses.PaymentVerification
             && !string.IsNullOrEmpty(SelectedOrder.PaymentProofUrl);
 
         public bool CanRejectPayment =>
-            SelectedOrder?.OrderStatus == OrderStatuses.PendingVerification
+            SelectedOrder?.OrderStatus == OrderStatuses.PaymentVerification
             && !string.IsNullOrEmpty(SelectedOrder.PaymentProofUrl);
+
+        public bool CanMarkProcessing =>
+            SelectedOrder != null
+            && !OrderStatuses.TerminalStatuses.Contains(SelectedOrder.OrderStatus)
+            && OrderStatuses.IsValidTransition(SelectedOrder.OrderStatus, OrderStatuses.Processing);
+
+        // ── Bulk Status Dropdown ──────────────────────────────────────────────
+        
+        public IEnumerable<string> BulkStatuses
+        {
+            get
+            {
+                var selected = Orders.Where(o => o.IsSelected).Select(o => o.Order).ToList();
+                if (selected.Count == 0) return Array.Empty<string>();
+
+                bool hasDelivery = selected.Any(o => o.DeliveryType == OrderTypes.Delivery);
+                bool hasPickup   = selected.Any(o => o.DeliveryType == OrderTypes.Pickup);
+
+                var list = new List<string> { OrderStatuses.Processing, OrderStatuses.Cancelled };
+
+                if (hasPickup && !hasDelivery)
+                {
+                    list.Add(OrderStatuses.ReadyForPickup);
+                    list.Add(OrderStatuses.PickedUp);
+                }
+                else if (hasDelivery && !hasPickup)
+                {
+                    list.Add(OrderStatuses.OutForDelivery);
+                    list.Add(OrderStatuses.Delivered);
+                }
+
+                return list;
+            }
+        }
+
+        private string? _selectedBulkStatus;
+        public string? SelectedBulkStatus
+        {
+            get => _selectedBulkStatus;
+            set => SetProperty(ref _selectedBulkStatus, value);
+        }
 
         // ── Commands ──────────────────────────────────────────────────────────
 
         public ICommand RefreshCommand             { get; }
         public ICommand SelectStatusCommand        { get; }
         public ICommand SelectTypeCommand          { get; }
+        public ICommand MarkProcessingCommand      { get; }
         public ICommand MarkReadyForPickupCommand  { get; }
         public ICommand ConfirmPickupCommand       { get; }
         public ICommand MarkOutForDeliveryCommand   { get; }
@@ -198,6 +240,7 @@ namespace AdminSystem_v2.ViewModels
         public ICommand ApprovePaymentCommand      { get; }
         public ICommand RejectPaymentCommand       { get; }
         public ICommand BulkUpdateStatusCommand    { get; }
+        public ICommand ApplyBulkUpdateCommand     { get; }
         public ICommand BulkCancelCommand          { get; }
         public ICommand DeselectAllCommand         { get; }
         public ICommand CloseDetailCommand         { get; }
@@ -212,6 +255,7 @@ namespace AdminSystem_v2.ViewModels
             RefreshCommand            = new RelayCommand(async () => await LoadAsync());
             SelectStatusCommand       = new RelayCommand<string>(s => SelectedStatusFilter = s ?? "All");
             SelectTypeCommand         = new RelayCommand<string>(t => SelectedTypeFilter = t ?? "All");
+            MarkProcessingCommand     = new RelayCommand(async () => await MarkProcessingAsync(),      () => CanMarkProcessing);
             MarkReadyForPickupCommand = new RelayCommand(async () => await MarkReadyForPickupAsync(),  () => CanMarkReadyForPickup);
             ConfirmPickupCommand      = new RelayCommand(async () => await ConfirmPickupAsync(),       () => CanConfirmPickup);
             MarkOutForDeliveryCommand = new RelayCommand(async () => await MarkOutForDeliveryAsync(),  () => CanMarkOutForDelivery);
@@ -220,6 +264,7 @@ namespace AdminSystem_v2.ViewModels
             ApprovePaymentCommand     = new RelayCommand(async () => await ApprovePaymentAsync(),      () => CanApprovePayment);
             RejectPaymentCommand      = new RelayCommand(async () => await RejectPaymentAsync(),       () => CanRejectPayment);
             BulkUpdateStatusCommand   = new RelayCommand<string>(async s => await BulkUpdateStatusAsync(s), _ => HasSelection);
+            ApplyBulkUpdateCommand    = new RelayCommand(async () => await BulkUpdateStatusAsync(SelectedBulkStatus), () => HasSelection && !string.IsNullOrEmpty(SelectedBulkStatus));
             BulkCancelCommand         = new RelayCommand(async () => await BulkCancelAsync(),          () => HasSelection);
             DeselectAllCommand        = new RelayCommand(() => IsAllSelected = false,                  () => HasSelection);
             CloseDetailCommand        = new RelayCommand(() =>
@@ -322,6 +367,12 @@ namespace AdminSystem_v2.ViewModels
             OnPropertyChanged(nameof(SelectionCount));
             OnPropertyChanged(nameof(HasSelection));
             OnPropertyChanged(nameof(IsAllSelected));
+            OnPropertyChanged(nameof(BulkStatuses));
+
+            if (SelectedBulkStatus != null && !BulkStatuses.Contains(SelectedBulkStatus))
+            {
+                SelectedBulkStatus = null;
+            }
         }
 
         // ── Status badges ─────────────────────────────────────────────────────
@@ -333,7 +384,7 @@ namespace AdminSystem_v2.ViewModels
             {
                 Badge("All",                              "All Orders",          total,                                                          0x37,0x41,0x51, 0xD1,0xD5,0xDB),
                 Badge(OrderStatuses.Pending,              "Pending",             counts.GetValueOrDefault(OrderStatuses.Pending),                 0x29,0x21,0x00, 0xF5,0x9E,0x0B),
-                Badge(OrderStatuses.PendingVerification,  "Pending Verification",counts.GetValueOrDefault(OrderStatuses.PendingVerification),     0x2D,0x1A,0x00, 0xFB,0x92,0x3C),
+                Badge(OrderStatuses.PaymentVerification,  "Payment Verification",counts.GetValueOrDefault(OrderStatuses.PaymentVerification),     0x2D,0x1A,0x00, 0xFB,0x92,0x3C),
                 Badge(OrderStatuses.Processing,           "Processing",          counts.GetValueOrDefault(OrderStatuses.Processing),              0x1F,0x12,0x00, 0xF9,0x73,0x16),
                 Badge(OrderStatuses.OnHold,               "On Hold",             counts.GetValueOrDefault(OrderStatuses.OnHold),                  0x1A,0x10,0x2E, 0xC0,0x84,0xFC),
                 Badge(OrderStatuses.ReadyForPickup,       "Ready for Pickup",    counts.GetValueOrDefault(OrderStatuses.ReadyForPickup),          0x0F,0x1E,0x3D, 0x60,0xA5,0xFA),
@@ -401,6 +452,14 @@ namespace AdminSystem_v2.ViewModels
         }
 
         // ── Single-order status actions ───────────────────────────────────────
+
+        private async Task MarkProcessingAsync()
+        {
+            if (SelectedOrder == null) return;
+            await ExecuteOrderActionAsync(
+                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.Processing),
+                $"Order {SelectedOrder.OrderNumber} is now Processing.");
+        }
 
         private async Task MarkReadyForPickupAsync()
         {
@@ -475,8 +534,8 @@ namespace AdminSystem_v2.ViewModels
             var targets = Orders.Where(o => o.IsSelected).Select(o => o.Order).ToList();
             if (targets.Count == 0) return;
 
-            // Pre-validate: filter to only orders where the transition is valid
-            var valid   = targets.Where(o => OrderStatuses.IsValidTransition(o.OrderStatus, status)).ToList();
+            // Pre-validate: filter to only orders where the transition is valid including delivery type rules
+            var valid   = targets.Where(o => OrderStatuses.IsValidTransition(o.OrderStatus, status, o.DeliveryType)).ToList();
             int skipped = targets.Count - valid.Count;
 
             if (valid.Count == 0)
@@ -595,6 +654,7 @@ namespace AdminSystem_v2.ViewModels
 
         private void NotifyActionAvailability()
         {
+            OnPropertyChanged(nameof(CanMarkProcessing));
             OnPropertyChanged(nameof(CanMarkReadyForPickup));
             OnPropertyChanged(nameof(CanConfirmPickup));
             OnPropertyChanged(nameof(CanMarkOutForDelivery));

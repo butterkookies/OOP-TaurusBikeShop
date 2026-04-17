@@ -27,6 +27,7 @@ public sealed class CheckoutController : Controller
 
     private const string SessionKeyVoucherCode     = "checkout_voucher_code";
     private const string SessionKeyVoucherDiscount = "checkout_voucher_discount";
+    private const string SessionKeySelectedItems   = "checkout_selected_items";
 
     /// <inheritdoc/>
     public CheckoutController(
@@ -53,7 +54,7 @@ public sealed class CheckoutController : Controller
     /// Redirects to cart if cart is empty.
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    public async Task<IActionResult> Index(string? ids, CancellationToken cancellationToken)
     {
         int userId = GetCurrentUserId();
 
@@ -63,6 +64,28 @@ public sealed class CheckoutController : Controller
             TempData["info"] = "Your cart is empty.";
             return RedirectToAction("ViewCart", "Cart");
         }
+
+        // Resolve the per-checkout selection of cart item IDs.
+        // Priority: query string (fresh navigation from Cart) → session
+        // (subsequent GETs within the same checkout flow, e.g. after model-state
+        // validation bounce) → all items (fallback when nothing was specified).
+        HashSet<int>? selectedIds = ParseIds(ids)
+                                    ?? ParseIds(HttpContext.Session.GetString(SessionKeySelectedItems));
+
+        IReadOnlyList<CartItemViewModel> selectedItems = selectedIds is null
+            ? cart.Items
+            : cart.Items.Where(i => selectedIds.Contains(i.CartItemId)).ToList().AsReadOnly();
+
+        if (selectedItems.Count == 0)
+        {
+            TempData["info"] = "Select at least one item to check out.";
+            return RedirectToAction("ViewCart", "Cart");
+        }
+
+        // Persist the selection so PlaceOrder (and any re-GETs) see the same set.
+        HttpContext.Session.SetString(
+            SessionKeySelectedItems,
+            string.Join(',', selectedItems.Select(i => i.CartItemId)));
 
         Models.Entities.User? user =
             await _userRepo.GetWithAddressesAsync(userId, cancellationToken);
@@ -80,8 +103,8 @@ public sealed class CheckoutController : Controller
                 .ThenBy(a => a.CreatedAt)
                 .ToList()
                 .AsReadOnly(),
-            CartItems       = cart.Items,
-            SubTotal        = cart.SubTotal,
+            CartItems       = selectedItems,
+            SubTotal        = selectedItems.Sum(i => i.LineTotal),
             VoucherCode     = voucherCode,
             DiscountAmount  = discountAmount,
             SelectedAddressId = user?.DefaultAddressId,
@@ -114,6 +137,8 @@ public sealed class CheckoutController : Controller
         string? rawDiscount = HttpContext.Session.GetString(SessionKeyVoucherDiscount);
         vm.DiscountAmount = decimal.TryParse(rawDiscount, out decimal d) ? d : 0m;
 
+        HashSet<int>? selectedIds = ParseIds(HttpContext.Session.GetString(SessionKeySelectedItems));
+
         if (!ModelState.IsValid)
         {
             // Reload read-only fields before returning the view
@@ -121,8 +146,12 @@ public sealed class CheckoutController : Controller
             Models.Entities.User? user =
                 await _userRepo.GetWithAddressesAsync(userId, cancellationToken);
 
-            vm.CartItems      = cart.Items;
-            vm.SubTotal       = cart.SubTotal;
+            IReadOnlyList<CartItemViewModel> items = selectedIds is null
+                ? cart.Items
+                : cart.Items.Where(i => selectedIds.Contains(i.CartItemId)).ToList().AsReadOnly();
+
+            vm.CartItems      = items;
+            vm.SubTotal       = items.Sum(i => i.LineTotal);
             vm.SavedAddresses = (user?.Addresses ?? new List<Address>())
                 .Where(a => !a.IsSnapshot)
                 .OrderByDescending(a => a.IsDefault)
@@ -138,7 +167,7 @@ public sealed class CheckoutController : Controller
         try
         {
             ServiceResult<int> result =
-                await _orderService.CreateOrderAsync(userId, vm, cancellationToken);
+                await _orderService.CreateOrderAsync(userId, vm, selectedIds, cancellationToken);
 
             if (!result.IsSuccess)
             {
@@ -146,9 +175,10 @@ public sealed class CheckoutController : Controller
                 return RedirectToAction(nameof(Index));
             }
 
-            // Clear voucher session keys after successful order
+            // Clear voucher + selection session keys after successful order
             HttpContext.Session.Remove(SessionKeyVoucherCode);
             HttpContext.Session.Remove(SessionKeyVoucherDiscount);
+            HttpContext.Session.Remove(SessionKeySelectedItems);
 
             TempData["success"] = "Your order has been placed successfully!";
             return RedirectToAction("Confirmation", "Order",
@@ -196,6 +226,20 @@ public sealed class CheckoutController : Controller
     {
         string? value = User.FindFirstValue(ClaimTypes.NameIdentifier);
         return int.TryParse(value, out int id) ? id : 0;
+    }
+
+    /// <summary>
+    /// Parses a comma-separated list of cart item IDs (e.g. "12,14,18").
+    /// Returns null when input is null/empty, so callers can distinguish
+    /// "no selection specified" from "explicit empty selection".
+    /// </summary>
+    private static HashSet<int>? ParseIds(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        HashSet<int> ids = new();
+        foreach (string token in raw.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            if (int.TryParse(token, out int id)) ids.Add(id);
+        return ids.Count == 0 ? null : ids;
     }
 
     private async Task<IReadOnlyList<AssignedVoucherViewModel>> GetAssignedVoucherViewModelsAsync(int userId, CancellationToken cancellationToken)

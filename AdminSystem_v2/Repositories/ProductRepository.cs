@@ -6,21 +6,32 @@ namespace AdminSystem_v2.Repositories
 {
     public class ProductRepository : Repository<Product>, IProductRepository
     {
+        private const string ProductColumns =
+            @"p.ProductId, p.CategoryId, p.BrandId, p.Name, p.ShortDescription,
+              p.Description, p.Price, p.Currency, p.IsActive, p.IsFeatured,
+              p.CreatedAt, p.UpdatedAt";
+
+        private const string VariantColumns =
+            @"ProductVariantId, ProductId, VariantName, AdditionalPrice, StockQuantity,
+              ReorderThreshold, SKU, IsActive, UpdatedAt";
+
         public async Task<Product?> GetByIdAsync(int id)
         {
             await using var conn = GetConnection();
 
             var product = await conn.QueryFirstOrDefaultAsync<Product>(
-                @"SELECT p.*, c.Name AS CategoryName, b.BrandName
-                  FROM Product p
-                  LEFT JOIN Category c ON p.CategoryId = c.CategoryId
-                  LEFT JOIN Brand    b ON p.BrandId    = b.BrandId
-                  WHERE p.ProductId = @Id", new { Id = id });
+                $@"SELECT {ProductColumns}, c.Name AS CategoryName, b.BrandName
+                   FROM Product p
+                   LEFT JOIN Category c ON p.CategoryId = c.CategoryId
+                   LEFT JOIN Brand    b ON p.BrandId    = b.BrandId
+                   WHERE p.ProductId = @Id", new { Id = id });
 
             if (product == null) return null;
 
             product.Variants = (await conn.QueryAsync<ProductVariant>(
-                "SELECT * FROM ProductVariant WHERE ProductId = @Id AND IsActive = 1 ORDER BY VariantName",
+                $@"SELECT {VariantColumns} FROM ProductVariant
+                   WHERE ProductId = @Id AND IsActive = 1
+                   ORDER BY VariantName",
                 new { Id = id })).ToList();
 
             return product;
@@ -31,12 +42,12 @@ namespace AdminSystem_v2.Repositories
             await using var conn = GetConnection();
 
             var products = (await conn.QueryAsync<Product>(
-                @"SELECT p.*, c.Name AS CategoryName, b.BrandName
-                  FROM Product p
-                  LEFT JOIN Category c ON p.CategoryId = c.CategoryId
-                  LEFT JOIN Brand    b ON p.BrandId    = b.BrandId
-                  WHERE p.IsActive = 1
-                  ORDER BY p.Name")).ToList();
+                $@"SELECT {ProductColumns}, c.Name AS CategoryName, b.BrandName
+                   FROM Product p
+                   LEFT JOIN Category c ON p.CategoryId = c.CategoryId
+                   LEFT JOIN Brand    b ON p.BrandId    = b.BrandId
+                   WHERE p.IsActive = 1
+                   ORDER BY p.Name")).ToList();
 
             await PopulateVariantsAsync(conn, products);
             return products;
@@ -47,13 +58,13 @@ namespace AdminSystem_v2.Repositories
             await using var conn = GetConnection();
 
             var products = (await conn.QueryAsync<Product>(
-                @"SELECT p.*, c.Name AS CategoryName, b.BrandName
-                  FROM Product p
-                  LEFT JOIN Category c ON p.CategoryId = c.CategoryId
-                  LEFT JOIN Brand    b ON p.BrandId    = b.BrandId
-                  WHERE p.IsActive = 1
-                    AND (p.Name LIKE @Search OR p.Description LIKE @Search)
-                  ORDER BY p.Name",
+                $@"SELECT {ProductColumns}, c.Name AS CategoryName, b.BrandName
+                   FROM Product p
+                   LEFT JOIN Category c ON p.CategoryId = c.CategoryId
+                   LEFT JOIN Brand    b ON p.BrandId    = b.BrandId
+                   WHERE p.IsActive = 1
+                     AND (p.Name LIKE @Search OR p.Description LIKE @Search)
+                   ORDER BY p.Name",
                 new { Search = $"%{searchText}%" })).ToList();
 
             await PopulateVariantsAsync(conn, products);
@@ -96,41 +107,48 @@ namespace AdminSystem_v2.Repositories
             string changeType, int changedByUserId, string? notes = null)
         {
             await using var conn = GetConnection();
-            await using var tx   = await conn.BeginTransactionAsync();
-            try
-            {
-                await conn.ExecuteAsync(
-                    @"UPDATE ProductVariant
-                      SET StockQuantity = StockQuantity + @Qty,
-                          UpdatedAt     = GETUTCDATE()
-                      WHERE ProductVariantId = @VariantId",
-                    new { Qty = qty, VariantId = variantId }, tx);
+            
+            const string sql = @"
+                BEGIN TRY
+                    BEGIN TRANSACTION;
+                    
+                    -- 1. Update the stock quantity
+                    UPDATE ProductVariant
+                    SET StockQuantity = StockQuantity + @Qty,
+                        UpdatedAt     = GETUTCDATE()
+                    WHERE ProductVariantId = @VariantId;
 
-                int productId = await conn.ExecuteScalarAsync<int>(
-                    "SELECT ProductId FROM ProductVariant WHERE ProductVariantId = @Id",
-                    new { Id = variantId }, tx);
+                    -- 2. Retrieve the associated ProductId
+                    DECLARE @MatchedProductId INT;
+                    SELECT @MatchedProductId = ProductId 
+                    FROM ProductVariant 
+                    WHERE ProductVariantId = @VariantId;
 
-                await conn.ExecuteAsync(
-                    @"INSERT INTO InventoryLog
+                    -- 3. Insert a record into the InventoryLog
+                    INSERT INTO InventoryLog
                         (ProductId, ProductVariantId, ChangeQuantity,
                          ChangeType, ChangedByUserId, Notes, CreatedAt)
-                      VALUES
-                        (@ProductId, @VariantId, @Qty,
-                         @ChangeType, @UserId, @Notes, GETUTCDATE())",
-                    new { ProductId  = productId,
-                          VariantId  = variantId,
-                          Qty        = qty,
-                          ChangeType = changeType,
-                          UserId     = changedByUserId,
-                          Notes      = notes }, tx);
+                    VALUES
+                        (@MatchedProductId, @VariantId, @Qty,
+                         @ChangeType, @UserId, @Notes, GETUTCDATE());
 
-                await tx.CommitAsync();
-            }
-            catch
-            {
-                await tx.RollbackAsync();
-                throw;
-            }
+                    COMMIT;
+                END TRY
+                BEGIN CATCH
+                    IF @@TRANCOUNT > 0
+                        ROLLBACK;
+                    
+                    THROW;
+                END CATCH;
+            ";
+
+            await conn.ExecuteAsync(sql, new { 
+                VariantId = variantId, 
+                Qty = qty, 
+                ChangeType = changeType, 
+                UserId = changedByUserId, 
+                Notes = notes 
+            });
         }
 
         public async Task AddVariantAsync(ProductVariant variant)
@@ -160,17 +178,20 @@ namespace AdminSystem_v2.Repositories
 
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
             => await QueryAsync<Category>(
-                "SELECT * FROM Category ORDER BY Name");
+                "SELECT CategoryId, Name, CategoryCode FROM Category ORDER BY Name");
 
         public async Task<IEnumerable<Brand>> GetAllBrandsAsync()
             => await QueryAsync<Brand>(
-                "SELECT * FROM Brand WHERE IsActive = 1 ORDER BY BrandName");
+                @"SELECT BrandId, BrandName, IsActive
+                  FROM Brand WHERE IsActive = 1 ORDER BY BrandName");
 
         // ── Product images ────────────────────────────────────────────────
 
         public async Task<IEnumerable<ProductImage>> GetImagesAsync(int productId)
             => await QueryAsync<ProductImage>(
-                @"SELECT * FROM ProductImage
+                @"SELECT ProductImageId, ProductId, ImageUrl, ImageType,
+                         StorageBucket, StoragePath, IsPrimary, DisplayOrder, CreatedAt
+                  FROM ProductImage
                   WHERE ProductId = @ProductId
                   ORDER BY IsPrimary DESC, DisplayOrder",
                 new { ProductId = productId });
@@ -206,7 +227,9 @@ namespace AdminSystem_v2.Repositories
 
             var ids      = products.Select(p => p.ProductId).ToList();
             var variants = (await conn.QueryAsync<ProductVariant>(
-                "SELECT * FROM ProductVariant WHERE ProductId IN @Ids AND IsActive = 1 ORDER BY VariantName",
+                $@"SELECT {VariantColumns} FROM ProductVariant
+                   WHERE ProductId IN @Ids AND IsActive = 1
+                   ORDER BY VariantName",
                 new { Ids = ids })).ToList();
 
             var map = variants

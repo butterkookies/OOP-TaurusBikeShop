@@ -351,12 +351,34 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#x1F6CD;" FontSize="13"
                                            Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="Products" FontSize="13"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
+                                 <TextBlock Text="Products" FontSize="13"
+                                            VerticalAlignment="Center"/>
+                             </StackPanel>
+                         </Button>
+                         
+                         <!-- Support -->
+                         <Button Command="{Binding NavigateCommand}"
+                                 CommandParameter="Support Tickets">
+                             <Button.Style>
+                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
+                                     <Style.Triggers>
+                                         <DataTrigger Binding="{Binding ActivePage}" Value="Support Tickets">
+                                             <Setter Property="Background"  Value="#1F2937"/>
+                                             <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                             <Setter Property="BorderBrush" Value="#DC2626"/>
+                                         </DataTrigger>
+                                     </Style.Triggers>
+                                 </Style>
+                             </Button.Style>
+                             <StackPanel Orientation="Horizontal">
+                                 <TextBlock Text="&#x1F4AC;" FontSize="13"
+                                            Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                 <TextBlock Text="Support" FontSize="13"
+                                            VerticalAlignment="Center"/>
+                             </StackPanel>
+                         </Button>
 
-                        <Separator Style="{StaticResource SidebarSep}"/>
+                         <Separator Style="{StaticResource SidebarSep}"/>
                         <TextBlock Text="TEAM" Style="{StaticResource SectionLabel}"/>
 
                         <!-- Staff (Admin only) -->

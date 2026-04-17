@@ -1,0 +1,1079 @@
+# WebApplication File Library
+This document outlines the purpose, functions, and responsibilities of every script within the WebApplication folder.
+
+## Controllers
+---
+
+### `CartController.cs`
+**Purpose:** Handles cart view and all AJAX cart mutation endpoints. Supports both authenticated and guest users. Flowchart: Part 3 — Cart &amp; Checkout.
+
+**Functions / Methods:**
+- `ViewCart`
+- `AddToCart`
+- `UpdateQuantity`
+- `RemoveFromCart`
+- `GetCartCount`
+- `GetCurrentUserId`
+- `GetGuestSessionId`
+- `EnsureGuestSessionAsync`
+
+### `CheckoutController.cs`
+**Purpose:** Handles the checkout flow: address selection, delivery method, payment method selection, and order submission. Flowchart: Part 3 — Cart &amp; Checkout.
+
+**Functions / Methods:**
+- `Index`
+- `PlaceOrder`
+- `GetShippingFee`
+- `GetCurrentUserId`
+- `ParseIds`
+- `GetAssignedVoucherViewModelsAsync`
+- `FormatTimeLeft`
+
+### `CustomerController.cs`
+**Purpose:** Handles all customer authentication and account management routes. Flowchart: Part 1 — Customer Registration &amp; Login.
+
+**Functions / Methods:**
+- `Register`
+- `VerifyOTP`
+- `ResendOTP`
+- `Login`
+- `Logout`
+- `Dashboard`
+- `Profile`
+- `DeleteAddress`
+- `SetDefaultAddress`
+- `Notifications`
+- `NotificationCount`
+- `MarkNotificationRead`
+- `MarkAllNotificationsRead`
+- `SignInUserAsync`
+- `GetCurrentUserId`
+
+### `HomeController.cs`
+**Purpose:** Handles the homepage and shared static pages. No authentication required.
+
+**Functions / Methods:**
+- `Index`
+- `Privacy`
+- `Error`
+
+### `OrderController.cs`
+**Purpose:** Handles order confirmation, history, detail, and customer cancellation. All views live in Views/Customer/ — explicit paths used on every return. Flowchart: Part 4 — Order Tracking.
+
+**Functions / Methods:**
+- `Confirmation`
+- `History`
+- `Detail`
+- `Cancel`
+- `ConfirmDelivery`
+- `GetCurrentUserId`
+
+### `PaymentController.cs`
+**Purpose:** Handles GCash and BankTransfer payment proof submission. Cash is POS-only — no Cash actions here. Flowchart: Part 3 — Payment Processing.
+
+**Functions / Methods:**
+- `Submit`
+- `SubmitGCash`
+- `SubmitBankTransfer`
+- `GetCurrentUserId`
+
+### `ProductController.cs`
+**Purpose:** Handles product catalog listing, search, filtering, detail pages, and the AJAX variant price endpoint. Flowchart: Part 2 — Customer Dashboard &amp; Shopping.
+
+**Functions / Methods:**
+- `List`
+- `Detail`
+- `GetVariantPrice`
+- `GetCurrentUserId`
+
+### `ReviewController.cs`
+**Purpose:** Handles review submission, the customer reviews list page, and the AJAX load-more endpoint for the product detail page. Flowchart: Part 6 — Delivery &amp; Review.
+
+**Functions / Methods:**
+- `MyReviews`
+- `Submit`
+- `LoadMore`
+- `GetCurrentUserId`
+
+### `SupplierController.cs`
+**Purpose:** Read-only supplier and purchase order views for Admin and Manager roles. Customers never reach these routes. All write operations (create/receive purchase orders) are handled exclusively by AdminSystem via Dapper.
+
+**Functions / Methods:**
+- `Index`
+- `PurchaseOrders`
+- `PurchaseOrderDetail`
+
+### `SupportController.cs`
+**Purpose:** Handles customer-facing support ticket creation, listing, and detail. Flowchart: Part 13 — Support System.
+
+**Functions / Methods:**
+- `Index`
+- `Create`
+- `Detail`
+- `Reply`
+- `GetCurrentUserId`
+
+### `VoucherController.cs`
+**Purpose:** Handles voucher validation AJAX calls from the checkout page. All actions require authentication — vouchers are not applicable to guests.
+
+**Functions / Methods:**
+- `Validate`
+- `Remove`
+- `GetCurrentUserId`
+
+### `WishlistController.cs`
+**Purpose:** Handles the wishlist page and AJAX toggle/remove/move-to-cart endpoints. All actions require authentication.
+
+**Functions / Methods:**
+- `ViewWishlist`
+- `Toggle`
+- `Remove`
+- `MoveToCart`
+- `GetCurrentUserId`
+
+## BusinessLogic
+---
+
+### `Interfaces/IBrandService.cs`
+**Purpose:** Contract for brand retrieval operations. Brands are reference data managed exclusively via AdminSystem. The WebApplication reads brands for filter dropdowns and product details.
+
+**Functions / Methods:** None or simple data structure.
+
+### `Interfaces/ICartService.cs`
+**Purpose:** Contract for shopping cart operations. Supports both authenticated user carts and anonymous guest session carts. Flowchart: Part 3 — Cart &amp; Checkout.
+
+**Functions / Methods:** None or simple data structure.
+
+### `Interfaces/IEmailSender.cs`
+**Purpose:** Contract for sending emails via SMTP. Implementations handle the actual dispatch to an SMTP gateway (e.g. Gmail).
+
+**Functions / Methods:** None or simple data structure.
+
+### `Interfaces/INotificationService.cs`
+**Purpose:** Contract for queuing outbound email and SMS notifications. <para> <b>Queue-only pattern:</b> Implementations of this interface insert a row into the <c>Notification</c> table with <c>Status = Pending</c>. They never dispatch directly to an email or SMS gateway. Dispatch is handled exclusively by the background job that polls <c>vw_PendingNotifications</c> (rows where RetryCount &lt; 3). </para> <para> This interface is injected into every service and background job that needs to send a notification. Use <see cref="Models.Entities.NotifTypes"/> constants for the notification type and <see cref="Models.Entities.NotifChannels"/> constants for the channel — never pass magic strings. <para> <b>OTP codes are not sent through this service.</b> OTP lifecycle is handled exclusively via the <c>OTPVerification</c> table. </para> </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Interfaces/IOrderService.cs`
+**Purpose:** Contract for order creation and lifecycle management. Flowchart: Part 3 — Cart &amp; Checkout, Part 4 — Order Tracking.
+
+**Functions / Methods:** None or simple data structure.
+
+### `Interfaces/IPaymentService.cs`
+**Purpose:** Contract for payment submission and status management. Payment methods: GCash and BankTransfer only — no Cash, no Card, no COD. Flowchart: Part 5 — Payment Processing.
+
+**Functions / Methods:** None or simple data structure.
+
+### `Interfaces/IPhotoService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `Interfaces/IProductService.cs`
+**Purpose:** Contract for product catalog operations. Flowchart: Part 2 — Customer Dashboard &amp; Shopping.
+
+**Functions / Methods:** None or simple data structure.
+
+### `Interfaces/IReviewService.cs`
+**Purpose:** Contract for customer product review operations. Reviews can only be submitted for products in Delivered orders (verified purchase requirement).
+
+**Functions / Methods:** None or simple data structure.
+
+### `Interfaces/ISupportService.cs`
+**Purpose:** Contract for customer support ticket operations available in the WebApplication.
+
+**Functions / Methods:** None or simple data structure.
+
+### `Interfaces/IUserService.cs`
+**Purpose:** Contract for customer account operations covering the full registration and authentication lifecycle defined in flowchart Part 1.
+
+**Functions / Methods:**
+- `Ok`
+- `Fail`
+
+### `Interfaces/IVoucherService.cs`
+**Purpose:** Contract for voucher validation and redemption. Validation is a 5-step chain — all steps must pass in order. Redemption writes a <c>VoucherUsage</c> row at order creation.
+
+**Functions / Methods:** None or simple data structure.
+
+### `Interfaces/IWishlistService.cs`
+**Purpose:** Contract for wishlist operations. Wishlist is an authenticated-only feature — all methods require a valid userId.
+
+**Functions / Methods:** None or simple data structure.
+
+### `Services/BrandService.cs`
+**Purpose:** Implements <see cref="IBrandService"/> — simple read-only pass-through to <see cref="BrandRepository"/>.
+
+**Functions / Methods:**
+- `GetAllActiveBrandsAsync`
+- `GetByIdAsync`
+
+### `Services/CartService.cs`
+**Purpose:** Implements <see cref="ICartService"/> — full cart lifecycle including guest cart support and guest-to-user merge on login. Flowchart: Part 3 — Cart &amp; Checkout.
+
+**Functions / Methods:**
+- `GetCartAsync`
+- `AddItemAsync`
+- `UpdateQuantityAsync`
+- `RemoveItemAsync`
+- `ClearCartAsync`
+- `MergeGuestCartAsync`
+- `GetCartCountAsync`
+- `CreateGuestSessionAsync`
+- `MapToViewModel`
+
+### `Services/GmailEmailSender.cs`
+**Purpose:** Sends emails via Gmail SMTP using MailKit. Configured through <see cref="SmtpSettings"/> (bound from appsettings "SmtpSettings" section). <para> <b>Authentication:</b> Uses a Gmail App Password with STARTTLS on port 587. Regular Gmail passwords will not work — 2FA must be enabled and an App Password generated. </para>
+
+**Functions / Methods:**
+- `SendAsync`
+
+### `Services/NotificationService.cs`
+**Purpose:** Implements <see cref="INotificationService"/> by inserting rows into the <c>Notification</c> table with <c>Status = Pending</c>. <para> <b>This service never dispatches email or SMS directly.</b> It is a pure write-to-queue operation. The background job that polls <c>vw_PendingNotifications</c> (Status = 'Pending' AND RetryCount &lt; 3) handles all actual dispatch to the email/SMS gateway. </para> <para> <b>Retry policy:</b> The background dispatcher increments <c>Notification.RetryCount</c> on each failed attempt and sets <c>Status = Failed</c> once <c>RetryCount</c> reaches 3. This service always inserts with <c>RetryCount = 0</c>. </para>
+
+**Functions / Methods:**
+- `QueueAsync`
+- `GetUnreadCountAsync`
+- `MarkAsReadAsync`
+- `MarkAllAsReadAsync`
+
+### `Services/OrderService.cs`
+**Purpose:** Implements <see cref="IOrderService"/> — order creation, history, detail retrieval, and customer-initiated cancellation. Flowchart: Part 3 — Cart &amp; Checkout, Part 4 — Order Tracking.
+
+**Functions / Methods:**
+- `CreateOrderAsync`
+- `GetOrderConfirmationAsync`
+- `GetOrderDetailAsync`
+- `CancelOrderAsync`
+- `ConfirmDeliveryAsync`
+- `BuildOrderViewModelAsync`
+- `MapToListViewModel`
+- `MapToDetailViewModel`
+- `GenerateOrderNumberAsync`
+
+### `Services/PaymentService.cs`
+**Purpose:** Implements <see cref="IPaymentService"/> — GCash and BankTransfer proof submission with Cloudinary upload, status transitions, and notification queuing. Flowchart: Part 5 — Payment Processing.
+
+**Functions / Methods:**
+- `SubmitGCashPaymentAsync`
+- `SubmitBankTransferPaymentAsync`
+- `GetPaymentDetailAsync`
+- `ValidateOrderForPaymentAsync`
+- `GetOrderGrandTotalAsync`
+- `WriteSystemLogAsync`
+- `QueuePaymentNotificationAsync`
+
+### `Services/PhotoService.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `UploadAsync`
+- `UploadPaymentProofAsync`
+- `DeleteAsync`
+- `SaveLocallyAsync`
+
+### `Services/ProductService.cs`
+**Purpose:** Implements <see cref="IProductService"/> — product listing, filtering, detail loading, and variant price/stock queries. Flowchart: Part 2 — Customer Dashboard &amp; Shopping.
+
+**Functions / Methods:**
+- `GetByIdAsync`
+- `GetFeaturedAsync`
+- `CheckStockAsync`
+- `MapToViewModel`
+- `MapReviewToViewModel`
+
+### `Services/ReviewService.cs`
+**Purpose:** Implements <see cref="IReviewService"/> — verified-purchase review submission and product review retrieval.
+
+**Functions / Methods:**
+- `GetReviewPageAsync`
+- `SubmitReviewAsync`
+- `GetProductReviewsAsync`
+- `GetByUserAsync`
+- `GetPendingReviewsAsync`
+- `GetProductReviewsPageAsync`
+
+### `Services/SupportService.cs`
+**Purpose:** Implements <see cref="ISupportService"/> — customer support ticket creation and retrieval for the WebApplication.
+
+**Functions / Methods:**
+- `GetUserTicketsAsync`
+- `GetTicketDetailAsync`
+- `GetByUserAsync`
+- `GetDetailAsync`
+- `CreateAsync`
+- `AddReplyAsync`
+- `CreateTicketAsync`
+
+### `Services/UserService.cs`
+**Purpose:** Implements <see cref="IUserService"/> — handles customer registration, OTP verification, login, and profile management. Follows the flow defined in flowchart Part 1: Customer Registration &amp; Login.
+
+**Functions / Methods:**
+- `RegisterAsync`
+- `VerifyOTPAndCreateAccountAsync`
+- `ResendOTPAsync`
+- `LoginAsync`
+- `GetProfileAsync`
+- `GetUserByIdAsync`
+- `UpdateProfileAsync`
+- `ChangePasswordAsync`
+- `AddAddressAsync`
+- `DeleteAddressAsync`
+- `SetDefaultAddressAsync`
+- `GenerateOTPCode`
+
+### `Services/VoucherService.cs`
+**Purpose:** Implements <see cref="IVoucherService"/> — 6-step voucher validation chain and usage recording at order creation. <para> Validation order follows flowchart Part 15 (V6 → V7 → V8 → V9 → V10): <list type="number"> <item><description>Code format (local, no DB)</description></item> <item><description>Exists and IsActive</description></item> <item><description>Within StartDate / EndDate window</description></item> <item><description>Subtotal meets MinimumOrderAmount</description></item> <item><description>Global usage cap (MaxUses)</description></item> <item><description>Per-user usage cap (MaxUsesPerUser)</description></item> </list> Steps 1–4 are cheap (no extra DB round-trips); steps 5–6 are DB queries and are intentionally deferred until the cart value is confirmed valid. </para>
+
+**Functions / Methods:**
+- `ValidateAsync`
+- `RedeemAsync`
+- `GetActiveAssignedVouchersAsync`
+- `Fail`
+
+### `Services/WishlistService.cs`
+**Purpose:** Implements <see cref="IWishlistService"/> — add, remove, toggle, and list wishlist products for authenticated customers.
+
+**Functions / Methods:**
+- `GetWishlistAsync`
+- `AddAsync`
+- `RemoveAsync`
+- `ToggleAsync`
+- `GetProductIdsAsync`
+- `GetCountAsync`
+
+## DataAccess
+---
+
+### `Context/AppDbContext.Auth.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ConfigureUser`
+- `ConfigureRole`
+- `ConfigureUserRole`
+- `ConfigureAddress`
+- `ConfigureOTPVerification`
+- `ConfigureGuestSession`
+
+### `Context/AppDbContext.Catalog.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ConfigureCategory`
+- `ConfigureBrand`
+- `ConfigureProduct`
+- `ConfigureProductVariant`
+- `ConfigureProductImage`
+- `ConfigurePriceHistory`
+
+### `Context/AppDbContext.Commerce.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ConfigureVoucher`
+- `ConfigureUserVoucher`
+- `ConfigureVoucherUsage`
+- `ConfigureCart`
+- `ConfigureCartItem`
+- `ConfigureWishlist`
+
+### `Context/AppDbContext.Delivery.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ConfigureDelivery`
+- `ConfigureLalamoveDelivery`
+- `ConfigureLBCDelivery`
+
+### `Context/AppDbContext.Orders.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ConfigureOrder`
+- `ConfigureOrderItem`
+- `ConfigurePickupOrder`
+- `ConfigureInventoryLog`
+
+### `Context/AppDbContext.Payments.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ConfigurePayment`
+- `ConfigureGCashPayment`
+- `ConfigureBankTransferPayment`
+- `ConfigureStorePaymentAccount`
+
+### `Context/AppDbContext.SupplyChain.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ConfigureSupplier`
+- `ConfigurePurchaseOrder`
+- `ConfigurePurchaseOrderItem`
+
+### `Context/AppDbContext.SupportComms.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:**
+- `ConfigureReview`
+- `ConfigurePOSSession`
+- `ConfigureSupportTicket`
+- `ConfigureSupportTicketReply`
+- `ConfigureSupportTask`
+- `ConfigureNotification`
+- `ConfigureSystemLog`
+
+### `Context/AppDbContext.cs`
+**Purpose:** EF Core database context for the Taurus Bike Shop WebApplication. Connects to TaurusBikeShopSqlServer2026 on Google Cloud SQL for SQL Server. <para> All entity relationships, foreign keys, cascade behaviours, unique indexes, and filtered indexes are configured exclusively here via Fluent API in <see cref="OnModelCreating"/>. No relationship data annotations exist on entity classes — only validation annotations (Required, MaxLength) are permitted there. </para> <para> <b>5 shared-PK 1:1 subtypes</b> configured via HasOne/WithOne/HasForeignKey: <see cref="GCashPayment"/>, <see cref="BankTransferPayment"/>, <see cref="LalamoveDelivery"/>, <see cref="LBCDelivery"/>, <see cref="PickupOrder"/>. </para> <para> <b>Circular FK:</b> <c>User.DefaultAddressId → Address.AddressId</c> is configured with <c>IsRequired(false)</c> and no cascade delete to break the dependency cycle. </para>
+
+**Functions / Methods:**
+- `OnModelCreating`
+
+### `Repositories/BrandRepository.cs`
+**Purpose:** Data access for <see cref="Brand"/> entities. Brands are reference data managed exclusively via AdminSystem. The WebApplication reads brands for product filter dropdowns and detail pages.
+
+**Functions / Methods:**
+- `GetAllActiveBrandsAsync`
+
+### `Repositories/CartRepository.cs`
+**Purpose:** Data access for <see cref="Cart"/> and <see cref="CartItem"/> entities. Supports both authenticated user carts and anonymous guest session carts.
+
+**Functions / Methods:**
+- `GetActiveCartAsync`
+- `GetCartItemCountAsync`
+- `GetCartItemAsync`
+
+### `Repositories/IRepository.cs`
+**Purpose:** Generic repository interface defining the base data access contract for all entity repositories in the WebApplication. <para> Specific repositories extend this interface with domain-specific query methods. Services depend on specific repository interfaces — never on this base interface directly, except in generic infrastructure code. </para> <para> <b>IQueryable is never exposed</b> outside the repository boundary. All methods return materialised collections or single entities only. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Repositories/OrderRepository.cs`
+**Purpose:** Data access for <see cref="Order"/> and <see cref="OrderItem"/> entities. Handles order history retrieval, full order detail loading, status updates, and pending order monitoring.
+
+**Functions / Methods:**
+- `GetOrdersByUserAsync`
+- `GetOrderWithDetailsAsync`
+- `UpdateStatusAsync`
+- `GetPendingUnprocessedAsync`
+- `GetOrderCountByUserAsync`
+
+### `Repositories/PaymentRepository.cs`
+**Purpose:** Data access for <see cref="Payment"/>, <see cref="GCashPayment"/>, and <see cref="BankTransferPayment"/> entities. Handles payment creation with subtype rows, status queries, and pending verification retrieval.
+
+**Functions / Methods:**
+- `GetWithSubtypeAsync`
+- `CreateWithSubtypeAsync`
+- `GetPendingBankTransfersAsync`
+- `GetTimedOutBankTransfersAsync`
+
+### `Repositories/ProductRepository.cs`
+**Purpose:** Data access for <see cref="Product"/>, <see cref="ProductVariant"/>, and <see cref="ProductImage"/> entities. Handles catalog listing with dynamic filtering, full product detail loading, and featured product retrieval.
+
+**Functions / Methods:**
+- `GetFilteredAsync`
+- `GetFilteredCountAsync`
+- `GetWithFullDetailsAsync`
+- `GetBySKUAsync`
+- `GetFeaturedAsync`
+- `GetActiveCategoriesAsync`
+
+### `Repositories/Repository.cs`
+**Purpose:** Generic EF Core repository implementation providing default CRUD operations for all entity types. All specific repositories inherit from this class and add domain-specific query methods on top. <para> <b>Tracking policy:</b> <see cref="GetAllAsync"/> and <see cref="FindAsync"/> use <c>AsNoTracking()</c> — they are read-only operations and tracking would waste memory and CPU. <see cref="GetByIdAsync"/> uses <c>FindAsync</c> which checks the EF Core identity map first, making it safe for both read and subsequent update scenarios. </para> <para> <b>SaveChanges scope:</b> Each method calls <c>SaveChangesAsync</c> immediately after its operation. For multi-table transactions (e.g. CreateOrder, ReceiveStock), specific repositories use <see cref="Context"/> directly inside a <c>BeginTransactionAsync</c> block rather than relying on the base methods. </para>
+
+**Functions / Methods:**
+- `GetAllAsync`
+- `GetByIdAsync`
+- `AddAsync`
+- `UpdateAsync`
+- `DeleteAsync`
+- `FindAsync`
+
+### `Repositories/ReviewRepository.cs`
+**Purpose:** Data access for <see cref="Review"/> entities. Handles review retrieval, verified purchase checks, and average rating calculation.
+
+**Functions / Methods:**
+- `GetByProductAsync`
+- `HasVerifiedPurchaseAsync`
+- `GetVerifiedPurchaseOrderIdAsync`
+- `GetAverageRatingAsync`
+- `GetReviewCountAsync`
+
+### `Repositories/StorePaymentAccountRepository.cs`
+**Purpose:** Data access for <see cref="StorePaymentAccount"/> — the store-owned GCash / BPI account rows displayed to customers on the payment page.
+
+**Functions / Methods:**
+- `GetActiveForMethodAsync`
+
+### `Repositories/SupplierRepository.cs`
+**Purpose:** Data access for <see cref="Supplier"/>, <see cref="PurchaseOrder"/>, and <see cref="PurchaseOrderItem"/> entities. The WebApplication uses this repository as read-only. The AdminSystem uses the shared database directly via Dapper — but <see cref="ReceiveStockAsync"/> is implemented here so the EF Core transaction logic is available to any process using this context.
+
+**Functions / Methods:**
+- `GetActiveSuppliersAsync`
+- `GetPurchaseOrdersAsync`
+- `CreatePurchaseOrderAsync`
+
+### `Repositories/SupportRepository.cs`
+**Purpose:** Data access for <see cref="SupportTicket"/>, <see cref="SupportTicketReply"/>, and <see cref="SupportTask"/> entities. The WebApplication creates tickets and allows customers to read their own. The AdminSystem handles replies, task assignment, and resolution via its own Dapper-based repository.
+
+**Functions / Methods:**
+- `GetByUserAsync`
+- `GetWithRepliesAsync`
+- `AddReplyAsync`
+- `CreateTicketAsync`
+
+### `Repositories/UserRepository.cs`
+**Purpose:** Data access for <see cref="User"/> and <see cref="OTPVerification"/> entities. Handles registration, OTP lifecycle, login lookup, and profile updates.
+
+**Functions / Methods:**
+- `FindByEmailAsync`
+- `CreateOTPAsync`
+- `VerifyOTPAsync`
+- `UpdateLastLoginAsync`
+- `GetWithRolesAsync`
+- `GetWithAddressesAsync`
+
+### `Repositories/VoucherRepository.cs`
+**Purpose:** Data access for <see cref="Voucher"/>, <see cref="UserVoucher"/>, and <see cref="VoucherUsage"/> entities. Supports the 5-step validation chain in <c>VoucherService.ValidateAsync</c> and usage recording at order confirmation.
+
+**Functions / Methods:**
+- `GetByCodeAsync`
+- `GetGlobalUsageCountAsync`
+- `GetUserUsageCountAsync`
+- `WriteUsageAsync`
+- `GetActiveAssignedVouchersAsync`
+
+### `Repositories/WishlistRepository.cs`
+**Purpose:** Data access for <see cref="Wishlist"/> entities. Supports wishlist display, idempotent add, and stock monitor job queries.
+
+**Functions / Methods:**
+- `GetByUserWithProductAsync`
+- `AddIdempotentAsync`
+- `GetProductIdsForUserAsync`
+- `GetUserIdsForProductAsync`
+- `GetWishlistCountAsync`
+
+## Models
+---
+
+### `ApiResponse.cs`
+**Purpose:** Standard JSON envelope returned by all AJAX controller actions. Every action that returns <c>JsonResult</c> must use this shape — never return anonymous objects or raw data directly. <para> Use the static factory methods <see cref="Ok"/> and <see cref="Fail"/> for clean, consistent call sites: <code> return Json(ApiResponse.Ok(new { cartCount = 3 })); return Json(ApiResponse.Fail("Voucher code is expired.")); </code> </para>
+
+**Functions / Methods:**
+- `Ok`
+- `Fail`
+
+### `CloudinarySettings.cs`
+**Purpose:** [No explicit XML summary provided in code. Handles related logic for the assigned namespace.]
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Address.cs`
+**Purpose:** Represents a user's shipping or billing address. <para> Two types of rows exist in this table: <list type="bullet"> <item> <b>Live addresses</b> (<see cref="IsSnapshot"/> = false) — editable addresses saved to the user's profile. One may be marked as default via <see cref="IsDefault"/>. </item> <item> <b>Snapshot addresses</b> (<see cref="IsSnapshot"/> = true) — immutable copies created at checkout time and linked to an order via <c>Order.ShippingAddressId</c>. These are never modified after creation, preserving the exact address at the time of the order permanently. </item> </list> </para> <para> Part of the circular FK pair: <c>User.DefaultAddressId</c> → <c>Address.AddressId</c>. The reverse side (<c>Address.UserId</c> → <c>User.UserId</c>) uses CASCADE DELETE so that deleting a user removes all their addresses. The circular FK on <c>User.DefaultAddressId</c> is configured with no cascade delete in AppDbContext to break the cycle. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/BankTransferPayment.cs`
+**Purpose:** Bank transfer-specific payment data. Exists only when the parent <see cref="Payment.PaymentMethod"/> = <c>BankTransfer</c>. <para> <b>Shared PK pattern:</b> <see cref="PaymentId"/> is simultaneously the primary key of this table AND a foreign key to <c>Payment.PaymentId</c>, enforcing a strict 1:1 relationship. Configured in AppDbContext via HasOne/WithOne/HasForeignKey. </para> <para> <b>Verification flow:</b> <list type="number"> <item>Customer uploads proof screenshot → <see cref="ProofUrl"/>, <see cref="ProofStorageBucket"/>, <see cref="ProofStoragePath"/> are set. Payment status → VerificationPending.</item> <item><see cref="VerificationDeadline"/> is set to <c>now + 24 hours</c> by <c>PaymentService</c>.</item> <item>Admin reviews and approves or rejects: <see cref="VerifiedByUserId"/>, <see cref="VerifiedAt"/>, and optionally <see cref="VerificationNotes"/> are set.</item> <item>If deadline is exceeded without admin action, <c>PaymentTimeoutJob</c> sets the order to OnHold.</item> </list> </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Brand.cs`
+**Purpose:** Represents a bicycle or parts manufacturer. Brands are reference data managed exclusively through the AdminSystem. The WebApplication reads brands for product filter dropdowns and detail pages.
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Cart.cs`
+**Purpose:** Represents an active or checked-out shopping cart session. Supports both authenticated users and anonymous guests. <para> <b>Ownership rule:</b> Exactly one of <see cref="UserId"/> or <see cref="GuestSessionId"/> must be non-NULL — never both, never neither. This is enforced by CK_Cart_Owner in the database. Application code in <c>CartService</c> must validate this before inserting a cart row. </para> <para> <b>Active cart rule:</b> Each user and each guest session may have at most one active cart (<see cref="IsCheckedOut"/> = false) at a time. Enforced by UX_Cart_User_Active and UX_Cart_Guest_Active filtered unique indexes. </para> <para> <b>Guest-to-user merge:</b> When a guest logs in or registers, <c>CartService.MergeGuestCartAsync</c> copies all items from the guest cart to the user's cart, then marks the guest cart as checked out. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/CartItem.cs`
+**Purpose:** Represents a single product line item within a shopping cart. <para> <b>Price snapshot:</b> <see cref="PriceAtAdd"/> captures the effective selling price of the selected variant at the exact moment the item was added to the cart. This is <c>Product.Price + ProductVariant.AdditionalPrice</c> at add time. If the product price changes after the item is in the cart, the cart item retains the original price until the customer removes and re-adds the item. </para> <para> <b>Variant rule:</b> <see cref="ProductVariantId"/> should always be set — even for products using the Default variant. NULL is permitted by the schema for legacy compatibility but new cart items should always reference a variant. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Category.cs`
+**Purpose:** Represents a product category with optional parent-child hierarchy. Top-level categories have <see cref="ParentCategoryId"/> = NULL. Child categories point to a parent via <see cref="ParentCategoryId"/>. <para> Valid category codes (enforced by UQ_Category_Code): UNIT, FRAME, FORK, HUB, UPGKIT, STEM, HBAR, SADDLE, GRIP, PEDAL, RIM, TIRE, CHAIN. </para> <para> The self-referencing FK (<see cref="ParentCategoryId"/> → <see cref="CategoryId"/>) is configured in AppDbContext via Fluent API with no cascade delete to prevent accidental tree destruction. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Delivery.cs`
+**Purpose:** Base delivery record — courier-agnostic. One row per delivery attempt per order. Courier-specific data lives in subtype tables sharing this row's PK: <list type="bullet"> <item><see cref="LalamoveDelivery"/> — when <see cref="Courier"/> = Lalamove</item> <item><see cref="LBCDelivery"/> — when <see cref="Courier"/> = LBC</item> </list> <para> <b>Couriers:</b> Lalamove and LBC only. No other courier values are valid. Use <see cref="Couriers"/> constants instead of magic strings. </para> <para> <b>Delivery status flow:</b> Pending → PickedUp → InTransit → Delivered | Failed. Updated by <c>DeliveryStatusPollJob</c> via courier API polling every 5 minutes, and by the AdminSystem when dispatching or marking delays. Use <see cref="DeliveryStatuses"/> constants instead of magic strings. </para> <para> <b>Delay tracking:</b> When a delivery is delayed, the AdminSystem sets <see cref="IsDelayed"/> = true and updates <see cref="DelayedUntil"/> with the new ETA. A DeliveryDelay notification is queued for the customer. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/GCashPayment.cs`
+**Purpose:** GCash-specific payment data. Exists only when the parent <see cref="Payment.PaymentMethod"/> = <c>GCash</c>. <para> <b>Shared PK pattern:</b> <see cref="PaymentId"/> is simultaneously the primary key of this table AND a foreign key to <c>Payment.PaymentId</c>. This enforces a strict 1:1 relationship at the database level. The value is never auto-generated here — it is always copied from the parent Payment row. Configured in AppDbContext via: <code> modelBuilder.Entity&lt;GCashPayment&gt;() .HasOne(g => g.Payment) .WithOne(p => p.GCashPayment) .HasForeignKey&lt;GCashPayment&gt;(g => g.PaymentId); </code> </para> <para> <b>Transaction flow:</b> When the GCash gateway callback confirms payment, <c>PaymentService.InitiateGCashAsync</c> stores the gateway reference in <see cref="GcashTransactionId"/> and updates the parent Payment status to Completed. NULL while the payment is Pending or Failed. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/GuestSession.cs`
+**Purpose:** Represents an anonymous browsing and checkout session for a guest user. A guest session is created when an unauthenticated visitor adds an item to the cart. The session token is stored in a browser cookie to identify the guest across requests. <para> When a guest registers or logs in, <see cref="ConvertedToUserId"/> is set and <c>CartService.MergeGuestCartAsync</c> moves all cart items to the user's cart. Expired sessions and their associated carts can be purged by a maintenance job. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/InventoryLog.cs`
+**Purpose:** Immutable audit trail of every stock movement in the system. Every change to <c>ProductVariant.StockQuantity</c> — regardless of the source (order, POS sale, manual adjustment, purchase order receipt, damage) — must produce exactly one InventoryLog row written in the same transaction. <para> <b>Immutability contract:</b> Rows in this table must NEVER be updated or deleted. They are an append-only audit log. Any correction to a prior entry is made by writing a new offsetting entry. </para> <para> <b>Lock/Unlock pattern for online orders:</b> <list type="bullet"> <item>Order placed → Lock entry (<see cref="ChangeQuantity"/> is negative, stock is reserved)</item> <item>Order delivered → Unlock entry + Sale entry (stock fully consumed)</item> <item>Order cancelled → Unlock entry (stock restored)</item> </list> All three writes happen within the same DB transaction as the Order status change. </para> <para> <b>Change types:</b> Use <see cref="InventoryChangeTypes"/> constants instead of magic strings for <see cref="ChangeType"/>. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/LBCDelivery.cs`
+**Purpose:** LBC-specific delivery data. Exists only when the parent <see cref="Delivery.Courier"/> = <c>LBC</c>. <para> <b>Shared PK pattern:</b> <see cref="DeliveryId"/> is simultaneously the primary key of this table AND a foreign key to <c>Delivery.DeliveryId</c>, enforcing a strict 1:1 relationship. Configured in AppDbContext via HasOne/WithOne/HasForeignKey. </para> <para> <b>No driver fields:</b> Unlike <see cref="LalamoveDelivery"/>, this table has no driver name or phone columns. LBC does not expose driver information via its API — tracking is waybill-number based only. </para> <para> <b>Tracking number:</b> <see cref="TrackingNumber"/> is the LBC waybill number generated when the parcel is booked. NULL until the AdminSystem receives confirmation from LBC. Polled by <c>DeliveryStatusPollJob</c>. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/LalamoveDelivery.cs`
+**Purpose:** Lalamove-specific delivery data. Exists only when the parent <see cref="Delivery.Courier"/> = <c>Lalamove</c>. <para> <b>Shared PK pattern:</b> <see cref="DeliveryId"/> is simultaneously the primary key of this table AND a foreign key to <c>Delivery.DeliveryId</c>, enforcing a strict 1:1 relationship. Configured in AppDbContext via HasOne/WithOne/HasForeignKey. </para> <para> <b>Field population timeline:</b> <list type="bullet"> <item><see cref="BookingRef"/> — populated when the AdminSystem successfully books via the Lalamove API.</item> <item><see cref="DriverName"/> and <see cref="DriverPhone"/> — populated when Lalamove assigns a driver to the booking. Polled by <c>DeliveryStatusPollJob</c> every 5 minutes.</item> </list> All three fields are NULL until the respective events occur. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Notification.cs`
+**Purpose:** Outbound email/SMS notification queue. Every notification in the system — OTP codes, order confirmations, payment alerts, delivery updates, stock alerts — is written here as a Pending row before dispatch. <para> <b>Queue-only pattern:</b> Application code (services, background jobs) only INSERTS rows via <c>INotificationService.QueueAsync</c>. Rows are never dispatched directly by application code. Dispatch is handled exclusively by <c>DeliveryStatusPollJob</c> (or a dedicated notification dispatcher job) which polls <c>vw_PendingNotifications</c> — filtered to Status = 'Pending' AND RetryCount &lt; 3. </para> <para> <b>Retry policy:</b> The background dispatcher increments <see cref="RetryCount"/> on each failed dispatch attempt. Once <see cref="RetryCount"/> reaches 3, the row is excluded from <c>vw_PendingNotifications</c> and no further dispatch is attempted. <see cref="FailureReason"/> should be set on the final failed attempt. </para> <para> <b>Notification types:</b> Use <see cref="NotifTypes"/> constants instead of magic strings for <see cref="NotifType"/>. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/OTPVerification.cs`
+**Purpose:** Stores one-time password records used during the two-step customer registration flow. Intentionally has no FK to <c>User</c> — this row is created before the user account exists. Once the OTP is verified, <see cref="IsUsed"/> is flipped to <c>true</c> and the user account is created. <para> Expired or used rows can be purged by a maintenance job without affecting any user data. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Order.cs`
+**Purpose:** Core customer order record. Created at the end of the checkout flow and updated throughout the order lifecycle by both the WebApplication and AdminSystem. <para> <b>Computed fields (never stored):</b> <c>TotalAmount = SubTotal - DiscountAmount + ShippingFee</c> is computed in <c>vw_OrderSummary</c>. It must never be stored as a column or property. Use the view or calculate it inline in ViewModels. </para> <para> <b>Order number format:</b> <c>TBS-YYYY-NNNNN</c> (e.g. TBS-2026-00001). Generated by <c>OrderService.CreateOrderAsync</c> — unique enforced by the database unique index on <see cref="OrderNumber"/>. </para> <para> <b>OrderStatus flow:</b> <list type="bullet"> <item>Online delivery: Pending → PendingVerification → Processing → OutForDelivery → Delivered</item> <item>Store pickup: Pending → ReadyForPickup → PickedUp</item> <item>Payment hold: Pending → OnHold</item> <item>Cancellation: any non-terminal state → Cancelled</item> </list> Use <see cref="OrderStatuses"/> constants instead of magic strings for all status comparisons and assignments. </para> <para> <b>Walk-in POS orders:</b> <see cref="IsWalkIn"/> = true for orders created via the AdminSystem POS terminal. These orders have no <see cref="ShippingAddressId"/>, are created with status <c>Delivered</c> immediately, and use Cash or GCash payment only. </para> <para> <b>Inventory locking:</b> When an order is created, <c>OrderService</c> writes <c>InventoryLog</c> Lock entries for each item and decrements <c>ProductVariant.StockQuantity</c>. When the order is delivered, Unlock + Sale entries are written. When cancelled, Unlock entries are written and stock is restored. All of this happens within a single DB transaction. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/OrderItem.cs`
+**Purpose:** Represents a single product line item within a customer order. All values are locked at order creation time and are immutable thereafter. <para> <b>Computed subtotal:</b> <c>Subtotal = Quantity × UnitPrice</c> is computed in <c>vw_OrderItemDetail</c> and must never be stored as a column or property. Calculate it inline in ViewModels where needed. </para> <para> <b>Price lock:</b> <see cref="UnitPrice"/> is copied from the cart item's <c>PriceAtAdd</c> value at the moment the order is created. Subsequent changes to the product price do not affect existing order items. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/POS_Session.cs`
+**Purpose:** Represents a single cashier shift on a POS terminal in the physical store. A session begins when a cashier opens the terminal and ends when they close their shift. Walk-in orders created during the session contribute to <see cref="TotalSales"/>. <para> POS sessions are created and managed exclusively through the AdminSystem. The WebApplication entity exists to support EF Core relationship mapping and read-only reporting queries only. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Payment.cs`
+**Purpose:** Base payment record — method-agnostic. One row per payment attempt per order. Method-specific data lives in subtype tables sharing this row's PK: <list type="bullet"> <item><see cref="GCashPayment"/> — when <see cref="PaymentMethod"/> = GCash</item> <item><see cref="BankTransferPayment"/> — when <see cref="PaymentMethod"/> = BankTransfer</item> <item>No subtype row — when <see cref="PaymentMethod"/> = Cash (POS only)</item> </list> <para> <b>Payment methods:</b> GCash, BankTransfer, and Cash (POS only). COD and card payments are NOT offered by Taurus Bike Shop. Use <see cref="PaymentMethods"/> constants instead of magic strings. </para> <para> <b>Payment status flow:</b> <list type="bullet"> <item>GCash: Pending → Completed | Failed</item> <item>BankTransfer: Pending → VerificationPending → Completed | VerificationRejected | Failed</item> <item>Cash (POS): directly → Completed</item> </list> Use <see cref="PaymentStatuses"/> constants instead of magic strings. </para> <para> <b>No refunds:</b> Taurus does not offer refunds. No code path should ever set a PaymentStatus value of 'Refunded' — that value does not exist in the database CHECK constraint. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/PickupOrder.cs`
+**Purpose:** Stores store-pickup metadata for orders where the customer chose to collect in person rather than have the order delivered by a courier. <para> <b>1:1 relationship with Order:</b> This table only has rows for pickup orders. The <see cref="OrderId"/> column is both the PK and a unique FK to <c>Order.OrderId</c>, enforcing a strict 1:1 relationship. Configured in AppDbContext via HasOne/WithOne/HasForeignKey. </para> <para> <b>Pickup expiry:</b> <see cref="PickupExpiresAt"/> is set to <c>PickupReadyAt + 3 days</c> by the AdminSystem when the order is marked ReadyForPickup. <c>PendingOrderMonitorJob</c> polls this column and auto-holds orders that have not been collected by the expiry time. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/PriceHistory.cs`
+**Purpose:** Immutable price change audit log for products. Rows are written exclusively by the database trigger <c>TR_Product_PriceAudit</c> which fires AFTER UPDATE on the Product table whenever <c>Product.Price</c> changes. <para> <b>Application code must never insert, update, or delete rows in this table.</b> Any attempt to do so directly bypasses the audit mechanism and violates the immutability contract. Reads are permitted for admin reporting only. </para> <para> When the trigger fires, <see cref="ChangedByUserId"/> is NULL because the trigger has no session context. If an admin manually triggers a price update through the AdminSystem, the AdminSystem should write its own audit note to <c>SystemLog</c> with the <c>ProductUpdate</c> event type. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Product.cs`
+**Purpose:** Core product master record for the Taurus Bike Shop catalog. Represents a single sellable product — a complete bike unit, frame, component, or part. <para> <b>Stock rule (v7.0+):</b> There is NO StockQuantity column on this table. All stock lives exclusively in <see cref="ProductVariant.StockQuantity"/>. Every product must have at least one <see cref="ProductVariant"/> row. Products with no real variants use <c>VariantName = "Default"</c>. </para> <para> <b>Price audit:</b> The DB trigger <c>TR_Product_PriceAudit</c> fires AFTER UPDATE and automatically inserts a <see cref="PriceHistory"/> row whenever <see cref="Price"/> changes. Application code must never write to PriceHistory directly. </para> <para> <b>Computed fields:</b> TotalPrice per variant is computed as <c>Product.Price + ProductVariant.AdditionalPrice</c> in <c>vw_ProductVariantDetails</c>. It is never stored on either table. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/ProductImage.cs`
+**Purpose:** Stores Google Cloud Storage metadata for a product image. Binary image files live in GCS — only the URL and storage path metadata are persisted here. <para> <b>Primary image rule:</b> At most one image per product may have <see cref="IsPrimary"/> = true. This is enforced by the UX_ProductImage_Primary filtered unique index in the database. Application code in <c>FileUploadHelper</c> must clear any existing primary flag before setting a new one. </para> <para> Images are ordered for display using <see cref="DisplayOrder"/> — lower values appear first in the gallery. The primary image should typically have <see cref="DisplayOrder"/> = 0. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/ProductVariant.cs`
+**Purpose:** Represents a stock and pricing variant of a product. This is the single source of truth for inventory in the Taurus system (v7.0+). <para> <b>Stock rule:</b> All stock lives exclusively in <see cref="StockQuantity"/>. There is no StockQuantity on the Product table. Every stock change — purchase, sale, adjustment, lock, unlock — must update this column and write a corresponding <c>InventoryLog</c> row. </para> <para> <b>Default variant:</b> Products with no real variants (e.g. a single-size part) must still have exactly one ProductVariant row with <c>VariantName = "Default"</c> and <c>AdditionalPrice = 0</c>. </para> <para> <b>Computed total price:</b> The effective selling price of a variant is <c>Product.Price + AdditionalPrice</c>, computed in <c>vw_ProductVariantDetails</c>. It is never stored here. </para> <para> <b>Low-stock alert (v7.1):</b> <see cref="ReorderThreshold"/> is polled every 15 minutes by <c>StockMonitorJob</c>. When <see cref="StockQuantity"/> drops below this threshold, a LowStockAlert notification is queued for admin and a WishlistRestock notification is sent to matching wishlist customers. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/PurchaseOrder.cs`
+**Purpose:** Represents an admin-created restocking order sent to a supplier. Purchase orders are created and managed exclusively through the AdminSystem. The WebApplication entity exists only to support EF Core relationship mapping — there are no PurchaseOrder controllers or views in the WebApplication. <para> <b>Computed total:</b> <c>TotalAmount = SUM(Quantity × UnitPrice)</c> across all line items is computed in <c>vw_PurchaseOrderDetail</c> and must never be stored as a column or property. </para> <para> <b>Status flow:</b> Pending → Received | Cancelled. Use <see cref="PurchaseOrderStatuses"/> constants instead of magic strings. </para> <para> <b>Stock receiving:</b> When the AdminSystem marks a PO as Received, <c>SupplierRepository.ReceiveStockAsync</c> updates <c>ProductVariant.StockQuantity</c> and writes <c>InventoryLog</c> Purchase entries for each received item — all within a single DB transaction. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/PurchaseOrderItem.cs`
+**Purpose:** Represents a single product line item within a supplier purchase order. All values are locked at purchase order creation time and are immutable thereafter. <para> <b>Computed subtotal:</b> <c>Subtotal = Quantity × UnitPrice</c> is computed in <c>vw_PurchaseOrderDetail</c> and must never be stored as a column or property. </para> <para> <b>UnitPrice lock:</b> <see cref="UnitPrice"/> records the wholesale price agreed with the supplier at the time the PO was created. Changes to the product's retail price after PO creation do not affect this value. </para> <para> <b>Stock receiving:</b> When the AdminSystem receives stock for this line item, <c>SupplierRepository.ReceiveStockAsync</c> increments <c>ProductVariant.StockQuantity</c> by the received quantity and writes an <c>InventoryLog</c> row with <c>ChangeType = Purchase</c>. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Review.cs`
+**Purpose:** Represents a customer product review submitted after confirmed delivery. <para> <b>Verified purchase requirement:</b> A review can only be submitted when <c>ReviewService.HasVerifiedPurchaseAsync</c> confirms that the submitting user has a Delivered order containing the reviewed product. <see cref="IsVerifiedPurchase"/> is set to <c>true</c> by the service after this check passes. </para> <para> <b>Rating range:</b> 1–5 stars, enforced by CK_Review_Rating. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Role.cs`
+**Purpose:** Represents a system role assigned to users via the <see cref="UserRole"/> junction table. Valid role names are enforced by the CK_Role_Name CHECK constraint on the database.
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/StorePaymentAccount.cs`
+**Purpose:** A store-owned payment account (GCash number / BPI account) that customers should send money to. Rows are managed by admin via AdminSystem_v2 so account numbers can rotate without a redeploy. <para> At most one row per <see cref="PaymentMethod"/> may have <c>IsActive = true</c> (enforced by a filtered unique index). </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Supplier.cs`
+**Purpose:** Represents an external supplier used for product restocking via purchase orders. Suppliers are managed exclusively through the AdminSystem. The WebApplication exposes supplier data as read-only via <c>SupplierRepository</c> (no controller or views on the web side).
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/SupportTask.cs`
+**Purpose:** An actionable follow-up task linked to a support ticket (added in v7.1). Tasks are distinct from replies — they have their own assignee, status lifecycle, and due date. Created and managed exclusively by AdminSystem staff. <para> <b>Task type rule:</b> Valid TaskType values are: ShipReplacement, ArrangeReturn, ContactSupplier, Other. The 'IssueRefund' value was removed in the v7.1 patch because Taurus does not offer refunds. Never add IssueRefund back. Use <see cref="SupportTaskTypes"/> constants instead of magic strings. </para> <para> <b>Status lifecycle:</b> Pending → InProgress → Done | Cancelled. Use <see cref="SupportTaskStatuses"/> constants instead of magic strings. <see cref="CompletedAt"/> is set when status transitions to Done. </para> <para> Cascade-deleted when the parent <see cref="SupportTicket"/> is deleted. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/SupportTicket.cs`
+**Purpose:** Represents a customer support ticket. Can be raised by a customer via the WebApplication, by an admin via AdminSystem, or automatically by the system. <para> <b>Web vs Admin responsibilities:</b> The WebApplication creates tickets and allows customers to read their own. The AdminSystem handles replies, task assignment, status updates, and resolution. </para> <para> <b>Ticket status flow:</b> Open → InProgress → AwaitingResponse → Resolved | Closed. Use <see cref="TicketStatuses"/> constants instead of magic strings. </para> <para> <b>Attachments:</b> File attachments are stored in Google Cloud Storage. Only the GCS URL and path metadata are stored here — the binary file lives in GCS. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/SupportTicketReply.cs`
+**Purpose:** A single reply message within a support ticket thread. Both customers and admin/staff can reply to tickets. <see cref="IsAdminReply"/> distinguishes between customer and staff messages. <para> <b>Responsibilities by application:</b> <list type="bullet"> <item>WebApplication — customers read replies via the ticket detail page.</item> <item>AdminSystem — staff create replies via <c>SupportService.ReplyToTicketAsync</c>, which also updates <c>SupportTicket.TicketStatus</c> to AwaitingResponse and queues a SupportTicketReply notification to the customer.</item> </list> </para> <para> Cascade-deleted when the parent <see cref="SupportTicket"/> is deleted. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/SystemLog.cs`
+**Purpose:** Immutable audit trail for admin actions and background job lifecycle events. Every significant state change in the system — user actions, payment events, inventory changes, background job cycles — writes a row here. <para> <see cref="UserId"/> is NULL for automated or system-generated events (e.g. background job runs, trigger-fired actions). </para> <para> Rows in this table must never be updated or deleted — they are an append-only audit log. Use <see cref="SystemLogEvents"/> constants for the <see cref="EventType"/> value instead of magic strings. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/User.cs`
+**Purpose:** Represents a user account — covers registered customers, admin/staff, and the anonymous walk-in POS placeholder. Email and PasswordHash are nullable to support the walk-in placeholder row (IsWalkIn = true). <para> Circular FK: <see cref="DefaultAddressId"/> → <see cref="Address.AddressId"/> is a deferred relationship added via ALTER TABLE and configured in AppDbContext using <c>IsRequired(false)</c> to avoid EF Core circular-insert issues. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/UserRole.cs`
+**Purpose:** Junction table that assigns roles to users (N:M between User and Role). A user may have multiple roles (e.g. Admin + Cashier). The combination of <see cref="UserId"/> and <see cref="RoleId"/> is unique — enforced by UX_UserRole_Pair in the database — preventing duplicate assignments. <para> CASCADE DELETE is configured on the User side — removing a user removes all their role assignments. The Role side has no cascade to prevent accidental role-wide deletions. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/UserVoucher.cs`
+**Purpose:** Assigns a voucher to a specific user, controlling per-user voucher access. Not all vouchers require a UserVoucher row — public vouchers (e.g. promotional codes shared on social media) can be used by any authenticated user without a UserVoucher assignment. Assigned vouchers are visible in the user's voucher wallet. <para> The combination of <see cref="UserId"/> and <see cref="VoucherId"/> is unique — enforced by UX_UserVoucher_Pair in the database. A user cannot be assigned the same voucher twice. </para> <para> <see cref="ExpiresAt"/> is an optional per-user override of the voucher's global <c>Voucher.EndDate</c>. When set, the earlier of the two dates applies. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Voucher.cs`
+**Purpose:** Represents a discount voucher definition — either percentage-based or fixed-amount. Vouchers are created and managed in the AdminSystem. The WebApplication validates and applies them during checkout via <c>VoucherService</c>. <para> Validation chain (enforced in <c>VoucherService.ValidateAsync</c> in strict order): <list type="number"> <item>Voucher exists and <see cref="IsActive"/> is <c>true</c></item> <item><see cref="StartDate"/> &lt;= now &lt;= <see cref="EndDate"/> (if set)</item> <item>Cart subtotal &gt;= <see cref="MinimumOrderAmount"/> (if set)</item> <item>Global usage count &lt; <see cref="MaxUses"/> (if set)</item> <item>Per-user usage count &lt; <see cref="MaxUsesPerUser"/> (if set)</item> </list> </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/VoucherUsage.cs`
+**Purpose:** Immutable redemption log — records each successful voucher application to an order. One row is written per voucher per order by <c>VoucherService.ApplyAsync</c> at the moment the order is confirmed. <para> <b>Usage counting:</b> This table is the source of truth for voucher usage counts. <c>VoucherRepository.GetGlobalUsageCountAsync</c> and <c>GetUserUsageCountAsync</c> COUNT rows here to enforce <c>Voucher.MaxUses</c> and <c>Voucher.MaxUsesPerUser</c> limits during the validation chain in <c>VoucherService.ValidateAsync</c>. </para> <para> Rows in this table must never be updated or deleted — they are an append-only redemption audit log. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `Entities/Wishlist.cs`
+**Purpose:** Represents a product saved to a customer's wishlist. Typically used when a product is out of stock — the customer saves it and receives a WishlistRestock notification when stock is restored. <para> <b>Uniqueness rule:</b> A user can save a product to their wishlist only once. Enforced by UX_Wishlist_UserProduct unique index on (UserId, ProductId). <c>WishlistService.AddAsync</c> handles this idempotently — duplicate add attempts are silently ignored. </para> <para> <b>Stock monitor integration:</b> <c>StockMonitorJob</c> reads wishlist rows via <c>WishlistRepository.GetUserIdsForProductAsync</c> to find which customers should receive a WishlistRestock notification when a variant's stock is restored above its ReorderThreshold. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `ErrorViewModel.cs`
+**Purpose:** Model for the unhandled exception fallback view (<c>Error.cshtml</c>). Populated by <c>HomeController.Error</c> from the HTTP context.
+
+**Functions / Methods:** None or simple data structure.
+
+### `SmtpSettings.cs`
+**Purpose:** Configuration for the Gmail SMTP email sender. Bound from the "SmtpSettings" section in appsettings.json. <para> <b>Gmail App Password:</b> Use a Gmail App Password (not your regular password). Generate one at https://myaccount.google.com/apppasswords — requires 2FA enabled. Store the password in User Secrets or environment variables, never in appsettings.json. </para>
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/AssignedVoucherViewModel.cs`
+**Purpose:** DTO representing an active voucher assigned to a user, suitable for displaying in the checkout combobox.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/CartViewModel.cs`
+**Purpose:** View model for the full shopping cart page and the order summary sidebar. Populated by <c>CartService.GetCartViewModelAsync</c>.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/CheckoutViewModel.cs`
+**Purpose:** View model for the checkout page — shipping, payment method, voucher entry, and the read-only order summary sidebar. Bound to the checkout form POST.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/DashboardViewModel.cs`
+**Purpose:** View model for the customer dashboard page. Aggregates data from orders, wishlist, reviews, and support into a single load so the dashboard controller makes one service call per data source.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/LoginViewModel.cs`
+**Purpose:** ViewModel for the customer login form. Validated by data annotations at the ViewModel level; credential verification is performed by <c>UserService.LoginAsync</c>.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/NotificationViewModel.cs`
+**Purpose:** View model for a single notification item on the Notifications page.
+
+**Functions / Methods:**
+- `FormatTimeAgo`
+
+### `ViewModels/OrderViewModel.cs`
+**Purpose:** View model for order confirmation, order detail, and order history rows. Populated by <c>OrderService</c>.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/ProductDetailViewModel.cs`
+**Purpose:** Rich view model for the product detail page. Populated by <c>ProductService.GetByIdAsync</c>.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/ProductViewModel.cs`
+**Purpose:** Lightweight product model for listing cards in the catalog grid. Populated by <c>ProductService.GetFilteredAsync</c> and <c>ProductService.GetFeaturedAsync</c>.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/ProfileViewModel.cs`
+**Purpose:** ViewModel for the customer profile view and edit form. Contains personal info, saved addresses, and the change-password sub-model.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/RegisterViewModel.cs`
+**Purpose:** ViewModel for the customer registration form. Validated by data annotations at the ViewModel level; OTP sending and account creation are performed by <c>UserService</c>.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/ReviewViewModel.cs`
+**Purpose:** Represents a single review entry for display in the reviews feed.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/SupportViewModel.cs`
+**Purpose:** A single row in the customer's support ticket list page.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/VoucherViewModels.cs`
+**Purpose:** JSON request body sent by the voucher input widget when applying a code.
+
+**Functions / Methods:** None or simple data structure.
+
+### `ViewModels/WishlistViewModel.cs`
+**Purpose:** View model for the customer wishlist page. Populated by <c>WishlistService.GetWishlistAsync</c>.
+
+**Functions / Methods:** None or simple data structure.
+
+## Views
+---
+
+### `Customer/Cart.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Checkout.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Confirmation.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Dashboard.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Login.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Notifications.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/OrderDetail.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/OrderHistory.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_CartItem.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_ConfirmationModal.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_DeliverySelection.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_NotificationAlert.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_OTPModal.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_OrderStatusBadge.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_OrderSummary.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_PaymentMethod.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_PaymentStatusBadge.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_ProductCard.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_ReviewForm.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_ReviewList.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_SupportTicketCard.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Partials/_TicketStatusBadge.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Payment.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/ProductCatalog.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/ProductDetails.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Profile.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/PurchaseOrderDetail.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/PurchaseOrderList.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Register.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Review.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Reviews.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/SupplierList.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/SupportCreate.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/SupportDetail.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/SupportList.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Customer/Wishlist.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Home/Index.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Home/Privacy.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Shared/Error.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Shared/_Footer.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Shared/_Layout.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Shared/_Navbar.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `Shared/_ValidationScriptsPartial.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `_ViewImports.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+### `_ViewStart.cshtml`
+**Type:** ASP.NET Razor View (HTML/C#)
+**Purpose:** Defines the frontend UI structure and renders data from the models.
+
+## BackgroundJobs
+---
+
+### `DeliveryStatusPollJob.cs`
+**Purpose:** Polls active deliveries every 5 minutes to pick up courier-reported status changes and propagate them to the Delivery table. Flowchart: Part 8 — "Monitor Delivery Progress" (O11). <para> <b>Scope of responsibility — AdminSystem books, this job polls:</b> The actual courier booking (selecting Lalamove or LBC, calling their APIs, and receiving a booking reference) is an AdminSystem action — flowchart Part 8 nodes O6A through O9. This job is invoked only AFTER those booking references are written to <c>LalamoveDelivery.BookingRef</c> or <c>LBCDelivery.TrackingNumber</c>. Deliveries with a null booking reference are skipped each cycle with a debug-level log. </para> <para> <b>Current integration state:</b> Lalamove and LBC API clients are not yet connected. Both <c>PollLalamoveAsync</c> and <c>PollLBCAsync</c> are stubs that return <c>null</c> (no status change). See their XML docs for integration steps. </para> <para> <b>Notification pattern:</b> Status changes are persisted via <c>SaveChangesAsync</c> before notifications are queued. A notification failure therefore never rolls back a status update. Only terminal or customer-visible transitions queue notifications: Delivered → <c>DeliveryConfirmation</c> (flowchart O12), Failed → <c>TrackingUpdate</c> alert (flowchart O11C). </para>
+
+**Functions / Methods:**
+- `RunCycleAsync`
+- `PollCourierStatusAsync`
+- `LogAndSkipUnknownCourier`
+- `PollLalamoveAsync`
+- `PollLBCAsync`
+- `QueueStatusChangeNotificationAsync`
+
+### `InventorySyncJob.cs`
+**Purpose:** Polls the product-variant table every 10 seconds to keep a live inventory count available to the rest of the application. Flowchart: Part 11 — "Every 10 Seconds". <para> SystemLog summary entries are throttled to once every 5 minutes to prevent log flooding (10-second intervals would otherwise produce ~8,640 rows/day of BackgroundJobStart/Complete noise). </para>
+
+**Functions / Methods:**
+- `RunCycleAsync`
+
+### `NotificationDispatchJob.cs`
+**Purpose:** Background job that polls the Notification table for pending email notifications and dispatches them via <see cref="IEmailSender"/> (Gmail SMTP). <para> <b>Poll interval:</b> Every 30 seconds. <b>Retry policy:</b> Up to 3 attempts per notification. On the 3rd failure, the notification is marked as Failed with a reason. </para>
+
+**Functions / Methods:**
+- `DispatchPendingAsync`
+
+### `PaymentTimeoutJob.cs`
+**Purpose:** Checks every 5 minutes for orders in PaymentVerification whose bank-transfer payment proof has passed its <c>BankTransferPayment.VerificationDeadline</c>. Moves them to OnHold and queues a PaymentHeld notification to the customer. Flowchart: Part 13 / J3 — "Every 5 Minutes", J3B — "Queue Alert". <para> The deadline is read from <c>BankTransferPayment.VerificationDeadline</c> — the admin-settable column written by <c>PaymentService</c> at proof-upload time (<c>SubmittedAt + 24 h</c>). This column is the authoritative source: it reflects the actual proof-upload timestamp and can be extended by an admin in the AdminSystem. Using <c>Payment.CreatedAt</c> as a fallback would ignore both of these facts and produce incorrect timeouts. </para> <para> Execution order within each cycle: <list type="number"> <item>Load expired orders — filter on <c>BankTransferPayment.VerificationDeadline &lt; UtcNow</c>.</item> <item>Set OrderStatus = OnHold + write SystemLog entries for each order.</item> <item>SaveChangesAsync — status transitions are committed before any notification work, so a partial notification failure never leaves an order in a corrupted state.</item> <item>Queue PaymentHeld email per customer (per-order try/catch so one bad address never prevents other customers from being notified).</item> </list> </para>
+
+**Functions / Methods:**
+- `RunCycleAsync`
+
+### `PendingOrderMonitorJob.cs`
+**Purpose:** Checks every 5 minutes for orders that have been in Pending status for over 24 hours and queues a PendingOrderAlert notification to all admin and manager users. Flowchart: Part 12 / J2 — "Every 5 Minutes", alert threshold "> 24 Hours", J2B — "Notify Admin". <para> Deduplication: a PendingOrderAlert is only queued once per order per 24-hour window. The check is performed against the Notifications table — if any PendingOrderAlert row for the same OrderId was inserted within the last 24 hours the order is skipped for this cycle. </para>
+
+**Functions / Methods:**
+- `RunCycleAsync`
+
+### `StockMonitorJob.cs`
+**Purpose:** Background job that runs every 15 minutes to check whether any active <see cref="ProductVariant"/> has fallen below its <c>ReorderThreshold</c>. <para> When a variant is detected as low-stock, two notification paths are triggered: <list type="bullet"> <item><description> <b>Admin/Manager alert (<see cref="NotifTypes.LowStockAlert"/>):</b> All active users holding the Admin or Manager role receive an email prompting them to raise a purchase order. </description></item> <item><description> <b>Wishlist customer nudge (<see cref="NotifTypes.WishlistRestock"/>):</b> Any active customer who has the product in their wishlist and where <c>StockQuantity &gt; 0</c> receives a "last chance" email urging them to order before stock runs out. </description></item> </list> </para> <para> <b>Cooldown / deduplication:</b> A 24-hour cooldown is enforced per variant using the <c>SystemLog</c> table. If a <see cref="SystemLogEvents.LowStockTriggered"/> entry already exists for the variant within the cooldown window, both notifications are skipped to prevent spam on every 15-minute cycle. The <c>LowStockTriggered</c> SystemLog row is written BEFORE notifications are queued so that the cooldown record survives even if individual notification inserts fail. </para> <para> Flowchart references: Part 12 (INV7–INV9A), Part 14 (JOB 4 / J4A–J4B). </para>
+
+**Functions / Methods:**
+- `RunCycleAsync`
+

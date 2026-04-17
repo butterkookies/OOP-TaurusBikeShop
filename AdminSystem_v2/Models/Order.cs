@@ -74,7 +74,7 @@ namespace AdminSystem_v2.Models
     public static class OrderStatuses
     {
         public const string Pending             = "Pending";
-        public const string PendingVerification = "PendingVerification";
+        public const string PaymentVerification = "PendingVerification";
         public const string Processing          = "Processing";
         public const string OnHold              = "OnHold";
         public const string ReadyForPickup      = "ReadyForPickup";
@@ -96,8 +96,8 @@ namespace AdminSystem_v2.Models
         public static readonly IReadOnlyDictionary<string, IReadOnlySet<string>> AllowedTransitions =
             new Dictionary<string, IReadOnlySet<string>>
             {
-                [Pending]             = new HashSet<string> { PendingVerification, Processing, ReadyForPickup, OutForDelivery, Cancelled },
-                [PendingVerification] = new HashSet<string> { Processing, OnHold, Pending, Cancelled },
+                [Pending]             = new HashSet<string> { PaymentVerification, Processing, ReadyForPickup, OutForDelivery, Cancelled },
+                [PaymentVerification] = new HashSet<string> { Processing, OnHold, Pending, Cancelled },
                 [Processing]          = new HashSet<string> { ReadyForPickup, OutForDelivery, Cancelled },
                 [OnHold]              = new HashSet<string> { Processing, Cancelled },
                 [ReadyForPickup]      = new HashSet<string> { PickedUp },
@@ -116,6 +116,24 @@ namespace AdminSystem_v2.Models
         {
             return AllowedTransitions.TryGetValue(currentStatus, out var allowed)
                 && allowed.Contains(newStatus);
+        }
+
+        /// <summary>
+        /// Returns true when moving from <paramref name="currentStatus"/> to
+        /// <paramref name="newStatus"/> is a valid forward transition, constrained by the delivery type.
+        /// </summary>
+        public static bool IsValidTransition(string currentStatus, string newStatus, string deliveryType)
+        {
+            if (!IsValidTransition(currentStatus, newStatus))
+                return false;
+
+            if (deliveryType == OrderTypes.Delivery && (newStatus == ReadyForPickup || newStatus == PickedUp))
+                return false;
+
+            if (deliveryType == OrderTypes.Pickup && (newStatus == OutForDelivery || newStatus == Delivered))
+                return false;
+
+            return true;
         }
     }
 

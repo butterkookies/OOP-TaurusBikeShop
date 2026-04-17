@@ -23,8 +23,8 @@ namespace WebApplication.Models.Entities;
 /// </summary>
 public sealed class SupportTicketReply
 {
-    /// <summary>Primary key — auto-increment identity.</summary>
-    public int ReplyId { get; set; }
+    /// <summary>Primary key — auto-increment identity (bigint).</summary>
+    public long ReplyId { get; set; }
 
     /// <summary>
     /// FK to the parent support ticket.
