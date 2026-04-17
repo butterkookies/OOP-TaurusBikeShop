@@ -625,107 +625,109 @@ erDiagram
 ### **User**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| UserId | int | PK, IDENTITY | Unique identifier for each user |
+| UserId | int | PK, IDENTITY, NOT NULL | Unique identifier for each user |
 | Email | nvarchar(255) | NULLABLE | User's email address, used for login |
 | PasswordHash | nvarchar(255) | NULLABLE | BCrypt-hashed password (work factor 12) |
 | FirstName | nvarchar(100) | NOT NULL | User's first name |
 | LastName | nvarchar(100) | NOT NULL | User's last name |
 | PhoneNumber | nvarchar(20) | NULLABLE | Contact phone number |
-| DefaultAddressId | int | FK → Address | User's default shipping address |
+| DefaultAddressId | int | NULLABLE | User's default shipping address |
 | IsActive | bit | NOT NULL | Whether the account is active |
 | IsWalkIn | bit | NOT NULL | True for the special POS walk-in user |
-| CreatedAt | datetime2 | NOT NULL | Account creation timestamp |
-| LastLoginAt | datetime2 | NULLABLE | Most recent login timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Account creation timestamp |
+| LastLoginAt | datetime2(7) | NULLABLE | Most recent login timestamp |
 | FailedLoginAttempts | int | NOT NULL | Counter for lockout logic |
-| LockoutUntil | datetime2 | NULLABLE | Lockout expiry timestamp |
+| LockoutUntil | datetime2(7) | NULLABLE | Lockout expiry timestamp |
 | IsDeleted | bit | NOT NULL | Soft-delete flag |
 
 ### **Role**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| RoleId | int | PK, IDENTITY | Unique role identifier |
-| RoleName | nvarchar(50) | UNIQUE, NOT NULL | Role name (e.g., Admin, Manager, Customer) |
+| RoleId | int | PK, IDENTITY, NOT NULL | Unique role identifier |
+| RoleName | nvarchar(50) | PK, NOT NULL | Role name (e.g., Admin, Manager, Customer) |
 | Description | nvarchar(255) | NULLABLE | Human-readable role description |
-| CreatedAt | datetime2 | NOT NULL | Role creation timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Role creation timestamp |
 
 ### **UserRole**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| UserRoleId | int | PK, IDENTITY | Unique assignment identifier |
-| UserId | int | FK → User, UNIQUE(UserId,RoleId) | The user being assigned |
-| RoleId | int | FK → Role, UNIQUE(UserId,RoleId) | The role being assigned |
-| AssignedAt | datetime2 | NOT NULL | When the role was assigned |
+| UserRoleId | int | PK, IDENTITY, NOT NULL | Unique assignment identifier |
+| UserId | int | PK, NOT NULL | The user being assigned |
+| RoleId | int | PK, NOT NULL | The role being assigned |
+| AssignedAt | datetime2(7) | NOT NULL | When the role was assigned |
 
 ### **Address**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| AddressId | int | PK, IDENTITY | Unique address identifier |
-| UserId | int | FK → User, NOT NULL | Owner of the address |
-| Label | nvarchar(50) | CHECK (Home/Work/Other) | Address label type |
+| AddressId | int | PK, IDENTITY, NOT NULL | Unique address identifier |
+| UserId | int | NOT NULL | Owner of the address |
+| Label | nvarchar(50) | NOT NULL | Address label type |
 | Street | nvarchar(500) | NOT NULL | Street address line |
 | City | nvarchar(100) | NOT NULL | City name |
 | PostalCode | nvarchar(20) | NOT NULL | ZIP/postal code |
 | Province | nvarchar(100) | NULLABLE | Province or state |
-| Country | nvarchar(100) | DEFAULT 'Philippines' | Country name |
-| IsDefault | bit | DEFAULT 0 | Whether this is the user's default address |
-| IsSnapshot | bit | DEFAULT 0 | True for order-time address snapshots (immutable) |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
+| Country | nvarchar(100) | NOT NULL | Country name |
+| IsDefault | bit | NOT NULL | Whether this is the user's default address |
+| IsSnapshot | bit | NOT NULL | True for order-time address snapshots (immutable) |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
 
 ### **ActiveSession**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| SessionId | int | PK, IDENTITY | Unique session identifier |
-| UserId | int | FK → User | The logged-in user |
-| SessionToken | nvarchar(500) | NOT NULL | Unique session token |
-| IsRevoked | bit | DEFAULT 0 | Whether the session was manually revoked |
-| ExpiresAt | datetime2 | NOT NULL | Session expiry timestamp |
-| CreatedAt | datetime2 | NOT NULL | Session creation timestamp |
+| SessionId | int | PK, IDENTITY, NOT NULL | Unique session identifier |
+| UserId | int | NOT NULL | The logged-in user |
+| RefreshToken | nvarchar(500) | NOT NULL | (Missing description) |
+| DeviceInfo | nvarchar(500) | NULLABLE | (Missing description) |
+| IpAddress | nvarchar(50) | NULLABLE | (Missing description) |
+| IsRevoked | bit | NOT NULL | Whether the session was manually revoked |
+| ExpiresAt | datetime2(7) | NOT NULL | Session expiry timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Session creation timestamp |
+| RevokedAt | datetime2(7) | NULLABLE | (Missing description) |
 
 ### **OTPVerification**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| OTPId | int | PK, IDENTITY | Unique OTP identifier |
+| OTPId | int | PK, IDENTITY, NOT NULL | Unique OTP identifier |
 | Email | nvarchar(255) | NOT NULL | Target email address |
 | OTPCode | nvarchar(128) | NOT NULL | Hashed OTP code |
 | IsUsed | bit | NOT NULL | Whether the code has been consumed |
-| ExpiresAt | datetime2 | NOT NULL | Code expiration timestamp |
-| CreatedAt | datetime2 | NOT NULL | Code creation timestamp |
+| ExpiresAt | datetime2(7) | NOT NULL | Code expiration timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Code creation timestamp |
 
 ### **Category**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| CategoryId | int | PK, IDENTITY | Unique category identifier |
-| ParentCategoryId | int | FK → Category (self) | Parent category for hierarchy |
+| CategoryId | int | PK, IDENTITY, NOT NULL | Unique category identifier |
+| CategoryCode | varchar(20) | PK, NOT NULL | URL-friendly category slug |
 | Name | nvarchar(100) | NOT NULL | Display name |
-| CategoryCode | nvarchar(50) | NULLABLE | URL-friendly category slug |
 | Description | nvarchar(500) | NULLABLE | Category description |
-| IsActive | bit | DEFAULT 1 | Whether category is visible |
-| DisplayOrder | int | DEFAULT 0 | Sort order in listings |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
+| ParentCategoryId | int | NULLABLE | Parent category for hierarchy |
+| IsActive | bit | NOT NULL | Whether category is visible |
+| DisplayOrder | int | NOT NULL | Sort order in listings |
 
 ### **Brand**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| BrandId | int | PK, IDENTITY | Unique brand identifier |
-| BrandName | nvarchar(100) | UNIQUE, NOT NULL | Brand name |
+| BrandId | int | PK, IDENTITY, NOT NULL | Unique brand identifier |
+| BrandName | nvarchar(100) | PK, NOT NULL | Brand name |
 | Country | nvarchar(100) | NULLABLE | Brand's country of origin |
 | Website | nvarchar(255) | NULLABLE | Brand website URL |
 | Description | nvarchar(500) | NULLABLE | Brand description |
-| IsActive | bit | DEFAULT 1 | Whether brand is active |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
+| IsActive | bit | NOT NULL | Whether brand is active |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
 
 ### **Product**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| ProductId | int | PK, IDENTITY | Unique product identifier |
-| CategoryId | int | FK → Category, NOT NULL | Product's category |
-| BrandId | int | FK → Brand, NULLABLE | Product's brand |
+| ProductId | int | PK, IDENTITY, NOT NULL | Unique product identifier |
+| CategoryId | int | NOT NULL | Product's category |
+| BrandId | int | NULLABLE | Product's brand |
 | SKU | varchar(50) | NULLABLE | Stock Keeping Unit code |
 | Name | nvarchar(200) | NOT NULL | Product display name |
 | ShortDescription | nvarchar(300) | NULLABLE | Brief product summary |
 | Description | nvarchar(max) | NULLABLE | Full product description |
-| Price | decimal(10,2) | NOT NULL, CHECK ≥ 0 | Base price in specified currency |
-| Currency | char(3) | CHECK (PHP/USD/EUR) | Price currency code |
+| Price | decimal(10, 2) | NOT NULL | Base price in specified currency |
+| Currency | char(3) | NOT NULL | Price currency code |
 | Material | nvarchar(100) | NULLABLE | Material specification |
 | Color | nvarchar(100) | NULLABLE | Product color |
 | WheelSize | nvarchar(20) | NULLABLE | Bike wheel size |
@@ -735,31 +737,31 @@ erDiagram
 | AxleStandard | nvarchar(50) | NULLABLE | Axle standard specification |
 | SuspensionTravel | nvarchar(50) | NULLABLE | Suspension travel distance |
 | BrakeType | nvarchar(100) | NULLABLE | Brake type specification |
-| AdditionalSpecs | nvarchar(1000) | CHECK ISJSON | Additional specs as JSON |
+| AdditionalSpecs | nvarchar(1000) | NULLABLE | Additional specs as JSON |
 | IsActive | bit | NOT NULL | Whether product is listed |
 | IsFeatured | bit | NOT NULL | Whether shown on homepage |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
-| UpdatedAt | datetime2 | NULLABLE | Last modification timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
+| UpdatedAt | datetime2(7) | NULLABLE | Last modification timestamp |
 
 ### **ProductVariant**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| ProductVariantId | int | PK, IDENTITY | Unique variant identifier |
-| ProductId | int | FK → Product, NOT NULL | Parent product |
+| ProductVariantId | int | PK, IDENTITY, NOT NULL | Unique variant identifier |
+| ProductId | int | NOT NULL | Parent product |
 | VariantName | nvarchar(100) | NOT NULL | Variant display name (e.g., "Size M", "Red") |
 | SKU | nvarchar(50) | NULLABLE | Variant-specific SKU |
-| AdditionalPrice | decimal(10,2) | NOT NULL | Price added to base product price |
+| AdditionalPrice | decimal(10, 2) | NOT NULL | Price added to base product price |
 | StockQuantity | int | NOT NULL | Current stock level |
 | IsActive | bit | NOT NULL | Whether variant is available |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
+| UpdatedAt | datetime2(7) | NULLABLE | Last modification timestamp |
 | ReorderThreshold | int | NOT NULL | Low-stock alert threshold |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
-| UpdatedAt | datetime2 | NULLABLE | Last modification timestamp |
 
 ### **ProductImage**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| ProductImageId | int | PK, IDENTITY | Unique image identifier |
-| ProductId | int | FK → Product, NOT NULL | Associated product |
+| ProductImageId | int | PK, IDENTITY, NOT NULL | Unique image identifier |
+| ProductId | int | NOT NULL | Associated product |
 | StorageBucket | nvarchar(200) | NOT NULL | GCS bucket name |
 | StoragePath | nvarchar(1000) | NOT NULL | GCS storage path |
 | ImageUrl | nvarchar(1000) | NOT NULL | Public image URL |
@@ -771,99 +773,100 @@ erDiagram
 | MimeType | nvarchar(50) | NULLABLE | MIME type (e.g., image/webp) |
 | Width | int | NULLABLE | Image width in pixels |
 | Height | int | NULLABLE | Image height in pixels |
-| CreatedAt | datetime2 | NOT NULL | Upload timestamp |
-| UploadedByUserId | int | FK → User | Admin who uploaded the image |
+| UploadedByUserId | int | NULLABLE | Admin who uploaded the image |
+| CreatedAt | datetime2(7) | NOT NULL | Upload timestamp |
 
 ### **PriceHistory**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| PriceHistoryId | int | PK, IDENTITY | Unique history identifier |
-| ProductId | int | FK → Product, NOT NULL | Product whose price changed |
-| OldPrice | decimal(10,2) | NOT NULL | Previous price |
-| NewPrice | decimal(10,2) | NOT NULL | Updated price |
-| ChangedAt | datetime2 | NOT NULL | When the change occurred |
-| ChangedByUserId | int | FK → User, NULLABLE | Admin who made the change |
+| PriceHistoryId | int | PK, IDENTITY, NOT NULL | Unique history identifier |
+| ProductId | int | NOT NULL | Product whose price changed |
+| OldPrice | decimal(10, 2) | NOT NULL | Previous price |
+| NewPrice | decimal(10, 2) | NOT NULL | Updated price |
+| ChangedAt | datetime2(7) | NOT NULL | When the change occurred |
+| ChangedByUserId | int | NULLABLE | Admin who made the change |
 | Notes | nvarchar(500) | NULLABLE | Reason for price change |
 
 ### **GuestSession**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| GuestSessionId | int | PK, IDENTITY | Unique guest session identifier |
-| SessionToken | nvarchar(100) | UNIQUE, CHECK LEN ≥ 32 | Secure session token stored in cookie |
+| GuestSessionId | int | PK, IDENTITY, NOT NULL | Unique guest session identifier |
+| SessionToken | nvarchar(100) | PK, NOT NULL | Secure session token stored in cookie |
 | Email | nvarchar(255) | NULLABLE | Guest's email if provided |
 | PhoneNumber | nvarchar(20) | NULLABLE | Guest's phone if provided |
-| ConvertedToUserId | int | FK → User, NULLABLE | Set when guest registers |
-| ExpiresAt | datetime2 | NOT NULL | Session expiry (7 days) |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
+| ConvertedToUserId | int | NULLABLE | Set when guest registers |
+| ExpiresAt | datetime2(7) | NOT NULL | Session expiry (7 days) |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
 
 ### **Cart**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| CartId | int | PK, IDENTITY | Unique cart identifier |
-| UserId | int | FK → User, NULLABLE | Authenticated cart owner |
-| GuestSessionId | int | FK → GuestSession, NULLABLE | Guest cart owner |
-| CreatedAt | datetime2 | NOT NULL | Cart creation timestamp |
-| IsCheckedOut | bit | DEFAULT 0 | Whether cart has been converted to an order |
+| CartId | int | PK, IDENTITY, NOT NULL | Unique cart identifier |
+| UserId | int | NULLABLE | Authenticated cart owner |
+| GuestSessionId | int | NULLABLE | Guest cart owner |
+| CreatedAt | datetime2(7) | NOT NULL | Cart creation timestamp |
+| LastUpdatedAt | datetime2(7) | NULLABLE | (Missing description) |
+| IsCheckedOut | bit | NOT NULL | Whether cart has been converted to an order |
 
 > **CHECK Constraint:** `CK_Cart_Owner` — Exactly one of UserId or GuestSessionId must be non-null.
 
 ### **CartItem**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| CartItemId | int | PK, IDENTITY | Unique cart item identifier |
-| CartId | int | FK → Cart, NOT NULL | Parent cart |
-| ProductId | int | FK → Product, NOT NULL | Product added |
-| ProductVariantId | int | FK → ProductVariant, NULLABLE | Selected variant |
-| Quantity | int | CHECK > 0 | Quantity in cart |
-| PriceAtAdd | decimal(10,2) | CHECK ≥ 0 | Price captured at add time |
-| AddedAt | datetime2 | NOT NULL | When item was added |
+| CartItemId | int | PK, IDENTITY, NOT NULL | Unique cart item identifier |
+| CartId | int | NOT NULL | Parent cart |
+| ProductId | int | NOT NULL | Product added |
+| ProductVariantId | int | NULLABLE | Selected variant |
+| Quantity | int | NOT NULL | Quantity in cart |
+| PriceAtAdd | decimal(10, 2) | NOT NULL | Price captured at add time |
+| AddedAt | datetime2(7) | NOT NULL | When item was added |
 
 ### **Order**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| OrderId | int | PK, IDENTITY | Unique order identifier |
-| UserId | int | FK → User, NULLABLE | Customer who placed the order |
-| OrderNumber | nvarchar(50) | UNIQUE, NOT NULL | Formatted order number (e.g., TBS-2026-00001) |
-| OrderDate | datetime2 | NOT NULL | When the order was placed |
-| OrderStatus | nvarchar(50) | CHECK (Pending/PendingVerification/OnHold/Processing/ReadyForPickup/PickedUp/OutForDelivery/Delivered/Cancelled) | Current order status |
-| SubTotal | decimal(10,2) | CHECK ≥ 0 | Sum of line item totals |
-| DiscountAmount | decimal(10,2) | CHECK ≥ 0 | Voucher discount applied |
-| ShippingFee | decimal(10,2) | CHECK ≥ 0 | Delivery fee |
-| TotalAmount | decimal(10,2) | COMPUTED PERSISTED | `(SubTotal - DiscountAmount) + ShippingFee` |
-| FulfillmentType | nvarchar(20) | CHECK (Delivery/Pickup/WalkIn) | How the order is fulfilled |
-| PaymentMethod | nvarchar(50) | CHECK (GCash/BankTransfer/Cash) | Selected payment method |
-| ShippingAddressId | int | FK → Address, NULLABLE | Snapshot of shipping address |
+| OrderId | int | PK, IDENTITY, NOT NULL | Unique order identifier |
+| UserId | int | NULLABLE | Customer who placed the order |
+| OrderNumber | nvarchar(50) | PK, NOT NULL | Formatted order number (e.g., TBS-2026-00001) |
+| OrderDate | datetime2(7) | NOT NULL | When the order was placed |
+| OrderStatus | nvarchar(50) | NOT NULL | Current order status |
+| SubTotal | decimal(10, 2) | NOT NULL | Sum of line item totals |
+| DiscountAmount | decimal(10, 2) | NOT NULL | Voucher discount applied |
+| ShippingFee | decimal(10, 2) | NOT NULL | Delivery fee |
+| ShippingAddressId | int | NULLABLE | Snapshot of shipping address |
 | ContactPhone | nvarchar(20) | NULLABLE | Customer contact phone |
 | DeliveryInstructions | nvarchar(500) | NULLABLE | Special delivery instructions |
 | IsWalkIn | bit | NOT NULL | True for POS transactions |
-| GuestSessionId | int | FK → GuestSession, NULLABLE | Guest who placed the order |
-| CartId | int | FK → Cart, NULLABLE | Source cart |
-| POSSessionId | int | FK → POS_Session, NULLABLE | POS session for walk-in orders |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
+| UpdatedAt | datetime2(7) | NULLABLE | Last modification timestamp |
 | IsDeleted | bit | NOT NULL | Soft-delete flag |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
-| UpdatedAt | datetime2 | NULLABLE | Last modification timestamp |
+| FulfillmentType | nvarchar(20) | NOT NULL | How the order is fulfilled |
+| GuestSessionId | int | NULLABLE | Guest who placed the order |
+| CartId | int | NULLABLE | Source cart |
+| POSSessionId | int | NULLABLE | POS session for walk-in orders |
+| TotalAmount | computed | NULLABLE | `(SubTotal - DiscountAmount) + ShippingFee` |
+| PaymentMethod | nvarchar(50) | NOT NULL | Selected payment method |
 
 ### **OrderItem**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| OrderItemId | int | PK, IDENTITY | Unique line item identifier |
-| OrderId | int | FK → Order, NOT NULL | Parent order |
-| ProductId | int | FK → Product, NOT NULL | Product ordered |
-| ProductVariantId | int | FK → ProductVariant, NULLABLE | Specific variant |
-| Quantity | int | CHECK > 0 | Quantity ordered |
-| UnitPrice | decimal(10,2) | CHECK ≥ 0 | Price at time of order |
+| OrderItemId | int | PK, IDENTITY, NOT NULL | Unique line item identifier |
+| OrderId | int | NOT NULL | Parent order |
+| ProductId | int | NOT NULL | Product ordered |
+| ProductVariantId | int | NULLABLE | Specific variant |
+| Quantity | int | NOT NULL | Quantity ordered |
+| UnitPrice | decimal(10, 2) | NOT NULL | Price at time of order |
 
 ### **Payment**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| PaymentId | int | PK, IDENTITY | Unique payment identifier |
-| OrderId | int | FK → Order, NOT NULL | Associated order |
-| PaymentMethod | nvarchar(50) | CHECK (GCash/BankTransfer/Cash) | Payment method used |
-| PaymentStage | nvarchar(20) | CHECK (Upfront/Confirmation) | Payment stage |
-| PaymentStatus | nvarchar(50) | CHECK (Pending/VerificationPending/VerificationRejected/Completed/Failed) | Current payment status |
-| Amount | decimal(10,2) | CHECK ≥ 0 | Payment amount |
-| PaymentDate | datetime2 | NULLABLE | When payment was completed |
-| CreatedAt | datetime2 | NOT NULL | Payment record creation |
+| PaymentId | int | PK, IDENTITY, NOT NULL | Unique payment identifier |
+| OrderId | int | NOT NULL | Associated order |
+| PaymentMethod | nvarchar(50) | NOT NULL | Payment method used |
+| PaymentStage | nvarchar(20) | NOT NULL | Payment stage |
+| PaymentStatus | nvarchar(50) | NOT NULL | Current payment status |
+| Amount | decimal(10, 2) | NOT NULL | Payment amount |
+| PaymentDate | datetime2(7) | NULLABLE | When payment was completed |
+| CreatedAt | datetime2(7) | NOT NULL | Payment record creation |
 | IsDeleted | bit | NOT NULL | Soft-delete flag |
 | PaidToAccountName | nvarchar(150) | NULLABLE | Store account name used |
 | PaidToAccountNumber | nvarchar(50) | NULLABLE | Store account number used |
@@ -872,44 +875,44 @@ erDiagram
 ### **GCashPayment**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| PaymentId | int | PK, FK → Payment | Shared key (TPT inheritance) |
+| PaymentId | int | PK, NOT NULL | Shared key (TPT inheritance) |
 | GcashTransactionId | nvarchar(255) | NULLABLE | GCash reference/transaction ID |
 | ScreenshotUrl | nvarchar(1000) | NULLABLE | Public URL of payment screenshot |
 | StorageBucket | nvarchar(200) | NULLABLE | GCS bucket for screenshot |
 | StoragePath | nvarchar(1000) | NULLABLE | GCS path for screenshot |
-| SubmittedAt | datetime2 | NULLABLE | When proof was submitted |
+| SubmittedAt | datetime2(7) | NULLABLE | When proof was submitted |
 
 ### **BankTransferPayment**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| PaymentId | int | PK, FK → Payment | Shared key (TPT inheritance) |
+| PaymentId | int | PK, NOT NULL | Shared key (TPT inheritance) |
 | BpiReferenceNumber | nvarchar(255) | NULLABLE | Bank reference/transaction number |
 | ProofUrl | nvarchar(1000) | NULLABLE | Public URL of deposit slip |
 | ProofStorageBucket | nvarchar(200) | NULLABLE | GCS bucket for deposit slip |
 | ProofStoragePath | nvarchar(1000) | NULLABLE | GCS path for deposit slip |
-| VerifiedByUserId | int | FK → User, NULLABLE | Admin who verified the payment |
+| VerifiedByUserId | int | NULLABLE | Admin who verified the payment |
 | VerificationNotes | nvarchar(500) | NULLABLE | Admin notes on verification |
-| VerifiedAt | datetime2 | NULLABLE | When verification occurred |
-| VerificationDeadline | datetime2 | NULLABLE | Deadline for verification |
-| SubmittedAt | datetime2 | NULLABLE | When proof was submitted |
+| VerifiedAt | datetime2(7) | NULLABLE | When verification occurred |
+| VerificationDeadline | datetime2(7) | NULLABLE | Deadline for verification |
+| SubmittedAt | datetime2(7) | NULLABLE | When proof was submitted |
 
 ### **Delivery**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| DeliveryId | int | PK, IDENTITY | Unique delivery identifier |
-| OrderId | int | FK → Order, NOT NULL | Associated order |
-| Courier | nvarchar(20) | CHECK (Lalamove/LBC) | Courier service used |
-| DeliveryStatus | nvarchar(50) | CHECK (Pending/PickedUp/InTransit/Delivered/Failed) | Current delivery status |
-| IsDelayed | bit | DEFAULT 0 | Whether delivery is delayed |
-| DelayedUntil | datetime2 | NULLABLE | Expected delay resolution |
-| EstimatedDeliveryTime | datetime2 | NULLABLE | Estimated arrival |
-| ActualDeliveryTime | datetime2 | NULLABLE | Actual arrival |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
+| DeliveryId | int | PK, IDENTITY, NOT NULL | Unique delivery identifier |
+| OrderId | int | NOT NULL | Associated order |
+| Courier | nvarchar(20) | NOT NULL | Courier service used |
+| DeliveryStatus | nvarchar(50) | NOT NULL | Current delivery status |
+| IsDelayed | bit | NOT NULL | Whether delivery is delayed |
+| DelayedUntil | datetime2(7) | NULLABLE | Expected delay resolution |
+| EstimatedDeliveryTime | datetime2(7) | NULLABLE | Estimated arrival |
+| ActualDeliveryTime | datetime2(7) | NULLABLE | Actual arrival |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
 
 ### **LalamoveDelivery**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| DeliveryId | int | PK, FK → Delivery | Shared key (TPT inheritance) |
+| DeliveryId | int | PK, NOT NULL | Shared key (TPT inheritance) |
 | BookingRef | nvarchar(255) | NULLABLE | Lalamove booking reference |
 | DriverName | nvarchar(100) | NULLABLE | Assigned driver name |
 | DriverPhone | nvarchar(20) | NULLABLE | Driver contact number |
@@ -917,79 +920,79 @@ erDiagram
 ### **LBCDelivery**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| DeliveryId | int | PK, FK → Delivery | Shared key (TPT inheritance) |
+| DeliveryId | int | PK, NOT NULL | Shared key (TPT inheritance) |
 | TrackingNumber | nvarchar(255) | NULLABLE | LBC tracking number |
 
 ### **PickupOrder**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| PickupOrderId | int | PK, IDENTITY | Unique pickup identifier |
-| OrderId | int | FK → Order, UNIQUE | Associated order (one-to-one) |
-| PickupReadyAt | datetime2 | NULLABLE | When order was marked ready |
-| PickupExpiresAt | datetime2 | NULLABLE | Pickup expiry (7 days) |
-| PickupConfirmedAt | datetime2 | NULLABLE | When customer picked up |
+| PickupOrderId | int | PK, IDENTITY, NOT NULL | Unique pickup identifier |
+| OrderId | int | PK, NOT NULL | Associated order (one-to-one) |
+| PickupReadyAt | datetime2(7) | NULLABLE | When order was marked ready |
+| PickupExpiresAt | datetime2(7) | NULLABLE | Pickup expiry (7 days) |
+| PickupConfirmedAt | datetime2(7) | NULLABLE | When customer picked up |
 
 ### **Voucher**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| VoucherId | int | PK, IDENTITY | Unique voucher identifier |
-| Code | nvarchar(50) | UNIQUE, NOT NULL | Promo code entered by customer |
+| VoucherId | int | PK, IDENTITY, NOT NULL | Unique voucher identifier |
+| Code | nvarchar(50) | PK, NOT NULL | Promo code entered by customer |
 | Description | nvarchar(500) | NULLABLE | Human-readable description |
 | DiscountType | nvarchar(20) | NOT NULL | "Percentage" or "Fixed" |
-| DiscountValue | decimal(10,2) | NOT NULL | Discount amount or percentage |
-| MinimumOrderAmount | decimal(10,2) | NULLABLE | Minimum subtotal required |
+| DiscountValue | decimal(10, 2) | NOT NULL | Discount amount or percentage |
+| MinimumOrderAmount | decimal(10, 2) | NULLABLE | Minimum subtotal required |
 | MaxUses | int | NULLABLE | Global usage cap |
 | MaxUsesPerUser | int | NULLABLE | Per-user usage cap |
-| StartDate | datetime2 | NOT NULL | Voucher start date |
-| EndDate | datetime2 | NULLABLE | Voucher end date |
+| StartDate | datetime2(7) | NOT NULL | Voucher start date |
+| EndDate | datetime2(7) | NULLABLE | Voucher end date |
 | IsActive | bit | NOT NULL | Whether voucher is active |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
 
 ### **UserVoucher**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| UserVoucherId | int | PK, IDENTITY | Unique assignment identifier |
-| UserId | int | FK → User, UNIQUE(UserId,VoucherId) | Assigned user |
-| VoucherId | int | FK → Voucher, UNIQUE(UserId,VoucherId) | Assigned voucher |
-| AssignedAt | datetime2 | NOT NULL | Assignment timestamp |
-| ExpiresAt | datetime2 | NULLABLE | Per-user assignment expiry |
+| UserVoucherId | int | PK, IDENTITY, NOT NULL | Unique assignment identifier |
+| UserId | int | PK, NOT NULL | Assigned user |
+| VoucherId | int | PK, NOT NULL | Assigned voucher |
+| AssignedAt | datetime2(7) | NOT NULL | Assignment timestamp |
+| ExpiresAt | datetime2(7) | NULLABLE | Per-user assignment expiry |
 
 ### **VoucherUsage**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| VoucherUsageId | int | PK, IDENTITY | Unique usage identifier |
-| VoucherId | int | FK → Voucher, NOT NULL | Voucher that was used |
-| UserId | int | FK → User, NOT NULL | User who used it |
-| OrderId | int | FK → Order, NOT NULL | Order it was applied to |
-| DiscountAmount | decimal(10,2) | NOT NULL | Actual discount given |
-| UsedAt | datetime2 | NOT NULL | When it was redeemed |
+| VoucherUsageId | int | PK, IDENTITY, NOT NULL | Unique usage identifier |
+| VoucherId | int | NOT NULL | Voucher that was used |
+| UserId | int | NOT NULL | User who used it |
+| OrderId | int | NOT NULL | Order it was applied to |
+| DiscountAmount | decimal(10, 2) | NOT NULL | Actual discount given |
+| UsedAt | datetime2(7) | NOT NULL | When it was redeemed |
 
 ### **Wishlist**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| WishlistId | int | PK, IDENTITY | Unique wishlist entry identifier |
-| UserId | int | FK → User, UNIQUE(UserId,ProductId) | User who saved the product |
-| ProductId | int | FK → Product, UNIQUE(UserId,ProductId) | Saved product |
-| AddedAt | datetime2 | NOT NULL | When the item was wishlisted |
+| WishlistId | int | PK, IDENTITY, NOT NULL | Unique wishlist entry identifier |
+| UserId | int | PK, NOT NULL | User who saved the product |
+| ProductId | int | PK, NOT NULL | Saved product |
+| AddedAt | datetime2(7) | NOT NULL | When the item was wishlisted |
 
 ### **Review**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| ReviewId | int | PK, IDENTITY | Unique review identifier |
-| UserId | int | FK → User, NOT NULL | Reviewer |
-| ProductId | int | FK → Product, NOT NULL | Reviewed product |
-| OrderId | int | FK → Order, NOT NULL | The order that verifies the purchase |
+| ReviewId | int | PK, IDENTITY, NOT NULL | Unique review identifier |
+| UserId | int | NOT NULL | Reviewer |
+| ProductId | int | NOT NULL | Reviewed product |
+| OrderId | int | NOT NULL | The order that verifies the purchase |
 | Rating | int | NOT NULL | Star rating (1–5) |
 | Comment | nvarchar(1000) | NULLABLE | Review text |
 | IsVerifiedPurchase | bit | NOT NULL | Whether the reviewer actually bought the product |
-| CreatedAt | datetime2 | NOT NULL | Review submission timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Review submission timestamp |
 
 ### **SupportTicket**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| TicketId | int | PK, IDENTITY | Unique ticket identifier |
-| UserId | int | FK → User, NOT NULL | Customer who created the ticket |
-| OrderId | int | FK → Order, NULLABLE | Related order (if applicable) |
+| TicketId | int | PK, IDENTITY, NOT NULL | Unique ticket identifier |
+| UserId | int | NOT NULL | Customer who created the ticket |
+| OrderId | int | NULLABLE | Related order (if applicable) |
 | TicketSource | nvarchar(50) | NOT NULL | Source channel (e.g., "Web") |
 | TicketCategory | nvarchar(100) | NOT NULL | Issue category |
 | Subject | nvarchar(200) | NOT NULL | Ticket subject line |
@@ -998,147 +1001,147 @@ erDiagram
 | AttachmentBucket | nvarchar(200) | NULLABLE | GCS bucket for attachment |
 | AttachmentPath | nvarchar(1000) | NULLABLE | GCS path for attachment |
 | TicketStatus | nvarchar(50) | NOT NULL | Current status (Open/InProgress/Resolved/Closed) |
-| AssignedToUserId | int | FK → User, NULLABLE | Admin staff assigned |
-| ResolvedAt | datetime2 | NULLABLE | Resolution timestamp |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
-| UpdatedAt | datetime2 | NULLABLE | Last update timestamp |
+| AssignedToUserId | int | NULLABLE | Admin staff assigned |
+| ResolvedAt | datetime2(7) | NULLABLE | Resolution timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
+| UpdatedAt | datetime2(7) | NULLABLE | Last update timestamp |
 
 ### **SupportTicketReply**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| ReplyId | bigint | PK, IDENTITY | Unique reply identifier |
-| TicketId | int | FK → SupportTicket, NOT NULL | Parent ticket |
-| UserId | int | FK → User, NOT NULL | Author of the reply |
+| ReplyId | bigint | PK, IDENTITY, NOT NULL | Unique reply identifier |
+| TicketId | int | NOT NULL | Parent ticket |
+| UserId | int | NOT NULL | Author of the reply |
 | IsAdminReply | bit | NOT NULL | True if reply is from admin staff |
 | Message | nvarchar(max) | NOT NULL | Reply message content |
 | AttachmentUrl | nvarchar(1000) | NULLABLE | Attachment public URL |
 | AttachmentBucket | nvarchar(200) | NULLABLE | GCS bucket for attachment |
 | AttachmentPath | nvarchar(1000) | NULLABLE | GCS path for attachment |
-| CreatedAt | datetime2 | NOT NULL | Reply timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Reply timestamp |
 
 ### **SupportTask**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| TaskId | int | PK, IDENTITY | Unique task identifier |
-| TicketId | int | FK → SupportTicket, NOT NULL | Parent ticket |
-| AssignedToUserId | int | FK → User, NULLABLE | Staff assigned to the task |
+| TaskId | int | PK, IDENTITY, NOT NULL | Unique task identifier |
+| TicketId | int | NOT NULL | Parent ticket |
+| AssignedToUserId | int | NULLABLE | Staff assigned to the task |
 | TaskType | nvarchar(50) | NOT NULL | Type of task |
 | TaskStatus | nvarchar(20) | NOT NULL | Task status |
-| DueDate | datetime2 | NULLABLE | Task deadline |
+| DueDate | datetime2(7) | NULLABLE | Task deadline |
 | Notes | nvarchar(500) | NULLABLE | Task notes |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
-| CompletedAt | datetime2 | NULLABLE | Completion timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
+| CompletedAt | datetime2(7) | NULLABLE | Completion timestamp |
 
 ### **Notification**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| NotificationId | int | PK, IDENTITY | Unique notification identifier |
-| UserId | int | FK → User, NOT NULL | Recipient user |
-| OrderId | int | FK → Order, NULLABLE | Related order |
-| TicketId | int | FK → SupportTicket, NULLABLE | Related ticket |
-| Channel | nvarchar(20) | CHECK (SMS/Email/InApp) | Delivery channel |
-| NotifType | nvarchar(100) | CHECK (18 predefined types) | Notification type |
+| NotificationId | int | PK, IDENTITY, NOT NULL | Unique notification identifier |
+| UserId | int | NOT NULL | Recipient user |
+| OrderId | int | NULLABLE | Related order |
+| TicketId | int | NULLABLE | Related ticket |
+| Channel | nvarchar(20) | NOT NULL | Delivery channel |
+| NotifType | nvarchar(100) | NOT NULL | Notification type |
 | Recipient | nvarchar(255) | NOT NULL | Target address/number |
 | Subject | nvarchar(255) | NULLABLE | Notification subject |
 | Body | nvarchar(max) | NULLABLE | Notification body content |
-| Status | nvarchar(20) | CHECK (Pending/Sent/Failed) | Delivery status |
-| RetryCount | int | DEFAULT 0 | Number of delivery attempts |
-| SentAt | datetime2 | NULLABLE | When successfully sent |
+| Status | nvarchar(20) | NOT NULL | Delivery status |
+| RetryCount | int | NOT NULL | Number of delivery attempts |
+| SentAt | datetime2(7) | NULLABLE | When successfully sent |
 | FailureReason | nvarchar(500) | NULLABLE | Reason for delivery failure |
-| IsRead | bit | DEFAULT 0 | Whether user has read it |
-| ReadAt | datetime2 | NULLABLE | When user marked it as read |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
+| IsRead | bit | NOT NULL | Whether user has read it |
+| ReadAt | datetime2(7) | NULLABLE | When user marked it as read |
 
 ### **Supplier**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| SupplierId | int | PK, IDENTITY | Unique supplier identifier |
+| SupplierId | int | PK, IDENTITY, NOT NULL | Unique supplier identifier |
 | Name | nvarchar(200) | NOT NULL | Supplier company name |
 | ContactPerson | nvarchar(100) | NULLABLE | Primary contact name |
 | PhoneNumber | nvarchar(20) | NULLABLE | Contact phone |
 | Email | nvarchar(255) | NULLABLE | Contact email |
 | Address | nvarchar(500) | NULLABLE | Business address |
 | IsActive | bit | NOT NULL | Whether supplier is active |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
 
 ### **PurchaseOrder**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| PurchaseOrderId | int | PK, IDENTITY | Unique PO identifier |
-| SupplierId | int | FK → Supplier, NOT NULL | Supplier being ordered from |
-| OrderDate | datetime2 | NOT NULL | When the PO was placed |
-| ExpectedDeliveryDate | datetime2 | NULLABLE | Expected supplier delivery |
+| PurchaseOrderId | int | PK, IDENTITY, NOT NULL | Unique PO identifier |
+| SupplierId | int | NOT NULL | Supplier being ordered from |
+| OrderDate | datetime2(7) | NOT NULL | When the PO was placed |
+| ExpectedDeliveryDate | datetime2(7) | NULLABLE | Expected supplier delivery |
 | Status | nvarchar(50) | NOT NULL | PO status |
-| CreatedByUserId | int | FK → User, NULLABLE | Admin who created the PO |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
+| CreatedByUserId | int | NULLABLE | Admin who created the PO |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
 
 ### **PurchaseOrderItem**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| PurchaseOrderItemId | int | PK, IDENTITY | Unique PO line item identifier |
-| PurchaseOrderId | int | FK → PurchaseOrder, NOT NULL | Parent PO |
-| ProductId | int | FK → Product, NOT NULL | Product being ordered |
-| ProductVariantId | int | FK → ProductVariant, NULLABLE | Specific variant |
+| PurchaseOrderItemId | int | PK, IDENTITY, NOT NULL | Unique PO line item identifier |
+| PurchaseOrderId | int | NOT NULL | Parent PO |
+| ProductId | int | NOT NULL | Product being ordered |
+| ProductVariantId | int | NULLABLE | Specific variant |
 | Quantity | int | NOT NULL | Quantity ordered |
-| UnitPrice | decimal(10,2) | NOT NULL | Supplier unit price |
+| UnitPrice | decimal(10, 2) | NOT NULL | Supplier unit price |
 
 ### **InventoryLog**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| InventoryLogId | bigint | PK, IDENTITY | Unique log entry identifier |
-| ProductId | int | FK → Product, NOT NULL | Product affected |
-| ProductVariantId | int | FK → ProductVariant, NULLABLE | Variant affected |
+| InventoryLogId | bigint | PK, IDENTITY, NOT NULL | Unique log entry identifier |
+| ProductId | int | NOT NULL | Product affected |
+| ProductVariantId | int | NULLABLE | Variant affected |
 | ChangeQuantity | int | NOT NULL | Stock change (negative = decrease) |
-| ChangeType | nvarchar(50) | CHECK (Purchase/Sale/Return/Adjustment/Damage/Loss/Lock/Unlock) | Type of stock change |
-| OrderId | int | FK → Order, NULLABLE | Related customer order |
-| PurchaseOrderId | int | FK → PurchaseOrder, NULLABLE | Related purchase order |
-| ChangedByUserId | int | FK → User, NULLABLE | Staff who made the change |
+| ChangeType | nvarchar(50) | NOT NULL | Type of stock change |
+| OrderId | int | NULLABLE | Related customer order |
+| PurchaseOrderId | int | NULLABLE | Related purchase order |
+| ChangedByUserId | int | NULLABLE | Staff who made the change |
 | Notes | nvarchar(500) | NULLABLE | Reason/description |
-| CreatedAt | datetime2 | NOT NULL | Timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Timestamp |
 
 ### **OrderStatusAudit**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| AuditId | bigint | PK, IDENTITY | Unique audit entry identifier |
-| OrderId | int | FK → Order, NOT NULL | Order being transitioned |
+| AuditId | bigint | PK, IDENTITY, NOT NULL | Unique audit entry identifier |
+| OrderId | int | NOT NULL | Order being transitioned |
 | FromStatus | nvarchar(50) | NOT NULL | Previous status |
 | ToStatus | nvarchar(50) | NOT NULL | New status |
 | Success | bit | NOT NULL | Whether transition was allowed |
 | Reason | nvarchar(500) | NULLABLE | Reason for rejection (if failed) |
-| CreatedAt | datetime2 | NOT NULL | Timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Timestamp |
 
 ### **POS_Session**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| POSSessionId | int | PK, IDENTITY | Unique session identifier |
-| UserId | int | FK → User, NOT NULL | Cashier operating the POS |
+| POSSessionId | int | PK, IDENTITY, NOT NULL | Unique session identifier |
+| UserId | int | NOT NULL | Cashier operating the POS |
 | TerminalName | nvarchar(50) | NOT NULL | POS terminal identifier |
-| ShiftStart | datetime2 | NOT NULL | Shift start time |
-| ShiftEnd | datetime2 | NULLABLE | Shift end time |
-| TotalSales | decimal(10,2) | NOT NULL | Total sales during shift |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
+| ShiftStart | datetime2(7) | NOT NULL | Shift start time |
+| ShiftEnd | datetime2(7) | NULLABLE | Shift end time |
+| TotalSales | decimal(10, 2) | NOT NULL | Total sales during shift |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
 
 ### **Refund**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| RefundId | int | PK, IDENTITY | Unique refund identifier |
-| OrderId | int | FK → Order, NOT NULL | Order being refunded |
-| PaymentId | int | FK → Payment, NULLABLE | Original payment |
-| RefundAmount | decimal(10,2) | NOT NULL | Refund amount |
+| RefundId | int | PK, IDENTITY, NOT NULL | Unique refund identifier |
+| OrderId | int | NOT NULL | Order being refunded |
+| PaymentId | int | NULLABLE | Original payment |
+| RefundAmount | decimal(10, 2) | NOT NULL | Refund amount |
 | RefundReason | nvarchar(500) | NOT NULL | Reason for the refund |
 | RefundStatus | nvarchar(50) | NOT NULL | Refund status |
 | RefundMethod | nvarchar(50) | NULLABLE | Method for returning funds |
-| RequestedByUserId | int | FK → User, NULLABLE | Customer who requested |
-| ApprovedByUserId | int | FK → User, NULLABLE | Admin who approved |
-| TicketId | int | FK → SupportTicket, NULLABLE | Related support ticket |
+| RequestedByUserId | int | NULLABLE | Customer who requested |
+| ApprovedByUserId | int | NULLABLE | Admin who approved |
+| TicketId | int | NULLABLE | Related support ticket |
 | Notes | nvarchar(500) | NULLABLE | Internal notes |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
-| ProcessedAt | datetime2 | NULLABLE | When refund was processed |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
+| ProcessedAt | datetime2(7) | NULLABLE | When refund was processed |
 
 ### **StorePaymentAccount**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| StorePaymentAccountId | int | PK, IDENTITY | Unique account identifier |
+| StorePaymentAccountId | int | PK, IDENTITY, NOT NULL | Unique account identifier |
 | PaymentMethod | nvarchar(50) | NOT NULL | Method (GCash/BankTransfer) |
 | AccountName | nvarchar(150) | NOT NULL | Account holder name |
 | AccountNumber | nvarchar(50) | NOT NULL | Account number |
@@ -1147,19 +1150,26 @@ erDiagram
 | Instructions | nvarchar(500) | NULLABLE | Payment instructions for customer |
 | IsActive | bit | NOT NULL | Whether currently displayed |
 | DisplayOrder | int | NOT NULL | Sort order on checkout page |
-| CreatedAt | datetime2 | NOT NULL | Creation timestamp |
-| UpdatedAt | datetime2 | NOT NULL | Last modification timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Creation timestamp |
+| UpdatedAt | datetime2(7) | NOT NULL | Last modification timestamp |
 
 ### **SystemLog**
 | Column Name | Data Type | Constraints | Description |
 |---|---|---|---|
-| SystemLogId | bigint | PK, IDENTITY | Unique log identifier |
-| UserId | int | FK → User, NULLABLE | User who triggered the event |
+| SystemLogId | bigint | PK, IDENTITY, NOT NULL | Unique log identifier |
+| UserId | int | NULLABLE | User who triggered the event |
 | EventType | nvarchar(100) | NOT NULL | Type of system event |
 | EventDescription | nvarchar(1000) | NULLABLE | Event details |
-| CreatedAt | datetime2 | NOT NULL | Event timestamp |
+| CreatedAt | datetime2(7) | NOT NULL | Event timestamp |
 
 ---
+
+
+### **__EFMigrationsHistory**
+| Column Name | Data Type | Constraints | Description |
+|---|---|---|---|
+| MigrationId | nvarchar(150) | PK, NOT NULL | EF Core Migration History |
+| ProductVersion | nvarchar(32) | NOT NULL | EF Core Migration History |
 
 ## **2.4 Storyboard / System Flow**
 

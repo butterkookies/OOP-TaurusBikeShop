@@ -27,7 +27,7 @@
     --pkfk-text: #c39bd3;
     --pkfk-badge: #8e44ad;
     --line-color: #4d5180;
-    --crow-color: #a8accc;
+    --crow-color: #c8cdf0;
     --label-color: #9ca0bf;
     --group-users: #3b82f6;
     --group-catalog: #10b981;
@@ -88,10 +88,15 @@
   /* ── CANVAS ── */
   #erd-canvas { position: relative; padding: 80px 40px 120px; min-height: 100vh; }
 
-  /* ── SVG LAYER ── */
-  #erd-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-  #erd-lines polyline { stroke: var(--line-color); stroke-width: 1.8; fill: none; }
-  .card-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; fill: var(--label-color); }
+  /* ── SVG LAYERS ── */
+  .svg-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+  #erd-lines-bg { z-index: 1; }
+  #erd-lines-bg polyline { stroke: var(--line-color); stroke-width: 1.8; fill: none; }
+  #erd-lines-fg { z-index: 20; }
+  .card-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 5px; font-weight: 600;
+    fill: #e0e4ff; paint-order: stroke; stroke: var(--bg); stroke-width: 2px;
+  }
 
   /* ── ENTITY CARD ── */
   .entity {
@@ -99,7 +104,9 @@
     border-radius: var(--radius); box-shadow: var(--shadow);
     min-width: 240px; max-width: 300px; z-index: 10;
     transition: border-color .2s, box-shadow .2s; overflow: hidden;
+    cursor: grab; user-select: none;
   }
+  .entity.dragging { cursor: grabbing; z-index: 50; box-shadow: 0 8px 32px rgba(0,0,0,0.6); }
   .entity:hover { border-color: var(--border-hover); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
   .entity-header {
     padding: 8px 12px; font-size: 12px; font-weight: 700; color: var(--text-header);
@@ -164,7 +171,7 @@
       <span>Zero or One (0..1)</span>
     </div>
     <div class="legend-item legend-crow">
-      <svg width="32" height="18" viewBox="0 0 32 18"><line x1="0" y1="9" x2="32" y2="9" stroke="var(--crow-color)" stroke-width="1.5"/><line x1="32" y1="9" x2="22" y2="2" stroke="var(--crow-color)" stroke-width="1.5"/><line x1="32" y1="9" x2="22" y2="9" stroke="var(--crow-color)" stroke-width="1.5"/><line x1="32" y1="9" x2="22" y2="16" stroke="var(--crow-color)" stroke-width="1.5"/><circle cx="16" cy="9" r="4" fill="var(--bg)" stroke="var(--crow-color)" stroke-width="1.5"/></svg>
+      <svg width="32" height="18" viewBox="0 0 32 18"><line x1="0" y1="9" x2="32" y2="9" stroke="var(--crow-color)" stroke-width="1.5"/><line x1="32" y1="2" x2="22" y2="9" stroke="var(--crow-color)" stroke-width="1.5"/><line x1="32" y1="9" x2="22" y2="9" stroke="var(--crow-color)" stroke-width="1.5"/><line x1="32" y1="16" x2="22" y2="9" stroke="var(--crow-color)" stroke-width="1.5"/><circle cx="16" cy="9" r="4" fill="var(--bg)" stroke="var(--crow-color)" stroke-width="1.5"/></svg>
       <span>Zero or Many (0..*)</span>
     </div>
   </div>
@@ -180,7 +187,8 @@
 </div>
 
 <div id="erd-canvas">
-  <svg id="erd-lines"></svg>
+  <svg id="erd-lines-bg" class="svg-layer"></svg>
+  <svg id="erd-lines-fg" class="svg-layer"></svg>
 </div>
 
 <script>
@@ -855,6 +863,15 @@ const R = [
   { f:'ProductVariant', t:'PurchaseOrderItem', fc:'1', tc:'0..*' },
   { f:'Payment', t:'Refund', fc:'1', tc:'0..*' },
   { f:'Product', t:'InventoryLog', fc:'1', tc:'0..*' },
+  // ── Secondary User FK references (admin/assignee/uploader/verifier) ──
+  { f:'User', t:'BankTransferPayment', fc:'1', tc:'0..*' },
+  { f:'User', t:'InventoryLog', fc:'1', tc:'0..*' },
+  { f:'User', t:'PriceHistory', fc:'1', tc:'0..*' },
+  { f:'User', t:'ProductImage', fc:'1', tc:'0..*' },
+  { f:'User', t:'Refund', fc:'1', tc:'0..*' },
+  { f:'User', t:'SupportTask', fc:'1', tc:'0..*' },
+  { f:'User', t:'SupportTicketReply', fc:'1', tc:'0..*' },
+  { f:'Address', t:'User', fc:'1', tc:'0..*' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -931,7 +948,8 @@ const VG = {
 // RENDERING ENGINE
 // ═══════════════════════════════════════════════════════════════════════
 const canvas = document.getElementById('erd-canvas');
-const svgEl = document.getElementById('erd-lines');
+const svgBg = document.getElementById('erd-lines-bg');
+const svgFg = document.getElementById('erd-lines-fg');
 const NS = 'http://www.w3.org/2000/svg';
 const entityEls = {};
 
@@ -992,33 +1010,32 @@ function anchor(fromBox, toBox) {
     : [{ x: fromBox.cx, y: fromBox.y, s:'t' }, { x: toBox.cx, y: toBox.y+toBox.h, s:'b' }];
 }
 
+// d points OUTWARD from the card edge along the line
 function crowsFoot(g, x, y, card, side) {
   const h = (side==='r'||side==='l');
   const d = (side==='r'||side==='b') ? 1 : -1;
   if (card === '1') {
-    // Two perpendicular bars = "exactly one"
     if (h) {
-      ln(g, x-d*6,y-8, x-d*6,y+8); ln(g, x-d*12,y-8, x-d*12,y+8);
+      ln(g, x+d*6,y-8, x+d*6,y+8); ln(g, x+d*12,y-8, x+d*12,y+8);
     } else {
-      ln(g, x-8,y-d*6, x+8,y-d*6); ln(g, x-8,y-d*12, x+8,y-d*12);
+      ln(g, x-8,y+d*6, x+8,y+d*6); ln(g, x-8,y+d*12, x+8,y+d*12);
     }
   } else if (card === '0..1') {
-    // One bar + circle = "zero or one"
     if (h) {
-      ln(g, x-d*6,y-8, x-d*6,y+8);
-      circ(g, x-d*16, y, 5);
+      ln(g, x+d*6,y-8, x+d*6,y+8);
+      circ(g, x+d*16, y, 5);
     } else {
-      ln(g, x-8,y-d*6, x+8,y-d*6);
-      circ(g, x, y-d*16, 5);
+      ln(g, x-8,y+d*6, x+8,y+d*6);
+      circ(g, x, y+d*16, 5);
     }
   } else {
-    // Trident (crow's foot) = "many"
+    // Fork fans TOWARD the table: prongs at table edge, converge outward
     if (h) {
-      ln(g,x,y, x-d*12,y-9); ln(g,x,y, x-d*12,y); ln(g,x,y, x-d*12,y+9);
-      if (card==='0..*') circ(g, x-d*20, y, 5);
+      ln(g, x,y-9, x+d*12,y); ln(g, x,y, x+d*12,y); ln(g, x,y+9, x+d*12,y);
+      if (card==='0..*') circ(g, x+d*20, y, 5);
     } else {
-      ln(g,x,y, x-9,y-d*12); ln(g,x,y, x,y-d*12); ln(g,x,y, x+9,y-d*12);
-      if (card==='0..*') circ(g, x, y-d*20, 5);
+      ln(g, x-9,y, x,y+d*12); ln(g, x,y, x,y+d*12); ln(g, x+9,y, x,y+d*12);
+      if (card==='0..*') circ(g, x, y+d*20, 5);
     }
   }
 }
@@ -1026,16 +1043,15 @@ function crowsFoot(g, x, y, card, side) {
 function cardLabel(g, x, y, text, side) {
   const t = document.createElementNS(NS,'text');
   t.setAttribute('class','card-label');
-  // Offset the label so it doesn't overlap the line or crow's foot
   const h = (side==='r'||side==='l');
   const d = (side==='r'||side==='b') ? 1 : -1;
   let lx = x, ly = y;
   if (h) {
-    lx = x - d * 28;
-    ly = y - 10;
+    lx = x + d * 26;
+    ly = y - 6;
   } else {
-    lx = x + 12;
-    ly = y - d * 28;
+    lx = x + 8;
+    ly = y + d * 26;
   }
   t.setAttribute('x', lx); t.setAttribute('y', ly);
   t.setAttribute('text-anchor', h ? 'middle' : 'start');
@@ -1057,8 +1073,13 @@ function circ(g, cx,cy,r) {
   g.appendChild(c);
 }
 
+function sizeSvg(svg, mx, my) {
+  svg.style.width = mx+'px'; svg.style.height = my+'px';
+  svg.setAttribute('viewBox', `0 0 ${mx} ${my}`);
+}
+
 function drawLines() {
-  svgEl.innerHTML = '';
+  svgBg.innerHTML = ''; svgFg.innerHTML = '';
   const vis = VG[currentView];
   let mx = 0, my = 0;
   for (const n of vis) {
@@ -1066,8 +1087,7 @@ function drawLines() {
     mx = Math.max(mx, parseInt(el.style.left) + el.offsetWidth + 100);
     my = Math.max(my, parseInt(el.style.top) + el.offsetHeight + 100);
   }
-  svgEl.style.width = mx+'px'; svgEl.style.height = my+'px';
-  svgEl.setAttribute('viewBox', `0 0 ${mx} ${my}`);
+  sizeSvg(svgBg, mx, my); sizeSvg(svgFg, mx, my);
   canvas.style.width = mx+'px'; canvas.style.height = my+'px';
 
   const used = {};
@@ -1077,13 +1097,14 @@ function drawLines() {
     const fb = box(r.f), tb = box(r.t);
     if (!fb || !tb) continue;
     const [a1, a2] = anchor(fb, tb);
-    const g = document.createElementNS(NS,'g');
     const hz = (a1.s==='r'||a1.s==='l');
     let off = 0;
     const mk = hz ? `v${Math.round((a1.x+a2.x)/2)}` : `h${Math.round((a1.y+a2.y)/2)}`;
     if (used[mk]) off = used[mk]*10;
     used[mk] = (used[mk]||0)+1;
 
+    // Polyline goes in background layer (behind cards)
+    const gBg = document.createElementNS(NS,'g');
     const poly = document.createElementNS(NS,'polyline');
     if (hz) {
       const mx2 = Math.round((a1.x+a2.x)/2)+off;
@@ -1092,25 +1113,33 @@ function drawLines() {
       const my2 = Math.round((a1.y+a2.y)/2)+off;
       poly.setAttribute('points', `${a1.x},${a1.y} ${a1.x},${my2} ${a2.x},${my2} ${a2.x},${a2.y}`);
     }
-    g.appendChild(poly);
-    crowsFoot(g, a1.x, a1.y, r.fc, a1.s);
-    crowsFoot(g, a2.x, a2.y, r.tc, a2.s);
-    cardLabel(g, a1.x, a1.y, r.fc, a1.s);
-    cardLabel(g, a2.x, a2.y, r.tc, a2.s);
-    svgEl.appendChild(g);
+    gBg.appendChild(poly);
+    svgBg.appendChild(gBg);
+
+    // Notations go in foreground layer (above cards)
+    const gFg = document.createElementNS(NS,'g');
+    crowsFoot(gFg, a1.x, a1.y, r.fc, a1.s);
+    crowsFoot(gFg, a2.x, a2.y, r.tc, a2.s);
+    cardLabel(gFg, a1.x, a1.y, r.fc, a1.s);
+    cardLabel(gFg, a2.x, a2.y, r.tc, a2.s);
+    svgFg.appendChild(gFg);
   }
 }
 
 function drawSelf(r) {
   const b = box(r.f); if (!b) return;
-  const g = document.createElementNS(NS,'g');
+  // Line in background
+  const gBg = document.createElementNS(NS,'g');
   const poly = document.createElementNS(NS,'polyline');
   poly.setAttribute('points',
     `${b.x+b.w},${b.cy-15} ${b.x+b.w+30},${b.cy-15} ${b.x+b.w+30},${b.y-15} ${b.cx+15},${b.y-15} ${b.cx+15},${b.y}`);
   poly.setAttribute('stroke','var(--line-color)'); poly.setAttribute('stroke-width','1.5'); poly.setAttribute('fill','none');
-  g.appendChild(poly);
-  crowsFoot(g, b.cx+15, b.y, r.tc, 't');
-  svgEl.appendChild(g);
+  gBg.appendChild(poly);
+  svgBg.appendChild(gBg);
+  // Notation in foreground
+  const gFg = document.createElementNS(NS,'g');
+  crowsFoot(gFg, b.cx+15, b.y, r.tc, 't');
+  svgFg.appendChild(gFg);
 }
 
 function filterView(key, btn) {
@@ -1124,6 +1153,40 @@ function filterView(key, btn) {
 }
 window.filterView = filterView;
 requestAnimationFrame(() => drawLines());
+
+// ═══════════════════════════════════════════════════════════════════════
+// DRAG & DROP — move tables, lines auto-follow
+// ═══════════════════════════════════════════════════════════════════════
+(function() {
+  let dragEl = null, dragName = '', startX = 0, startY = 0, origX = 0, origY = 0;
+
+  canvas.addEventListener('mousedown', function(e) {
+    const ent = e.target.closest('.entity');
+    if (!ent) return;
+    e.preventDefault();
+    dragEl = ent;
+    dragName = ent.id.replace('e-','');
+    dragEl.classList.add('dragging');
+    startX = e.clientX; startY = e.clientY;
+    origX = parseInt(ent.style.left); origY = parseInt(ent.style.top);
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!dragEl) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    const nx = Math.max(0, origX + dx), ny = Math.max(0, origY + dy);
+    dragEl.style.left = nx + 'px';
+    dragEl.style.top = ny + 'px';
+    P[dragName] = [nx, ny];
+    drawLines();
+  });
+
+  document.addEventListener('mouseup', function() {
+    if (!dragEl) return;
+    dragEl.classList.remove('dragging');
+    dragEl = null;
+  });
+})();
 </script>
 </body>
 </html>

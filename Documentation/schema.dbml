@@ -1,0 +1,573 @@
+Table User {
+  UserId int [primary key, not null]
+  Email varchar
+  PasswordHash varchar
+  FirstName varchar [not null]
+  LastName varchar [not null]
+  PhoneNumber varchar
+  DefaultAddressId int
+  IsActive bit [not null]
+  IsWalkIn bit [not null]
+  CreatedAt timestamp [not null]
+  LastLoginAt timestamp
+  FailedLoginAttempts int [not null]
+  LockoutUntil timestamp
+  IsDeleted bit [not null]
+}
+
+Table Order {
+  OrderId int [primary key, not null]
+  UserId int
+  OrderNumber varchar [not null]
+  OrderDate timestamp [not null]
+  OrderStatus varchar [not null]
+  SubTotal decimal [not null]
+  DiscountAmount decimal [not null]
+  ShippingFee decimal [not null]
+  ShippingAddressId int
+  ContactPhone varchar
+  DeliveryInstructions varchar
+  IsWalkIn bit [not null]
+  CreatedAt timestamp [not null]
+  UpdatedAt timestamp
+  IsDeleted bit [not null]
+  FulfillmentType varchar [not null]
+  GuestSessionId int
+  CartId int
+  POSSessionId int
+  PaymentMethod varchar [not null]
+}
+
+Table OrderItem {
+  OrderItemId int [primary key, not null]
+  OrderId int [not null]
+  ProductId int [not null]
+  ProductVariantId int
+  Quantity int [not null]
+  UnitPrice decimal [not null]
+}
+
+Table PickupOrder {
+  PickupOrderId int [primary key, not null]
+  OrderId int [not null]
+  PickupReadyAt timestamp
+  PickupExpiresAt timestamp
+  PickupConfirmedAt timestamp
+}
+
+Table Address {
+  AddressId int [primary key, not null]
+  UserId int [not null]
+  Label varchar [not null]
+  Street varchar [not null]
+  City varchar [not null]
+  PostalCode varchar [not null]
+  Province varchar
+  Country varchar [not null]
+  IsDefault bit [not null]
+  IsSnapshot bit [not null]
+  CreatedAt timestamp [not null]
+}
+
+Table Payment {
+  PaymentId int [primary key, not null]
+  OrderId int [not null]
+  PaymentMethod varchar [not null]
+  PaymentStage varchar [not null]
+  PaymentStatus varchar [not null]
+  Amount decimal [not null]
+  PaymentDate timestamp
+  CreatedAt timestamp [not null]
+  IsDeleted bit [not null]
+  PaidToAccountName varchar
+  PaidToAccountNumber varchar
+  PaidToBankName varchar
+}
+
+Table GCashPayment {
+  PaymentId int [not null]
+  GcashTransactionId varchar
+  ScreenshotUrl varchar
+  StorageBucket varchar
+  StoragePath varchar
+  SubmittedAt timestamp
+}
+
+Table BankTransferPayment {
+  PaymentId int [not null]
+  BpiReferenceNumber varchar
+  ProofUrl varchar
+  ProofStorageBucket varchar
+  ProofStoragePath varchar
+  VerifiedByUserId int
+  VerificationNotes varchar
+  VerifiedAt timestamp
+  VerificationDeadline timestamp
+  SubmittedAt timestamp
+}
+
+Table VoucherUsage {
+  VoucherUsageId int [primary key, not null]
+  VoucherId int [not null]
+  UserId int [not null]
+  OrderId int [not null]
+  DiscountAmount decimal [not null]
+  UsedAt timestamp [not null]
+}
+
+Table ProductImage {
+  ProductImageId int [primary key, not null]
+  ProductId int [not null]
+  StorageBucket varchar [not null]
+  StoragePath varchar [not null]
+  ImageUrl varchar [not null]
+  ImageType varchar [not null]
+  IsPrimary bit [not null]
+  DisplayOrder int [not null]
+  AltText varchar
+  FileSizeBytes int
+  MimeType varchar
+  Width int
+  Height int
+  UploadedByUserId int
+  CreatedAt timestamp [not null]
+}
+
+Table Category {
+  CategoryId int [primary key, not null]
+  CategoryCode varchar [not null]
+  Name varchar [not null]
+  Description varchar
+  ParentCategoryId int
+  IsActive bit [not null]
+  DisplayOrder int [not null]
+}
+
+Table Brand {
+  BrandId int [primary key, not null]
+  BrandName varchar [not null]
+  Country varchar
+  Website varchar
+  Description varchar
+  IsActive bit [not null]
+  CreatedAt timestamp [not null]
+}
+
+Table Product {
+  ProductId int [primary key, not null]
+  CategoryId int [not null]
+  BrandId int
+  SKU varchar
+  Name varchar [not null]
+  ShortDescription varchar
+  Description varchar
+  Price decimal [not null]
+  Currency varchar [not null]
+  Material varchar
+  Color varchar
+  WheelSize varchar
+  SpeedCompatibility varchar
+  BoostCompatible bit
+  TubelessReady bit
+  AxleStandard varchar
+  SuspensionTravel varchar
+  BrakeType varchar
+  AdditionalSpecs varchar
+  IsActive bit [not null]
+  IsFeatured bit [not null]
+  CreatedAt timestamp [not null]
+  UpdatedAt timestamp
+}
+
+Table ProductVariant {
+  ProductVariantId int [primary key, not null]
+  ProductId int [not null]
+  VariantName varchar [not null]
+  SKU varchar
+  AdditionalPrice decimal [not null]
+  StockQuantity int [not null]
+  IsActive bit [not null]
+  CreatedAt timestamp [not null]
+  UpdatedAt timestamp
+  ReorderThreshold int [not null]
+}
+
+Table Notification {
+  NotificationId int [primary key, not null]
+  UserId int [not null]
+  OrderId int
+  TicketId int
+  Channel varchar [not null]
+  NotifType varchar [not null]
+  Recipient varchar [not null]
+  Subject varchar
+  Body varchar
+  Status varchar [not null]
+  RetryCount int [not null]
+  SentAt timestamp
+  FailureReason varchar
+  CreatedAt timestamp [not null]
+  IsRead bit [not null]
+  ReadAt timestamp
+}
+
+Table SupportTicket {
+  TicketId int [primary key, not null]
+  UserId int [not null]
+  OrderId int
+  TicketSource varchar [not null]
+  TicketCategory varchar [not null]
+  Subject varchar [not null]
+  Description varchar
+  AttachmentUrl varchar
+  AttachmentBucket varchar
+  AttachmentPath varchar
+  TicketStatus varchar [not null]
+  AssignedToUserId int
+  ResolvedAt timestamp
+  CreatedAt timestamp [not null]
+  UpdatedAt timestamp
+}
+
+Table LBCDelivery {
+  DeliveryId int [not null]
+  TrackingNumber varchar
+}
+
+Table Delivery {
+  DeliveryId int [primary key, not null]
+  OrderId int [not null]
+  Courier varchar [not null]
+  DeliveryStatus varchar [not null]
+  IsDelayed bit [not null]
+  DelayedUntil timestamp
+  EstimatedDeliveryTime timestamp
+  ActualDeliveryTime timestamp
+  CreatedAt timestamp [not null]
+}
+
+Table LalamoveDelivery {
+  DeliveryId int [not null]
+  BookingRef varchar
+  DriverName varchar
+  DriverPhone varchar
+}
+
+Table Supplier {
+  SupplierId int [primary key, not null]
+  Name varchar [not null]
+  ContactPerson varchar
+  PhoneNumber varchar
+  Email varchar
+  Address varchar
+  IsActive bit [not null]
+  CreatedAt timestamp [not null]
+}
+
+Table PurchaseOrder {
+  PurchaseOrderId int [primary key, not null]
+  SupplierId int [not null]
+  OrderDate timestamp [not null]
+  ExpectedDeliveryDate timestamp
+  Status varchar [not null]
+  CreatedByUserId int
+  CreatedAt timestamp [not null]
+}
+
+Table PurchaseOrderItem {
+  PurchaseOrderItemId int [primary key, not null]
+  PurchaseOrderId int [not null]
+  ProductId int [not null]
+  ProductVariantId int
+  Quantity int [not null]
+  UnitPrice decimal [not null]
+}
+
+Table __EFMigrationsHistory {
+  MigrationId varchar [not null]
+  ProductVersion varchar [not null]
+}
+
+Table ActiveSession {
+  SessionId int [primary key, not null]
+  UserId int [not null]
+  RefreshToken varchar [not null]
+  DeviceInfo varchar
+  IpAddress varchar
+  IsRevoked bit [not null]
+  ExpiresAt timestamp [not null]
+  CreatedAt timestamp [not null]
+  RevokedAt timestamp
+}
+
+Table Cart {
+  CartId int [primary key, not null]
+  UserId int
+  GuestSessionId int
+  CreatedAt timestamp [not null]
+  LastUpdatedAt timestamp
+  IsCheckedOut bit [not null]
+}
+
+Table CartItem {
+  CartItemId int [primary key, not null]
+  CartId int [not null]
+  ProductId int [not null]
+  ProductVariantId int
+  Quantity int [not null]
+  PriceAtAdd decimal [not null]
+  AddedAt timestamp [not null]
+}
+
+Table GuestSession {
+  GuestSessionId int [primary key, not null]
+  SessionToken varchar [not null]
+  Email varchar
+  PhoneNumber varchar
+  ConvertedToUserId int
+  ExpiresAt timestamp [not null]
+  CreatedAt timestamp [not null]
+}
+
+Table InventoryLog {
+  InventoryLogId bigint [primary key, not null]
+  ProductId int [not null]
+  ProductVariantId int
+  ChangeQuantity int [not null]
+  ChangeType varchar [not null]
+  OrderId int
+  PurchaseOrderId int
+  ChangedByUserId int
+  Notes varchar
+  CreatedAt timestamp [not null]
+}
+
+Table OrderStatusAudit {
+  AuditId bigint [primary key, not null]
+  OrderId int [not null]
+  FromStatus varchar [not null]
+  ToStatus varchar [not null]
+  Success bit [not null]
+  Reason varchar
+  CreatedAt timestamp [not null]
+}
+
+Table OTPVerification {
+  OTPId int [primary key, not null]
+  Email varchar [not null]
+  OTPCode varchar [not null]
+  IsUsed bit [not null]
+  ExpiresAt timestamp [not null]
+  CreatedAt timestamp [not null]
+}
+
+Table POS_Session {
+  POSSessionId int [primary key, not null]
+  UserId int [not null]
+  TerminalName varchar [not null]
+  ShiftStart timestamp [not null]
+  ShiftEnd timestamp
+  TotalSales decimal [not null]
+  CreatedAt timestamp [not null]
+}
+
+Table PriceHistory {
+  PriceHistoryId int [primary key, not null]
+  ProductId int [not null]
+  OldPrice decimal [not null]
+  NewPrice decimal [not null]
+  ChangedAt timestamp [not null]
+  ChangedByUserId int
+  Notes varchar
+}
+
+Table Refund {
+  RefundId int [primary key, not null]
+  OrderId int [not null]
+  PaymentId int
+  RefundAmount decimal [not null]
+  RefundReason varchar [not null]
+  RefundStatus varchar [not null]
+  RefundMethod varchar
+  RequestedByUserId int
+  ApprovedByUserId int
+  TicketId int
+  Notes varchar
+  CreatedAt timestamp [not null]
+  ProcessedAt timestamp
+}
+
+Table Review {
+  ReviewId int [primary key, not null]
+  UserId int [not null]
+  ProductId int [not null]
+  OrderId int [not null]
+  Rating int [not null]
+  Comment varchar
+  IsVerifiedPurchase bit [not null]
+  CreatedAt timestamp [not null]
+}
+
+Table Role {
+  RoleId int [primary key, not null]
+  RoleName varchar [not null]
+  Description varchar
+  CreatedAt timestamp [not null]
+}
+
+Table StorePaymentAccount {
+  StorePaymentAccountId int [primary key, not null]
+  PaymentMethod varchar [not null]
+  AccountName varchar [not null]
+  AccountNumber varchar [not null]
+  BankName varchar
+  QrImageUrl varchar
+  Instructions varchar
+  IsActive bit [not null]
+  DisplayOrder int [not null]
+  CreatedAt timestamp [not null]
+  UpdatedAt timestamp [not null]
+}
+
+Table SupportTask {
+  TaskId int [primary key, not null]
+  TicketId int [not null]
+  AssignedToUserId int
+  TaskType varchar [not null]
+  TaskStatus varchar [not null]
+  DueDate timestamp
+  Notes varchar
+  CreatedAt timestamp [not null]
+  CompletedAt timestamp
+}
+
+Table SupportTicketReply {
+  ReplyId bigint [primary key, not null]
+  TicketId int [not null]
+  UserId int [not null]
+  IsAdminReply bit [not null]
+  Message varchar [not null]
+  AttachmentUrl varchar
+  AttachmentBucket varchar
+  AttachmentPath varchar
+  CreatedAt timestamp [not null]
+}
+
+Table SystemLog {
+  SystemLogId bigint [primary key, not null]
+  UserId int
+  EventType varchar [not null]
+  EventDescription varchar
+  CreatedAt timestamp [not null]
+}
+
+Table UserRole {
+  UserRoleId int [primary key, not null]
+  UserId int [not null]
+  RoleId int [not null]
+  AssignedAt timestamp [not null]
+}
+
+Table UserVoucher {
+  UserVoucherId int [primary key, not null]
+  UserId int [not null]
+  VoucherId int [not null]
+  AssignedAt timestamp [not null]
+  ExpiresAt timestamp
+}
+
+Table Voucher {
+  VoucherId int [primary key, not null]
+  Code varchar [not null]
+  Description varchar
+  DiscountType varchar [not null]
+  DiscountValue decimal [not null]
+  MinimumOrderAmount decimal
+  MaxUses int
+  MaxUsesPerUser int
+  StartDate timestamp [not null]
+  EndDate timestamp
+  IsActive bit [not null]
+  CreatedAt timestamp [not null]
+}
+
+Table Wishlist {
+  WishlistId int [primary key, not null]
+  UserId int [not null]
+  ProductId int [not null]
+  AddedAt timestamp [not null]
+}
+
+Ref: ActiveSession.UserId > User.UserId
+Ref: Address.UserId > User.UserId
+Ref: BankTransferPayment.VerifiedByUserId > User.UserId
+Ref: BankTransferPayment.PaymentId > Payment.PaymentId
+Ref: Cart.GuestSessionId > GuestSession.GuestSessionId
+Ref: Cart.UserId > User.UserId
+Ref: CartItem.CartId > Cart.CartId
+Ref: CartItem.ProductId > Product.ProductId
+Ref: CartItem.ProductVariantId > ProductVariant.ProductVariantId
+Ref: Category.ParentCategoryId > Category.CategoryId
+Ref: Delivery.OrderId > Order.OrderId
+Ref: GCashPayment.PaymentId > Payment.PaymentId
+Ref: GuestSession.ConvertedToUserId > User.UserId
+Ref: InventoryLog.OrderId > Order.OrderId
+Ref: InventoryLog.ProductId > Product.ProductId
+Ref: InventoryLog.PurchaseOrderId > PurchaseOrder.PurchaseOrderId
+Ref: InventoryLog.ChangedByUserId > User.UserId
+Ref: InventoryLog.ProductVariantId > ProductVariant.ProductVariantId
+Ref: LalamoveDelivery.DeliveryId > Delivery.DeliveryId
+Ref: LBCDelivery.DeliveryId > Delivery.DeliveryId
+Ref: Notification.OrderId > Order.OrderId
+Ref: Notification.TicketId > SupportTicket.TicketId
+Ref: Notification.UserId > User.UserId
+Ref: Order.CartId > Cart.CartId
+Ref: Order.GuestSessionId > GuestSession.GuestSessionId
+Ref: Order.POSSessionId > POS_Session.POSSessionId
+Ref: Order.ShippingAddressId > Address.AddressId
+Ref: Order.UserId > User.UserId
+Ref: OrderItem.OrderId > Order.OrderId
+Ref: OrderItem.ProductId > Product.ProductId
+Ref: OrderItem.ProductVariantId > ProductVariant.ProductVariantId
+Ref: OrderStatusAudit.OrderId > Order.OrderId
+Ref: Payment.OrderId > Order.OrderId
+Ref: PickupOrder.OrderId > Order.OrderId
+Ref: POS_Session.UserId > User.UserId
+Ref: PriceHistory.ProductId > Product.ProductId
+Ref: PriceHistory.ChangedByUserId > User.UserId
+Ref: Product.BrandId > Brand.BrandId
+Ref: Product.CategoryId > Category.CategoryId
+Ref: ProductImage.ProductId > Product.ProductId
+Ref: ProductImage.UploadedByUserId > User.UserId
+Ref: ProductVariant.ProductId > Product.ProductId
+Ref: PurchaseOrder.SupplierId > Supplier.SupplierId
+Ref: PurchaseOrder.CreatedByUserId > User.UserId
+Ref: PurchaseOrderItem.PurchaseOrderId > PurchaseOrder.PurchaseOrderId
+Ref: PurchaseOrderItem.ProductId > Product.ProductId
+Ref: PurchaseOrderItem.ProductVariantId > ProductVariant.ProductVariantId
+Ref: Refund.ApprovedByUserId > User.UserId
+Ref: Refund.OrderId > Order.OrderId
+Ref: Refund.PaymentId > Payment.PaymentId
+Ref: Refund.RequestedByUserId > User.UserId
+Ref: Refund.TicketId > SupportTicket.TicketId
+Ref: Review.OrderId > Order.OrderId
+Ref: Review.ProductId > Product.ProductId
+Ref: Review.UserId > User.UserId
+Ref: SupportTask.AssignedToUserId > User.UserId
+Ref: SupportTask.TicketId > SupportTicket.TicketId
+Ref: SupportTicket.AssignedToUserId > User.UserId
+Ref: SupportTicket.OrderId > Order.OrderId
+Ref: SupportTicket.UserId > User.UserId
+Ref: SupportTicketReply.TicketId > SupportTicket.TicketId
+Ref: SupportTicketReply.UserId > User.UserId
+Ref: SystemLog.UserId > User.UserId
+Ref: User.DefaultAddressId > Address.AddressId
+Ref: UserRole.RoleId > Role.RoleId
+Ref: UserRole.UserId > User.UserId
+Ref: UserVoucher.UserId > User.UserId
+Ref: UserVoucher.VoucherId > Voucher.VoucherId
+Ref: VoucherUsage.OrderId > Order.OrderId
+Ref: VoucherUsage.UserId > User.UserId
+Ref: VoucherUsage.VoucherId > Voucher.VoucherId
+Ref: Wishlist.ProductId > Product.ProductId
+Ref: Wishlist.UserId > User.UserId

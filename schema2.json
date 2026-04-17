@@ -1,0 +1,3730 @@
+{
+  "tables": {
+    "User": {
+      "columns": [
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "Email",
+          "type": "nvarchar(255)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PasswordHash",
+          "type": "nvarchar(255)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "FirstName",
+          "type": "nvarchar(100)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "LastName",
+          "type": "nvarchar(100)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PhoneNumber",
+          "type": "nvarchar(20)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DefaultAddressId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsActive",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsWalkIn",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "LastLoginAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "FailedLoginAttempts",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "LockoutUntil",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsDeleted",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Order": {
+      "columns": [
+        {
+          "name": "OrderId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderNumber",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderDate",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderStatus",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "SubTotal",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DiscountAmount",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ShippingFee",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ShippingAddressId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ContactPhone",
+          "type": "nvarchar(20)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DeliveryInstructions",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsWalkIn",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UpdatedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsDeleted",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "FulfillmentType",
+          "type": "nvarchar(20)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "GuestSessionId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CartId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "POSSessionId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TotalAmount",
+          "type": "calc",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": true
+        },
+        {
+          "name": "PaymentMethod",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderNumber",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "OrderItem": {
+      "columns": [
+        {
+          "name": "OrderItemId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductVariantId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Quantity",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UnitPrice",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderItemId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "PickupOrder": {
+      "columns": [
+        {
+          "name": "PickupOrderId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PickupReadyAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PickupExpiresAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PickupConfirmedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PickupOrderId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Address": {
+      "columns": [
+        {
+          "name": "AddressId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Label",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Street",
+          "type": "nvarchar(500)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "City",
+          "type": "nvarchar(100)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PostalCode",
+          "type": "nvarchar(20)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Province",
+          "type": "nvarchar(100)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Country",
+          "type": "nvarchar(100)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsDefault",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsSnapshot",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AddressId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Payment": {
+      "columns": [
+        {
+          "name": "PaymentId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PaymentMethod",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PaymentStage",
+          "type": "nvarchar(20)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PaymentStatus",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Amount",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PaymentDate",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsDeleted",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PaidToAccountName",
+          "type": "nvarchar(150)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PaidToAccountNumber",
+          "type": "nvarchar(50)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PaidToBankName",
+          "type": "nvarchar(100)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PaymentId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "GCashPayment": {
+      "columns": [
+        {
+          "name": "PaymentId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "GcashTransactionId",
+          "type": "nvarchar(255)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ScreenshotUrl",
+          "type": "nvarchar(1000)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "StorageBucket",
+          "type": "nvarchar(200)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "StoragePath",
+          "type": "nvarchar(1000)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "SubmittedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PaymentId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "BankTransferPayment": {
+      "columns": [
+        {
+          "name": "PaymentId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "BpiReferenceNumber",
+          "type": "nvarchar(255)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProofUrl",
+          "type": "nvarchar(1000)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProofStorageBucket",
+          "type": "nvarchar(200)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProofStoragePath",
+          "type": "nvarchar(1000)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "VerifiedByUserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "VerificationNotes",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "VerifiedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "VerificationDeadline",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "SubmittedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PaymentId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "VoucherUsage": {
+      "columns": [
+        {
+          "name": "VoucherUsageId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "VoucherId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DiscountAmount",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UsedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "VoucherUsageId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "ProductImage": {
+      "columns": [
+        {
+          "name": "ProductImageId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "ProductId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "StorageBucket",
+          "type": "nvarchar(200)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "StoragePath",
+          "type": "nvarchar(1000)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ImageUrl",
+          "type": "nvarchar(1000)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ImageType",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsPrimary",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DisplayOrder",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AltText",
+          "type": "nvarchar(200)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "FileSizeBytes",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "MimeType",
+          "type": "nvarchar(50)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Width",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Height",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UploadedByUserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductImageId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Category": {
+      "columns": [
+        {
+          "name": "CategoryId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "CategoryCode",
+          "type": "varchar(20)",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Name",
+          "type": "nvarchar(100)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Description",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ParentCategoryId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsActive",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DisplayOrder",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CategoryId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CategoryCode",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Brand": {
+      "columns": [
+        {
+          "name": "BrandId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "BrandName",
+          "type": "nvarchar(100)",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Country",
+          "type": "nvarchar(100)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Website",
+          "type": "nvarchar(255)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Description",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsActive",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "BrandId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "BrandName",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Product": {
+      "columns": [
+        {
+          "name": "ProductId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "CategoryId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "BrandId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "SKU",
+          "type": "varchar(50)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Name",
+          "type": "nvarchar(200)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ShortDescription",
+          "type": "nvarchar(300)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Description",
+          "type": "nvarchar(max)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Price",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Currency",
+          "type": "char(3)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Material",
+          "type": "nvarchar(100)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Color",
+          "type": "nvarchar(100)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "WheelSize",
+          "type": "nvarchar(20)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "SpeedCompatibility",
+          "type": "nvarchar(50)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "BoostCompatible",
+          "type": "bit",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TubelessReady",
+          "type": "bit",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AxleStandard",
+          "type": "nvarchar(50)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "SuspensionTravel",
+          "type": "nvarchar(50)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "BrakeType",
+          "type": "nvarchar(100)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AdditionalSpecs",
+          "type": "nvarchar(1000)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsActive",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsFeatured",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UpdatedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "ProductVariant": {
+      "columns": [
+        {
+          "name": "ProductVariantId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "ProductId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "VariantName",
+          "type": "nvarchar(100)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "SKU",
+          "type": "nvarchar(50)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AdditionalPrice",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "StockQuantity",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsActive",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UpdatedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ReorderThreshold",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductVariantId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Notification": {
+      "columns": [
+        {
+          "name": "NotificationId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TicketId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Channel",
+          "type": "nvarchar(20)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "NotifType",
+          "type": "nvarchar(100)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Recipient",
+          "type": "nvarchar(255)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Subject",
+          "type": "nvarchar(255)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Body",
+          "type": "nvarchar(max)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Status",
+          "type": "nvarchar(20)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RetryCount",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "SentAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "FailureReason",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsRead",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ReadAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "NotificationId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "SupportTicket": {
+      "columns": [
+        {
+          "name": "TicketId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TicketSource",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TicketCategory",
+          "type": "nvarchar(100)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Subject",
+          "type": "nvarchar(200)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Description",
+          "type": "nvarchar(max)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AttachmentUrl",
+          "type": "nvarchar(1000)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AttachmentBucket",
+          "type": "nvarchar(200)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AttachmentPath",
+          "type": "nvarchar(1000)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TicketStatus",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AssignedToUserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ResolvedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UpdatedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TicketId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "LBCDelivery": {
+      "columns": [
+        {
+          "name": "DeliveryId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TrackingNumber",
+          "type": "nvarchar(255)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DeliveryId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Delivery": {
+      "columns": [
+        {
+          "name": "DeliveryId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Courier",
+          "type": "nvarchar(20)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DeliveryStatus",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsDelayed",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DelayedUntil",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "EstimatedDeliveryTime",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ActualDeliveryTime",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DeliveryId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "LalamoveDelivery": {
+      "columns": [
+        {
+          "name": "DeliveryId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "BookingRef",
+          "type": "nvarchar(255)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DriverName",
+          "type": "nvarchar(100)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DriverPhone",
+          "type": "nvarchar(20)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DeliveryId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Supplier": {
+      "columns": [
+        {
+          "name": "SupplierId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "Name",
+          "type": "nvarchar(200)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ContactPerson",
+          "type": "nvarchar(100)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PhoneNumber",
+          "type": "nvarchar(20)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Email",
+          "type": "nvarchar(255)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Address",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsActive",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "SupplierId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "PurchaseOrder": {
+      "columns": [
+        {
+          "name": "PurchaseOrderId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "SupplierId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderDate",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ExpectedDeliveryDate",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Status",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedByUserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PurchaseOrderId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "PurchaseOrderItem": {
+      "columns": [
+        {
+          "name": "PurchaseOrderItemId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "PurchaseOrderId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductVariantId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Quantity",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UnitPrice",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PurchaseOrderItemId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "__EFMigrationsHistory": {
+      "columns": [
+        {
+          "name": "MigrationId",
+          "type": "nvarchar(150)",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductVersion",
+          "type": "nvarchar(32)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "MigrationId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "ActiveSession": {
+      "columns": [
+        {
+          "name": "SessionId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RefreshToken",
+          "type": "nvarchar(500)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DeviceInfo",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IpAddress",
+          "type": "nvarchar(50)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsRevoked",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ExpiresAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RevokedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "SessionId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Cart": {
+      "columns": [
+        {
+          "name": "CartId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "GuestSessionId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "LastUpdatedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsCheckedOut",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CartId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "CartItem": {
+      "columns": [
+        {
+          "name": "CartItemId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "CartId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductVariantId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Quantity",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PriceAtAdd",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AddedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CartItemId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "GuestSession": {
+      "columns": [
+        {
+          "name": "GuestSessionId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "SessionToken",
+          "type": "nvarchar(100)",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Email",
+          "type": "nvarchar(255)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PhoneNumber",
+          "type": "nvarchar(20)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ConvertedToUserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ExpiresAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "GuestSessionId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "SessionToken",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "InventoryLog": {
+      "columns": [
+        {
+          "name": "InventoryLogId",
+          "type": "bigint",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "ProductId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductVariantId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ChangeQuantity",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ChangeType",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PurchaseOrderId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ChangedByUserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Notes",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "InventoryLogId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "OrderStatusAudit": {
+      "columns": [
+        {
+          "name": "AuditId",
+          "type": "bigint",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "FromStatus",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ToStatus",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Success",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Reason",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AuditId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "OTPVerification": {
+      "columns": [
+        {
+          "name": "OTPId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "Email",
+          "type": "nvarchar(255)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OTPCode",
+          "type": "nvarchar(128)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsUsed",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ExpiresAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OTPId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "POS_Session": {
+      "columns": [
+        {
+          "name": "POSSessionId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TerminalName",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ShiftStart",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ShiftEnd",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TotalSales",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "POSSessionId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "PriceHistory": {
+      "columns": [
+        {
+          "name": "PriceHistoryId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "ProductId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OldPrice",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "NewPrice",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ChangedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ChangedByUserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Notes",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PriceHistoryId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Refund": {
+      "columns": [
+        {
+          "name": "RefundId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "PaymentId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RefundAmount",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RefundReason",
+          "type": "nvarchar(500)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RefundStatus",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RefundMethod",
+          "type": "nvarchar(50)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RequestedByUserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ApprovedByUserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TicketId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Notes",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProcessedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RefundId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Review": {
+      "columns": [
+        {
+          "name": "ReviewId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "OrderId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Rating",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Comment",
+          "type": "nvarchar(1000)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsVerifiedPurchase",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ReviewId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Role": {
+      "columns": [
+        {
+          "name": "RoleId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "RoleName",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Description",
+          "type": "nvarchar(255)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RoleId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RoleName",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "StorePaymentAccount": {
+      "columns": [
+        {
+          "name": "StorePaymentAccountId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "PaymentMethod",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AccountName",
+          "type": "nvarchar(150)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AccountNumber",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "BankName",
+          "type": "nvarchar(100)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "QrImageUrl",
+          "type": "nvarchar(1000)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Instructions",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsActive",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DisplayOrder",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UpdatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "StorePaymentAccountId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "SupportTask": {
+      "columns": [
+        {
+          "name": "TaskId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "TicketId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AssignedToUserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TaskType",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TaskStatus",
+          "type": "nvarchar(20)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DueDate",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Notes",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CompletedAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "TaskId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "SupportTicketReply": {
+      "columns": [
+        {
+          "name": "ReplyId",
+          "type": "bigint",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "TicketId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsAdminReply",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Message",
+          "type": "nvarchar(max)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AttachmentUrl",
+          "type": "nvarchar(1000)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AttachmentBucket",
+          "type": "nvarchar(200)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AttachmentPath",
+          "type": "nvarchar(1000)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ReplyId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "SystemLog": {
+      "columns": [
+        {
+          "name": "SystemLogId",
+          "type": "bigint",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "EventType",
+          "type": "nvarchar(100)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "EventDescription",
+          "type": "nvarchar(1000)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "SystemLogId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "UserRole": {
+      "columns": [
+        {
+          "name": "UserRoleId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RoleId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AssignedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UserRoleId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "RoleId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "UserVoucher": {
+      "columns": [
+        {
+          "name": "UserVoucherId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "VoucherId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AssignedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ExpiresAt",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UserVoucherId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "VoucherId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Voucher": {
+      "columns": [
+        {
+          "name": "VoucherId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "Code",
+          "type": "nvarchar(50)",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Description",
+          "type": "nvarchar(500)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DiscountType",
+          "type": "nvarchar(20)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "DiscountValue",
+          "type": "decimal(10, 2)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "MinimumOrderAmount",
+          "type": "decimal(10, 2)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "MaxUses",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "MaxUsesPerUser",
+          "type": "int",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "StartDate",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "EndDate",
+          "type": "datetime2(7)",
+          "nullable": true,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "IsActive",
+          "type": "bit",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "CreatedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "VoucherId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "Code",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    },
+    "Wishlist": {
+      "columns": [
+        {
+          "name": "WishlistId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": true,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductId",
+          "type": "int",
+          "nullable": false,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "AddedAt",
+          "type": "datetime2(7)",
+          "nullable": false,
+          "is_pk": false,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "WishlistId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "UserId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        },
+        {
+          "name": "ProductId",
+          "type": "unknown",
+          "nullable": true,
+          "is_pk": true,
+          "is_identity": false,
+          "is_computed": false
+        }
+      ],
+      "pks": [],
+      "computed": [],
+      "nullable": []
+    }
+  },
+  "relations": []
+}

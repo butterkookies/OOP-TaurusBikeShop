@@ -1,0 +1,443 @@
+erDiagram
+    User {
+        int UserId PK
+        nvarchar Email
+        nvarchar PasswordHash
+        nvarchar FirstName
+        nvarchar LastName
+        nvarchar PhoneNumber
+        int DefaultAddressId FK
+        bit IsActive
+        bit IsWalkIn
+        bit IsDeleted
+        datetime2 CreatedAt
+    }
+
+    Role {
+        int RoleId PK
+        nvarchar RoleName
+        nvarchar Description
+    }
+
+    UserRole {
+        int UserRoleId PK
+        int UserId FK
+        int RoleId FK
+        datetime2 AssignedAt
+    }
+
+    Address {
+        int AddressId PK
+        int UserId FK
+        nvarchar Label
+        nvarchar Street
+        nvarchar City
+        nvarchar PostalCode
+        nvarchar Province
+        nvarchar Country
+        bit IsDefault
+        bit IsSnapshot
+    }
+
+    ActiveSession {
+        int SessionId PK
+        int UserId FK
+        nvarchar SessionToken
+        bit IsRevoked
+        datetime2 ExpiresAt
+    }
+
+    OTPVerification {
+        int OTPId PK
+        nvarchar Email
+        nvarchar OTPCode
+        bit IsUsed
+        datetime2 ExpiresAt
+    }
+
+    Category {
+        int CategoryId PK
+        int ParentCategoryId FK
+        nvarchar Name
+        nvarchar CategoryCode
+        bit IsActive
+        int DisplayOrder
+    }
+
+    Brand {
+        int BrandId PK
+        nvarchar BrandName
+        nvarchar Country
+        bit IsActive
+    }
+
+    Product {
+        int ProductId PK
+        int CategoryId FK
+        int BrandId FK
+        varchar SKU
+        nvarchar Name
+        decimal Price
+        char Currency
+        bit IsActive
+        bit IsFeatured
+    }
+
+    ProductVariant {
+        int ProductVariantId PK
+        int ProductId FK
+        nvarchar VariantName
+        nvarchar SKU
+        decimal AdditionalPrice
+        int StockQuantity
+        int ReorderThreshold
+        bit IsActive
+    }
+
+    ProductImage {
+        int ProductImageId PK
+        int ProductId FK
+        nvarchar ImageUrl
+        nvarchar StorageBucket
+        nvarchar StoragePath
+        bit IsPrimary
+        int DisplayOrder
+    }
+
+    PriceHistory {
+        int PriceHistoryId PK
+        int ProductId FK
+        decimal OldPrice
+        decimal NewPrice
+        int ChangedByUserId FK
+    }
+
+    GuestSession {
+        int GuestSessionId PK
+        nvarchar SessionToken
+        nvarchar Email
+        int ConvertedToUserId FK
+        datetime2 ExpiresAt
+    }
+
+    Cart {
+        int CartId PK
+        int UserId FK
+        int GuestSessionId FK
+        bit IsCheckedOut
+    }
+
+    CartItem {
+        int CartItemId PK
+        int CartId FK
+        int ProductId FK
+        int ProductVariantId FK
+        int Quantity
+        decimal PriceAtAdd
+    }
+
+    Order {
+        int OrderId PK
+        int UserId FK
+        nvarchar OrderNumber
+        nvarchar OrderStatus
+        decimal SubTotal
+        decimal DiscountAmount
+        decimal ShippingFee
+        decimal TotalAmount "COMPUTED"
+        nvarchar FulfillmentType
+        nvarchar PaymentMethod
+        bit IsWalkIn
+        bit IsDeleted
+    }
+
+    OrderItem {
+        int OrderItemId PK
+        int OrderId FK
+        int ProductId FK
+        int ProductVariantId FK
+        int Quantity
+        decimal UnitPrice
+    }
+
+    Payment {
+        int PaymentId PK
+        int OrderId FK
+        nvarchar PaymentMethod
+        nvarchar PaymentStage
+        nvarchar PaymentStatus
+        decimal Amount
+        bit IsDeleted
+    }
+
+    GCashPayment {
+        int PaymentId PK_FK
+        nvarchar GcashTransactionId
+        nvarchar ScreenshotUrl
+        nvarchar StorageBucket
+        nvarchar StoragePath
+    }
+
+    BankTransferPayment {
+        int PaymentId PK_FK
+        nvarchar BpiReferenceNumber
+        nvarchar ProofUrl
+        int VerifiedByUserId FK
+        nvarchar VerificationNotes
+        datetime2 VerifiedAt
+    }
+
+    Delivery {
+        int DeliveryId PK
+        int OrderId FK
+        nvarchar Courier
+        nvarchar DeliveryStatus
+        bit IsDelayed
+        datetime2 EstimatedDeliveryTime
+        datetime2 ActualDeliveryTime
+    }
+
+    LalamoveDelivery {
+        int DeliveryId PK_FK
+        nvarchar BookingRef
+        nvarchar DriverName
+        nvarchar DriverPhone
+    }
+
+    LBCDelivery {
+        int DeliveryId PK_FK
+        nvarchar TrackingNumber
+    }
+
+    PickupOrder {
+        int PickupOrderId PK
+        int OrderId FK
+        datetime2 PickupReadyAt
+        datetime2 PickupExpiresAt
+        datetime2 PickupConfirmedAt
+    }
+
+    Voucher {
+        int VoucherId PK
+        nvarchar Code
+        nvarchar DiscountType
+        decimal DiscountValue
+        decimal MinimumOrderAmount
+        int MaxUses
+        int MaxUsesPerUser
+        datetime2 StartDate
+        datetime2 EndDate
+        bit IsActive
+    }
+
+    UserVoucher {
+        int UserVoucherId PK
+        int UserId FK
+        int VoucherId FK
+        datetime2 ExpiresAt
+    }
+
+    VoucherUsage {
+        int VoucherUsageId PK
+        int VoucherId FK
+        int UserId FK
+        int OrderId FK
+        decimal DiscountAmount
+    }
+
+    Wishlist {
+        int WishlistId PK
+        int UserId FK
+        int ProductId FK
+        datetime2 AddedAt
+    }
+
+    Review {
+        int ReviewId PK
+        int UserId FK
+        int ProductId FK
+        int OrderId FK
+        int Rating
+        nvarchar Comment
+        bit IsVerifiedPurchase
+    }
+
+    SupportTicket {
+        int TicketId PK
+        int UserId FK
+        int OrderId FK
+        nvarchar TicketCategory
+        nvarchar Subject
+        nvarchar TicketStatus
+        int AssignedToUserId FK
+    }
+
+    SupportTicketReply {
+        bigint ReplyId PK
+        int TicketId FK
+        int UserId FK
+        bit IsAdminReply
+        nvarchar Message
+    }
+
+    SupportTask {
+        int TaskId PK
+        int TicketId FK
+        int AssignedToUserId FK
+        nvarchar TaskType
+        nvarchar TaskStatus
+    }
+
+    Notification {
+        int NotificationId PK
+        int UserId FK
+        int OrderId FK
+        int TicketId FK
+        nvarchar Channel
+        nvarchar NotifType
+        nvarchar Status
+        bit IsRead
+    }
+
+    Supplier {
+        int SupplierId PK
+        nvarchar Name
+        nvarchar ContactPerson
+        nvarchar Email
+        bit IsActive
+    }
+
+    PurchaseOrder {
+        int PurchaseOrderId PK
+        int SupplierId FK
+        nvarchar Status
+        int CreatedByUserId FK
+        datetime2 OrderDate
+    }
+
+    PurchaseOrderItem {
+        int PurchaseOrderItemId PK
+        int PurchaseOrderId FK
+        int ProductId FK
+        int ProductVariantId FK
+        int Quantity
+        decimal UnitPrice
+    }
+
+    InventoryLog {
+        bigint InventoryLogId PK
+        int ProductId FK
+        int ProductVariantId FK
+        int ChangeQuantity
+        nvarchar ChangeType
+        int OrderId FK
+        int PurchaseOrderId FK
+    }
+
+    OrderStatusAudit {
+        bigint AuditId PK
+        int OrderId FK
+        nvarchar FromStatus
+        nvarchar ToStatus
+        bit Success
+    }
+
+    POS_Session {
+        int POSSessionId PK
+        int UserId FK
+        nvarchar TerminalName
+        datetime2 ShiftStart
+        datetime2 ShiftEnd
+        decimal TotalSales
+    }
+
+    Refund {
+        int RefundId PK
+        int OrderId FK
+        int PaymentId FK
+        decimal RefundAmount
+        nvarchar RefundReason
+        nvarchar RefundStatus
+        int RequestedByUserId FK
+        int ApprovedByUserId FK
+        int TicketId FK
+    }
+
+    StorePaymentAccount {
+        int StorePaymentAccountId PK
+        nvarchar PaymentMethod
+        nvarchar AccountName
+        nvarchar AccountNumber
+        nvarchar BankName
+        bit IsActive
+    }
+
+    SystemLog {
+        bigint SystemLogId PK
+        int UserId FK
+        nvarchar EventType
+        nvarchar EventDescription
+    }
+
+    User ||--o{ Address : "has"
+    User ||--o{ UserRole : "has"
+    Role ||--o{ UserRole : "assigned"
+    User ||--o{ ActiveSession : "has"
+    User ||--o{ Cart : "owns"
+    User ||--o{ Order : "places"
+    User ||--o{ Wishlist : "saves"
+    User ||--o{ Review : "writes"
+    User ||--o{ SupportTicket : "creates"
+    User ||--o{ Notification : "receives"
+    User ||--o{ UserVoucher : "assigned"
+    User ||--o{ VoucherUsage : "uses"
+    User ||--o{ SystemLog : "generates"
+    User ||--o{ POS_Session : "operates"
+
+    GuestSession ||--o| Cart : "owns"
+    GuestSession }o--o| User : "converts to"
+
+    Category ||--o{ Product : "contains"
+    Category ||--o{ Category : "parent"
+    Brand ||--o{ Product : "manufactures"
+    Product ||--o{ ProductVariant : "has"
+    Product ||--o{ ProductImage : "has"
+    Product ||--o{ PriceHistory : "tracks"
+    Product ||--o{ Review : "reviewed"
+    Product ||--o{ Wishlist : "wishlisted"
+    Product ||--o{ CartItem : "added to"
+    Product ||--o{ OrderItem : "ordered"
+
+    Cart ||--o{ CartItem : "contains"
+    CartItem }o--o| ProductVariant : "specifies"
+
+    Order ||--o{ OrderItem : "contains"
+    Order ||--o{ Payment : "paid by"
+    Order ||--o| Delivery : "shipped"
+    Order ||--o| PickupOrder : "picked up"
+    Order ||--o{ VoucherUsage : "redeems"
+    Order ||--o{ Notification : "triggers"
+    Order ||--o{ OrderStatusAudit : "audited"
+    Order ||--o{ Refund : "refunded"
+    Order ||--o{ Review : "reviewed"
+    Order ||--o{ SupportTicket : "referenced"
+    Order ||--o{ InventoryLog : "logged"
+    OrderItem }o--o| ProductVariant : "specifies"
+
+    Payment ||--o| GCashPayment : "extends"
+    Payment ||--o| BankTransferPayment : "extends"
+
+    Delivery ||--o| LalamoveDelivery : "extends"
+    Delivery ||--o| LBCDelivery : "extends"
+
+    Voucher ||--o{ UserVoucher : "assigned"
+    Voucher ||--o{ VoucherUsage : "used"
+
+    SupportTicket ||--o{ SupportTicketReply : "has"
+    SupportTicket ||--o{ SupportTask : "has"
+    SupportTicket ||--o{ Notification : "triggers"
+    SupportTicket ||--o{ Refund : "linked"
+
+    Supplier ||--o{ PurchaseOrder : "supplies"
+    PurchaseOrder ||--o{ PurchaseOrderItem : "contains"
+    PurchaseOrder ||--o{ InventoryLog : "logged"
