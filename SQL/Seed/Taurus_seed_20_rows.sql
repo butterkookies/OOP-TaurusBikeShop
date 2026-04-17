@@ -1,0 +1,507 @@
+USE [Taurus-bike-shop-sqlserver-2026];
+GO
+
+-- 20 Rows Generated Dummy Data for Taurus Bike Shop DB
+
+SET IDENTITY_INSERT [User] ON;
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1001, 'jane@example.com', 'dummyhash', 'Jane', 'Lopez', '09170000000', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1002, 'alice@example.com', 'dummyhash', 'Alice', 'Johnson', '09170000001', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1003, 'luna@example.com', 'dummyhash', 'Luna', 'Anderson', '09170000002', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1004, 'quinn@example.com', 'dummyhash', 'Quinn', 'Thomas', '09170000003', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1005, 'quinn@example.com', 'dummyhash', 'Quinn', 'Hernandez', '09170000004', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1006, 'emma@example.com', 'dummyhash', 'Emma', 'Johnson', '09170000005', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1007, 'luna@example.com', 'dummyhash', 'Luna', 'Thomas', '09170000006', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1008, 'charlie@example.com', 'dummyhash', 'Charlie', 'Martinez', '09170000007', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1009, 'emma@example.com', 'dummyhash', 'Emma', 'Jackson', '09170000008', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1010, 'nina@example.com', 'dummyhash', 'Nina', 'Moore', '09170000009', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1011, 'kevin@example.com', 'dummyhash', 'Kevin', 'Brown', '09170000010', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1012, 'bob@example.com', 'dummyhash', 'Bob', 'Jones', '09170000011', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1013, 'oscar@example.com', 'dummyhash', 'Oscar', 'Lopez', '09170000012', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1014, 'fiona@example.com', 'dummyhash', 'Fiona', 'Jones', '09170000013', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1015, 'bob@example.com', 'dummyhash', 'Bob', 'Martinez', '09170000014', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1016, 'emma@example.com', 'dummyhash', 'Emma', 'Hernandez', '09170000015', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1017, 'nina@example.com', 'dummyhash', 'Nina', 'Hernandez', '09170000016', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1018, 'julia@example.com', 'dummyhash', 'Julia', 'Doe', '09170000017', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1019, 'hannah@example.com', 'dummyhash', 'Hannah', 'Hernandez', '09170000018', NULL, 1, 0, SYSDATETIME(), 0, 0);
+INSERT INTO [User] (UserId, Email, PasswordHash, FirstName, LastName, PhoneNumber, DefaultAddressId, IsActive, IsWalkIn, CreatedAt, FailedLoginAttempts, IsDeleted) VALUES (1020, 'ivan@example.com', 'dummyhash', 'Ivan', 'Taylor', '09170000019', NULL, 1, 0, SYSDATETIME(), 0, 0);
+SET IDENTITY_INSERT [User] OFF;
+GO
+
+SET IDENTITY_INSERT [Address] ON;
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1001, 1001, 'Home', '123 Fake Street', 'Cebu', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1002, 1002, 'Home', '123 Fake Street', 'Makati', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1003, 1003, 'Home', '123 Fake Street', 'Makati', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1004, 1004, 'Home', '123 Fake Street', 'Manila', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1005, 1005, 'Home', '123 Fake Street', 'Quezon City', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1006, 1006, 'Home', '123 Fake Street', 'Taguig', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1007, 1007, 'Home', '123 Fake Street', 'Makati', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1008, 1008, 'Home', '123 Fake Street', 'Cebu', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1009, 1009, 'Home', '123 Fake Street', 'Quezon City', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1010, 1010, 'Home', '123 Fake Street', 'Pasig', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1011, 1011, 'Home', '123 Fake Street', 'Makati', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1012, 1012, 'Home', '123 Fake Street', 'Alabang', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1013, 1013, 'Home', '123 Fake Street', 'Quezon City', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1014, 1014, 'Home', '123 Fake Street', 'Davao', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1015, 1015, 'Home', '123 Fake Street', 'Manila', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1016, 1016, 'Home', '123 Fake Street', 'Manila', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1017, 1017, 'Home', '123 Fake Street', 'Mandaluyong', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1018, 1018, 'Home', '123 Fake Street', 'Mandaluyong', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1019, 1019, 'Home', '123 Fake Street', 'Cebu', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+INSERT INTO [Address] (AddressId, UserId, Label, Street, City, PostalCode, Province, Country, IsDefault, IsSnapshot, CreatedAt) VALUES (1020, 1020, 'Home', '123 Fake Street', 'Taguig', '1000', 'Metro', 'Philippines', 1, 0, SYSDATETIME());
+SET IDENTITY_INSERT [Address] OFF;
+GO
+
+UPDATE [User] SET DefaultAddressId = UserId WHERE UserId >= 1001;
+GO
+
+SET IDENTITY_INSERT [Order] ON;
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1001, 1006, 'ORD-1001', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1005, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1002, 1007, 'ORD-1002', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1015, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1003, 1004, 'ORD-1003', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1019, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1004, 1013, 'ORD-1004', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1003, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1005, 1012, 'ORD-1005', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1002, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1006, 1013, 'ORD-1006', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1017, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1007, 1002, 'ORD-1007', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1008, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1008, 1008, 'ORD-1008', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1010, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1009, 1002, 'ORD-1009', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1020, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1010, 1020, 'ORD-1010', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1014, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1011, 1019, 'ORD-1011', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1010, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1012, 1016, 'ORD-1012', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1004, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1013, 1014, 'ORD-1013', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1001, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1014, 1017, 'ORD-1014', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1008, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1015, 1002, 'ORD-1015', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1009, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1016, 1010, 'ORD-1016', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1017, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1017, 1013, 'ORD-1017', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1010, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1018, 1018, 'ORD-1018', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1010, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1019, 1016, 'ORD-1019', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1011, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+INSERT INTO [Order] (OrderId, UserId, OrderNumber, OrderDate, OrderStatus, SubTotal, DiscountAmount, ShippingFee, ShippingAddressId, ContactPhone, IsWalkIn, CreatedAt, IsDeleted, FulfillmentType, PaymentMethod) VALUES (1020, 1008, 'ORD-1020', SYSDATETIME(), 'Completed', 1500.00, 0, 50.00, 1010, '0917000000', 0, SYSDATETIME(), 0, 'Delivery', 'GCash');
+SET IDENTITY_INSERT [Order] OFF;
+GO
+
+SET IDENTITY_INSERT [OrderItem] ON;
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1001, 1008, 31, 3, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1002, 1006, 2, 2, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1003, 1011, 83, 3, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1004, 1009, 149, 4, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1005, 1015, 119, 1, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1006, 1017, 74, 1, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1007, 1002, 149, 2, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1008, 1005, 128, 1, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1009, 1014, 111, 4, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1010, 1020, 119, 5, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1011, 1014, 14, 3, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1012, 1005, 9, 3, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1013, 1019, 11, 1, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1014, 1017, 55, 2, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1015, 1014, 44, 4, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1016, 1010, 139, 3, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1017, 1001, 96, 1, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1018, 1011, 23, 5, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1019, 1001, 150, 2, 500.00);
+INSERT INTO [OrderItem] (OrderItemId, OrderId, ProductId, Quantity, UnitPrice) VALUES (1020, 1016, 71, 2, 500.00);
+SET IDENTITY_INSERT [OrderItem] OFF;
+GO
+
+SET IDENTITY_INSERT [Payment] ON;
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1001, 1001, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1002, 1002, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1003, 1003, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1004, 1004, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1005, 1005, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1006, 1006, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1007, 1007, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1008, 1008, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1009, 1009, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1010, 1010, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1011, 1011, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1012, 1012, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1013, 1013, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1014, 1014, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1015, 1015, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1016, 1016, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1017, 1017, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1018, 1018, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1019, 1019, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+INSERT INTO [Payment] (PaymentId, OrderId, PaymentMethod, PaymentStage, PaymentStatus, Amount, PaymentDate, CreatedAt, IsDeleted) VALUES (1020, 1020, 'GCash', 'Full', 'Paid', 1550.00, SYSDATETIME(), SYSDATETIME(), 0);
+SET IDENTITY_INSERT [Payment] OFF;
+GO
+
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1001, 'GCX1001X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1002, 'GCX1002X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1003, 'GCX1003X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1004, 'GCX1004X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1005, 'GCX1005X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1006, 'GCX1006X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1007, 'GCX1007X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1008, 'GCX1008X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1009, 'GCX1009X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1010, 'GCX1010X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1011, 'GCX1011X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1012, 'GCX1012X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1013, 'GCX1013X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1014, 'GCX1014X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1015, 'GCX1015X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1016, 'GCX1016X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1017, 'GCX1017X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1018, 'GCX1018X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1019, 'GCX1019X', SYSDATETIME());
+INSERT INTO [GCashPayment] (PaymentId, GcashTransactionId, SubmittedAt) VALUES (1020, 'GCX1020X', SYSDATETIME());
+GO
+
+SET IDENTITY_INSERT [Delivery] ON;
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1001, 1001, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1002, 1002, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1003, 1003, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1004, 1004, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1005, 1005, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1006, 1006, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1007, 1007, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1008, 1008, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1009, 1009, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1010, 1010, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1011, 1011, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1012, 1012, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1013, 1013, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1014, 1014, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1015, 1015, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1016, 1016, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1017, 1017, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1018, 1018, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1019, 1019, 'LBC', 'Delivered', 0, SYSDATETIME());
+INSERT INTO [Delivery] (DeliveryId, OrderId, Courier, DeliveryStatus, IsDelayed, CreatedAt) VALUES (1020, 1020, 'LBC', 'Delivered', 0, SYSDATETIME());
+SET IDENTITY_INSERT [Delivery] OFF;
+GO
+
+-- Delivery subtypes (LBCDelivery)
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1001, 'TRK-1001');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1002, 'TRK-1002');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1003, 'TRK-1003');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1004, 'TRK-1004');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1005, 'TRK-1005');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1006, 'TRK-1006');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1007, 'TRK-1007');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1008, 'TRK-1008');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1009, 'TRK-1009');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1010, 'TRK-1010');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1011, 'TRK-1011');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1012, 'TRK-1012');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1013, 'TRK-1013');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1014, 'TRK-1014');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1015, 'TRK-1015');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1016, 'TRK-1016');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1017, 'TRK-1017');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1018, 'TRK-1018');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1019, 'TRK-1019');
+INSERT INTO [LBCDelivery] (DeliveryId, TrackingNumber) VALUES (1020, 'TRK-1020');
+GO
+
+SET IDENTITY_INSERT [Notification] ON;
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1001, 1019, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1002, 1011, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1003, 1018, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1004, 1006, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1005, 1019, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1006, 1002, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1007, 1009, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1008, 1008, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1009, 1018, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1010, 1001, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1011, 1019, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1012, 1003, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1013, 1006, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1014, 1009, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1015, 1010, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1016, 1002, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1017, 1010, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1018, 1015, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1019, 1014, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+INSERT INTO [Notification] (NotificationId, UserId, Channel, NotifType, Recipient, Subject, Status, RetryCount, CreatedAt, IsRead) VALUES (1020, 1015, 'Email', 'OrderCreated', 'user@ex.com', 'Update', 'Sent', 0, SYSDATETIME(), 0);
+SET IDENTITY_INSERT [Notification] OFF;
+GO
+
+SET IDENTITY_INSERT [SupportTicket] ON;
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1001, 1004, 'Web', 'Inquiry', 'Question 1001', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1002, 1002, 'Web', 'Inquiry', 'Question 1002', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1003, 1005, 'Web', 'Inquiry', 'Question 1003', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1004, 1007, 'Web', 'Inquiry', 'Question 1004', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1005, 1002, 'Web', 'Inquiry', 'Question 1005', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1006, 1003, 'Web', 'Inquiry', 'Question 1006', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1007, 1019, 'Web', 'Inquiry', 'Question 1007', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1008, 1018, 'Web', 'Inquiry', 'Question 1008', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1009, 1002, 'Web', 'Inquiry', 'Question 1009', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1010, 1010, 'Web', 'Inquiry', 'Question 1010', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1011, 1005, 'Web', 'Inquiry', 'Question 1011', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1012, 1004, 'Web', 'Inquiry', 'Question 1012', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1013, 1015, 'Web', 'Inquiry', 'Question 1013', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1014, 1004, 'Web', 'Inquiry', 'Question 1014', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1015, 1016, 'Web', 'Inquiry', 'Question 1015', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1016, 1012, 'Web', 'Inquiry', 'Question 1016', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1017, 1019, 'Web', 'Inquiry', 'Question 1017', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1018, 1012, 'Web', 'Inquiry', 'Question 1018', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1019, 1007, 'Web', 'Inquiry', 'Question 1019', 'Open', SYSDATETIME());
+INSERT INTO [SupportTicket] (TicketId, UserId, TicketSource, TicketCategory, Subject, TicketStatus, CreatedAt) VALUES (1020, 1005, 'Web', 'Inquiry', 'Question 1020', 'Open', SYSDATETIME());
+SET IDENTITY_INSERT [SupportTicket] OFF;
+GO
+
+SET IDENTITY_INSERT [Supplier] ON;
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1001, 'Supplier Company 1001', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1002, 'Supplier Company 1002', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1003, 'Supplier Company 1003', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1004, 'Supplier Company 1004', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1005, 'Supplier Company 1005', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1006, 'Supplier Company 1006', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1007, 'Supplier Company 1007', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1008, 'Supplier Company 1008', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1009, 'Supplier Company 1009', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1010, 'Supplier Company 1010', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1011, 'Supplier Company 1011', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1012, 'Supplier Company 1012', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1013, 'Supplier Company 1013', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1014, 'Supplier Company 1014', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1015, 'Supplier Company 1015', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1016, 'Supplier Company 1016', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1017, 'Supplier Company 1017', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1018, 'Supplier Company 1018', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1019, 'Supplier Company 1019', 1, SYSDATETIME());
+INSERT INTO [Supplier] (SupplierId, Name, IsActive, CreatedAt) VALUES (1020, 'Supplier Company 1020', 1, SYSDATETIME());
+SET IDENTITY_INSERT [Supplier] OFF;
+GO
+
+SET IDENTITY_INSERT [PurchaseOrder] ON;
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1001, 1018, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1002, 1004, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1003, 1002, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1004, 1002, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1005, 1008, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1006, 1007, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1007, 1019, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1008, 1011, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1009, 1018, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1010, 1004, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1011, 1002, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1012, 1009, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1013, 1006, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1014, 1015, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1015, 1012, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1016, 1012, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1017, 1018, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1018, 1007, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1019, 1005, SYSDATETIME(), 'Pending', SYSDATETIME());
+INSERT INTO [PurchaseOrder] (PurchaseOrderId, SupplierId, OrderDate, Status, CreatedAt) VALUES (1020, 1002, SYSDATETIME(), 'Pending', SYSDATETIME());
+SET IDENTITY_INSERT [PurchaseOrder] OFF;
+GO
+
+SET IDENTITY_INSERT [PurchaseOrderItem] ON;
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1001, 1007, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1002, 1014, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1003, 1003, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1004, 1005, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1005, 1020, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1006, 1013, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1007, 1003, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1008, 1009, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1009, 1014, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1010, 1017, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1011, 1008, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1012, 1016, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1013, 1001, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1014, 1018, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1015, 1018, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1016, 1015, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1017, 1012, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1018, 1006, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1019, 1003, 1, 10, 100.00);
+INSERT INTO [PurchaseOrderItem] (PurchaseOrderItemId, PurchaseOrderId, ProductId, Quantity, UnitPrice) VALUES (1020, 1017, 1, 10, 100.00);
+SET IDENTITY_INSERT [PurchaseOrderItem] OFF;
+GO
+
+SET IDENTITY_INSERT [SystemLog] ON;
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1001, SYSDATETIME(), 'Info', 'Dummy log 1001', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1002, SYSDATETIME(), 'Info', 'Dummy log 1002', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1003, SYSDATETIME(), 'Info', 'Dummy log 1003', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1004, SYSDATETIME(), 'Info', 'Dummy log 1004', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1005, SYSDATETIME(), 'Info', 'Dummy log 1005', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1006, SYSDATETIME(), 'Info', 'Dummy log 1006', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1007, SYSDATETIME(), 'Info', 'Dummy log 1007', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1008, SYSDATETIME(), 'Info', 'Dummy log 1008', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1009, SYSDATETIME(), 'Info', 'Dummy log 1009', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1010, SYSDATETIME(), 'Info', 'Dummy log 1010', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1011, SYSDATETIME(), 'Info', 'Dummy log 1011', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1012, SYSDATETIME(), 'Info', 'Dummy log 1012', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1013, SYSDATETIME(), 'Info', 'Dummy log 1013', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1014, SYSDATETIME(), 'Info', 'Dummy log 1014', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1015, SYSDATETIME(), 'Info', 'Dummy log 1015', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1016, SYSDATETIME(), 'Info', 'Dummy log 1016', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1017, SYSDATETIME(), 'Info', 'Dummy log 1017', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1018, SYSDATETIME(), 'Info', 'Dummy log 1018', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1019, SYSDATETIME(), 'Info', 'Dummy log 1019', 'System');
+INSERT INTO [SystemLog] (LogId, Timestamp, Level, Message, Source) VALUES (1020, SYSDATETIME(), 'Info', 'Dummy log 1020', 'System');
+SET IDENTITY_INSERT [SystemLog] OFF;
+GO
+
+SET IDENTITY_INSERT [Review] ON;
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1001, 73, 1019, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1002, 114, 1006, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1003, 18, 1013, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1004, 9, 1014, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1005, 122, 1003, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1006, 67, 1002, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1007, 12, 1015, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1008, 26, 1004, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1009, 124, 1003, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1010, 56, 1018, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1011, 65, 1012, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1012, 6, 1004, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1013, 81, 1001, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1014, 48, 1015, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1015, 117, 1009, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1016, 133, 1016, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1017, 21, 1008, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1018, 9, 1007, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1019, 47, 1012, 5, 'Great product!', 'Approved', SYSDATETIME());
+INSERT INTO [Review] (ReviewId, ProductId, UserId, Rating, Comment, Status, CreatedAt) VALUES (1020, 125, 1008, 5, 'Great product!', 'Approved', SYSDATETIME());
+SET IDENTITY_INSERT [Review] OFF;
+GO
+
+SET IDENTITY_INSERT [Wishlist] ON;
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1001, 1014, 59, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1002, 1005, 101, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1003, 1011, 143, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1004, 1017, 25, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1005, 1006, 119, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1006, 1011, 123, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1007, 1020, 147, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1008, 1009, 18, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1009, 1015, 50, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1010, 1020, 70, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1011, 1001, 18, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1012, 1017, 111, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1013, 1017, 115, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1014, 1016, 88, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1015, 1014, 74, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1016, 1010, 98, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1017, 1017, 130, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1018, 1003, 9, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1019, 1011, 13, SYSDATETIME());
+INSERT INTO [Wishlist] (WishlistId, UserId, ProductId, AddedAt) VALUES (1020, 1016, 66, SYSDATETIME());
+SET IDENTITY_INSERT [Wishlist] OFF;
+GO
+
+SET IDENTITY_INSERT [Cart] ON;
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1001, 1001, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1002, 1002, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1003, 1003, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1004, 1004, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1005, 1005, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1006, 1006, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1007, 1007, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1008, 1008, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1009, 1009, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1010, 1010, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1011, 1011, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1012, 1012, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1013, 1013, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1014, 1014, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1015, 1015, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1016, 1016, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1017, 1017, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1018, 1018, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1019, 1019, SYSDATETIME(), 0);
+INSERT INTO [Cart] (CartId, UserId, CreatedAt, IsCheckedOut) VALUES (1020, 1020, SYSDATETIME(), 0);
+SET IDENTITY_INSERT [Cart] OFF;
+GO
+
+SET IDENTITY_INSERT [CartItem] ON;
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1001, 1001, 47, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1002, 1002, 113, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1003, 1003, 55, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1004, 1004, 128, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1005, 1005, 86, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1006, 1006, 148, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1007, 1007, 11, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1008, 1008, 121, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1009, 1009, 148, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1010, 1010, 39, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1011, 1011, 77, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1012, 1012, 56, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1013, 1013, 3, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1014, 1014, 145, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1015, 1015, 77, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1016, 1016, 19, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1017, 1017, 112, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1018, 1018, 66, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1019, 1019, 55, 1, 100.00);
+INSERT INTO [CartItem] (CartItemId, CartId, ProductId, Quantity, PriceAtAdd) VALUES (1020, 1020, 29, 1, 100.00);
+SET IDENTITY_INSERT [CartItem] OFF;
+GO
+
+SET IDENTITY_INSERT [InventoryLog] ON;
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1001, 1, 'ManualAdjustment', 1, 'Dummy 1001', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1002, 1, 'ManualAdjustment', 1, 'Dummy 1002', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1003, 1, 'ManualAdjustment', 1, 'Dummy 1003', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1004, 1, 'ManualAdjustment', 1, 'Dummy 1004', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1005, 1, 'ManualAdjustment', 1, 'Dummy 1005', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1006, 1, 'ManualAdjustment', 1, 'Dummy 1006', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1007, 1, 'ManualAdjustment', 1, 'Dummy 1007', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1008, 1, 'ManualAdjustment', 1, 'Dummy 1008', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1009, 1, 'ManualAdjustment', 1, 'Dummy 1009', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1010, 1, 'ManualAdjustment', 1, 'Dummy 1010', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1011, 1, 'ManualAdjustment', 1, 'Dummy 1011', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1012, 1, 'ManualAdjustment', 1, 'Dummy 1012', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1013, 1, 'ManualAdjustment', 1, 'Dummy 1013', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1014, 1, 'ManualAdjustment', 1, 'Dummy 1014', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1015, 1, 'ManualAdjustment', 1, 'Dummy 1015', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1016, 1, 'ManualAdjustment', 1, 'Dummy 1016', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1017, 1, 'ManualAdjustment', 1, 'Dummy 1017', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1018, 1, 'ManualAdjustment', 1, 'Dummy 1018', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1019, 1, 'ManualAdjustment', 1, 'Dummy 1019', SYSDATETIME());
+INSERT INTO [InventoryLog] (LogId, ProductVariantId, ChangeType, QuantityChanged, Reason, CreatedAt) VALUES (1020, 1, 'ManualAdjustment', 1, 'Dummy 1020', SYSDATETIME());
+SET IDENTITY_INSERT [InventoryLog] OFF;
+GO
+
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1001, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1002, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1003, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1004, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1005, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1006, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1007, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1008, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1009, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1010, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1011, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1012, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1013, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1014, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1015, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1016, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1017, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1018, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1019, 5);
+INSERT INTO [UserRole] (UserId, RoleId) VALUES (1020, 5);
+GO
+
+SET IDENTITY_INSERT [Voucher] ON;
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1001, 'VOUCHER-1001', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1002, 'VOUCHER-1002', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1003, 'VOUCHER-1003', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1004, 'VOUCHER-1004', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1005, 'VOUCHER-1005', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1006, 'VOUCHER-1006', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1007, 'VOUCHER-1007', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1008, 'VOUCHER-1008', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1009, 'VOUCHER-1009', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1010, 'VOUCHER-1010', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1011, 'VOUCHER-1011', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1012, 'VOUCHER-1012', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1013, 'VOUCHER-1013', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1014, 'VOUCHER-1014', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1015, 'VOUCHER-1015', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1016, 'VOUCHER-1016', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1017, 'VOUCHER-1017', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1018, 'VOUCHER-1018', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1019, 'VOUCHER-1019', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+INSERT INTO [Voucher] (VoucherId, Code, Description, DiscountType, DiscountValue, MinimumSpend, StartDate, EndDate, IsActive, CreatedAt) VALUES (1020, 'VOUCHER-1020', 'Dummy', 'Fixed', 100, 500, SYSDATETIME(), SYSDATETIME(), 1, SYSDATETIME());
+SET IDENTITY_INSERT [Voucher] OFF;
+GO
+
