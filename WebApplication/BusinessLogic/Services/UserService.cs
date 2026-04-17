@@ -93,6 +93,7 @@ public sealed class UserService : IUserService
     {
         // ── Step 1: Find and validate the OTP (read-only, no save yet) ────
         var otp = await _userRepo.Context.OTPVerifications
+            .AsTracking() // Modified below (IsUsed = true)
             .FirstOrDefaultAsync(
                 o => o.Email == email
                   && o.OTPCode == code
@@ -364,6 +365,7 @@ public sealed class UserService : IUserService
 
         // Clear existing default
         List<Address> existingDefaults = await _userRepo.Context.Addresses
+            .AsTracking() // Modified below (IsDefault = false)
             .Where(a => a.UserId == userId && a.IsDefault && !a.IsSnapshot)
             .ToListAsync(cancellationToken);
 

@@ -57,6 +57,11 @@ public sealed class PaymentTimeoutJob : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("PaymentTimeoutJob started.");
+
+        // Staggered startup: delay before first cycle to prevent all background
+        // services from hitting the DB simultaneously at boot.
+        await Task.Delay(TimeSpan.FromSeconds(8), stoppingToken).ConfigureAwait(false);
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -115,6 +120,7 @@ public sealed class PaymentTimeoutJob : BackgroundService
             // Include o.User so the customer's email address is available for the
             // PaymentHeld notification queued after the save (flowchart J3B).
             List<Order> timedOutOrders = await context.Orders
+                .AsTracking() // Entities are modified (OrderStatus) then saved
                 .Include(o => o.Payments)
                 .Include(o => o.User)
                 .Where(o => o.OrderStatus == OrderStatuses.PendingVerification

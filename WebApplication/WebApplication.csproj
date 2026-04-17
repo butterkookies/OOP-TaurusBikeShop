@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -10,6 +10,12 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors />
     <UserSecretsId>fbe64185-b3a5-41ff-9715-6b03fc7c1472</UserSecretsId>
+    <!-- Server GC: higher throughput + larger generation budgets for long-running
+         services with 6 background jobs + web requests.  Without this the default
+         Workstation GC fragments the LOH under sustained allocation pressure,
+         leading to a fatal native OOM (exit code -1). -->
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>

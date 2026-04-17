@@ -98,6 +98,7 @@ public sealed class CartService : ICartService
 
         // If same variant already in cart — increment quantity
         CartItem? existingItem = await _cartRepo.Context.CartItems
+            .AsTracking() // Modified below (Quantity += qty)
             .FirstOrDefaultAsync(
                 ci => ci.CartId == cart.CartId
                    && ci.ProductId == productId
@@ -245,6 +246,7 @@ public sealed class CartService : ICartService
         foreach (CartItem guestItem in guestCart.Items)
         {
             CartItem? existingItem = await _cartRepo.Context.CartItems
+                .AsTracking() // Modified below (Quantity += qty)
                 .FirstOrDefaultAsync(
                     ci => ci.CartId == userCart.CartId
                        && ci.ProductId == guestItem.ProductId

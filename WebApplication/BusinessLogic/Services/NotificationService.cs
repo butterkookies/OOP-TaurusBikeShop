@@ -117,6 +117,7 @@ public sealed class NotificationService : INotificationService
         CancellationToken cancellationToken = default)
     {
         Notification? notification = await _context.Notifications
+            .AsTracking() // Modified below (IsRead, ReadAt)
             .FirstOrDefaultAsync(
                 n => n.NotificationId == notificationId && n.UserId == userId,
                 cancellationToken);

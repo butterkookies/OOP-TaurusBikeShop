@@ -58,6 +58,11 @@ public sealed class DeliveryStatusPollJob : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("DeliveryStatusPollJob started.");
+
+        // Staggered startup: delay before first cycle to prevent all background
+        // services from hitting the DB simultaneously at boot.
+        await Task.Delay(TimeSpan.FromSeconds(14), stoppingToken).ConfigureAwait(false);
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -110,6 +115,7 @@ public sealed class DeliveryStatusPollJob : BackgroundService
             // booking references. Include Order.User so customer notifications
             // can be addressed after status transitions are committed.
             List<Delivery> activeDeliveries = await context.Deliveries
+                .AsTracking() // Entities are modified (DeliveryStatus) then saved
                 .Include(d => d.LalamoveDelivery)
                 .Include(d => d.LBCDelivery)
                 .Include(d => d.Order)

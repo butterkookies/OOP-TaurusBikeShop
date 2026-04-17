@@ -33,6 +33,7 @@ public sealed class CartRepository : Repository<Cart>
         CancellationToken cancellationToken = default)
     {
         IQueryable<Cart> query = Context.Carts
+            .AsTracking() // Callers modify cart (IsCheckedOut, LastUpdatedAt, UserId)
             .Include(c => c.Items)
                 .ThenInclude(ci => ci.Product)
                     .ThenInclude(p => p!.Images)
@@ -80,6 +81,7 @@ public sealed class CartRepository : Repository<Cart>
         CancellationToken cancellationToken = default)
     {
         return await Context.CartItems
+            .AsTracking() // Callers modify item (Quantity) or remove it
             .Include(ci => ci.Product)
             .Include(ci => ci.Variant)
             .FirstOrDefaultAsync(ci => ci.CartItemId == cartItemId, cancellationToken);

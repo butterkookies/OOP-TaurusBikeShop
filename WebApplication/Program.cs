@@ -11,12 +11,35 @@ using WebApplication.DataAccess.Context;
 using WebApplication.DataAccess.Repositories;
 using WebApplication.Utilities;
 
+// ─── Fatal crash diagnostics ─────────────────────────────────────────────
+// Exit code -1 with no managed exception logged means the CLR is dying
+// before any catch block can fire.  These handlers write to stderr so the
+// output appears in the VS Output / console even after a fatal crash.
+AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+{
+    Console.Error.WriteLine($"[FATAL] UnhandledException (isTerminating={e.IsTerminating}): {e.ExceptionObject}");
+    Console.Error.Flush();
+};
+
+TaskScheduler.UnobservedTaskException += (_, e) =>
+{
+    Console.Error.WriteLine($"[FATAL] UnobservedTaskException: {e.Exception}");
+    Console.Error.Flush();
+    e.SetObserved(); // prevent crash from unobserved task exceptions
+};
+
 WebApplicationBuilder builder = AppWebApplication.CreateBuilder(args);
 
 // Allow file uploads up to 15 MB (form + overhead).
 // Individual actions can tighten via [RequestFormLimits].
 builder.WebHost.ConfigureKestrel(o =>
-    o.Limits.MaxRequestBodySize = 15 * 1024 * 1024);
+{
+    o.Limits.MaxRequestBodySize = 15 * 1024 * 1024;
+    // All other limits (MaxConcurrentConnections, buffer sizes) intentionally
+    // left at Kestrel defaults.  Explicitly capping them at 200 previously
+    // pre-allocated tracking structures that added to the memory pressure
+    // causing the fatal OOM on file upload.
+});
 
 builder.Services.Configure<HostOptions>(options =>
     options.BackgroundServiceExceptionBehavior =
@@ -35,14 +58,48 @@ builder.Services.AddScoped<IEmailSender, GmailEmailSender>();
 // DATABASE
 // =============================================================================
 
-builder.Services.AddDbContext<AppDbContext>(options =>
+// Use DbContext POOLING to reuse context instances instead of creating/destroying
+// one per scope.  With 6 background services creating scopes every 10–60 seconds
+// plus web requests, the non-pooled path was generating dozens of contexts per
+// minute — each compiling model metadata for 38 tables.  Pooling eliminates this
+// allocation churn and dramatically reduces GC pressure.
+//
+// Pool size capped at 32 (not the default 1024) — a single-process app with
+// 6 background services + web requests never needs more than ~20 concurrent
+// contexts.  Keeping the pool small prevents idle DbContext instances from
+// pinning memory (entity metadata, compiled query caches) that the GC cannot
+// reclaim, which contributed to the fatal native OOM (exit code -1) on
+// multipart file uploads.
+const int DbContextPoolSize = 32;
+builder.Services.AddDbContextPool<AppDbContext>(options =>
 {
     string connectionString = builder.Configuration.GetConnectionString("TaurusBikeShopSqlServer2026")
         ?? throw new InvalidOperationException(
             "Connection string 'TaurusBikeShopSqlServer2026' not found in configuration. " +
             "Ensure appsettings.Development.json is present and excluded from source control.");
 
-    options.UseSqlServer(connectionString, sqlOptions =>
+    // Disable MARS to reduce per-connection memory overhead and eliminate
+    // savepoint warnings.  Split queries (below) do NOT require MARS — they
+    // use separate round-trips.
+    //
+    // MaxPoolSize = 30 (not 200): each open SQL connection holds ~200 KB of
+    // TLS + network buffers.  At 200 connections that's ~40 MB of pinned
+    // native memory the GC cannot reclaim.  30 is more than enough for
+    // 6 background services + a handful of concurrent web requests, and
+    // keeps the native memory footprint manageable.
+    var csb = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString)
+    {
+        MaxPoolSize              = 30,
+        MultipleActiveResultSets = false
+    };
+
+    // Default to NoTracking — most operations (page loads, background checks) are
+    // read-only and don't need the change tracker.  This prevents EF Core from
+    // holding entity graphs in memory for display-only queries.  Code that needs
+    // to update entities can opt-in with .AsTracking() or context.ChangeTracker.
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+
+    options.UseSqlServer(csb.ConnectionString, sqlOptions =>
     {
         // Retry on transient failures — Google Cloud SQL connections can briefly drop
         sqlOptions.EnableRetryOnFailure(
@@ -54,7 +111,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         // the CartesianExplosion / MultipleCollectionIncludeWarning.
         sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
     });
-});
+}, poolSize: DbContextPoolSize);
 
 // =============================================================================
 // AUTHENTICATION & SESSION
@@ -149,9 +206,9 @@ if (gcsClient is not null)
 }
 else
 {
-    // Register a null placeholder so DI doesn't throw when controllers
-    // that depend on FileUploadHelper are resolved. The helper itself is
-    // only called during actual file upload actions.
+    // SupportService declares FileUploadHelper? (nullable) and null-checks
+    // before use, so a null registration is safe.  Callers that need file
+    // uploads get a clear "unavailable" ServiceResult instead of a DI crash.
     builder.Services.AddScoped<FileUploadHelper>(_ =>
         null!);
 }

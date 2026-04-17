@@ -18,8 +18,9 @@ namespace WebApplication.BackgroundJobs;
 /// </summary>
 public sealed class InventorySyncJob : BackgroundService
 {
-    // Flowchart Part 11: sync every 10 seconds.
-    private static readonly TimeSpan CycleInterval      = TimeSpan.FromSeconds(10);
+    // Flowchart Part 11: sync every 60 seconds (was 10s — reduced to cut
+    // DbContext allocation churn that contributed to process memory exhaustion).
+    private static readonly TimeSpan CycleInterval      = TimeSpan.FromSeconds(60);
 
     // Write a SystemLog summary entry at most once per this interval.
     private static readonly TimeSpan SummaryLogInterval = TimeSpan.FromMinutes(5);
@@ -47,6 +48,11 @@ public sealed class InventorySyncJob : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("InventorySyncJob started.");
+
+        // Staggered startup: delay before first cycle to prevent all background
+        // services from hitting the DB simultaneously at boot.
+        await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken).ConfigureAwait(false);
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try

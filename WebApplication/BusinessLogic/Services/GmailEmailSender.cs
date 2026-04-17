@@ -62,7 +62,21 @@ public sealed class GmailEmailSender : IEmailSender
         }
         finally
         {
-            await client.DisconnectAsync(quit: true, cancellationToken);
+            // Use CancellationToken.None — the disconnect must complete cleanly
+            // even if the caller's token is cancelled.  Passing the caller's token
+            // caused OperationCanceledException during scope disposal, which left
+            // the underlying SChannel TLS session in a half-closed state and
+            // triggered a fatal native crash (exit code -1) when the finalizer
+            // thread later tried to clean up the abandoned socket.
+            try
+            {
+                if (client.IsConnected)
+                    await client.DisconnectAsync(quit: true, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "SMTP disconnect failed — connection will be abandoned.");
+            }
         }
     }
 }

@@ -21,7 +21,7 @@ public sealed class NotificationDispatchJob : BackgroundService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<NotificationDispatchJob> _logger;
 
-    private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(60);
     private const int MaxRetryCount = 3;
     private const int BatchSize = 10;
 
@@ -41,6 +41,10 @@ public sealed class NotificationDispatchJob : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("NotificationDispatchJob started.");
+
+        // Staggered startup: delay before first cycle to prevent all background
+        // services from hitting the DB simultaneously at boot.
+        await Task.Delay(TimeSpan.FromSeconds(17), stoppingToken).ConfigureAwait(false);
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -66,11 +70,16 @@ public sealed class NotificationDispatchJob : BackgroundService
 
     private async Task DispatchPendingAsync(CancellationToken cancellationToken)
     {
-        using IServiceScope scope = _scopeFactory.CreateScope();
+        // Must use CreateAsyncScope (not CreateScope) with DbContext pooling.
+        // The synchronous Dispose() path can corrupt pooled context state during
+        // cleanup, leading to a fatal native crash (exit code -1) on subsequent
+        // pool rentals.  All other background jobs already use CreateAsyncScope.
+        await using AsyncServiceScope scope = _scopeFactory.CreateAsyncScope();
         AppDbContext context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         IEmailSender emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
 
         List<Notification> pending = await context.Notifications
+            .AsTracking() // Entities are modified (Status, SentAt) then saved
             .Where(n => n.Status == NotifStatuses.Pending
                      && n.RetryCount < MaxRetryCount
                      && n.Channel == NotifChannels.Email)

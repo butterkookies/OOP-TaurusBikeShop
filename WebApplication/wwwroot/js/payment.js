@@ -14,9 +14,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ── Proof upload drag-and-drop ─────────────────────────
-    var uploadBox   = document.getElementById('proofUploadBox');
-    var fileInput   = document.getElementById('proofFileInput');
+    // ── Proof upload drag-and-drop (legacy selector compat) ──
+    var uploadBox   = document.getElementById('proofUploadBox')  || document.getElementById('file-drop-zone');
+    var fileInput   = document.getElementById('proofFileInput')  || document.getElementById('payment-file-input');
     var fileNameEl  = document.getElementById('proofFileName');
 
     if (uploadBox && fileInput) {
@@ -33,14 +33,14 @@ document.addEventListener('DOMContentLoaded', function () {
         ['dragover', 'dragenter'].forEach(function (ev) {
             uploadBox.addEventListener(ev, function (e) {
                 e.preventDefault();
-                uploadBox.style.borderColor = 'var(--accent)';
+                uploadBox.classList.add('is-dragover');
             });
         });
 
         ['dragleave', 'drop'].forEach(function (ev) {
             uploadBox.addEventListener(ev, function (e) {
                 e.preventDefault();
-                uploadBox.style.borderColor = '';
+                uploadBox.classList.remove('is-dragover');
                 if (ev === 'drop' && e.dataTransfer.files.length) {
                     fileInput.files = e.dataTransfer.files;
                     fileInput.dispatchEvent(new Event('change'));

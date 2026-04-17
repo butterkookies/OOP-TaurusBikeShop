@@ -55,6 +55,7 @@ public sealed class UserRepository : Repository<User>
     {
         // Invalidate any existing unused OTPs for this email
         List<OTPVerification> existingOTPs = await Context.OTPVerifications
+            .AsTracking() // Modified below (IsUsed = true)
             .Where(o => o.Email == email && !o.IsUsed)
             .ToListAsync(cancellationToken);
 
@@ -92,6 +93,7 @@ public sealed class UserRepository : Repository<User>
         CancellationToken cancellationToken = default)
     {
         OTPVerification? otp = await Context.OTPVerifications
+            .AsTracking() // Modified below (IsUsed = true)
             .FirstOrDefaultAsync(
                 o => o.Email == email
                   && o.OTPCode == code

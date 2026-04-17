@@ -70,6 +70,7 @@ public sealed class OrderService : IOrderService
             if (item.ProductVariantId is null) continue;
 
             ProductVariant? variant = await _context.ProductVariants
+                .AsTracking() // Modified below (StockQuantity -= qty)
                 .FirstOrDefaultAsync(v => v.ProductVariantId == item.ProductVariantId,
                     cancellationToken);
 
@@ -200,6 +201,7 @@ public sealed class OrderService : IOrderService
                     if (cartItem.ProductVariantId is null) continue;
 
                     ProductVariant variant = (await _context.ProductVariants
+                        .AsTracking() // Modified below (StockQuantity -= qty)
                         .FirstAsync(v => v.ProductVariantId == cartItem.ProductVariantId,
                             cancellationToken))!;
 
@@ -391,6 +393,7 @@ public sealed class OrderService : IOrderService
                 // GetOrderWithDetailsAsync uses AsNoTracking — setting a property on
                 // that entity would be silently discarded by SaveChangesAsync.
                 Order trackedOrder = await _context.Orders
+                    .AsTracking() // Modified below (OrderStatus = Cancelled)
                     .FirstOrDefaultAsync(o => o.OrderId == orderId, cancellationToken)
                     ?? throw new InvalidOperationException(
                         $"Order {orderId} not found for status update.");
@@ -401,6 +404,7 @@ public sealed class OrderService : IOrderService
                     if (item.ProductVariantId is null) continue;
 
                     ProductVariant? variant = await _context.ProductVariants
+                        .AsTracking() // Modified below (StockQuantity += qty)
                         .FirstOrDefaultAsync(
                             v => v.ProductVariantId == item.ProductVariantId,
                             cancellationToken);
@@ -488,6 +492,7 @@ public sealed class OrderService : IOrderService
 
                 // Load order WITH change-tracking for the status update.
                 Order trackedOrder = await _context.Orders
+                    .AsTracking() // Modified below (OrderStatus = Delivered)
                     .FirstOrDefaultAsync(o => o.OrderId == orderId, cancellationToken)
                     ?? throw new InvalidOperationException(
                         $"Order {orderId} not found for status update.");
@@ -505,6 +510,7 @@ public sealed class OrderService : IOrderService
                     if (item.ProductVariantId is null) continue;
 
                     ProductVariant? variant = await _context.ProductVariants
+                        .AsTracking() // Modified below (StockQuantity ± qty)
                         .FirstOrDefaultAsync(
                             v => v.ProductVariantId == item.ProductVariantId,
                             cancellationToken);

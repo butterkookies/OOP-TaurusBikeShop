@@ -1,0 +1,848 @@
+
+<style>
+#erd-wrap { padding: 1rem 0; }
+#erd-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.erd-btn { font-size: 12px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--color-border-primary); background: var(--color-background-secondary); color: var(--color-text-secondary); cursor: pointer; transition: background .15s, color .15s; }
+.erd-btn.active { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+#erd-container { overflow-x: auto; }
+#erd-container svg { max-width: none; display: block; }
+#erd-error { color: var(--color-text-danger); font-size: 13px; padding: 8px 0; display: none; }
+</style>
+<h2 class="sr-only">Entity-relationship diagram for an e-commerce platform covering users, products, orders, payments, delivery, inventory, and support.</h2>
+<div id="erd-wrap">
+  <div id="erd-controls">
+    <button class="erd-btn active" onclick="show('all',this)">All tables</button>
+    <button class="erd-btn" onclick="show('users',this)">Users & Auth</button>
+    <button class="erd-btn" onclick="show('catalog',this)">Catalog</button>
+    <button class="erd-btn" onclick="show('orders',this)">Orders & Payments</button>
+    <button class="erd-btn" onclick="show('fulfillment',this)">Fulfillment</button>
+    <button class="erd-btn" onclick="show('support',this)">Support & Vouchers</button>
+    <button class="erd-btn" onclick="show('inventory',this)">Inventory & POS</button>
+  </div>
+  <div id="erd-error"></div>
+  <div id="erd-container"></div>
+</div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '12px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+  },
+});
+
+const diagrams = {
+all: `erDiagram
+  User {
+    int UserId PK
+    nvarchar Email
+    nvarchar FirstName
+    nvarchar LastName
+    int DefaultAddressId FK
+    bit IsActive
+    bit IsWalkIn
+    bit IsDeleted
+  }
+  Role {
+    int RoleId PK
+    nvarchar RoleName
+  }
+  UserRole {
+    int UserRoleId PK
+    int UserId FK
+    int RoleId FK
+    datetime2 AssignedAt
+  }
+  Address {
+    int AddressId PK
+    int UserId FK
+    nvarchar Label
+    nvarchar Street
+    nvarchar City
+    nvarchar PostalCode
+    bit IsDefault
+    bit IsSnapshot
+  }
+  ActiveSession {
+    int SessionId PK
+    int UserId FK
+    nvarchar SessionToken
+    datetime2 ExpiresAt
+  }
+  OTPVerification {
+    int OTPId PK
+    nvarchar Email
+    nvarchar OTPCode
+    datetime2 ExpiresAt
+  }
+  GuestSession {
+    int GuestSessionId PK
+    nvarchar SessionToken
+    nvarchar Email
+    int ConvertedToUserId FK
+  }
+  Category {
+    int CategoryId PK
+    int ParentCategoryId FK
+    nvarchar Name
+    nvarchar CategoryCode
+    bit IsActive
+  }
+  Brand {
+    int BrandId PK
+    nvarchar BrandName
+    nvarchar Country
+  }
+  Product {
+    int ProductId PK
+    int CategoryId FK
+    int BrandId FK
+    varchar SKU
+    nvarchar Name
+    decimal Price
+    bit IsActive
+    bit IsFeatured
+  }
+  ProductVariant {
+    int ProductVariantId PK
+    int ProductId FK
+    nvarchar VariantName
+    decimal AdditionalPrice
+    int StockQuantity
+    int ReorderThreshold
+  }
+  ProductImage {
+    int ProductImageId PK
+    int ProductId FK
+    nvarchar ImageUrl
+    bit IsPrimary
+    int DisplayOrder
+  }
+  PriceHistory {
+    int PriceHistoryId PK
+    int ProductId FK
+    decimal OldPrice
+    decimal NewPrice
+    int ChangedByUserId FK
+  }
+  Cart {
+    int CartId PK
+    int UserId FK
+    int GuestSessionId FK
+    bit IsCheckedOut
+  }
+  CartItem {
+    int CartItemId PK
+    int CartId FK
+    int ProductId FK
+    int ProductVariantId FK
+    int Quantity
+    decimal PriceAtAdd
+  }
+  Order {
+    int OrderId PK
+    int UserId FK
+    nvarchar OrderNumber
+    nvarchar OrderStatus
+    decimal SubTotal
+    decimal DiscountAmount
+    decimal ShippingFee
+    decimal TotalAmount
+    nvarchar FulfillmentType
+    nvarchar PaymentMethod
+    bit IsWalkIn
+  }
+  OrderItem {
+    int OrderItemId PK
+    int OrderId FK
+    int ProductId FK
+    int ProductVariantId FK
+    int Quantity
+    decimal UnitPrice
+  }
+  Payment {
+    int PaymentId PK
+    int OrderId FK
+    nvarchar PaymentMethod
+    nvarchar PaymentStage
+    nvarchar PaymentStatus
+    decimal Amount
+  }
+  GCashPayment {
+    int PaymentId PK
+    nvarchar GcashTransactionId
+    nvarchar ScreenshotUrl
+    nvarchar StorageBucket
+  }
+  BankTransferPayment {
+    int PaymentId PK
+    nvarchar BpiReferenceNumber
+    nvarchar ProofUrl
+    int VerifiedByUserId FK
+    datetime2 VerifiedAt
+  }
+  Delivery {
+    int DeliveryId PK
+    int OrderId FK
+    nvarchar Courier
+    nvarchar DeliveryStatus
+    bit IsDelayed
+    datetime2 EstimatedDeliveryTime
+    datetime2 ActualDeliveryTime
+  }
+  LalamoveDelivery {
+    int DeliveryId PK
+    nvarchar BookingRef
+    nvarchar DriverName
+    nvarchar DriverPhone
+  }
+  LBCDelivery {
+    int DeliveryId PK
+    nvarchar TrackingNumber
+  }
+  PickupOrder {
+    int PickupOrderId PK
+    int OrderId FK
+    datetime2 PickupReadyAt
+    datetime2 PickupExpiresAt
+    datetime2 PickupConfirmedAt
+  }
+  Voucher {
+    int VoucherId PK
+    nvarchar Code
+    nvarchar DiscountType
+    decimal DiscountValue
+    decimal MinimumOrderAmount
+    int MaxUses
+    datetime2 StartDate
+    datetime2 EndDate
+  }
+  UserVoucher {
+    int UserVoucherId PK
+    int UserId FK
+    int VoucherId FK
+    datetime2 ExpiresAt
+  }
+  VoucherUsage {
+    int VoucherUsageId PK
+    int VoucherId FK
+    int UserId FK
+    int OrderId FK
+    decimal DiscountAmount
+  }
+  Wishlist {
+    int WishlistId PK
+    int UserId FK
+    int ProductId FK
+    datetime2 AddedAt
+  }
+  Review {
+    int ReviewId PK
+    int UserId FK
+    int ProductId FK
+    int OrderId FK
+    int Rating
+    nvarchar Comment
+    bit IsVerifiedPurchase
+  }
+  SupportTicket {
+    int TicketId PK
+    int UserId FK
+    int OrderId FK
+    nvarchar Subject
+    nvarchar TicketStatus
+    int AssignedToUserId FK
+  }
+  SupportTicketReply {
+    bigint ReplyId PK
+    int TicketId FK
+    int UserId FK
+    bit IsAdminReply
+    nvarchar Message
+  }
+  SupportTask {
+    int TaskId PK
+    int TicketId FK
+    int AssignedToUserId FK
+    nvarchar TaskType
+    nvarchar TaskStatus
+  }
+  Notification {
+    int NotificationId PK
+    int UserId FK
+    int OrderId FK
+    int TicketId FK
+    nvarchar NotifType
+    nvarchar Status
+    bit IsRead
+  }
+  Refund {
+    int RefundId PK
+    int OrderId FK
+    int PaymentId FK
+    decimal RefundAmount
+    nvarchar RefundStatus
+    int TicketId FK
+  }
+  Supplier {
+    int SupplierId PK
+    nvarchar Name
+    nvarchar ContactPerson
+    nvarchar Email
+  }
+  PurchaseOrder {
+    int PurchaseOrderId PK
+    int SupplierId FK
+    nvarchar Status
+    int CreatedByUserId FK
+    datetime2 OrderDate
+  }
+  PurchaseOrderItem {
+    int PurchaseOrderItemId PK
+    int PurchaseOrderId FK
+    int ProductId FK
+    int ProductVariantId FK
+    int Quantity
+    decimal UnitPrice
+  }
+  InventoryLog {
+    bigint InventoryLogId PK
+    int ProductId FK
+    int ProductVariantId FK
+    int ChangeQuantity
+    nvarchar ChangeType
+    int OrderId FK
+    int PurchaseOrderId FK
+  }
+  OrderStatusAudit {
+    bigint AuditId PK
+    int OrderId FK
+    nvarchar FromStatus
+    nvarchar ToStatus
+    bit Success
+  }
+  POS_Session {
+    int POSSessionId PK
+    int UserId FK
+    nvarchar TerminalName
+    decimal TotalSales
+  }
+  StorePaymentAccount {
+    int StorePaymentAccountId PK
+    nvarchar PaymentMethod
+    nvarchar AccountName
+    nvarchar AccountNumber
+    nvarchar BankName
+  }
+  SystemLog {
+    bigint SystemLogId PK
+    int UserId FK
+    nvarchar EventType
+    nvarchar EventDescription
+  }
+
+  User ||--o{ Address : "has"
+  User ||--o{ UserRole : "has"
+  Role ||--o{ UserRole : "assigned"
+  User ||--o{ ActiveSession : "has"
+  User ||--o{ Cart : "owns"
+  User ||--o{ Order : "places"
+  User ||--o{ Wishlist : "saves"
+  User ||--o{ Review : "writes"
+  User ||--o{ SupportTicket : "creates"
+  User ||--o{ Notification : "receives"
+  User ||--o{ UserVoucher : "assigned"
+  User ||--o{ POS_Session : "operates"
+  User ||--o{ SystemLog : "generates"
+  GuestSession ||--o| Cart : "owns"
+  GuestSession }o--o| User : "converts to"
+  Category ||--o{ Product : "contains"
+  Category ||--o{ Category : "parent"
+  Brand ||--o{ Product : "manufactures"
+  Product ||--o{ ProductVariant : "has"
+  Product ||--o{ ProductImage : "has"
+  Product ||--o{ PriceHistory : "tracks"
+  Product ||--o{ Review : "reviewed"
+  Product ||--o{ Wishlist : "wishlisted"
+  Product ||--o{ CartItem : "added to"
+  Product ||--o{ OrderItem : "ordered"
+  Cart ||--o{ CartItem : "contains"
+  CartItem }o--o| ProductVariant : "specifies"
+  Order ||--o{ OrderItem : "contains"
+  Order ||--o{ Payment : "paid by"
+  Order ||--o| Delivery : "shipped"
+  Order ||--o| PickupOrder : "picked up"
+  Order ||--o{ VoucherUsage : "redeems"
+  Order ||--o{ Notification : "triggers"
+  Order ||--o{ OrderStatusAudit : "audited"
+  Order ||--o{ Refund : "refunded"
+  Order ||--o{ Review : "reviewed"
+  Order ||--o{ SupportTicket : "referenced"
+  Order ||--o{ InventoryLog : "logged"
+  OrderItem }o--o| ProductVariant : "specifies"
+  Payment ||--o| GCashPayment : "extends"
+  Payment ||--o| BankTransferPayment : "extends"
+  Delivery ||--o| LalamoveDelivery : "extends"
+  Delivery ||--o| LBCDelivery : "extends"
+  Voucher ||--o{ UserVoucher : "assigned"
+  Voucher ||--o{ VoucherUsage : "used"
+  SupportTicket ||--o{ SupportTicketReply : "has"
+  SupportTicket ||--o{ SupportTask : "has"
+  SupportTicket ||--o{ Notification : "triggers"
+  SupportTicket ||--o{ Refund : "linked"
+  Supplier ||--o{ PurchaseOrder : "supplies"
+  PurchaseOrder ||--o{ PurchaseOrderItem : "contains"
+  PurchaseOrder ||--o{ InventoryLog : "logged"`,
+
+users: `erDiagram
+  User {
+    int UserId PK
+    nvarchar Email
+    nvarchar FirstName
+    nvarchar LastName
+    nvarchar PhoneNumber
+    int DefaultAddressId FK
+    bit IsActive
+    bit IsWalkIn
+    bit IsDeleted
+  }
+  Role {
+    int RoleId PK
+    nvarchar RoleName
+    nvarchar Description
+  }
+  UserRole {
+    int UserRoleId PK
+    int UserId FK
+    int RoleId FK
+    datetime2 AssignedAt
+  }
+  Address {
+    int AddressId PK
+    int UserId FK
+    nvarchar Label
+    nvarchar Street
+    nvarchar City
+    nvarchar PostalCode
+    nvarchar Province
+    bit IsDefault
+    bit IsSnapshot
+  }
+  ActiveSession {
+    int SessionId PK
+    int UserId FK
+    nvarchar SessionToken
+    bit IsRevoked
+    datetime2 ExpiresAt
+  }
+  OTPVerification {
+    int OTPId PK
+    nvarchar Email
+    nvarchar OTPCode
+    bit IsUsed
+    datetime2 ExpiresAt
+  }
+  GuestSession {
+    int GuestSessionId PK
+    nvarchar SessionToken
+    nvarchar Email
+    int ConvertedToUserId FK
+    datetime2 ExpiresAt
+  }
+  SystemLog {
+    bigint SystemLogId PK
+    int UserId FK
+    nvarchar EventType
+    nvarchar EventDescription
+  }
+  User ||--o{ Address : "has"
+  User ||--o{ UserRole : "has"
+  Role ||--o{ UserRole : "assigned"
+  User ||--o{ ActiveSession : "has"
+  User ||--o{ SystemLog : "generates"
+  GuestSession }o--o| User : "converts to"`,
+
+catalog: `erDiagram
+  Category {
+    int CategoryId PK
+    int ParentCategoryId FK
+    nvarchar Name
+    nvarchar CategoryCode
+    bit IsActive
+    int DisplayOrder
+  }
+  Brand {
+    int BrandId PK
+    nvarchar BrandName
+    nvarchar Country
+    bit IsActive
+  }
+  Product {
+    int ProductId PK
+    int CategoryId FK
+    int BrandId FK
+    varchar SKU
+    nvarchar Name
+    decimal Price
+    bit IsActive
+    bit IsFeatured
+  }
+  ProductVariant {
+    int ProductVariantId PK
+    int ProductId FK
+    nvarchar VariantName
+    decimal AdditionalPrice
+    int StockQuantity
+    int ReorderThreshold
+  }
+  ProductImage {
+    int ProductImageId PK
+    int ProductId FK
+    nvarchar ImageUrl
+    nvarchar StorageBucket
+    bit IsPrimary
+    int DisplayOrder
+  }
+  PriceHistory {
+    int PriceHistoryId PK
+    int ProductId FK
+    decimal OldPrice
+    decimal NewPrice
+    int ChangedByUserId FK
+  }
+  Wishlist {
+    int WishlistId PK
+    int UserId FK
+    int ProductId FK
+    datetime2 AddedAt
+  }
+  Review {
+    int ReviewId PK
+    int UserId FK
+    int ProductId FK
+    int OrderId FK
+    int Rating
+    nvarchar Comment
+    bit IsVerifiedPurchase
+  }
+  Category ||--o{ Product : "contains"
+  Category ||--o{ Category : "parent"
+  Brand ||--o{ Product : "manufactures"
+  Product ||--o{ ProductVariant : "has"
+  Product ||--o{ ProductImage : "has"
+  Product ||--o{ PriceHistory : "tracks"
+  Product ||--o{ Review : "reviewed"
+  Product ||--o{ Wishlist : "wishlisted"`,
+
+orders: `erDiagram
+  Order {
+    int OrderId PK
+    int UserId FK
+    nvarchar OrderNumber
+    nvarchar OrderStatus
+    decimal SubTotal
+    decimal DiscountAmount
+    decimal ShippingFee
+    decimal TotalAmount
+    nvarchar FulfillmentType
+    nvarchar PaymentMethod
+    bit IsWalkIn
+  }
+  OrderItem {
+    int OrderItemId PK
+    int OrderId FK
+    int ProductId FK
+    int ProductVariantId FK
+    int Quantity
+    decimal UnitPrice
+  }
+  Cart {
+    int CartId PK
+    int UserId FK
+    int GuestSessionId FK
+    bit IsCheckedOut
+  }
+  CartItem {
+    int CartItemId PK
+    int CartId FK
+    int ProductId FK
+    int ProductVariantId FK
+    int Quantity
+    decimal PriceAtAdd
+  }
+  Payment {
+    int PaymentId PK
+    int OrderId FK
+    nvarchar PaymentMethod
+    nvarchar PaymentStage
+    nvarchar PaymentStatus
+    decimal Amount
+  }
+  GCashPayment {
+    int PaymentId PK
+    nvarchar GcashTransactionId
+    nvarchar ScreenshotUrl
+    nvarchar StorageBucket
+  }
+  BankTransferPayment {
+    int PaymentId PK
+    nvarchar BpiReferenceNumber
+    nvarchar ProofUrl
+    int VerifiedByUserId FK
+    datetime2 VerifiedAt
+  }
+  Refund {
+    int RefundId PK
+    int OrderId FK
+    int PaymentId FK
+    decimal RefundAmount
+    nvarchar RefundReason
+    nvarchar RefundStatus
+  }
+  OrderStatusAudit {
+    bigint AuditId PK
+    int OrderId FK
+    nvarchar FromStatus
+    nvarchar ToStatus
+    bit Success
+  }
+  StorePaymentAccount {
+    int StorePaymentAccountId PK
+    nvarchar PaymentMethod
+    nvarchar AccountName
+    nvarchar AccountNumber
+    nvarchar BankName
+  }
+  Order ||--o{ OrderItem : "contains"
+  Order ||--o{ Payment : "paid by"
+  Order ||--o{ Refund : "refunded"
+  Order ||--o{ OrderStatusAudit : "audited"
+  Cart ||--o{ CartItem : "contains"
+  Payment ||--o| GCashPayment : "extends"
+  Payment ||--o| BankTransferPayment : "extends"`,
+
+fulfillment: `erDiagram
+  Order {
+    int OrderId PK
+    nvarchar OrderNumber
+    nvarchar OrderStatus
+    nvarchar FulfillmentType
+    decimal TotalAmount
+  }
+  Delivery {
+    int DeliveryId PK
+    int OrderId FK
+    nvarchar Courier
+    nvarchar DeliveryStatus
+    bit IsDelayed
+    datetime2 EstimatedDeliveryTime
+    datetime2 ActualDeliveryTime
+  }
+  LalamoveDelivery {
+    int DeliveryId PK
+    nvarchar BookingRef
+    nvarchar DriverName
+    nvarchar DriverPhone
+  }
+  LBCDelivery {
+    int DeliveryId PK
+    nvarchar TrackingNumber
+  }
+  PickupOrder {
+    int PickupOrderId PK
+    int OrderId FK
+    datetime2 PickupReadyAt
+    datetime2 PickupExpiresAt
+    datetime2 PickupConfirmedAt
+  }
+  Address {
+    int AddressId PK
+    int UserId FK
+    nvarchar Label
+    nvarchar Street
+    nvarchar City
+    nvarchar PostalCode
+  }
+  Order ||--o| Delivery : "shipped via"
+  Order ||--o| PickupOrder : "picked up"
+  Delivery ||--o| LalamoveDelivery : "extends"
+  Delivery ||--o| LBCDelivery : "extends"`,
+
+support: `erDiagram
+  SupportTicket {
+    int TicketId PK
+    int UserId FK
+    int OrderId FK
+    nvarchar TicketCategory
+    nvarchar Subject
+    nvarchar TicketStatus
+    int AssignedToUserId FK
+  }
+  SupportTicketReply {
+    bigint ReplyId PK
+    int TicketId FK
+    int UserId FK
+    bit IsAdminReply
+    nvarchar Message
+  }
+  SupportTask {
+    int TaskId PK
+    int TicketId FK
+    int AssignedToUserId FK
+    nvarchar TaskType
+    nvarchar TaskStatus
+  }
+  Notification {
+    int NotificationId PK
+    int UserId FK
+    int OrderId FK
+    int TicketId FK
+    nvarchar Channel
+    nvarchar NotifType
+    nvarchar Status
+    bit IsRead
+  }
+  Voucher {
+    int VoucherId PK
+    nvarchar Code
+    nvarchar DiscountType
+    decimal DiscountValue
+    decimal MinimumOrderAmount
+    int MaxUses
+    datetime2 StartDate
+    datetime2 EndDate
+  }
+  UserVoucher {
+    int UserVoucherId PK
+    int UserId FK
+    int VoucherId FK
+    datetime2 ExpiresAt
+  }
+  VoucherUsage {
+    int VoucherUsageId PK
+    int VoucherId FK
+    int UserId FK
+    int OrderId FK
+    decimal DiscountAmount
+  }
+  Refund {
+    int RefundId PK
+    int OrderId FK
+    int PaymentId FK
+    decimal RefundAmount
+    nvarchar RefundStatus
+    int TicketId FK
+  }
+  SupportTicket ||--o{ SupportTicketReply : "has"
+  SupportTicket ||--o{ SupportTask : "has"
+  SupportTicket ||--o{ Notification : "triggers"
+  SupportTicket ||--o{ Refund : "linked"
+  Voucher ||--o{ UserVoucher : "assigned"
+  Voucher ||--o{ VoucherUsage : "used"`,
+
+inventory: `erDiagram
+  Supplier {
+    int SupplierId PK
+    nvarchar Name
+    nvarchar ContactPerson
+    nvarchar Email
+    bit IsActive
+  }
+  PurchaseOrder {
+    int PurchaseOrderId PK
+    int SupplierId FK
+    nvarchar Status
+    int CreatedByUserId FK
+    datetime2 OrderDate
+  }
+  PurchaseOrderItem {
+    int PurchaseOrderItemId PK
+    int PurchaseOrderId FK
+    int ProductId FK
+    int ProductVariantId FK
+    int Quantity
+    decimal UnitPrice
+  }
+  InventoryLog {
+    bigint InventoryLogId PK
+    int ProductId FK
+    int ProductVariantId FK
+    int ChangeQuantity
+    nvarchar ChangeType
+    int OrderId FK
+    int PurchaseOrderId FK
+  }
+  ProductVariant {
+    int ProductVariantId PK
+    int ProductId FK
+    nvarchar VariantName
+    int StockQuantity
+    int ReorderThreshold
+  }
+  POS_Session {
+    int POSSessionId PK
+    int UserId FK
+    nvarchar TerminalName
+    datetime2 ShiftStart
+    datetime2 ShiftEnd
+    decimal TotalSales
+  }
+  Supplier ||--o{ PurchaseOrder : "supplies"
+  PurchaseOrder ||--o{ PurchaseOrderItem : "contains"
+  PurchaseOrder ||--o{ InventoryLog : "logged"
+  PurchaseOrderItem }o--o| ProductVariant : "stocks"`
+};
+
+async function render(key) {
+  const errEl = document.getElementById('erd-error');
+  const container = document.getElementById('erd-container');
+  errEl.style.display = 'none';
+  container.innerHTML = '';
+  try {
+    const { svg } = await mermaid.render('erd-' + key + '-' + Date.now(), diagrams[key]);
+    container.innerHTML = svg;
+    container.querySelectorAll('svg').forEach(s => {
+      s.style.maxWidth = 'none';
+      s.style.display = 'block';
+    });
+    container.querySelectorAll('.node').forEach(node => {
+      const firstPath = node.querySelector('path[d]');
+      if (!firstPath) return;
+      const d = firstPath.getAttribute('d');
+      const nums = d.match(/-?[\d.]+/g)?.map(Number);
+      if (!nums || nums.length < 8) return;
+      const xs = [nums[0], nums[2], nums[4], nums[6]];
+      const ys = [nums[1], nums[3], nums[5], nums[7]];
+      const x = Math.min(...xs), y = Math.min(...ys);
+      const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', x); rect.setAttribute('y', y);
+      rect.setAttribute('width', w); rect.setAttribute('height', h);
+      rect.setAttribute('rx', '8');
+      for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+        if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+      }
+      firstPath.replaceWith(rect);
+    });
+  } catch (e) {
+    errEl.textContent = 'Render error: ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+window.show = function(key, btn) {
+  document.querySelectorAll('.erd-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render(key);
+};
+
+render('all');
+</script>

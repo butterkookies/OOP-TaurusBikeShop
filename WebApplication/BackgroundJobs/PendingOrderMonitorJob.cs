@@ -46,6 +46,11 @@ public sealed class PendingOrderMonitorJob : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("PendingOrderMonitorJob started.");
+
+        // Staggered startup: delay before first cycle to prevent all background
+        // services from hitting the DB simultaneously at boot.
+        await Task.Delay(TimeSpan.FromSeconds(11), stoppingToken).ConfigureAwait(false);
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try

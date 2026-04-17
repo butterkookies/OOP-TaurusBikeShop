@@ -88,12 +88,16 @@
                         <label class="cal-label">Payment Screenshot</label>
                         <div class="cal-file-drop" id="file-drop-zone">
                             <input type="file" name="screenshotFile" accept="image/*"
-                                   class="cal-file-drop__input" id="payment-file-input" required />
-                            <div class="text-mid-gray">
-                                <svg class="mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                                <p class="text-sm font-medium text-charcoal dark:text-white">Drop file or click to upload</p>
-                                <p class="text-xs mt-1">PNG, JPG, up to 10 MB</p>
+                                   class="cal-file-drop__input" id="payment-file-input"
+                                   style="display:none" required />
+                            <!-- Default prompt (visible when no file attached) -->
+                            <div class="cal-file-drop__prompt text-mid-gray">
+                                <svg class="mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <p class="text-sm font-medium text-charcoal dark:text-white">Drop file here or click to browse</p>
+                                <p class="text-xs mt-1">PNG, JPG — up to 10 MB</p>
                             </div>
+                            <!-- File info (hidden until file is attached) -->
+                            <div class="cal-file-drop__info" style="display:none"></div>
                         </div>
                     </div>
                 </div>
@@ -162,12 +166,16 @@
                         <label class="cal-label">Deposit Slip / Screenshot</label>
                         <div class="cal-file-drop" id="file-drop-zone">
                             <input type="file" name="depositSlipFile" accept="image/*,.pdf"
-                                   class="cal-file-drop__input" id="payment-file-input" required />
-                            <div class="text-mid-gray">
-                                <svg class="mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                                <p class="text-sm font-medium text-charcoal dark:text-white">Drop file or click to upload</p>
+                                   class="cal-file-drop__input" id="payment-file-input"
+                                   style="display:none" required />
+                            <!-- Default prompt (visible when no file attached) -->
+                            <div class="cal-file-drop__prompt text-mid-gray">
+                                <svg class="mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <p class="text-sm font-medium text-charcoal dark:text-white">Drop file here or click to browse</p>
                                 <p class="text-xs mt-1">PNG, JPG, PDF — up to 10 MB</p>
                             </div>
+                            <!-- File info (hidden until file is attached) -->
+                            <div class="cal-file-drop__info" style="display:none"></div>
                         </div>
                     </div>
                 </div>
@@ -206,91 +214,200 @@
     @await Html.PartialAsync("_ValidationScriptsPartial")
     <script>
         (function () {
+            'use strict';
+
             // ── File drop zone ───────────────────────────────────────────
-            const zone = document.getElementById('file-drop-zone');
+            const zone      = document.getElementById('file-drop-zone');
             let   fileInput = document.getElementById('payment-file-input');
             if (!zone || !fileInput) return;
 
-            const innerDiv = zone.querySelector('div.text-mid-gray');
-            const originalHTML = innerDiv ? innerDiv.innerHTML : '';
+            const promptEl = zone.querySelector('.cal-file-drop__prompt');
+            const infoEl   = zone.querySelector('.cal-file-drop__info');
+
+            // Track drag-enter depth so nested elements don't flicker
+            let dragCounter = 0;
+
+            /* ── helpers ─────────────────────────────────────────────── */
+            function escapeHtml(str) {
+                return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            }
+
+            function formatSize(bytes) {
+                if (bytes < 1024) return bytes + ' B';
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+            }
+
+            function getFileExtension(name) {
+                var dot = name.lastIndexOf('.');
+                return dot !== -1 ? name.substring(dot).toLowerCase() : '';
+            }
 
             function getInput() {
                 return zone.querySelector('.cal-file-drop__input');
             }
 
+            /* ── reset to empty state ────────────────────────────────── */
             function resetDropZone() {
-                // Build a brand-new input to clear the file selection
-                const old = getInput();
+                // Clone the input to fully clear the file selection
+                var old = getInput();
                 if (old) {
-                    const fresh = old.cloneNode(false);  // shallow clone — no files
-                    fresh.value = '';                     // explicit clear
-                    fresh.addEventListener('change', () => showFileInfo(fresh.files[0]));
+                    var fresh = old.cloneNode(false);
+                    fresh.value = '';
+                    fresh.style.display = 'none';
+                    fresh.addEventListener('change', function () { showFileInfo(fresh.files[0]); });
                     old.parentNode.replaceChild(fresh, old);
-                    fileInput = fresh;                    // keep mutable ref current
+                    fileInput = fresh;
                 }
-                // Restore original upload icon + text
-                if (innerDiv) {
-                    innerDiv.innerHTML = originalHTML;
-                    innerDiv.style.display = '';           // unhide in case
-                }
-                // Clear green border and remove the "has-file" marker
-                zone.style.borderColor = '';
-                zone.classList.remove('has-file');
+                // Show prompt, hide info
+                if (promptEl) promptEl.style.display = '';
+                if (infoEl)   { infoEl.style.display = 'none'; infoEl.innerHTML = ''; }
+                // Remove the X button (it lives directly on the zone)
+                var existingBtn = zone.querySelector('.cal-file-drop__remove');
+                if (existingBtn) existingBtn.remove();
+                // Clear visual states
+                zone.classList.remove('has-file', 'is-dragover');
             }
 
+            /* ── show file info + optional preview ───────────────────── */
             function showFileInfo(file) {
-                if (!file || !innerDiv) return;
-                const safe = file.name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                innerDiv.innerHTML =
-                    '<svg class="mx-auto mb-2 text-success" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
-                    '<p class="text-sm font-medium text-charcoal dark:text-white" style="word-break:break-all">' + safe + '</p>' +
-                    '<p class="text-xs mt-0.5 text-mid-gray">' + sizeMB + ' MB</p>' +
-                    '<p class="text-xs mt-1 text-success font-medium">File attached — ready to submit</p>' +
-                    '<button type="button" class="remove-file-btn inline-flex items-center gap-1 mt-3 px-3 py-1.5 text-xs font-medium text-error bg-error/10 hover:bg-error/20 rounded-lg transition-colors">' +
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-                        'Remove file' +
-                    '</button>';
-                zone.style.borderColor = '#22c55e';
-                zone.classList.add('has-file');
+                if (!file || !infoEl) return;
 
-                zone.querySelector('.remove-file-btn')?.addEventListener('click', ev => {
+                var safeName = escapeHtml(file.name);
+                var ext      = getFileExtension(file.name);
+                var size     = formatSize(file.size);
+                var isImage  = file.type.startsWith('image/');
+
+                // Build preview HTML
+                var html = '';
+
+                if (isImage) {
+                    html += '<div class="cal-file-drop__preview" id="file-preview-container">' +
+                                '<img id="file-preview-img" alt="Preview" />' +
+                            '</div>';
+                } else {
+                    html += '<svg class="mx-auto mb-2 text-success" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+                                '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>' +
+                                '<polyline points="14 2 14 8 20 8"/>' +
+                            '</svg>';
+                }
+
+                html += '<p class="text-sm font-medium text-charcoal dark:text-white" style="word-break:break-all">' + safeName + '</p>';
+                html += '<p class="text-xs mt-0.5 text-mid-gray">' + size;
+                if (ext) html += ' &middot; <span class="uppercase font-medium">' + escapeHtml(ext.replace('.', '')) + '</span>';
+                html += '</p>';
+                html += '<p class="text-xs mt-1.5 text-success font-medium">&#10003; File attached &mdash; ready to submit</p>';
+
+                // Hide prompt, show info
+                if (promptEl) promptEl.style.display = 'none';
+                infoEl.innerHTML = html;
+                infoEl.style.display = '';
+
+                zone.classList.add('has-file');
+                zone.classList.remove('is-dragover');
+
+                // Remove any old X, then create a fresh one
+                var oldBtn = zone.querySelector('.cal-file-drop__remove');
+                if (oldBtn) oldBtn.remove();
+
+                var removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'cal-file-drop__remove';
+                removeBtn.setAttribute('aria-label', 'Remove attached file');
+                // Inline styles to guarantee positioning (Tailwind v4 layer specificity)
+                removeBtn.style.cssText = 'position:absolute;top:8px;right:8px;z-index:10;' +
+                    'display:flex;align-items:center;justify-content:center;' +
+                    'width:28px;height:28px;padding:0;border-radius:50%;cursor:pointer;' +
+                    'color:#ef4444;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);' +
+                    'transition:background 0.15s ease,transform 0.15s ease';
+                removeBtn.innerHTML =
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+                        '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>' +
+                    '</svg>';
+                zone.appendChild(removeBtn);
+
+                // X button click → remove file, do NOT open file explorer
+                removeBtn.addEventListener('click', function (ev) {
                     ev.preventDefault();
                     ev.stopPropagation();
+                    ev.stopImmediatePropagation();
                     resetDropZone();
                 });
+                removeBtn.addEventListener('mousedown', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                });
+
+                // Load image preview
+                if (isImage) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var img = document.getElementById('file-preview-img');
+                        if (img) img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
             }
 
-            ['dragenter', 'dragover'].forEach(e =>
-                zone.addEventListener(e, ev => { ev.preventDefault(); zone.style.borderColor = '#242424'; }));
-
-            zone.addEventListener('drop', ev => {
-                ev.preventDefault();
-                zone.style.borderColor = '';
-                const inp = getInput();
-                if (inp) { inp.files = ev.dataTransfer.files; showFileInfo(inp.files[0]); }
+            /* ── click on zone → open file dialog (only when empty) ──── */
+            zone.addEventListener('click', function (ev) {
+                // If the click came from the remove button, do nothing
+                if (ev.target.closest('.cal-file-drop__remove')) return;
+                // Only open file explorer when no file is attached
+                if (!zone.classList.contains('has-file')) {
+                    getInput().click();
+                }
             });
 
-            zone.addEventListener('dragleave', ev => {
+            /* ── drag & drop ─────────────────────────────────────────── */
+            zone.addEventListener('dragenter', function (ev) {
                 ev.preventDefault();
-                if (!zone.classList.contains('has-file')) zone.style.borderColor = '';
+                dragCounter++;
+                if (!zone.classList.contains('has-file')) {
+                    zone.classList.add('is-dragover');
+                }
             });
 
-            fileInput.addEventListener('change', () => showFileInfo(fileInput.files[0]));
+            zone.addEventListener('dragover', function (ev) {
+                ev.preventDefault();
+            });
+
+            zone.addEventListener('dragleave', function (ev) {
+                ev.preventDefault();
+                dragCounter--;
+                if (dragCounter <= 0) {
+                    dragCounter = 0;
+                    zone.classList.remove('is-dragover');
+                }
+            });
+
+            zone.addEventListener('drop', function (ev) {
+                ev.preventDefault();
+                dragCounter = 0;
+                zone.classList.remove('is-dragover');
+                var inp = getInput();
+                if (inp && ev.dataTransfer.files.length) {
+                    inp.files = ev.dataTransfer.files;
+                    showFileInfo(inp.files[0]);
+                }
+            });
+
+            /* ── file input change ────────────────────────────────────── */
+            fileInput.addEventListener('change', function () { showFileInfo(fileInput.files[0]); });
 
             // ── Digits-only enforcement on number fields ─────────────────
-            document.querySelectorAll('input[inputmode="numeric"]').forEach(inp => {
-                inp.addEventListener('input', () => {
+            document.querySelectorAll('input[inputmode="numeric"]').forEach(function (inp) {
+                inp.addEventListener('input', function () {
                     inp.value = inp.value.replace(/[^0-9]/g, '');
                 });
             });
 
             // ── Confirmation modal ───────────────────────────────────────
-            const modal      = document.getElementById('confirm-modal');
-            const backdrop   = document.getElementById('confirm-backdrop');
-            const cancelBtn  = document.getElementById('confirm-cancel');
-            const confirmBtn = document.getElementById('confirm-submit');
-            let   pendingForm = null;
+            var modal      = document.getElementById('confirm-modal');
+            var backdrop   = document.getElementById('confirm-backdrop');
+            var cancelBtn  = document.getElementById('confirm-cancel');
+            var confirmBtn = document.getElementById('confirm-submit');
+            var pendingForm = null;
 
             function openModal(form) {
                 pendingForm = form;
@@ -303,49 +420,49 @@
                 pendingForm = null;
             }
 
-            document.querySelectorAll('.payment-submit-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const form = btn.closest('form');
+            document.querySelectorAll('.payment-submit-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var form = btn.closest('form');
                     if (!form) return;
-                    // Basic HTML5 validation before showing the confirm modal
                     if (!form.reportValidity()) return;
                     openModal(form);
                 });
             });
 
-            cancelBtn?.addEventListener('click', closeModal);
-            backdrop?.addEventListener('click', closeModal);
-            confirmBtn?.addEventListener('click', () => {
-                if (pendingForm) {
-                    // Disable button to prevent double submit
-                    confirmBtn.disabled = true;
-                    confirmBtn.textContent = 'Submitting…';
-                    pendingForm.submit();
-                }
-            });
+            if (cancelBtn)  cancelBtn.addEventListener('click', closeModal);
+            if (backdrop)   backdrop.addEventListener('click', closeModal);
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', function () {
+                    if (pendingForm) {
+                        confirmBtn.disabled = true;
+                        confirmBtn.textContent = 'Submitting\u2026';
+                        pendingForm.submit();
+                    }
+                });
+            }
         })();
 
         // ── Copy-to-clipboard ────────────────────────────────────────
         (function () {
-            document.querySelectorAll('[data-copy-target]').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const targetId = btn.getAttribute('data-copy-target');
-                    const target = document.getElementById(targetId);
+            document.querySelectorAll('[data-copy-target]').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    var targetId = btn.getAttribute('data-copy-target');
+                    var target = document.getElementById(targetId);
                     if (!target) return;
-                    const value = target.innerText.trim();
+                    var value = target.innerText.trim();
                     try {
                         await navigator.clipboard.writeText(value);
-                    } catch {
-                        const r = document.createRange();
+                    } catch (_) {
+                        var r = document.createRange();
                         r.selectNodeContents(target);
-                        const s = window.getSelection();
+                        var s = window.getSelection();
                         s.removeAllRanges(); s.addRange(r);
                         document.execCommand('copy'); s.removeAllRanges();
                     }
-                    const original = btn.innerText;
+                    var original = btn.innerText;
                     btn.innerText = 'Copied';
                     btn.disabled = true;
-                    setTimeout(() => { btn.innerText = original; btn.disabled = false; }, 1500);
+                    setTimeout(function () { btn.innerText = original; btn.disabled = false; }, 1500);
                 });
             });
         })();

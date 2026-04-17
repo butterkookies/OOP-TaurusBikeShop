@@ -1,178 +1,222 @@
-Use this. It is tightened based on the actual failure patterns in your files (constraint drift, audit fields, insert order, filtered indexes).
+Good call—here’s a **refined, model-optimized version** of your prompt, specifically tuned for **Claude / GPT / Gemini**, plus **auto-ERD generation (Mermaid)** so you can directly render diagrams.
 
 ---
 
-**PROMPT FOR CLAUDE OPUS 4.6**
+# **Prompt: System-Accurate Documentation Generator (Optimized Version)**
 
-You are a senior SQL Server database engineer specializing in schema evolution, migrations, and deterministic data seeding.
+## **Context**
 
-I will provide three SQL files:
+You are given the **full codebase** of the *Taurus Bike Shop Ordering System*, including:
 
-1. Seed script
-   `SQL\Seed\Taurus_seed_v7.1.sql`
+* Frontend code
+* Backend logic
+* Database schema (`.sql`)
 
-2. Base schema
-   `SQL\Schema\Taurus_schema_8.1.sql`
-
-3. Patch / migration
-   `SQL\Schema\Taurus_schema_8.2_audit_fixes.sql`
+Your task is to generate **accurate, implementation-based documentation** that strictly reflects the **actual system**, not assumptions.
 
 ---
 
-## Objective
+## **Critical Rules (NON-NEGOTIABLE)**
 
-Rewrite the seed script so it is **fully compatible with the FINAL schema state after applying 8.1 + 8.2**.
+* Base everything on the **actual codebase and schema**
+* ❌ Do NOT assume missing features
+* ❌ Do NOT generate generic/template answers
+* ❌ Do NOT fabricate relationships or logic
 
-The current seed is outdated and WILL FAIL due to:
+If something is missing:
 
-* Column mismatches
-* New NOT NULL constraints
-* Foreign key dependencies
-* Audit-related fields introduced in 8.2
-* Filtered indexes requiring proper SET options
+> Explicitly say: **"Not found in the current codebase"**
 
 ---
 
-## Required Process (Do NOT skip steps)
+## **Execution Strategy (IMPORTANT FOR MODEL BEHAVIOR)**
 
-### 1. Reconstruct Final Schema
+### **Step 1 — Deep Analysis**
 
-* Parse 8.1 schema
-* Apply 8.2 patch logically
-* Build the exact final structure:
+* Parse all `.sql` files → extract:
 
   * Tables
-  * Columns (including added/removed/renamed)
-  * Data types
-  * PK, FK, UNIQUE, CHECK constraints
-  * Identity columns
-  * Default constraints
-  * Filtered indexes and their conditions
+  * Columns
+  * Keys (PK, FK)
+* Scan backend:
+
+  * Controllers / services
+  * Database queries
+* Identify:
+
+  * Real workflows
+  * Actual system features
 
 ---
 
-### 2. Deep Analysis of Seed Script
-
-Analyze `Taurus_seed_v7.1.sql` and detect ALL incompatibilities:
-
-* Invalid or removed columns
-* Missing required columns (especially NOT NULL)
-* Foreign key violations
-* Insert order violations (child before parent)
-* Duplicate key risks
-* Identity misuse (missing or incorrect `IDENTITY_INSERT`)
-* Missing audit fields (e.g., created_at, updated_at, created_by, status, etc.)
-* Violations caused by filtered indexes
+## **Step 2 — Generate Documentation**
 
 ---
 
-### 3. Produce Structured Audit Report
+### **1. Database Design (ACTUAL)**
 
-Output:
+* Explain:
 
-**A. Schema Changes Impacting Seed**
-
-* List only changes from 8.2 that break the seed
-
-**B. Table-by-Table Issues**
-For each table:
-
-* Problem
-* Root cause
-* Required fix
+  * Each table’s real purpose
+  * Relationships based on foreign keys
+  * How the system uses the database in real flows
 
 ---
 
-### 4. Generate Fully Corrected Seed Script (PRIMARY OUTPUT)
+### **2. ERD (AUTO-GENERATED – MERMAID)**
 
-Rewrite the ENTIRE seed script.
-
-Strict requirements:
-
-* Must run on a clean DB after:
-
-  1. `Taurus_schema_8.1.sql`
-  2. `Taurus_schema_8.2_audit_fixes.sql`
-
-* Must execute with **ZERO ERRORS**
-
----
-
-## Critical Constraints for the New Seed
-
-### A. Correct Insert Order (MANDATORY)
-
-Order inserts based on dependency graph:
-
-1. Lookup tables (roles, categories, statuses)
-2. Parent tables (users, suppliers)
-3. Core entities (products)
-4. Transaction tables (orders)
-5. Child tables (order_items, logs, audit tables)
-
----
-
-### B. Column Alignment
-
-* Every INSERT must explicitly declare columns
-* Must match FINAL schema exactly
-* No missing NOT NULL fields
-
----
-
-### C. Audit Field Compliance
-
-* Populate all required audit fields introduced in 8.2
-* Use consistent values (e.g., GETDATE(), system user IDs)
-
----
-
-### D. Identity Handling
-
-* Prefer natural identity generation (no hardcoded IDs)
-* If explicit IDs are required:
-
-  * Use `SET IDENTITY_INSERT ON/OFF` correctly
-
----
-
-### E. Constraint Safety
-
-* All FK references must point to valid inserted rows
-* No duplicate values for UNIQUE constraints
-* Respect CHECK constraints and filtered index conditions
-
----
-
-### F. Required SET Options (MANDATORY AT TOP)
-
-Include:
+Generate a **valid Mermaid ER Diagram**:
 
 ```
-SET ANSI_NULLS ON
-SET QUOTED_IDENTIFIER ON
-SET ANSI_WARNINGS ON
+erDiagram
+    TABLE_NAME {
+        int id PK
+        varchar name
+    }
+
+    TABLE_A ||--o{ TABLE_B : has
 ```
 
----
+**Rules:**
 
-### G. Deterministic Execution
-
-* Script must be re-runnable ONLY on a clean DB
-* No reliance on pre-existing data
-
----
-
-## Output Format
-
-1. Summary of breaking schema changes
-2. Table-by-table issue breakdown
-3. **Final corrected seed SQL (clean, ordered, executable)**
+* Must compile in Mermaid (no syntax errors)
+* Include ALL tables
+* Reflect REAL relationships only
+* Use correct cardinality
 
 ---
 
-## Final Requirement
+### **3. Data Dictionary (STRICT)**
 
-Do not give advice. Do not explain theory.
+For EACH table:
 
-Perform full reconciliation and output a **production-quality corrected seed script** that will run successfully on the updated schema.
+| Column Name | Data Type | Constraints | Description |
+| ----------- | --------- | ----------- | ----------- |
+
+Descriptions must be based on **actual usage in code**, not guesses.
+
+---
+
+### **4. System Capabilities (REAL ONLY)**
+
+List features that are:
+
+* Actually implemented
+* Observable in code
+
+Example format:
+
+* “Processes customer orders via [OrderService]”
+* “Stores transaction data in [Orders table]”
+
+---
+
+### **5. System Limitations (CODE-BASED)**
+
+Identify:
+
+* Missing features
+* Hardcoded logic
+* Lack of validation
+* UI/backend constraints
+
+Must come from **real observations**
+
+---
+
+### **6. Unique Features (REAL DIFFERENTIATORS)**
+
+Only include features that:
+
+* Exist in the system
+* Are somewhat uncommon
+
+---
+
+### **7. SQL Command Extraction (REAL QUERIES)**
+
+Extract actual queries from code:
+
+* `SELECT`
+* `INSERT`
+* `UPDATE`
+* `DELETE`
+* `JOIN`
+
+Provide:
+
+* Real query
+* Short explanation of its role in the system
+
+---
+
+### **8. System Flow / Storyboard**
+
+Describe REAL flow:
+
+Example:
+
+1. User logs in
+2. System validates credentials
+3. Redirect to dashboard
+4. User creates order
+5. Order saved to database
+
+Must match actual logic.
+
+---
+
+### **9. Tech Stack (AUTO-DETECTED)**
+
+List:
+
+* Languages (e.g., C#)
+* Frameworks (e.g., WPF)
+* Database (MySQL)
+* Tools (Git, GitHub)
+
+---
+
+## **Output Format Requirements**
+
+* Use **clean headings**
+* Use **tables where needed**
+* Keep it **formal and documentation-ready**
+* Ensure **consistency with your case study format**
+
+---
+
+## **Model-Specific Optimization**
+
+### **For Claude**
+
+* Be extremely detailed in reasoning
+* Double-check relationships before output
+* Prefer correctness over verbosity
+
+### **For GPT**
+
+* Keep structure strict and organized
+* Avoid hallucination by re-checking schema references
+
+### **For Gemini**
+
+* Focus on structured outputs
+* Ensure Mermaid diagram is clean and valid
+
+---
+
+## **Final Goal**
+
+Produce documentation that:
+
+* Matches the **actual system behavior**
+* Aligns perfectly with the **database**
+* Can be used directly in a **capstone/case study submission**
+
+---
+
+If you want next, I can:
+
+* 🔧 Add **auto-generated screenshots mapping (based on UI code)**
+* 🧠 Or create a **grading-rubric optimized version (pang prof-ready)**
