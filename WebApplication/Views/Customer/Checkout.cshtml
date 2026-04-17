@@ -89,6 +89,25 @@
                             </label>
                         </div>
                         <span asp-validation-for="DeliveryMethod" class="cal-field-error"></span>
+
+                        @* ── PICKUP DETAILS (shown only when Pickup is selected) ── *@
+                        <div id="pickup-details"
+                             class="mt-4 p-4 rounded-lg border border-charcoal/10 dark:border-white/10 bg-light-gray/50 dark:bg-neutral-900/40"
+                             style="display:@(Model.DeliveryMethod == "Pickup" ? "block" : "none")">
+                            <p class="text-sm font-semibold text-charcoal dark:text-white">Taurus Bike Shop</p>
+                            <p class="text-sm text-mid-gray mt-1">QW7V+8Q2, Sandico, Marilao, 3019 Bulacan</p>
+                            <a href="https://maps.app.goo.gl/TL5fHi2JttHoC9GcA"
+                               target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1.5 mt-2 text-sm font-medium text-charcoal dark:text-white hover:underline">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                                View on Google Maps
+                            </a>
+                            <p class="text-xs text-mid-gray mt-2">Please bring a valid ID when picking up your order.</p>
+                        </div>
                     </div>
 
                     @* ── PAYMENT METHOD ── *@

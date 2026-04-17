@@ -13,6 +13,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // ── Pickup details panel toggle ────────────────────────
+    var pickupDetails = document.getElementById('pickup-details');
+    if (pickupDetails) {
+        document.querySelectorAll('input[name="DeliveryMethod"]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                pickupDetails.style.display = radio.value === 'Pickup' && radio.checked ? 'block' : 'none';
+            });
+        });
+    }
+
     // ── Payment method options ─────────────────────────────
     document.querySelectorAll('.tbs-payment-option').forEach(function (label) {
         label.addEventListener('click', function () {
