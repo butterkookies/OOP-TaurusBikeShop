@@ -73,13 +73,15 @@
                     </div>
 
                     <div class="mb-5">
-                        <label class="cal-label">GCash Number</label>
-                        <input type="text" name="gcashNumber" class="cal-input" placeholder="09xxxxxxxxx" />
+                        <label class="cal-label">GCash Number <span class="text-xs text-mid-gray font-normal">(11 digits)</span></label>
+                        <input type="text" name="gcashNumber" class="cal-input" placeholder="09xxxxxxxxx"
+                               maxlength="11" inputmode="numeric" pattern="[0-9]{11}" />
                     </div>
 
                     <div class="mb-5">
-                        <label class="cal-label">Reference Number</label>
-                        <input type="text" name="referenceNumber" class="cal-input" placeholder="GCash reference number" />
+                        <label class="cal-label">Reference Number <span class="text-xs text-mid-gray font-normal">(13 digits)</span></label>
+                        <input type="text" name="referenceNumber" class="cal-input" placeholder="GCash reference number"
+                               maxlength="13" inputmode="numeric" pattern="[0-9]{1,13}" />
                     </div>
 
                     <div>
@@ -96,7 +98,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-dark btn-lg btn-full" data-reveal="delay-2">
+                <button type="button" class="btn-dark btn-lg btn-full payment-submit-btn" data-reveal="delay-2">
                     Submit GCash Payment
                 </button>
             </form>
@@ -151,8 +153,9 @@
                     </div>
 
                     <div class="mb-5">
-                        <label class="cal-label">BPI Reference Number <span class="cal-label-opt">(optional)</span></label>
-                        <input type="text" name="bpiReferenceNumber" class="cal-input" placeholder="BPI transaction reference" />
+                        <label class="cal-label">BPI Reference Number <span class="cal-label-opt">(optional · 10 digits)</span></label>
+                        <input type="text" name="bpiReferenceNumber" class="cal-input" placeholder="BPI transaction reference"
+                               maxlength="10" inputmode="numeric" pattern="[0-9]{0,10}" />
                     </div>
 
                     <div>
@@ -169,7 +172,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-dark btn-lg btn-full" data-reveal="delay-2">
+                <button type="button" class="btn-dark btn-lg btn-full payment-submit-btn" data-reveal="delay-2">
                     Submit Bank Transfer Proof
                 </button>
             </form>
@@ -182,48 +185,147 @@
     </div>
 </div>
 
+@* ── Confirmation modal ─────────────────────────────────────────────────── *@
+<div id="confirm-modal" class="fixed inset-0 z-[9999] hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="confirm-backdrop"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-charcoal rounded-2xl shadow-2xl max-w-sm w-full p-6 relative" data-reveal>
+            <h3 class="font-display text-lg font-semibold text-charcoal dark:text-white mb-2">Confirm Submission</h3>
+            <p class="text-sm text-mid-gray mb-6">
+                Are you sure you want to submit this payment proof? Please double-check that you've uploaded the correct file and entered the right details.
+            </p>
+            <div class="flex gap-3">
+                <button type="button" id="confirm-cancel" class="btn-ghost btn-md flex-1">Go Back</button>
+                <button type="button" id="confirm-submit" class="btn-dark btn-md flex-1">Yes, Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
     <script>
         (function () {
-            const zone  = document.getElementById('file-drop-zone');
-            const input = document.getElementById('payment-file-input');
-            if (!zone || !input) return;
+            // ── File drop zone ───────────────────────────────────────────
+            const zone = document.getElementById('file-drop-zone');
+            let   fileInput = document.getElementById('payment-file-input');
+            if (!zone || !fileInput) return;
 
-            // Update drop zone UI to show the selected file's name
-            function showFileInfo(file) {
-                if (!file) return;
-                const inner = zone.querySelector('div.text-mid-gray');
-                if (!inner) return;
-                inner.innerHTML =
-                    '<svg class="mx-auto mb-2 text-success" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
-                    '<p class="text-sm font-medium text-charcoal dark:text-white" style="word-break:break-all">' + file.name + '</p>' +
-                    '<p class="text-xs mt-1 text-success">File attached — ready to submit</p>';
-                zone.style.borderColor = '#22c55e'; // success green
+            const innerDiv = zone.querySelector('div.text-mid-gray');
+            const originalHTML = innerDiv ? innerDiv.innerHTML : '';
+
+            function getInput() {
+                return zone.querySelector('.cal-file-drop__input');
             }
 
-            // Drag highlight
+            function resetDropZone() {
+                // Build a brand-new input to clear the file selection
+                const old = getInput();
+                if (old) {
+                    const fresh = old.cloneNode(false);  // shallow clone — no files
+                    fresh.value = '';                     // explicit clear
+                    fresh.addEventListener('change', () => showFileInfo(fresh.files[0]));
+                    old.parentNode.replaceChild(fresh, old);
+                    fileInput = fresh;                    // keep mutable ref current
+                }
+                // Restore original upload icon + text
+                if (innerDiv) {
+                    innerDiv.innerHTML = originalHTML;
+                    innerDiv.style.display = '';           // unhide in case
+                }
+                // Clear green border and remove the "has-file" marker
+                zone.style.borderColor = '';
+                zone.classList.remove('has-file');
+            }
+
+            function showFileInfo(file) {
+                if (!file || !innerDiv) return;
+                const safe = file.name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                innerDiv.innerHTML =
+                    '<svg class="mx-auto mb-2 text-success" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+                    '<p class="text-sm font-medium text-charcoal dark:text-white" style="word-break:break-all">' + safe + '</p>' +
+                    '<p class="text-xs mt-0.5 text-mid-gray">' + sizeMB + ' MB</p>' +
+                    '<p class="text-xs mt-1 text-success font-medium">File attached — ready to submit</p>' +
+                    '<button type="button" class="remove-file-btn inline-flex items-center gap-1 mt-3 px-3 py-1.5 text-xs font-medium text-error bg-error/10 hover:bg-error/20 rounded-lg transition-colors">' +
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                        'Remove file' +
+                    '</button>';
+                zone.style.borderColor = '#22c55e';
+                zone.classList.add('has-file');
+
+                zone.querySelector('.remove-file-btn')?.addEventListener('click', ev => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    resetDropZone();
+                });
+            }
+
             ['dragenter', 'dragover'].forEach(e =>
                 zone.addEventListener(e, ev => { ev.preventDefault(); zone.style.borderColor = '#242424'; }));
 
-            // Drop: wire file to input, then show info
             zone.addEventListener('drop', ev => {
                 ev.preventDefault();
                 zone.style.borderColor = '';
-                input.files = ev.dataTransfer.files;
-                showFileInfo(input.files[0]);
+                const inp = getInput();
+                if (inp) { inp.files = ev.dataTransfer.files; showFileInfo(inp.files[0]); }
             });
 
             zone.addEventListener('dragleave', ev => {
                 ev.preventDefault();
-                if (!input.files?.length) zone.style.borderColor = '';
+                if (!zone.classList.contains('has-file')) zone.style.borderColor = '';
             });
 
-            // Regular file-picker selection
-            input.addEventListener('change', () => showFileInfo(input.files[0]));
+            fileInput.addEventListener('change', () => showFileInfo(fileInput.files[0]));
+
+            // ── Digits-only enforcement on number fields ─────────────────
+            document.querySelectorAll('input[inputmode="numeric"]').forEach(inp => {
+                inp.addEventListener('input', () => {
+                    inp.value = inp.value.replace(/[^0-9]/g, '');
+                });
+            });
+
+            // ── Confirmation modal ───────────────────────────────────────
+            const modal      = document.getElementById('confirm-modal');
+            const backdrop   = document.getElementById('confirm-backdrop');
+            const cancelBtn  = document.getElementById('confirm-cancel');
+            const confirmBtn = document.getElementById('confirm-submit');
+            let   pendingForm = null;
+
+            function openModal(form) {
+                pendingForm = form;
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+            function closeModal() {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+                pendingForm = null;
+            }
+
+            document.querySelectorAll('.payment-submit-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const form = btn.closest('form');
+                    if (!form) return;
+                    // Basic HTML5 validation before showing the confirm modal
+                    if (!form.reportValidity()) return;
+                    openModal(form);
+                });
+            });
+
+            cancelBtn?.addEventListener('click', closeModal);
+            backdrop?.addEventListener('click', closeModal);
+            confirmBtn?.addEventListener('click', () => {
+                if (pendingForm) {
+                    // Disable button to prevent double submit
+                    confirmBtn.disabled = true;
+                    confirmBtn.textContent = 'Submitting…';
+                    pendingForm.submit();
+                }
+            });
         })();
 
-        // Copy-to-clipboard for the store account number.
+        // ── Copy-to-clipboard ────────────────────────────────────────
         (function () {
             document.querySelectorAll('[data-copy-target]').forEach(btn => {
                 btn.addEventListener('click', async () => {

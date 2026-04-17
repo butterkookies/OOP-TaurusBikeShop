@@ -169,7 +169,12 @@ public sealed class OrderService : IOrderService
                     FulfillmentType   = vm.DeliveryMethod == "Pickup"
                         ? FulfillmentTypes.Pickup
                         : FulfillmentTypes.Delivery,
-                    CartId            = cart.CartId
+                    CartId            = cart.CartId,
+
+                    // Schema v9.3 — persist customer's chosen method so the
+                    // payment upload page can resolve the correct store account
+                    // before any Payment row exists.
+                    PaymentMethod     = vm.PaymentMethod
                 };
                 await _context.Orders.AddAsync(order, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);

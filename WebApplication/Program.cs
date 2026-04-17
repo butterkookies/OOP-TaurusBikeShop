@@ -13,6 +13,11 @@ using WebApplication.Utilities;
 
 WebApplicationBuilder builder = AppWebApplication.CreateBuilder(args);
 
+// Allow file uploads up to 15 MB (form + overhead).
+// Individual actions can tighten via [RequestFormLimits].
+builder.WebHost.ConfigureKestrel(o =>
+    o.Limits.MaxRequestBodySize = 15 * 1024 * 1024);
+
 builder.Services.Configure<HostOptions>(options =>
     options.BackgroundServiceExceptionBehavior =
         BackgroundServiceExceptionBehavior.Ignore);

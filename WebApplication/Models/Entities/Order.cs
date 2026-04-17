@@ -150,6 +150,18 @@ public sealed class Order
     public string FulfillmentType { get; set; } = FulfillmentTypes.Delivery;
 
     /// <summary>
+    /// Payment method the customer chose at checkout (GCash or BankTransfer).
+    /// Captured from <c>CheckoutViewModel.PaymentMethod</c> when the order is
+    /// created so the payment upload page can render the correct instructions
+    /// and resolve the correct <c>StorePaymentAccount</c> before the customer
+    /// submits proof. Mirrored onto <c>Payment.PaymentMethod</c> at submission
+    /// time. Added in schema v9.3.
+    /// </summary>
+    [Required]
+    [MaxLength(50)]
+    public string PaymentMethod { get; set; } = string.Empty;
+
+    /// <summary>
     /// FK to GuestSession for orders placed without a registered account.
     /// NULL for all registered-user orders. Planned feature — added in schema v8.2.
     /// </summary>

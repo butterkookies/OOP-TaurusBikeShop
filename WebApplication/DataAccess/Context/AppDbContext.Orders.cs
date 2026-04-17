@@ -23,6 +23,9 @@ public sealed partial class AppDbContext
             // FulfillmentType — constrained to 20 chars matching CK_Order_FulfillmentType
             e.Property(o => o.FulfillmentType).HasMaxLength(20);
 
+            // PaymentMethod — GCash | BankTransfer | Cash (walk-in). v9.3.
+            e.Property(o => o.PaymentMethod).HasMaxLength(50);
+
             e.Property(o => o.DiscountAmount).HasPrecision(18, 2);
             e.Property(o => o.ShippingFee).HasPrecision(18, 2);
             e.Property(o => o.SubTotal).HasPrecision(18, 2);

@@ -258,8 +258,12 @@ public sealed class PaymentService : IPaymentService
         // Carry the active store account info so the view can show
         // "Pay to: …". For already-submitted payments, prefer the snapshot on
         // Payment itself so the customer sees what they were actually asked
-        // to pay to even if admin later rotates the account.
-        string method = existingPayment?.PaymentMethod ?? string.Empty;
+        // to pay to even if admin later rotates the account. Before a Payment
+        // row exists we fall back to the method the customer chose at checkout,
+        // persisted on Order.PaymentMethod (schema v9.3).
+        string method = existingPayment?.PaymentMethod
+                        ?? order.PaymentMethod
+                        ?? string.Empty;
 
         string? storeName   = existingPayment?.PaidToAccountName;
         string? storeNumber = existingPayment?.PaidToAccountNumber;

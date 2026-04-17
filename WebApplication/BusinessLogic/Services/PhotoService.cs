@@ -1,6 +1,8 @@
 // Services/PhotoService.cs
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 public class PhotoService : IPhotoService
@@ -15,38 +17,70 @@ public class PhotoService : IPhotoService
         "application/pdf"
     };
 
-    private readonly Cloudinary _cloudinary;
+    private readonly Cloudinary? _cloudinary;
+    private readonly IWebHostEnvironment _env;
+    private readonly ILogger<PhotoService> _logger;
 
-    public PhotoService(IOptions<CloudinarySettings> config)
+    public PhotoService(
+        IOptions<CloudinarySettings> config,
+        IWebHostEnvironment env,
+        ILogger<PhotoService> logger)
     {
-        var acc = new Account(
-            config.Value.CloudName,
-            config.Value.ApiKey,
-            config.Value.ApiSecret
-        );
-        _cloudinary = new Cloudinary(acc);
+        _env    = env;
+        _logger = logger;
+
+        // Only initialise Cloudinary when real credentials are present.
+        string? cloud  = config.Value.CloudName;
+        string? apiKey = config.Value.ApiKey;
+        string? secret = config.Value.ApiSecret;
+
+        bool hasCredentials =
+            !string.IsNullOrWhiteSpace(cloud)  &&
+            !string.IsNullOrWhiteSpace(apiKey)  && apiKey  != "SET_VIA_USER_SECRETS_OR_ENVIRONMENT_VARIABLE" &&
+            !string.IsNullOrWhiteSpace(secret) && secret != "SET_VIA_USER_SECRETS_OR_ENVIRONMENT_VARIABLE";
+
+        if (hasCredentials)
+        {
+            try
+            {
+                _cloudinary = new Cloudinary(new Account(cloud, apiKey, secret));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to initialise Cloudinary — local storage will be used.");
+            }
+        }
+        else
+        {
+            _logger.LogWarning("Cloudinary credentials not configured — payment proofs will be saved locally.");
+        }
     }
 
     /// <inheritdoc/>
     public async Task<string> UploadAsync(IFormFile file)
     {
-        await using var stream = file.OpenReadStream();
-
-        var uploadParams = new ImageUploadParams
+        // Try Cloudinary first
+        if (_cloudinary != null)
         {
-            File = new FileDescription(file.FileName, stream),
-            Folder = "taurus-bikeshop/products",
-            Transformation = new Transformation()
-                                 .Width(800).Height(600)
-                                 .Crop("fill").Quality("auto")
-        };
+            await using var stream = file.OpenReadStream();
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(file.FileName, stream),
+                Folder = "taurus-bikeshop/products",
+                Transformation = new Transformation()
+                                     .Width(800).Height(600)
+                                     .Crop("fill").Quality("auto")
+            };
 
-        var result = await _cloudinary.UploadAsync(uploadParams);
+            var result = await _cloudinary.UploadAsync(uploadParams);
+            if (result.Error != null)
+                throw new Exception(result.Error.Message);
 
-        if (result.Error != null)
-            throw new Exception(result.Error.Message);
+            return result.SecureUrl.ToString();
+        }
 
-        return result.SecureUrl.ToString();
+        // Fallback: save locally
+        return await SaveLocallyAsync(file, "products");
     }
 
     /// <inheritdoc/>
@@ -58,7 +92,7 @@ public class PhotoService : IPhotoService
 
         if (file.Length > MaxProofFileSizeBytes)
             throw new InvalidOperationException(
-                $"File size exceeds the 5 MB maximum. Please upload a smaller file.");
+                "File size exceeds the 5 MB maximum. Please upload a smaller file.");
 
         // Validate MIME type
         string contentType = file.ContentType?.ToLowerInvariant() ?? string.Empty;
@@ -67,43 +101,80 @@ public class PhotoService : IPhotoService
                 $"File type '{contentType}' is not allowed. " +
                 "Please upload a JPEG, PNG, WebP image, or PDF.");
 
-        await using var stream = file.OpenReadStream();
+        string subfolder = $"payment-proofs/order-{orderId}";
 
-        // Use RawUploadParams for PDFs; ImageUploadParams for images.
-        // No transformation — we need the proof exactly as the customer uploaded it.
-        string folder = $"taurus-bikeshop/payment-proofs/order-{orderId}";
+        // Try Cloudinary first
+        if (_cloudinary != null)
+        {
+            try
+            {
+                await using var stream = file.OpenReadStream();
+                string folder = $"taurus-bikeshop/{subfolder}";
 
-        if (contentType == "application/pdf")
-        {
-            var uploadParams = new RawUploadParams
+                if (contentType == "application/pdf")
+                {
+                    var uploadParams = new RawUploadParams
+                    {
+                        File   = new FileDescription(file.FileName, stream),
+                        Folder = folder,
+                    };
+                    var result = await _cloudinary.UploadAsync(uploadParams);
+                    if (result.Error != null)
+                        throw new InvalidOperationException(result.Error.Message);
+                    return result.SecureUrl.ToString();
+                }
+                else
+                {
+                    var uploadParams = new ImageUploadParams
+                    {
+                        File   = new FileDescription(file.FileName, stream),
+                        Folder = folder,
+                    };
+                    var result = await _cloudinary.UploadAsync(uploadParams);
+                    if (result.Error != null)
+                        throw new InvalidOperationException(result.Error.Message);
+                    return result.SecureUrl.ToString();
+                }
+            }
+            catch (Exception ex)
             {
-                File   = new FileDescription(file.FileName, stream),
-                Folder = folder,
-            };
-            var result = await _cloudinary.UploadAsync(uploadParams);
-            if (result.Error != null)
-                throw new InvalidOperationException(result.Error.Message);
-            return result.SecureUrl.ToString();
+                _logger.LogWarning(ex, "Cloudinary upload failed for order {OrderId} — falling back to local.", orderId);
+            }
         }
-        else
-        {
-            var uploadParams = new ImageUploadParams
-            {
-                File    = new FileDescription(file.FileName, stream),
-                Folder  = folder,
-                // No Transformation — preserve original resolution for admin review
-            };
-            var result = await _cloudinary.UploadAsync(uploadParams);
-            if (result.Error != null)
-                throw new InvalidOperationException(result.Error.Message);
-            return result.SecureUrl.ToString();
-        }
+
+        // Fallback: save locally under wwwroot/uploads/
+        return await SaveLocallyAsync(file, subfolder);
     }
 
     /// <inheritdoc/>
     public async Task DeleteAsync(string publicId)
     {
+        if (_cloudinary == null) return;
         var deleteParams = new DeletionParams(publicId);
         await _cloudinary.DestroyAsync(deleteParams);
+    }
+
+    // =========================================================================
+    // Local file fallback
+    // =========================================================================
+
+    private async Task<string> SaveLocallyAsync(IFormFile file, string subfolder)
+    {
+        // Save to wwwroot/uploads/{subfolder}/
+        string uploadsDir = Path.Combine(_env.WebRootPath, "uploads", subfolder);
+        Directory.CreateDirectory(uploadsDir);
+
+        // Unique filename to avoid collisions
+        string ext      = Path.GetExtension(file.FileName);
+        string safeName = $"{Guid.NewGuid():N}{ext}";
+        string filePath = Path.Combine(uploadsDir, safeName);
+
+        await using var fs = new FileStream(filePath, FileMode.Create);
+        await file.CopyToAsync(fs);
+
+        _logger.LogInformation("Saved file locally: {FilePath}", filePath);
+
+        // Return a URL-path relative to wwwroot so it can be served as a static file.
+        return $"/uploads/{subfolder}/{safeName}";
     }
 }
