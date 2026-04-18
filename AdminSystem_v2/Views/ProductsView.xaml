@@ -266,9 +266,13 @@
                             <TextBlock Text="Category *" Style="{StaticResource FieldLabel}"/>
                             <ComboBox ItemsSource="{Binding Categories}"
                                       SelectedValuePath="CategoryId"
-                                      SelectedValue="{Binding EditProduct.CategoryId}"
-                                      DisplayMemberPath="Name"
-/>
+                                      SelectedValue="{Binding EditProduct.CategoryId}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </StackPanel>
                     </Grid>
 
@@ -284,9 +288,13 @@
                             <TextBlock Text="Brand" Style="{StaticResource FieldLabel}"/>
                             <ComboBox ItemsSource="{Binding Brands}"
                                       SelectedValuePath="BrandId"
-                                      SelectedValue="{Binding EditProduct.BrandId}"
-                                      DisplayMemberPath="BrandName"
-/>
+                                      SelectedValue="{Binding EditProduct.BrandId}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding BrandName}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
