@@ -44,9 +44,9 @@ namespace AdminSystem_v2.Repositories
         Task ApprovePaymentAsync(int orderId);
 
         /// <summary>
-        /// Rejects the payment proof for a PendingVerification order:
-        /// transitions order back to Pending and payment to VerificationRejected.
+        /// Places the order on hold when the admin finds a discrepancy in the payment proof:
+        /// transitions order from PaymentVerification to OnHold and payment to VerificationRejected.
         /// </summary>
-        Task RejectPaymentAsync(int orderId);
+        Task HoldPaymentAsync(int orderId);
     }
 }

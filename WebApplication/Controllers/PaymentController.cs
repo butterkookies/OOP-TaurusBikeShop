@@ -71,8 +71,8 @@ public sealed class PaymentController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [RequestSizeLimit(15 * 1024 * 1024)]
-    [RequestFormLimits(MultipartBodyLengthLimit = 10 * 1024 * 1024)]
+    [RequestSizeLimit(20 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 15 * 1024 * 1024)]
     public async Task<IActionResult> SubmitGCash(
         int orderId,
         string gcashNumber,
@@ -111,8 +111,8 @@ public sealed class PaymentController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [RequestSizeLimit(15 * 1024 * 1024)]
-    [RequestFormLimits(MultipartBodyLengthLimit = 10 * 1024 * 1024)]
+    [RequestSizeLimit(20 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 15 * 1024 * 1024)]
     public async Task<IActionResult> SubmitBankTransfer(
         int orderId,
         string depositorName,

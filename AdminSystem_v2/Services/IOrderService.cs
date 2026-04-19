@@ -26,7 +26,7 @@ namespace AdminSystem_v2.Services
         /// <summary>Approves the payment proof: transitions order to Processing, payment to Completed.</summary>
         Task ApprovePaymentAsync(int orderId);
 
-        /// <summary>Rejects the payment proof: returns order to Pending, payment to VerificationRejected.</summary>
-        Task RejectPaymentAsync(int orderId);
+        /// <summary>Holds the payment on discrepancy: moves order to OnHold, payment to VerificationRejected.</summary>
+        Task HoldPaymentAsync(int orderId);
     }
 }

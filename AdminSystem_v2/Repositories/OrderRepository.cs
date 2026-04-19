@@ -335,7 +335,7 @@ namespace AdminSystem_v2.Repositories
             }
         }
 
-        public async Task RejectPaymentAsync(int orderId)
+        public async Task HoldPaymentAsync(int orderId)
         {
             await using var conn = GetConnection();
             await using var tx   = await conn.BeginTransactionAsync();
@@ -348,32 +348,32 @@ namespace AdminSystem_v2.Repositories
                 if (currentStatus == null)
                     throw new InvalidOperationException($"Order {orderId} not found.");
 
-                if (!OrderStatuses.IsValidTransition(currentStatus, OrderStatuses.Pending))
+                if (!OrderStatuses.IsValidTransition(currentStatus, OrderStatuses.OnHold))
                 {
                     await LogStatusTransitionAsync(conn, tx, orderId, currentStatus,
-                        OrderStatuses.Pending, success: false, "Payment rejection rejected by validation");
-                    throw new InvalidStatusTransitionException(orderId, currentStatus, OrderStatuses.Pending);
+                        OrderStatuses.OnHold, success: false, "Payment hold rejected by validation");
+                    throw new InvalidStatusTransitionException(orderId, currentStatus, OrderStatuses.OnHold);
                 }
 
-                // Return order to Pending
+                // Move order to OnHold pending admin resolution
                 await conn.ExecuteAsync(
                     @"UPDATE [Order]
                       SET OrderStatus = @Status, UpdatedAt = GETUTCDATE()
                       WHERE OrderId = @OrderId",
-                    new { OrderId = orderId, Status = OrderStatuses.Pending }, tx);
+                    new { OrderId = orderId, Status = OrderStatuses.OnHold }, tx);
 
-                // Mark payment as VerificationRejected
+                // Mark payment as VerificationRejected (discrepancy flagged by admin)
                 await conn.ExecuteAsync(
                     @"UPDATE Payment
                       SET PaymentStatus = 'VerificationRejected'
                       WHERE OrderId = @OrderId",
                     new { OrderId = orderId }, tx);
 
-                // Notify customer — reuse 'Pending' key, body overridden in switch
-                await QueueOrderNotificationAsync(conn, tx, orderId, "PaymentRejected");
+                // Notify customer that the order is on hold due to a payment-proof discrepancy
+                await QueueOrderNotificationAsync(conn, tx, orderId, "PaymentHeld");
 
                 await LogStatusTransitionAsync(conn, tx, orderId, currentStatus,
-                    OrderStatuses.Pending, success: true, "Payment proof rejected by admin");
+                    OrderStatuses.OnHold, success: true, "Payment proof flagged; order placed on hold by admin");
 
                 await tx.CommitAsync();
             }
@@ -424,10 +424,13 @@ namespace AdminSystem_v2.Repositories
                 OrderStatuses.OutForDelivery => "TrackingUpdate",
                 OrderStatuses.Delivered      => "DeliveryConfirmation",
                 OrderStatuses.Cancelled      => "TrackingUpdate",
+                "PaymentHeld"                => "PaymentHeld",
                 _                            => "TrackingUpdate",
             };
 
-            string subject = $"Order {info.OrderNumber} — {status}";
+            string subject = status == "PaymentHeld"
+                ? $"Order {info.OrderNumber} — On Hold"
+                : $"Order {info.OrderNumber} — {status}";
             string body = status switch
             {
                 OrderStatuses.Processing     => $"Your payment for order {info.OrderNumber} has been verified and approved. Your order is now being processed.",
@@ -436,7 +439,7 @@ namespace AdminSystem_v2.Repositories
                 OrderStatuses.OutForDelivery => $"Your order {info.OrderNumber} is out for delivery.",
                 OrderStatuses.Delivered      => $"Your order {info.OrderNumber} has been delivered.",
                 OrderStatuses.Cancelled      => $"Your order {info.OrderNumber} has been cancelled.",
-                "PaymentRejected"            => $"Your payment proof for order {info.OrderNumber} could not be verified. Please log in and resubmit your payment proof.",
+                "PaymentHeld"                => $"We found a discrepancy with the payment proof for order {info.OrderNumber}. The order has been placed on hold — please contact us so we can resolve it.",
                 _                            => $"Your order {info.OrderNumber} status changed to {status}.",
             };
 

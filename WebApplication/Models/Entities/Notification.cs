@@ -233,6 +233,12 @@ public static class NotifTypes
     /// <summary>An online order has been pending for more than 24 hours.</summary>
     public const string PendingOrderAlert = "PendingOrderAlert";
 
+    /// <summary>Reminder to the customer that their Pending order will auto-cancel if left unpaid.</summary>
+    public const string PendingOrderReminder = "PendingOrderReminder";
+
+    /// <summary>Order was auto-cancelled after 24 hours in Pending without payment.</summary>
+    public const string OrderAutoCancelled = "OrderAutoCancelled";
+
     /// <summary>A voucher has been assigned to a customer by an admin.</summary>
     public const string VoucherAssigned = "VoucherAssigned";
 }

@@ -181,7 +181,7 @@ namespace AdminSystem_v2.ViewModels
             SelectedOrder?.OrderStatus == OrderStatuses.PaymentVerification
             && !string.IsNullOrEmpty(SelectedOrder.PaymentProofUrl);
 
-        public bool CanRejectPayment =>
+        public bool CanHoldPayment =>
             SelectedOrder?.OrderStatus == OrderStatuses.PaymentVerification
             && !string.IsNullOrEmpty(SelectedOrder.PaymentProofUrl);
 
@@ -238,7 +238,7 @@ namespace AdminSystem_v2.ViewModels
         public ICommand MarkDeliveredCommand       { get; }
         public ICommand CancelOrderCommand         { get; }
         public ICommand ApprovePaymentCommand      { get; }
-        public ICommand RejectPaymentCommand       { get; }
+        public ICommand HoldPaymentCommand         { get; }
         public ICommand BulkUpdateStatusCommand    { get; }
         public ICommand ApplyBulkUpdateCommand     { get; }
         public ICommand BulkCancelCommand          { get; }
@@ -262,7 +262,7 @@ namespace AdminSystem_v2.ViewModels
             MarkDeliveredCommand      = new RelayCommand(async () => await MarkDeliveredAsync(),       () => CanMarkDelivered);
             CancelOrderCommand        = new RelayCommand(async () => await CancelOrderAsync(),         () => CanCancelOrder);
             ApprovePaymentCommand     = new RelayCommand(async () => await ApprovePaymentAsync(),      () => CanApprovePayment);
-            RejectPaymentCommand      = new RelayCommand(async () => await RejectPaymentAsync(),       () => CanRejectPayment);
+            HoldPaymentCommand        = new RelayCommand(async () => await HoldPaymentAsync(),         () => CanHoldPayment);
             BulkUpdateStatusCommand   = new RelayCommand<string>(async s => await BulkUpdateStatusAsync(s), _ => HasSelection);
             ApplyBulkUpdateCommand    = new RelayCommand(async () => await BulkUpdateStatusAsync(SelectedBulkStatus), () => HasSelection && !string.IsNullOrEmpty(SelectedBulkStatus));
             BulkCancelCommand         = new RelayCommand(async () => await BulkCancelAsync(),          () => HasSelection);
@@ -504,15 +504,15 @@ namespace AdminSystem_v2.ViewModels
                 $"Payment approved. Order {SelectedOrder.OrderNumber} is now Processing.");
         }
 
-        private async Task RejectPaymentAsync()
+        private async Task HoldPaymentAsync()
         {
             if (SelectedOrder == null) return;
             if (!_dialog.Confirm(
-                    $"Reject payment proof for order {SelectedOrder.OrderNumber}? The customer will be notified to resubmit.",
-                    "Reject Payment")) return;
+                    $"Place order {SelectedOrder.OrderNumber} on hold? The customer will be notified that a payment-proof discrepancy was found.",
+                    "Hold Payment")) return;
             await ExecuteOrderActionAsync(
-                () => _orderService.RejectPaymentAsync(SelectedOrder.OrderId),
-                $"Payment rejected. Order {SelectedOrder.OrderNumber} returned to Pending.");
+                () => _orderService.HoldPaymentAsync(SelectedOrder.OrderId),
+                $"Order {SelectedOrder.OrderNumber} placed on hold pending payment-proof resolution.");
         }
 
         private async Task CancelOrderAsync()
@@ -661,7 +661,7 @@ namespace AdminSystem_v2.ViewModels
             OnPropertyChanged(nameof(CanMarkDelivered));
             OnPropertyChanged(nameof(CanCancelOrder));
             OnPropertyChanged(nameof(CanApprovePayment));
-            OnPropertyChanged(nameof(CanRejectPayment));
+            OnPropertyChanged(nameof(CanHoldPayment));
         }
     }
 }

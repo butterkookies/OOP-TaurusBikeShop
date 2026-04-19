@@ -41,6 +41,8 @@ public sealed class NotificationViewModel
         "SupportTicketResolved" => "check-square",
         "LowStockAlert"         => "alert-triangle",
         "PendingOrderAlert"     => "clock",
+        "PendingOrderReminder"  => "clock",
+        "OrderAutoCancelled"    => "x-circle",
         _                       => "bell"
     };
 
@@ -63,6 +65,8 @@ public sealed class NotificationViewModel
         "SupportTicketResolved" => "Ticket Resolved",
         "LowStockAlert"         => "Low Stock",
         "PendingOrderAlert"     => "Order Pending",
+        "PendingOrderReminder"  => "Payment Reminder",
+        "OrderAutoCancelled"    => "Order Cancelled",
         _                       => "Notification"
     };
 

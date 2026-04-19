@@ -30,7 +30,7 @@ namespace AdminSystem_v2.Services
         public Task ApprovePaymentAsync(int orderId)
             => _repo.ApprovePaymentAsync(orderId);
 
-        public Task RejectPaymentAsync(int orderId)
-            => _repo.RejectPaymentAsync(orderId);
+        public Task HoldPaymentAsync(int orderId)
+            => _repo.HoldPaymentAsync(orderId);
     }
 }

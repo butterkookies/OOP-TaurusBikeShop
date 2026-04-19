@@ -17,7 +17,6 @@ namespace WebApplication.BusinessLogic.Services;
 public sealed class PaymentService : IPaymentService
 {
     private readonly AppDbContext                    _context;
-    private readonly PaymentRepository               _paymentRepo;
     private readonly OrderRepository                 _orderRepo;
     private readonly StorePaymentAccountRepository   _storeAccountRepo;
     private readonly IPhotoService                   _photoService;
@@ -29,7 +28,6 @@ public sealed class PaymentService : IPaymentService
     /// <inheritdoc/>
     public PaymentService(
         AppDbContext                   context,
-        PaymentRepository              paymentRepo,
         OrderRepository                orderRepo,
         StorePaymentAccountRepository  storeAccountRepo,
         IPhotoService                  photoService,
@@ -37,7 +35,6 @@ public sealed class PaymentService : IPaymentService
         ILogger<PaymentService>        logger)
     {
         _context          = context          ?? throw new ArgumentNullException(nameof(context));
-        _paymentRepo      = paymentRepo      ?? throw new ArgumentNullException(nameof(paymentRepo));
         _orderRepo        = orderRepo        ?? throw new ArgumentNullException(nameof(orderRepo));
         _storeAccountRepo = storeAccountRepo ?? throw new ArgumentNullException(nameof(storeAccountRepo));
         _photoService     = photoService     ?? throw new ArgumentNullException(nameof(photoService));
@@ -81,7 +78,6 @@ public sealed class PaymentService : IPaymentService
             StorePaymentAccount? storeAccount = await _storeAccountRepo
                 .GetActiveForMethodAsync(PaymentMethods.GCash, cancellationToken);
 
-            // Create Payment + GCashPayment subtype in one transaction
             Payment payment = new()
             {
                 OrderId             = orderId,
@@ -104,11 +100,13 @@ public sealed class PaymentService : IPaymentService
                 SubmittedAt        = DateTime.UtcNow
             };
 
-            await _paymentRepo.CreateWithSubtypeAsync(payment, gcash, cancellationToken);
-
-            // Transition order to PaymentVerification
-            await _orderRepo.UpdateStatusAsync(
-                orderId, OrderStatuses.PaymentVerification, cancellationToken);
+            // Payment insert + subtype + order-status transition must be atomic.
+            // A separate-transaction approach (used previously) could leave a Payment
+                // committed while the order stayed Pending if the second commit failed,
+                // producing the "proof visible but order still Pending" symptom.
+            await InsertPaymentAndTransitionOrderAsync(
+                payment, gcash, orderId,
+                OrderStatuses.PaymentVerification, cancellationToken);
 
             // SystemLog
             await WriteSystemLogAsync(userId,
@@ -199,10 +197,9 @@ public sealed class PaymentService : IPaymentService
                 SubmittedAt          = DateTime.UtcNow
             };
 
-            await _paymentRepo.CreateWithSubtypeAsync(payment, bankTransfer, cancellationToken);
-
-            await _orderRepo.UpdateStatusAsync(
-                orderId, OrderStatuses.PaymentVerification, cancellationToken);
+            await InsertPaymentAndTransitionOrderAsync(
+                payment, bankTransfer, orderId,
+                OrderStatuses.PaymentVerification, cancellationToken);
 
             await WriteSystemLogAsync(userId,
                 SystemLogEvents.PaymentProcessed,
@@ -313,6 +310,67 @@ public sealed class PaymentService : IPaymentService
     // =========================================================================
     // Private helpers
     // =========================================================================
+
+    /// <summary>
+    /// Inserts the Payment row, its method-specific subtype, and transitions the
+    /// order's status in a single transaction. Guarantees that proof-of-payment
+    /// and order-status updates are committed atomically — a transient failure
+    /// after the Payment insert can never leave the order stuck in Pending.
+    /// </summary>
+    private async Task InsertPaymentAndTransitionOrderAsync(
+        Payment payment,
+        object? subtype,
+        int orderId,
+        string newOrderStatus,
+        CancellationToken cancellationToken)
+    {
+        Microsoft.EntityFrameworkCore.Storage.IExecutionStrategy strategy =
+            _context.Database.CreateExecutionStrategy();
+
+        await strategy.ExecuteAsync(async () =>
+        {
+            await using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction tx =
+                await _context.Database.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                await _context.Payments.AddAsync(payment, cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
+
+                if (subtype is GCashPayment gcash)
+                {
+                    gcash.PaymentId = payment.PaymentId;
+                    await _context.GCashPayments.AddAsync(gcash, cancellationToken);
+                }
+                else if (subtype is BankTransferPayment bankTransfer)
+                {
+                    bankTransfer.PaymentId = payment.PaymentId;
+                    await _context.BankTransferPayments.AddAsync(bankTransfer, cancellationToken);
+                }
+
+                // Explicit .AsTracking() — DbContext default is NoTracking, so a plain
+                // FirstOrDefaultAsync would return a detached entity whose mutations
+                // SaveChangesAsync would silently ignore.
+                Order? order = await _context.Orders
+                    .AsTracking()
+                    .FirstOrDefaultAsync(o => o.OrderId == orderId, cancellationToken);
+
+                if (order is null)
+                    throw new InvalidOperationException(
+                        $"Cannot transition status: Order {orderId} not found.");
+
+                order.OrderStatus = newOrderStatus;
+                order.UpdatedAt   = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync(cancellationToken);
+                await tx.CommitAsync(cancellationToken);
+            }
+            catch
+            {
+                await tx.RollbackAsync(cancellationToken);
+                throw;
+            }
+        });
+    }
 
     /// <summary>
     /// Returns null when the order is valid for payment submission,

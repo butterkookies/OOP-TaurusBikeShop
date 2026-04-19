@@ -7,14 +7,12 @@ using Microsoft.Extensions.Options;
 
 public class PhotoService : IPhotoService
 {
-    private const long MaxProofFileSizeBytes = 5 * 1024 * 1024; // 5 MB
+    private const long MaxProofFileSizeBytes = 15 * 1024 * 1024; // 15 MB
 
     private static readonly HashSet<string> AllowedProofMimeTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "image/jpeg",
-        "image/png",
-        "image/webp",
-        "application/pdf"
+        "image/png"
     };
 
     private readonly Cloudinary? _cloudinary;
@@ -92,14 +90,14 @@ public class PhotoService : IPhotoService
 
         if (file.Length > MaxProofFileSizeBytes)
             throw new InvalidOperationException(
-                "File size exceeds the 5 MB maximum. Please upload a smaller file.");
+                "File size exceeds the 15 MB maximum. Please upload a smaller file.");
 
         // Validate MIME type
         string contentType = file.ContentType?.ToLowerInvariant() ?? string.Empty;
         if (!AllowedProofMimeTypes.Contains(contentType))
             throw new InvalidOperationException(
                 $"File type '{contentType}' is not allowed. " +
-                "Please upload a JPEG, PNG, WebP image, or PDF.");
+                "Please upload a JPG or PNG image.");
 
         string subfolder = $"payment-proofs/order-{orderId}";
 
@@ -111,30 +109,15 @@ public class PhotoService : IPhotoService
                 await using var stream = file.OpenReadStream();
                 string folder = $"taurus-bikeshop/{subfolder}";
 
-                if (contentType == "application/pdf")
+                var uploadParams = new ImageUploadParams
                 {
-                    var uploadParams = new RawUploadParams
-                    {
-                        File   = new FileDescription(file.FileName, stream),
-                        Folder = folder,
-                    };
-                    var result = await _cloudinary.UploadAsync(uploadParams);
-                    if (result.Error != null)
-                        throw new InvalidOperationException(result.Error.Message);
-                    return result.SecureUrl.ToString();
-                }
-                else
-                {
-                    var uploadParams = new ImageUploadParams
-                    {
-                        File   = new FileDescription(file.FileName, stream),
-                        Folder = folder,
-                    };
-                    var result = await _cloudinary.UploadAsync(uploadParams);
-                    if (result.Error != null)
-                        throw new InvalidOperationException(result.Error.Message);
-                    return result.SecureUrl.ToString();
-                }
+                    File   = new FileDescription(file.FileName, stream),
+                    Folder = folder,
+                };
+                var result = await _cloudinary.UploadAsync(uploadParams);
+                if (result.Error != null)
+                    throw new InvalidOperationException(result.Error.Message);
+                return result.SecureUrl.ToString();
             }
             catch (Exception ex)
             {

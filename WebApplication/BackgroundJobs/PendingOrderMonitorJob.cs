@@ -8,24 +8,26 @@ using WebApplication.Models.Entities;
 namespace WebApplication.BackgroundJobs;
 
 /// <summary>
-/// Checks every 5 minutes for orders that have been in Pending status for
-/// over 24 hours and queues a PendingOrderAlert notification to all admin
-/// and manager users.
-/// Flowchart: Part 12 / J2 — "Every 5 Minutes", alert threshold "> 24 Hours",
-/// J2B — "Notify Admin".
-/// <para>
-/// Deduplication: a PendingOrderAlert is only queued once per order per 24-hour
-/// window. The check is performed against the Notifications table — if any
-/// PendingOrderAlert row for the same OrderId was inserted within the last 24
-/// hours the order is skipped for this cycle.
-/// </para>
+/// Enforces the 24-hour Pending-order policy:
+/// <list type="number">
+///   <item>
+///     Queues a <see cref="NotifTypes.PendingOrderReminder"/> email to the customer
+///     once their order has sat in <see cref="OrderStatuses.Pending"/> past the
+///     reminder threshold (4 hours before expiry). Deduplicated per order.
+///   </item>
+///   <item>
+///     Auto-cancels any order still in Pending after 24 hours: sets
+///     <see cref="OrderStatuses.Cancelled"/>, writes SystemLog entries, and
+///     queues an <see cref="NotifTypes.OrderAutoCancelled"/> email.
+///   </item>
+/// </list>
+/// Runs every 5 minutes.
 /// </summary>
 public sealed class PendingOrderMonitorJob : BackgroundService
 {
-    // Flowchart Part 12/J2: run every 5 minutes; flag orders pending > 24 hours.
-    private static readonly TimeSpan CycleInterval    = TimeSpan.FromMinutes(5);
-    private static readonly TimeSpan StaleOrderWindow = TimeSpan.FromHours(24);
-    private static readonly TimeSpan AlertCooldown    = TimeSpan.FromHours(24);
+    private static readonly TimeSpan CycleInterval      = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan CancelAfter        = TimeSpan.FromHours(24);
+    private static readonly TimeSpan ReminderLeadTime   = TimeSpan.FromHours(4);
 
     private readonly IServiceScopeFactory            _scopeFactory;
     private readonly ILogger<PendingOrderMonitorJob> _logger;
@@ -80,7 +82,6 @@ public sealed class PendingOrderMonitorJob : BackgroundService
         AppDbContext         context       = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         INotificationService notifications = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-        // -- SystemLog: cycle start --
         try
         {
             await context.SystemLogs.AddAsync(new SystemLog
@@ -99,104 +100,132 @@ public sealed class PendingOrderMonitorJob : BackgroundService
 
         try
         {
-            DateTime now            = DateTime.UtcNow;
-            DateTime staleThreshold = now - StaleOrderWindow;
-            DateTime cooldownCutoff = now - AlertCooldown;
+            DateTime now              = DateTime.UtcNow;
+            DateTime cancelThreshold  = now - CancelAfter;                   // older than this → cancel
+            DateTime reminderThreshold = now - (CancelAfter - ReminderLeadTime); // older than this → remind
 
-            // Fetch stale orders — OrderNumber is required for the notification body.
-            var staleOrders = await context.Orders
-                .AsNoTracking()
+            // -- 1. Auto-cancel orders past the 24h mark --
+            List<Order> expiredOrders = await context.Orders
+                .AsTracking()
+                .Include(o => o.User)
                 .Where(o => o.OrderStatus == OrderStatuses.Pending
-                         && o.OrderDate   < staleThreshold)
-                .Select(o => new { o.OrderId, o.OrderNumber })
+                         && o.OrderDate   < cancelThreshold)
                 .ToListAsync(cancellationToken);
 
-            if (staleOrders.Count == 0)
+            foreach (Order order in expiredOrders)
             {
-                _logger.LogDebug("PendingOrderMonitorJob: no stale pending orders found.");
-            }
-            else
-            {
-                _logger.LogWarning(
-                    "PendingOrderMonitorJob: {Count} order(s) Pending > {Hours}h: {Ids}",
-                    staleOrders.Count,
-                    StaleOrderWindow.TotalHours,
-                    string.Join(", ", staleOrders.Select(o => o.OrderId)));
+                order.OrderStatus = OrderStatuses.Cancelled;
+                order.UpdatedAt   = now;
 
-                // Load admin/manager recipients once per cycle — all must have
-                // an email address to receive the alert (flowchart J2B).
-                List<User> adminRecipients = await context.Users
-                    .AsNoTracking()
-                    .Where(u => u.UserRoles.Any(ur =>
-                                    ur.Role.RoleName == RoleNames.Admin ||
-                                    ur.Role.RoleName == RoleNames.Manager)
-                             && u.Email != null)
-                    .ToListAsync(cancellationToken);
-
-                if (adminRecipients.Count == 0)
-                    _logger.LogWarning(
-                        "PendingOrderMonitorJob: no admin/manager users with email found — " +
-                        "PendingOrderAlert notifications cannot be sent.");
-
-                foreach (var staleOrder in staleOrders)
+                await context.SystemLogs.AddAsync(new SystemLog
                 {
-                    try
-                    {
-                        // Dedup: skip this order if a PendingOrderAlert was already
-                        // queued within the AlertCooldown window.
-                        bool alreadyAlerted = await context.Notifications
-                            .AnyAsync(n => n.NotifType == NotifTypes.PendingOrderAlert
-                                       && n.OrderId   == staleOrder.OrderId
-                                       && n.CreatedAt  > cooldownCutoff,
-                                cancellationToken);
+                    EventType        = SystemLogEvents.OrderStatusChange,
+                    EventDescription = $"Order {order.OrderNumber} (ID {order.OrderId}): Pending \u2192 Cancelled (24h pending timeout).",
+                    CreatedAt        = now
+                }, cancellationToken);
+            }
 
-                        if (alreadyAlerted)
-                        {
-                            _logger.LogDebug(
-                                "PendingOrderMonitorJob: alert already sent for order {OrderId} — skipping.",
-                                staleOrder.OrderId);
-                            continue;
-                        }
+            // -- 2. Find orders in the reminder window (past 20h, not yet cancelled, no reminder sent) --
+            List<int> alreadyReminded = await context.Notifications
+                .Where(n => n.NotifType == NotifTypes.PendingOrderReminder
+                         && n.OrderId != null)
+                .Select(n => n.OrderId!.Value)
+                .Distinct()
+                .ToListAsync(cancellationToken);
 
-                        // Queue one notification per admin recipient.
-                        foreach (User admin in adminRecipients)
-                        {
-                            try
-                            {
-                                await notifications.QueueAsync(
-                                    channel:           NotifChannels.Email,
-                                    notifType:         NotifTypes.PendingOrderAlert,
-                                    recipient:         admin.Email!,
-                                    subject:           $"Pending Order Alert — {staleOrder.OrderNumber}",
-                                    body:              $"Order {staleOrder.OrderNumber} (ID {staleOrder.OrderId}) " +
-                                                       $"has been in Pending status for over " +
-                                                       $"{(int)StaleOrderWindow.TotalHours} hours and requires attention.",
-                                    userId:            admin.UserId,
-                                    orderId:           staleOrder.OrderId,
-                                    cancellationToken: cancellationToken);
-                            }
-                            catch (Exception ex) when (ex is not OperationCanceledException)
-                            {
-                                _logger.LogError(ex,
-                                    "PendingOrderMonitorJob: failed to queue alert for admin {AdminId}, order {OrderId}.",
-                                    admin.UserId, staleOrder.OrderId);
-                            }
-                        }
-                    }
-                    catch (Exception ex) when (ex is not OperationCanceledException)
-                    {
-                        _logger.LogError(ex,
-                            "PendingOrderMonitorJob: error processing stale order {OrderId}.",
-                            staleOrder.OrderId);
-                    }
+            List<Order> reminderOrders = await context.Orders
+                .AsNoTracking()
+                .Include(o => o.User)
+                .Where(o => o.OrderStatus == OrderStatuses.Pending
+                         && o.OrderDate   < reminderThreshold
+                         && o.OrderDate   >= cancelThreshold
+                         && !alreadyReminded.Contains(o.OrderId))
+                .ToListAsync(cancellationToken);
+
+            // Commit cancellations before firing notifications so a mail failure
+            // never rolls back a status transition.
+            await context.SaveChangesAsync(cancellationToken);
+
+            // -- 3. Notify customers of cancellations --
+            foreach (Order order in expiredOrders)
+            {
+                if (order.User?.Email is not string customerEmail)
+                {
+                    _logger.LogWarning(
+                        "PendingOrderMonitorJob: cancelled order {OrderId} has no customer email — skipping notification.",
+                        order.OrderId);
+                    continue;
                 }
+
+                try
+                {
+                    await notifications.QueueAsync(
+                        channel:           NotifChannels.Email,
+                        notifType:         NotifTypes.OrderAutoCancelled,
+                        recipient:         customerEmail,
+                        subject:           $"Order {order.OrderNumber} cancelled — payment not received",
+                        body:              $"Your order {order.OrderNumber} has been cancelled because payment was not " +
+                                           $"submitted within 24 hours of placing it. If you still want the items, " +
+                                           $"please place a new order.",
+                        userId:            order.UserId,
+                        orderId:           order.OrderId,
+                        cancellationToken: cancellationToken);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    _logger.LogError(ex,
+                        "PendingOrderMonitorJob: failed to queue OrderAutoCancelled notification for order {OrderId}.",
+                        order.OrderId);
+                }
+            }
+
+            // -- 4. Send pre-expiry reminders --
+            foreach (Order order in reminderOrders)
+            {
+                if (order.User?.Email is not string customerEmail)
+                {
+                    _logger.LogWarning(
+                        "PendingOrderMonitorJob: pending order {OrderId} has no customer email — skipping reminder.",
+                        order.OrderId);
+                    continue;
+                }
+
+                DateTime cancelAt = order.OrderDate + CancelAfter;
+
+                try
+                {
+                    await notifications.QueueAsync(
+                        channel:           NotifChannels.Email,
+                        notifType:         NotifTypes.PendingOrderReminder,
+                        recipient:         customerEmail,
+                        subject:           $"Reminder — complete payment for order {order.OrderNumber}",
+                        body:              $"Your order {order.OrderNumber} is still awaiting payment and will be " +
+                                           $"automatically cancelled at {cancelAt:MMMM d, yyyy h:mm tt} UTC " +
+                                           $"if we do not receive proof of payment. Please submit your payment proof to avoid cancellation.",
+                        userId:            order.UserId,
+                        orderId:           order.OrderId,
+                        cancellationToken: cancellationToken);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    _logger.LogError(ex,
+                        "PendingOrderMonitorJob: failed to queue PendingOrderReminder for order {OrderId}.",
+                        order.OrderId);
+                }
+            }
+
+            if (expiredOrders.Count > 0 || reminderOrders.Count > 0)
+            {
+                _logger.LogInformation(
+                    "PendingOrderMonitorJob: cycle complete — cancelled {CancelCount}, reminded {RemindCount}.",
+                    expiredOrders.Count, reminderOrders.Count);
             }
 
             await context.SystemLogs.AddAsync(new SystemLog
             {
                 EventType        = SystemLogEvents.BackgroundJobComplete,
                 EventDescription = $"{nameof(PendingOrderMonitorJob)} cycle completed. " +
-                                   $"{staleOrders.Count} stale pending order(s) detected.",
+                                   $"{expiredOrders.Count} auto-cancelled, {reminderOrders.Count} reminded.",
                 CreatedAt        = DateTime.UtcNow
             }, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);

@@ -17,23 +17,22 @@ namespace WebApplication.Utilities;
 /// <para>
 /// <b>Allowed MIME types:</b>
 /// <list type="bullet">
-///   <item>Product images: image/webp, image/jpeg, image/png</item>
-///   <item>Payment proofs: image/webp, image/jpeg, image/png, application/pdf</item>
-///   <item>Support attachments: image/webp, image/jpeg, image/png, application/pdf</item>
+///   <item>Product images: image/jpeg, image/png</item>
+///   <item>Payment proofs: image/jpeg, image/png</item>
+///   <item>Support attachments: image/jpeg, image/png</item>
 /// </list>
-/// Maximum file size: 5 MB for all upload types.
+/// Maximum file size: 15 MB for all upload types.
 /// </para>
 /// </summary>
 public sealed class FileUploadHelper
 {
-    /// <summary>Maximum allowed file size in bytes (5 MB).</summary>
-    private const long MaxFileSizeBytes = 5 * 1024 * 1024;
+    /// <summary>Maximum allowed file size in bytes (15 MB).</summary>
+    private const long MaxFileSizeBytes = 15 * 1024 * 1024;
 
     /// <summary>MIME types permitted for product images.</summary>
     private static readonly IReadOnlySet<string> ProductImageMimeTypes = new HashSet<string>(
         StringComparer.OrdinalIgnoreCase)
     {
-        "image/webp",
         "image/jpeg",
         "image/png"
     };
@@ -42,20 +41,16 @@ public sealed class FileUploadHelper
     private static readonly IReadOnlySet<string> PaymentProofMimeTypes = new HashSet<string>(
         StringComparer.OrdinalIgnoreCase)
     {
-        "image/webp",
         "image/jpeg",
-        "image/png",
-        "application/pdf"
+        "image/png"
     };
 
     /// <summary>MIME types permitted for support ticket attachments.</summary>
     private static readonly IReadOnlySet<string> SupportAttachmentMimeTypes = new HashSet<string>(
         StringComparer.OrdinalIgnoreCase)
     {
-        "image/webp",
         "image/jpeg",
-        "image/png",
-        "application/pdf"
+        "image/png"
     };
 
     private readonly StorageClient _storageClient;
@@ -173,7 +168,7 @@ public sealed class FileUploadHelper
 
         if (file.Length > MaxFileSizeBytes)
             throw new InvalidOperationException(
-                $"File size {file.Length:N0} bytes exceeds the maximum allowed size of {MaxFileSizeBytes:N0} bytes (5 MB).");
+                $"File size {file.Length:N0} bytes exceeds the maximum allowed size of {MaxFileSizeBytes:N0} bytes (15 MB).");
 
         // Validate MIME type
         string contentType = file.ContentType?.ToLowerInvariant() ?? string.Empty;
