@@ -1,7 +1,125 @@
-I’ve got it all noted down. Here's the detailed list of issues:
+**BATCH 2 — ACTION BUTTONS & STATUS CONTROL ISSUES / REQUIREMENTS**
 
-1. In the Orders tab, online orders automatically enter the "Pending" section by default. There is currently no constraint limiting how long an order can stay in "Pending." A 24-hour constraint is needed—if the order remains in "Pending" beyond 24 hours, it should automatically cancel. Before that, the system should email a reminder to the user as a background function. Once the time limit expires, it should move to "Canceled."
+---
 
-2. In the Payment Verification section, when a user uploads payment proof (image or file under 10 MB), the system should automatically move that order from "Pending" to "Payment Verification." No manual intervention is required. The admin will then verify the payment details (amount, account number, etc.). If verified, the admin will set the order to "Processing." If there is a discrepancy, the admin will mark it as "On Hold." All validations and status changes must be automatic once initiated by the user’s proof submission.
+### 1. Pending Tab — Action Buttons Behavior
 
-These two are the main issues detected. Let me know if there are more.
+**Current Issue / Unclear Design:**
+
+* No defined standard for available actions in `Pending` status.
+* System behavior for handling unpaid/unconfirmed orders is not clearly enforced.
+
+**Required Clarification / Decision Point:**
+
+* Determine correct action buttons for `Pending`:
+
+  * Option A: No actions allowed (system-controlled only)
+  * Option B: Allow `Cancel Order` only (manual override by admin)
+
+**AI Evaluation Task:**
+
+* Determine industry-standard behavior for `Pending` orders in order management systems.
+* Validate whether admins should be allowed to manually cancel unpaid orders or if cancellation should be fully automated (e.g., via timeout rules like 24-hour expiry).
+
+---
+
+### 2. Payment Verification — Action Buttons & Visibility
+
+**Required Actions:**
+
+* `Approve Payment` → moves order to `Processing`
+* `Hold Payment` → moves order to `On Hold`
+
+**Current Issue / Decision Gap:**
+
+* Uncertainty whether `Cancel Order` should be available in this state.
+
+**AI Evaluation Tasks:**
+
+* Determine if exposing `Cancel Order` during `Payment Verification` is standard practice.
+* Evaluate risk of premature cancellation vs maintaining structured payment validation flow.
+
+**Notification Requirement:**
+
+* System must support sending notifications when status changes occur.
+
+**AI Task:**
+
+* Verify capability and best practice for:
+
+  * Email notifications
+  * In-app notifications
+* Ensure notifications trigger on:
+
+  * Payment approval
+  * Payment hold
+  * Any status transition
+
+---
+
+### 3. Bulk “Select All” Status Update — Constraint Enforcement
+
+**Current Issue:**
+
+* Bulk status update allows invalid or illogical transitions.
+* Example:
+
+  * Orders in `Processing` can be updated to:
+
+    * `Processing` (redundant)
+    * `Picked Up` (invalid skip)
+    * Other inconsistent states
+
+**Required Behavior:**
+
+* Enforce **strict status transition rules** in dropdown.
+* Disable all invalid or illogical target statuses.
+
+**Example Constraint:**
+
+* If current status = `Processing`
+
+  * Allowed: `Ready for Pickup`
+  * Disallowed:
+
+    * `Processing` (same state)
+    * `Picked Up` (skips step)
+    * Any unrelated status
+
+**AI Evaluation Task:**
+
+* Define a **valid state transition map** for all order statuses.
+* Ensure:
+
+  * No backward transitions unless explicitly allowed
+  * No skipping of required intermediate states
+  * No redundant selections
+
+---
+
+### 4. Global Question — Cancel Order Availability
+
+**System-Wide Concern:**
+
+* Whether `Cancel Order` should exist across multiple statuses or be restricted.
+
+**AI Evaluation Task:**
+
+* Determine standard practices for:
+
+  * When cancellation is allowed
+  * Which statuses permit cancellation (e.g., Pending, Payment Verification, Processing)
+* Identify:
+
+  * Risks of allowing cancellation at later stages
+  * Whether cancellation should be replaced with other states (e.g., “Return”, “Failed”, “Rejected”)
+
+---
+
+**Summary of Batch 2 Focus:**
+
+* Define correct action buttons per status
+* Enforce strict and logical status transitions
+* Standardize cancellation rules
+* Ensure notification system integration
+* Prevent invalid bulk updates through constraints

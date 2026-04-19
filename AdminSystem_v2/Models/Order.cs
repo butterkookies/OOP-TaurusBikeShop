@@ -96,8 +96,8 @@ namespace AdminSystem_v2.Models
         public static readonly IReadOnlyDictionary<string, IReadOnlySet<string>> AllowedTransitions =
             new Dictionary<string, IReadOnlySet<string>>
             {
-                [Pending]             = new HashSet<string> { PaymentVerification, Processing, ReadyForPickup, OutForDelivery, Cancelled },
-                [PaymentVerification] = new HashSet<string> { Processing, OnHold, Pending, Cancelled },
+                [Pending]             = new HashSet<string> { Cancelled },
+                [PaymentVerification] = new HashSet<string> { Processing, OnHold },
                 [Processing]          = new HashSet<string> { ReadyForPickup, OutForDelivery, Cancelled },
                 [OnHold]              = new HashSet<string> { Processing, Cancelled },
                 [ReadyForPickup]      = new HashSet<string> { PickedUp },

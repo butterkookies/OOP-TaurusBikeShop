@@ -187,6 +187,7 @@ namespace AdminSystem_v2.ViewModels
 
         public bool CanMarkProcessing =>
             SelectedOrder != null
+            && SelectedOrder.OrderStatus != OrderStatuses.PaymentVerification
             && !OrderStatuses.TerminalStatuses.Contains(SelectedOrder.OrderStatus)
             && OrderStatuses.IsValidTransition(SelectedOrder.OrderStatus, OrderStatuses.Processing);
 
@@ -199,20 +200,24 @@ namespace AdminSystem_v2.ViewModels
                 var selected = Orders.Where(o => o.IsSelected).Select(o => o.Order).ToList();
                 if (selected.Count == 0) return Array.Empty<string>();
 
-                bool hasDelivery = selected.Any(o => o.DeliveryType == OrderTypes.Delivery);
-                bool hasPickup   = selected.Any(o => o.DeliveryType == OrderTypes.Pickup);
-
-                var list = new List<string> { OrderStatuses.Processing, OrderStatuses.Cancelled };
-
-                if (hasPickup && !hasDelivery)
+                var allTargets = new[] 
                 {
-                    list.Add(OrderStatuses.ReadyForPickup);
-                    list.Add(OrderStatuses.PickedUp);
-                }
-                else if (hasDelivery && !hasPickup)
+                    OrderStatuses.Processing,
+                    OrderStatuses.OnHold,
+                    OrderStatuses.ReadyForPickup,
+                    OrderStatuses.PickedUp,
+                    OrderStatuses.OutForDelivery,
+                    OrderStatuses.Delivered,
+                    OrderStatuses.Cancelled
+                };
+
+                var list = new List<string>();
+                foreach (string status in allTargets)
                 {
-                    list.Add(OrderStatuses.OutForDelivery);
-                    list.Add(OrderStatuses.Delivered);
+                    if (selected.All(o => OrderStatuses.IsValidTransition(o.OrderStatus, status, o.DeliveryType)))
+                    {
+                        list.Add(status);
+                    }
                 }
 
                 return list;
@@ -457,7 +462,7 @@ namespace AdminSystem_v2.ViewModels
         {
             if (SelectedOrder == null) return;
             await ExecuteOrderActionAsync(
-                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.Processing),
+                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.Processing, SelectedOrder.OrderStatus),
                 $"Order {SelectedOrder.OrderNumber} is now Processing.");
         }
 
@@ -465,7 +470,7 @@ namespace AdminSystem_v2.ViewModels
         {
             if (SelectedOrder == null) return;
             await ExecuteOrderActionAsync(
-                () => _orderService.MarkReadyForPickupAsync(SelectedOrder.OrderId),
+                () => _orderService.MarkReadyForPickupAsync(SelectedOrder.OrderId, SelectedOrder.OrderStatus),
                 $"Order {SelectedOrder.OrderNumber} is ready for pickup.");
         }
 
@@ -473,7 +478,7 @@ namespace AdminSystem_v2.ViewModels
         {
             if (SelectedOrder == null) return;
             await ExecuteOrderActionAsync(
-                () => _orderService.ConfirmPickupAsync(SelectedOrder.OrderId),
+                () => _orderService.ConfirmPickupAsync(SelectedOrder.OrderId, SelectedOrder.OrderStatus),
                 $"Pickup confirmed for order {SelectedOrder.OrderNumber}.");
         }
 
@@ -481,7 +486,7 @@ namespace AdminSystem_v2.ViewModels
         {
             if (SelectedOrder == null) return;
             await ExecuteOrderActionAsync(
-                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.OutForDelivery),
+                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.OutForDelivery, SelectedOrder.OrderStatus),
                 $"Order {SelectedOrder.OrderNumber} marked as Out for Delivery.");
         }
 
@@ -489,7 +494,7 @@ namespace AdminSystem_v2.ViewModels
         {
             if (SelectedOrder == null) return;
             await ExecuteOrderActionAsync(
-                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.Delivered),
+                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.Delivered, SelectedOrder.OrderStatus),
                 $"Order {SelectedOrder.OrderNumber} marked as Delivered.");
         }
 
@@ -500,7 +505,7 @@ namespace AdminSystem_v2.ViewModels
                     $"Approve payment for order {SelectedOrder.OrderNumber}? This will move the order to Processing.",
                     "Approve Payment")) return;
             await ExecuteOrderActionAsync(
-                () => _orderService.ApprovePaymentAsync(SelectedOrder.OrderId),
+                () => _orderService.ApprovePaymentAsync(SelectedOrder.OrderId, SelectedOrder.OrderStatus),
                 $"Payment approved. Order {SelectedOrder.OrderNumber} is now Processing.");
         }
 
@@ -511,7 +516,7 @@ namespace AdminSystem_v2.ViewModels
                     $"Place order {SelectedOrder.OrderNumber} on hold? The customer will be notified that a payment-proof discrepancy was found.",
                     "Hold Payment")) return;
             await ExecuteOrderActionAsync(
-                () => _orderService.HoldPaymentAsync(SelectedOrder.OrderId),
+                () => _orderService.HoldPaymentAsync(SelectedOrder.OrderId, SelectedOrder.OrderStatus),
                 $"Order {SelectedOrder.OrderNumber} placed on hold pending payment-proof resolution.");
         }
 
@@ -522,7 +527,7 @@ namespace AdminSystem_v2.ViewModels
                     $"Cancel order {SelectedOrder.OrderNumber}? This cannot be undone.",
                     "Cancel Order")) return;
             await ExecuteOrderActionAsync(
-                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.Cancelled),
+                () => _orderService.UpdateOrderStatusAsync(SelectedOrder.OrderId, OrderStatuses.Cancelled, SelectedOrder.OrderStatus),
                 $"Order {SelectedOrder.OrderNumber} cancelled.");
         }
 
@@ -552,7 +557,7 @@ namespace AdminSystem_v2.ViewModels
             if (!_dialog.Confirm(message, "Bulk Update Status")) return;
 
             await ExecuteBulkActionAsync(
-                o => _orderService.UpdateOrderStatusAsync(o.OrderId, status),
+                o => _orderService.UpdateOrderStatusAsync(o.OrderId, status, o.OrderStatus),
                 valid,
                 skipped > 0
                     ? $"{valid.Count} order(s) updated to '{status}'. {skipped} skipped (invalid transition)."
@@ -582,7 +587,7 @@ namespace AdminSystem_v2.ViewModels
             if (!_dialog.Confirm(message, "Bulk Cancel Orders")) return;
 
             await ExecuteBulkActionAsync(
-                o => _orderService.UpdateOrderStatusAsync(o.OrderId, OrderStatuses.Cancelled),
+                o => _orderService.UpdateOrderStatusAsync(o.OrderId, OrderStatuses.Cancelled, o.OrderStatus),
                 valid,
                 skipped > 0
                     ? $"{valid.Count} order(s) cancelled. {skipped} skipped (terminal state)."

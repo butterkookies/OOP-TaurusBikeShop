@@ -16,20 +16,20 @@ namespace AdminSystem_v2.Repositories
         /// Updates the Order.OrderStatus column after validating the transition.
         /// Throws <see cref="InvalidStatusTransitionException"/> if the transition is invalid.
         /// </summary>
-        Task UpdateOrderStatusAsync(int orderId, string status);
+        Task UpdateOrderStatusAsync(int orderId, string status, string? expectedCurrentStatus = null);
 
         /// <summary>
         /// Sets Order status to ReadyForPickup and upserts the PickupOrder row
         /// with PickupReadyAt = now, PickupExpiresAt = now + 7 days.
         /// Throws <see cref="InvalidStatusTransitionException"/> if the transition is invalid.
         /// </summary>
-        Task MarkReadyForPickupAsync(int orderId);
+        Task MarkReadyForPickupAsync(int orderId, string? expectedCurrentStatus = null);
 
         /// <summary>
         /// Sets Order status to PickedUp and stamps PickupOrder.PickupConfirmedAt.
         /// Throws <see cref="InvalidStatusTransitionException"/> if the transition is invalid.
         /// </summary>
-        Task ConfirmPickupAsync(int orderId);
+        Task ConfirmPickupAsync(int orderId, string? expectedCurrentStatus = null);
 
         /// <summary>
         /// Returns a dictionary of OrderStatus → count for all online orders.
@@ -41,12 +41,12 @@ namespace AdminSystem_v2.Repositories
         /// Approves the payment proof for a PendingVerification order:
         /// transitions order to Processing and payment to Completed.
         /// </summary>
-        Task ApprovePaymentAsync(int orderId);
+        Task ApprovePaymentAsync(int orderId, string? expectedCurrentStatus = null);
 
         /// <summary>
         /// Places the order on hold when the admin finds a discrepancy in the payment proof:
         /// transitions order from PaymentVerification to OnHold and payment to VerificationRejected.
         /// </summary>
-        Task HoldPaymentAsync(int orderId);
+        Task HoldPaymentAsync(int orderId, string? expectedCurrentStatus = null);
     }
 }

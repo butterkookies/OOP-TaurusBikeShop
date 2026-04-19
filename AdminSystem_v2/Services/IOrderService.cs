@@ -15,18 +15,18 @@ namespace AdminSystem_v2.Services
         /// Updates order status after validating the transition.
         /// Throws <see cref="InvalidStatusTransitionException"/> on invalid transitions.
         /// </summary>
-        Task UpdateOrderStatusAsync(int orderId, string status);
+        Task UpdateOrderStatusAsync(int orderId, string status, string? expectedCurrentStatus = null);
 
-        Task MarkReadyForPickupAsync(int orderId);
-        Task ConfirmPickupAsync(int orderId);
+        Task MarkReadyForPickupAsync(int orderId, string? expectedCurrentStatus = null);
+        Task ConfirmPickupAsync(int orderId, string? expectedCurrentStatus = null);
 
         /// <summary>Returns order counts per status for the badge bar (single cheap query).</summary>
         Task<Dictionary<string, int>> GetStatusCountsAsync();
 
         /// <summary>Approves the payment proof: transitions order to Processing, payment to Completed.</summary>
-        Task ApprovePaymentAsync(int orderId);
+        Task ApprovePaymentAsync(int orderId, string? expectedCurrentStatus = null);
 
         /// <summary>Holds the payment on discrepancy: moves order to OnHold, payment to VerificationRejected.</summary>
-        Task HoldPaymentAsync(int orderId);
+        Task HoldPaymentAsync(int orderId, string? expectedCurrentStatus = null);
     }
 }

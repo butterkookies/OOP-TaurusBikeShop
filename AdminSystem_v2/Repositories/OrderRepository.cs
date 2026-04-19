@@ -122,7 +122,7 @@ namespace AdminSystem_v2.Repositories
             return order;
         }
 
-        public async Task UpdateOrderStatusAsync(int orderId, string newStatus)
+        public async Task UpdateOrderStatusAsync(int orderId, string newStatus, string? expectedCurrentStatus = null)
         {
             await using var conn = GetConnection();
             await using var tx   = await conn.BeginTransactionAsync();
@@ -135,6 +135,9 @@ namespace AdminSystem_v2.Repositories
 
                 if (currentStatus == null)
                     throw new InvalidOperationException($"Order {orderId} not found.");
+
+                if (expectedCurrentStatus != null && currentStatus != expectedCurrentStatus)
+                    throw new InvalidOperationException($"Order status was modified by another process. Please refresh the page. (Expected: {expectedCurrentStatus}, Actual: {currentStatus})");
 
                 // 2 — Validate transition against allowed forward-only map
                 if (!OrderStatuses.IsValidTransition(currentStatus, newStatus))
@@ -168,7 +171,7 @@ namespace AdminSystem_v2.Repositories
             }
         }
 
-        public async Task MarkReadyForPickupAsync(int orderId)
+        public async Task MarkReadyForPickupAsync(int orderId, string? expectedCurrentStatus = null)
         {
             await using var conn = GetConnection();
             await using var tx   = await conn.BeginTransactionAsync();
@@ -181,6 +184,9 @@ namespace AdminSystem_v2.Repositories
 
                 if (currentStatus == null)
                     throw new InvalidOperationException($"Order {orderId} not found.");
+
+                if (expectedCurrentStatus != null && currentStatus != expectedCurrentStatus)
+                    throw new InvalidOperationException($"Order status was modified by another process. Please refresh the page. (Expected: {expectedCurrentStatus}, Actual: {currentStatus})");
 
                 if (!OrderStatuses.IsValidTransition(currentStatus, OrderStatuses.ReadyForPickup))
                 {
@@ -224,7 +230,7 @@ namespace AdminSystem_v2.Repositories
             }
         }
 
-        public async Task ConfirmPickupAsync(int orderId)
+        public async Task ConfirmPickupAsync(int orderId, string? expectedCurrentStatus = null)
         {
             await using var conn = GetConnection();
             await using var tx   = await conn.BeginTransactionAsync();
@@ -237,6 +243,9 @@ namespace AdminSystem_v2.Repositories
 
                 if (currentStatus == null)
                     throw new InvalidOperationException($"Order {orderId} not found.");
+
+                if (expectedCurrentStatus != null && currentStatus != expectedCurrentStatus)
+                    throw new InvalidOperationException($"Order status was modified by another process. Please refresh the page. (Expected: {expectedCurrentStatus}, Actual: {currentStatus})");
 
                 if (!OrderStatuses.IsValidTransition(currentStatus, OrderStatuses.PickedUp))
                 {
@@ -286,7 +295,7 @@ namespace AdminSystem_v2.Repositories
             return rows.ToDictionary(r => r.OrderStatus, r => r.Cnt);
         }
 
-        public async Task ApprovePaymentAsync(int orderId)
+        public async Task ApprovePaymentAsync(int orderId, string? expectedCurrentStatus = null)
         {
             await using var conn = GetConnection();
             await using var tx   = await conn.BeginTransactionAsync();
@@ -298,6 +307,9 @@ namespace AdminSystem_v2.Repositories
 
                 if (currentStatus == null)
                     throw new InvalidOperationException($"Order {orderId} not found.");
+
+                if (expectedCurrentStatus != null && currentStatus != expectedCurrentStatus)
+                    throw new InvalidOperationException($"Order status was modified by another process. Please refresh the page. (Expected: {expectedCurrentStatus}, Actual: {currentStatus})");
 
                 if (!OrderStatuses.IsValidTransition(currentStatus, OrderStatuses.Processing))
                 {
@@ -335,7 +347,7 @@ namespace AdminSystem_v2.Repositories
             }
         }
 
-        public async Task HoldPaymentAsync(int orderId)
+        public async Task HoldPaymentAsync(int orderId, string? expectedCurrentStatus = null)
         {
             await using var conn = GetConnection();
             await using var tx   = await conn.BeginTransactionAsync();
@@ -347,6 +359,9 @@ namespace AdminSystem_v2.Repositories
 
                 if (currentStatus == null)
                     throw new InvalidOperationException($"Order {orderId} not found.");
+
+                if (expectedCurrentStatus != null && currentStatus != expectedCurrentStatus)
+                    throw new InvalidOperationException($"Order status was modified by another process. Please refresh the page. (Expected: {expectedCurrentStatus}, Actual: {currentStatus})");
 
                 if (!OrderStatuses.IsValidTransition(currentStatus, OrderStatuses.OnHold))
                 {
