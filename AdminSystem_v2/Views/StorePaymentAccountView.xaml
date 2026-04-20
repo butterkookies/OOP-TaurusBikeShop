@@ -16,9 +16,9 @@
 
         <!-- =============== LEFT: LIST =============== -->
         <Border Grid.Column="0"
-                Background="#1F2937"
-                CornerRadius="8"
-                BorderBrush="#374151"
+                Background="#1A2234"
+                CornerRadius="10"
+                BorderBrush="#2D3748"
                 BorderThickness="1">
             <DockPanel LastChildFill="True">
 
@@ -155,9 +155,9 @@
 
         <!-- =============== RIGHT: EDIT FORM =============== -->
         <Border Grid.Column="1"
-                Background="#1F2937"
-                CornerRadius="8"
-                BorderBrush="#374151"
+                Background="#1A2234"
+                CornerRadius="10"
+                BorderBrush="#2D3748"
                 BorderThickness="1"
                 Margin="14,0,0,0"
                 Visibility="{Binding IsEditing, Converter={StaticResource BoolVis}}">
@@ -251,9 +251,9 @@
 
         <!-- Empty-state placeholder when nothing is selected -->
         <Border Grid.Column="1"
-                Background="#1F2937"
-                CornerRadius="8"
-                BorderBrush="#374151"
+                Background="#1A2234"
+                CornerRadius="10"
+                BorderBrush="#2D3748"
                 BorderThickness="1"
                 Margin="14,0,0,0">
             <Border.Style>

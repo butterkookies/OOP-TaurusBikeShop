@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:converters="clr-namespace:AdminSystem_v2.Converters"
         Title="Taurus Bike Shop — Admin Login"
-        Height="520" Width="420"
-        MinHeight="480" MinWidth="360"
+        Height="560" Width="440"
+        MinHeight="500" MinWidth="380"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
         Background="#111827">
@@ -14,51 +14,105 @@
 
         <!-- Input style -->
         <Style x:Key="InputStyle" TargetType="TextBox">
-            <Setter Property="Background"   Value="#1F2937"/>
-            <Setter Property="Foreground"   Value="#F9FAFB"/>
-            <Setter Property="BorderBrush"  Value="#374151"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"      Value="8,0"/>
-            <Setter Property="FontSize"     Value="13"/>
-            <Setter Property="Height"       Value="36"/>
+            <Setter Property="Background"             Value="#0D1526"/>
+            <Setter Property="Foreground"             Value="#F9FAFB"/>
+            <Setter Property="BorderBrush"            Value="#374151"/>
+            <Setter Property="BorderThickness"        Value="1"/>
+            <Setter Property="Padding"                Value="12,0"/>
+            <Setter Property="FontSize"               Value="13"/>
+            <Setter Property="Height"                 Value="36"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="CaretBrush"   Value="#F9FAFB"/>
+            <Setter Property="CaretBrush"             Value="#F9FAFB"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4B5563"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="PasswordStyle" TargetType="PasswordBox">
-            <Setter Property="Background"   Value="#1F2937"/>
-            <Setter Property="Foreground"   Value="#F9FAFB"/>
-            <Setter Property="BorderBrush"  Value="#374151"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"      Value="8,0"/>
-            <Setter Property="FontSize"     Value="13"/>
-            <Setter Property="Height"       Value="36"/>
+            <Setter Property="Background"             Value="#0D1526"/>
+            <Setter Property="Foreground"             Value="#F9FAFB"/>
+            <Setter Property="BorderBrush"            Value="#374151"/>
+            <Setter Property="BorderThickness"        Value="1"/>
+            <Setter Property="Padding"                Value="12,0"/>
+            <Setter Property="FontSize"               Value="13"/>
+            <Setter Property="Height"                 Value="36"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Focusable="False"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4B5563"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!-- Primary button -->
         <Style x:Key="PrimaryButton" TargetType="Button">
-            <Setter Property="Background"   Value="#DC2626"/>
-            <Setter Property="Foreground"   Value="White"/>
-            <Setter Property="FontSize"     Value="14"/>
-            <Setter Property="FontWeight"   Value="SemiBold"/>
-            <Setter Property="Height"       Value="42"/>
+            <Setter Property="Background"      Value="#DC2626"/>
+            <Setter Property="Foreground"      Value="White"/>
+            <Setter Property="FontSize"        Value="14"/>
+            <Setter Property="FontWeight"      Value="SemiBold"/>
+            <Setter Property="Height"          Value="42"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor"       Value="Hand"/>
+            <Setter Property="Cursor"          Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="6">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8">
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#B91C1C"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#B91C1C"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#991B1B"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#6B7280"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#374151"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -68,178 +122,233 @@
 
         <!-- Error text -->
         <Style x:Key="ErrorText" TargetType="TextBlock">
-            <Setter Property="Foreground"    Value="#EF4444"/>
-            <Setter Property="FontSize"      Value="11"/>
-            <Setter Property="TextWrapping"  Value="Wrap"/>
-            <Setter Property="Margin"        Value="0,2,0,6"/>
+            <Setter Property="Foreground"   Value="#EF4444"/>
+            <Setter Property="FontSize"     Value="11"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin"       Value="0,3,0,6"/>
         </Style>
 
         <!-- Label text -->
         <Style x:Key="LabelText" TargetType="TextBlock">
-            <Setter Property="Foreground"  Value="#9CA3AF"/>
-            <Setter Property="FontSize"    Value="11"/>
-            <Setter Property="FontWeight"  Value="SemiBold"/>
-            <Setter Property="Margin"      Value="0,0,0,4"/>
+            <Setter Property="Foreground" Value="#9CA3AF"/>
+            <Setter Property="FontSize"   Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin"     Value="0,0,0,6"/>
         </Style>
     </Window.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid MinWidth="340" MinHeight="440">
+    <Grid>
+        <!-- Subtle background gradient -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#0F172A" Offset="0"/>
+                <GradientStop Color="#111827" Offset="0.5"/>
+                <GradientStop Color="#0F172A" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
 
-            <!-- LOGIN CARD -->
-            <Border HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Width="340"
-                    Background="#1F2937"
-                    CornerRadius="10"
-                    Padding="32"
-                    BorderThickness="1"
-                    BorderBrush="#374151">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid MinWidth="360" MinHeight="500">
 
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="40" Opacity="0.5" ShadowDepth="0"/>
-                </Border.Effect>
+                <!-- LOGIN CARD -->
+                <Border HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Width="380"
+                        Background="#1A2234"
+                        CornerRadius="12"
+                        BorderThickness="1"
+                        BorderBrush="#2D3748">
 
-                <StackPanel>
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="60" Opacity="0.6" ShadowDepth="0" Color="#000000"/>
+                    </Border.Effect>
 
-                    <!-- BRAND -->
-                    <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Center"
-                                Margin="0,0,0,28">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <!-- Red accent stripe -->
+                            <RowDefinition Height="5"/>
+                            <!-- Content -->
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                        <Border Width="42" Height="42"
-                                Background="#DC2626"
-                                CornerRadius="8"
-                                Margin="0,0,12,0">
-                            <TextBlock Text="T"
-                                       Foreground="White"
-                                       FontSize="22"
-                                       FontWeight="Bold"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
+                        <!-- Top accent bar -->
+                        <Border Grid.Row="0" CornerRadius="12,12,0,0">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#DC2626" Offset="0"/>
+                                    <GradientStop Color="#B91C1C" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
                         </Border>
 
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="TAURUS"
+                        <!-- Main card content -->
+                        <StackPanel Grid.Row="1" Margin="36,32,36,36">
+
+                            <!-- BRAND -->
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,0,0,32">
+
+                                <Border Width="48" Height="48"
+                                        Background="#DC2626"
+                                        CornerRadius="10"
+                                        Margin="0,0,14,0">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="12" Opacity="0.5"
+                                                          ShadowDepth="0" Color="#DC2626"/>
+                                    </Border.Effect>
+                                    <TextBlock Text="T"
+                                               Foreground="White"
+                                               FontSize="26"
+                                               FontWeight="Bold"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="TAURUS"
+                                               Foreground="#F9FAFB"
+                                               FontSize="18"
+                                               FontWeight="Bold"/>
+                                    <TextBlock Text="BIKE SHOP ADMIN"
+                                               Foreground="#4B5563"
+                                               FontSize="10"
+                                               FontWeight="SemiBold"
+                                               Margin="1,3,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Section heading -->
+                            <TextBlock Text="Welcome back"
                                        Foreground="#F9FAFB"
-                                       FontSize="15"
-                                       FontWeight="Bold"/>
-                            <TextBlock Text="BIKE SHOP ADMIN"
+                                       FontSize="20"
+                                       FontWeight="Bold"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock Text="Sign in to your admin account"
                                        Foreground="#6B7280"
-                                       FontSize="10"
-                                       Margin="1,2,0,0"/>
+                                       FontSize="12"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,28"/>
+
+                            <!-- EMAIL -->
+                            <TextBlock Text="EMAIL ADDRESS" Style="{StaticResource LabelText}"/>
+                            <TextBox Style="{StaticResource InputStyle}"
+                                     Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding EmailError}"
+                                       Style="{StaticResource ErrorText}"
+                                       Visibility="{Binding HasEmailError, Converter={StaticResource BoolToVisibility}}"/>
+
+                            <!-- PASSWORD -->
+                            <TextBlock Text="PASSWORD" Style="{StaticResource LabelText}" Margin="0,8,0,6"/>
+                            <Grid Margin="0,0,0,4">
+
+                                <!-- Hidden password box -->
+                                <PasswordBox x:Name="PbPassword"
+                                             Style="{StaticResource PasswordStyle}"
+                                             Visibility="{Binding IsPasswordVisible,
+                                                 Converter={StaticResource BoolToVisibility},
+                                                 ConverterParameter=Invert}"/>
+
+                                <!-- Visible plain-text box -->
+                                <TextBox Style="{StaticResource InputStyle}"
+                                         Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
+                                         Visibility="{Binding IsPasswordVisible,
+                                             Converter={StaticResource BoolToVisibility}}"/>
+
+                                <!-- Toggle eye button -->
+                                <Button Background="Transparent"
+                                        BorderThickness="0"
+                                        Width="36"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Cursor="Hand"
+                                        Command="{Binding TogglePasswordCommand}">
+                                    <TextBlock FontSize="13" Foreground="#6B7280">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="&#x1F441;"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPasswordVisible}" Value="True">
+                                                        <Setter Property="Text" Value="&#x1F576;"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Button>
+                            </Grid>
+
+                            <TextBlock Text="{Binding PasswordError}"
+                                       Style="{StaticResource ErrorText}"
+                                       Visibility="{Binding HasPasswordError, Converter={StaticResource BoolToVisibility}}"/>
+
+                            <!-- FORGOT PASSWORD -->
+                            <Button Background="Transparent"
+                                    BorderThickness="0"
+                                    Foreground="#6B7280"
+                                    FontSize="11"
+                                    Cursor="Hand"
+                                    Content="Forgot password?"
+                                    HorizontalAlignment="Right"
+                                    Margin="0,2,0,20"
+                                    Command="{Binding ForgotPasswordCommand}"/>
+
+                            <!-- LOGIN BUTTON -->
+                            <Button Style="{StaticResource PrimaryButton}"
+                                    IsEnabled="{Binding IsNotLoading}"
+                                    Command="{Binding LoginCommand}">
+                                <Button.Content>
+                                    <TextBlock>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="Sign In"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                                        <Setter Property="Text" Value="Signing in..."/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Button.Content>
+                            </Button>
+
+                            <!-- LOGIN ERROR -->
+                            <Border Background="#3B1010"
+                                    CornerRadius="8"
+                                    BorderBrush="#7F1D1D"
+                                    BorderThickness="1"
+                                    Padding="14,10"
+                                    Margin="0,14,0,0"
+                                    Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="⚠" Foreground="#FCA5A5"
+                                               FontSize="13" Margin="0,0,8,0"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding ErrorMessage}"
+                                               Foreground="#FCA5A5"
+                                               FontSize="12"
+                                               TextWrapping="Wrap"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
                         </StackPanel>
-                    </StackPanel>
-
-                    <!-- EMAIL -->
-                    <TextBlock Text="EMAIL" Style="{StaticResource LabelText}"/>
-                    <TextBox Style="{StaticResource InputStyle}"
-                             Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"
-                             Margin="0,0,0,4"/>
-                    <TextBlock Text="{Binding EmailError}"
-                               Style="{StaticResource ErrorText}"
-                               Visibility="{Binding HasEmailError, Converter={StaticResource BoolToVisibility}}"/>
-
-                    <!-- PASSWORD -->
-                    <TextBlock Text="PASSWORD" Style="{StaticResource LabelText}" Margin="0,4,0,4"/>
-                    <Grid Margin="0,0,0,4">
-
-                        <!-- Hidden password box (bound via code-behind helper) -->
-                        <PasswordBox x:Name="PbPassword"
-                                     Style="{StaticResource PasswordStyle}"
-                                     Visibility="{Binding IsPasswordVisible,
-                                         Converter={StaticResource BoolToVisibility},
-                                         ConverterParameter=Invert}"/>
-
-                        <!-- Visible plain-text box -->
-                        <TextBox Style="{StaticResource InputStyle}"
-                                 Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
-                                 Visibility="{Binding IsPasswordVisible,
-                                     Converter={StaticResource BoolToVisibility}}"/>
-
-                        <!-- Toggle eye button -->
-                        <Button Background="Transparent"
-                                BorderThickness="0"
-                                Width="36"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Center"
-                                Cursor="Hand"
-                                Command="{Binding TogglePasswordCommand}">
-                            <TextBlock FontSize="13"
-                                       Foreground="#6B7280">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="&#x1F441;"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsPasswordVisible}" Value="True">
-                                                <Setter Property="Text" Value="&#x1F576;"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Button>
                     </Grid>
+                </Border>
 
-                    <TextBlock Text="{Binding PasswordError}"
-                               Style="{StaticResource ErrorText}"
-                               Visibility="{Binding HasPasswordError, Converter={StaticResource BoolToVisibility}}"/>
+                <!-- FOOTER -->
+                <TextBlock Text="Taurus Bike Shop  •  Admin System  •  v2"
+                           Foreground="#374151"
+                           FontSize="10"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom"
+                           Margin="0,0,0,16"/>
 
-                    <!-- FORGOT PASSWORD -->
-                    <Button Background="Transparent"
-                            BorderThickness="0"
-                            Foreground="#6B7280"
-                            FontSize="11"
-                            Cursor="Hand"
-                            Content="Forgot password?"
-                            HorizontalAlignment="Right"
-                            Margin="0,4,0,16"
-                            Command="{Binding ForgotPasswordCommand}"/>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
 
-                    <!-- LOGIN BUTTON -->
-                    <Button Style="{StaticResource PrimaryButton}"
-                            IsEnabled="{Binding IsNotLoading}"
-                            Command="{Binding LoginCommand}">
-                        <Button.Content>
-                            <TextBlock>
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="Sign In"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsLoading}" Value="True">
-                                                <Setter Property="Text" Value="Signing in..."/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Button.Content>
-                    </Button>
-
-                    <!-- LOGIN ERROR -->
-                    <Border Background="#7F991B1B"
-                            CornerRadius="6"
-                            Padding="12,8"
-                            Margin="0,12,0,0"
-                            Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
-                        <TextBlock Text="{Binding ErrorMessage}"
-                                   Foreground="#FCA5A5"
-                                   FontSize="12"
-                                   TextWrapping="Wrap"
-                                   TextAlignment="Center"/>
-                    </Border>
-
-                </StackPanel>
-            </Border>
-
-            <!-- FOOTER -->
-            <TextBlock Text="Taurus Bike Shop  •  Admin System"
-                       Foreground="#4B5563"
-                       FontSize="10"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Bottom"
-                       Margin="0,0,0,12"/>
-
-        </Grid>
-    </ScrollViewer>
 </Window>

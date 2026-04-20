@@ -102,7 +102,7 @@
         <!-- ══════════════════════════════════════
              ROW 0 — TOOLBAR
              ══════════════════════════════════════ -->
-        <Border Grid.Row="0" Background="#1F2937" BorderBrush="#374151"
+        <Border Grid.Row="0" Background="#1A2234" BorderBrush="#374151"
                 BorderThickness="0,0,0,1" Padding="20,0">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -123,7 +123,7 @@
                     <Button Command="{Binding RefreshCommand}"
                             ToolTip="Refresh staff list"
                             Background="Transparent" BorderThickness="0"
-                            Cursor="Hand" Padding="8,0">
+                            Cursor="Hand" Height="36" Padding="12,0">
                         <TextBlock Text="&#x21BB;" Foreground="#9CA3AF" FontSize="16"
                                    VerticalAlignment="Center"/>
                     </Button>
@@ -164,7 +164,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- Role filter chips -->
-                <Border Grid.Row="0" Background="#1F2937" Padding="10,8"
+                <Border Grid.Row="0" Background="#1A2234" Padding="10,8"
                         BorderBrush="#374151" BorderThickness="0,0,0,1">
                     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                   VerticalScrollBarVisibility="Disabled">
@@ -206,15 +206,15 @@
                 </Border>
 
                 <!-- Search box -->
-                <Border Grid.Row="1" Background="#1F2937" Padding="10,8"
+                <Border Grid.Row="1" Background="#1A2234" Padding="10,8"
                         BorderBrush="#374151" BorderThickness="0,0,0,1">
                     <Grid>
                         <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-
+                                 Height="36" Padding="12,0" VerticalContentAlignment="Center"
                                  x:Name="StaffSearchBox"/>
                         <TextBlock Text="Search by name or email..."
                                    Foreground="#4B5563" FontSize="13"
-                                   Margin="12,0" VerticalAlignment="Center"
+                                   Margin="14,0" VerticalAlignment="Center"
                                    IsHitTestVisible="False">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
@@ -410,7 +410,7 @@
                         <Separator Background="#374151" Margin="0,0,0,20"/>
 
                         <!-- ── Role change ── -->
-                        <Border Background="#1F2937" CornerRadius="8" Padding="16"
+                        <Border Background="#1A2234" CornerRadius="8" Padding="16"
                                 Margin="0,0,0,16" BorderThickness="1" BorderBrush="#374151">
                             <StackPanel>
                                 <TextBlock Text="ROLE" Style="{StaticResource SectionLabel}"/>
@@ -431,7 +431,7 @@
                                                             RelativeSource={RelativeSource AncestorType=UserControl}}"
                                               SelectedItem="{Binding DataContext.SelectedRole,
                                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
-
+                                              Height="36" Padding="12,0" VerticalContentAlignment="Center"
                                               IsEnabled="{Binding DataContext.IsSelectedSelf,
                                                           RelativeSource={RelativeSource AncestorType=UserControl},
                                                           Converter={StaticResource InverseBool}}"/>
@@ -448,7 +448,7 @@
                         </Border>
 
                         <!-- ── Account status toggle ── -->
-                        <Border Background="#1F2937" CornerRadius="8" Padding="16"
+                        <Border Background="#1A2234" CornerRadius="8" Padding="16"
                                 Margin="0,0,0,16" BorderThickness="1" BorderBrush="#374151">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -521,7 +521,7 @@
                         </Border>
 
                         <!-- ── Password reset ── -->
-                        <Border Background="#1F2937" CornerRadius="8" Padding="16"
+                        <Border Background="#1A2234" CornerRadius="8" Padding="16"
                                 Margin="0,0,0,16" BorderThickness="1" BorderBrush="#374151">
                             <StackPanel>
                                 <TextBlock Text="RESET PASSWORD" Style="{StaticResource SectionLabel}"/>
@@ -541,7 +541,7 @@
                                              Text="{Binding DataContext.NewPasswordText,
                                                     RelativeSource={RelativeSource AncestorType=UserControl},
                                                     UpdateSourceTrigger=PropertyChanged}"
-
+                                             Height="36" Padding="12,0" VerticalContentAlignment="Center"
                                              Tag="New password (min. 8 chars)"
                                              IsEnabled="{Binding DataContext.IsSelectedSelf,
                                                          RelativeSource={RelativeSource AncestorType=UserControl},
@@ -559,7 +559,7 @@
                         </Border>
 
                         <!-- ── Info grid (phone, last login) ── -->
-                        <Border Background="#1F2937" CornerRadius="8" Padding="16"
+                        <Border Background="#1A2234" CornerRadius="8" Padding="16"
                                 Margin="0,0,0,16" BorderThickness="1" BorderBrush="#374151">
                             <StackPanel>
                                 <TextBlock Text="ACCOUNT INFO" Style="{StaticResource SectionLabel}"/>
@@ -609,7 +609,7 @@
               Background="#CC111827"
               Visibility="{Binding IsCreating, Converter={StaticResource BoolVis}}">
 
-            <Border Background="#1F2937" CornerRadius="12"
+            <Border Background="#1A2234" CornerRadius="12"
                     BorderBrush="#374151" BorderThickness="1"
                     Width="440" VerticalAlignment="Center"
                     HorizontalAlignment="Center"
@@ -631,38 +631,38 @@
                         <StackPanel Grid.Column="0">
                             <TextBlock Text="First Name" Style="{StaticResource FieldLabel}"/>
                             <TextBox Text="{Binding NewFirstName, UpdateSourceTrigger=PropertyChanged}"
-/>
+                                     Height="36" Padding="12,0" VerticalContentAlignment="Center"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="Last Name" Style="{StaticResource FieldLabel}"/>
                             <TextBox Text="{Binding NewLastName, UpdateSourceTrigger=PropertyChanged}"
-/>
+                                     Height="36" Padding="12,0" VerticalContentAlignment="Center"/>
                         </StackPanel>
                     </Grid>
 
                     <!-- Email -->
                     <TextBlock Text="Email" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding NewEmail, UpdateSourceTrigger=PropertyChanged}"
-
+                             Height="36" Padding="12,0" VerticalContentAlignment="Center"
                              Margin="0,0,0,14"/>
 
                     <!-- Phone -->
                     <TextBlock Text="Phone (optional)" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding NewPhone, UpdateSourceTrigger=PropertyChanged}"
-
+                             Height="36" Padding="12,0" VerticalContentAlignment="Center"
                              Margin="0,0,0,14"/>
 
                     <!-- Role -->
                     <TextBlock Text="Role" Style="{StaticResource FieldLabel}"/>
                     <ComboBox ItemsSource="{Binding StaffRoleNames}"
                               SelectedItem="{Binding NewRole}"
-
+                              Height="36" Padding="12,0" VerticalContentAlignment="Center"
                               Margin="0,0,0,14"/>
 
                     <!-- Password -->
                     <TextBlock Text="Password (min. 8 chars)" Style="{StaticResource FieldLabel}"/>
                     <TextBox Text="{Binding NewPassword, UpdateSourceTrigger=PropertyChanged}"
-
+                             Height="36" Padding="12,0" VerticalContentAlignment="Center"
                              Margin="0,0,0,24"/>
 
                     <!-- Action buttons -->

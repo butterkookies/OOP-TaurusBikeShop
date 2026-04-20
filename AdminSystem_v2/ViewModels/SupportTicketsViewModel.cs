@@ -2,10 +2,13 @@ using AdminSystem_v2.Helpers;
 using AdminSystem_v2.Models;
 using AdminSystem_v2.Services;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Windows;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Input;
 
 namespace AdminSystem_v2.ViewModels
 {
@@ -14,9 +17,16 @@ namespace AdminSystem_v2.ViewModels
         private readonly ISupportTicketService _ticketService;
         private readonly IDialogService _dialogService;
 
-        public ObservableCollection<SupportTicket> Tickets { get; set; } = new ObservableCollection<SupportTicket>();
-        public ObservableCollection<SupportTicketReply> SelectedTicketReplies { get; set; } = new ObservableCollection<SupportTicketReply>();
+        // ── Backing collection (never bound to directly) ──────────────────────
+        private readonly ObservableCollection<SupportTicket> _allTickets = new();
 
+        // ── Filtered view (ListView binds here) ───────────────────────────────
+        public ICollectionView FilteredTickets { get; }
+
+        // ── Replies ───────────────────────────────────────────────────────────
+        public ObservableCollection<SupportTicketReply> SelectedTicketReplies { get; } = new();
+
+        // ── Selected ticket ───────────────────────────────────────────────────
         private SupportTicket? _selectedTicket;
         public SupportTicket? SelectedTicket
         {
@@ -32,6 +42,24 @@ namespace AdminSystem_v2.ViewModels
 
         public bool IsTicketSelected => SelectedTicket != null;
 
+        // ── Search ────────────────────────────────────────────────────────────
+        private string _searchQuery = string.Empty;
+        public string SearchQuery
+        {
+            get => _searchQuery;
+            set
+            {
+                _searchQuery = value;
+                OnPropertyChanged();
+                FilteredTickets.Refresh();
+                OnPropertyChanged(nameof(FilteredCount));
+            }
+        }
+
+        /// <summary>Number of tickets currently visible (after filtering).</summary>
+        public int FilteredCount => FilteredTickets.Cast<SupportTicket>().Count();
+
+        // ── Reply composer ────────────────────────────────────────────────────
         private string _replyMessage = string.Empty;
         public string ReplyMessage
         {
@@ -39,30 +67,60 @@ namespace AdminSystem_v2.ViewModels
             set { _replyMessage = value; OnPropertyChanged(); }
         }
 
+        // ── Commands ──────────────────────────────────────────────────────────
         public ICommand LoadTicketsCommand { get; }
         public ICommand ReplyCommand { get; }
         public ICommand MarkResolvedCommand { get; }
+        public ICommand ClearSearchCommand { get; }
 
+        // ── Constructor ───────────────────────────────────────────────────────
         public SupportTicketsViewModel(ISupportTicketService ticketService, IDialogService dialogService)
         {
             _ticketService = ticketService;
             _dialogService = dialogService;
 
-            LoadTicketsCommand = new RelayCommand(async _ => await LoadTicketsAsync());
-            ReplyCommand = new RelayCommand(async _ => await ReplyAsync(), _ => CanReply());
+            // Build the filtered view over _allTickets
+            FilteredTickets = CollectionViewSource.GetDefaultView(_allTickets);
+            FilteredTickets.Filter = FilterPredicate;
+            ((INotifyCollectionChanged)FilteredTickets).CollectionChanged += (_, _) =>
+                OnPropertyChanged(nameof(FilteredCount));
+
+            LoadTicketsCommand  = new RelayCommand(async _ => await LoadTicketsAsync());
+            ReplyCommand        = new RelayCommand(async _ => await ReplyAsync(), _ => CanReply());
             MarkResolvedCommand = new RelayCommand(async _ => await MarkResolvedAsync(), _ => CanMarkResolved());
+            ClearSearchCommand  = new RelayCommand(_ => SearchQuery = string.Empty);
         }
 
+        // ── Filter predicate ──────────────────────────────────────────────────
+        private bool FilterPredicate(object item)
+        {
+            if (item is not SupportTicket ticket) return false;
+            if (string.IsNullOrWhiteSpace(_searchQuery)) return true;
+
+            var q = _searchQuery.Trim();
+            return Contains(ticket.Subject, q)
+                || Contains(ticket.UserFullName, q)
+                || Contains(ticket.UserEmail, q)
+                || Contains(ticket.TicketCategory, q)
+                || Contains(ticket.TicketStatus, q)
+                || Contains(ticket.Description, q);
+
+            static bool Contains(string? source, string query) =>
+                source?.Contains(query, System.StringComparison.OrdinalIgnoreCase) == true;
+        }
+
+        // ── Data loading ──────────────────────────────────────────────────────
         public async Task LoadTicketsAsync()
         {
             try
             {
                 var ticketsRaw = await _ticketService.GetAllTicketsAsync();
-                Tickets.Clear();
+                _allTickets.Clear();
                 foreach (var ticket in ticketsRaw)
-                {
-                    Tickets.Add(ticket);
-                }
+                    _allTickets.Add(ticket);
+
+                FilteredTickets.Refresh();
+                OnPropertyChanged(nameof(FilteredCount));
             }
             catch (System.Exception ex)
             {
@@ -83,9 +141,7 @@ namespace AdminSystem_v2.ViewModels
                 var repliesRaw = await _ticketService.GetRepliesAsync(SelectedTicket.TicketId);
                 SelectedTicketReplies.Clear();
                 foreach (var r in repliesRaw)
-                {
                     SelectedTicketReplies.Add(r);
-                }
             }
             catch (System.Exception ex)
             {
@@ -93,6 +149,7 @@ namespace AdminSystem_v2.ViewModels
             }
         }
 
+        // ── Reply ─────────────────────────────────────────────────────────────
         private bool CanReply()
         {
             if (SelectedTicket == null) return false;
@@ -113,24 +170,18 @@ namespace AdminSystem_v2.ViewModels
 
             try
             {
-                await _ticketService.AddReplyAsync(SelectedTicket.TicketId, user.UserId, ReplyMessage);
-                
-                // Update Status to AwaitingResponse if it was Open
+                await _ticketService.AddReplyAsync(SelectedTicket!.TicketId, user.UserId, ReplyMessage);
                 await _ticketService.UpdateStatusAsync(SelectedTicket.TicketId, "AwaitingResponse", user.UserId);
 
                 ReplyMessage = string.Empty;
 
                 int ticketId = SelectedTicket.TicketId;
                 await LoadTicketsAsync();
-                var refreshed = Tickets.FirstOrDefault(t => t.TicketId == ticketId);
+                var refreshed = _allTickets.FirstOrDefault(t => t.TicketId == ticketId);
                 if (refreshed != null)
-                {
                     SelectedTicket = refreshed;
-                }
                 else
-                {
                     await LoadRepliesAsync();
-                }
             }
             catch (System.Exception ex)
             {
@@ -138,6 +189,7 @@ namespace AdminSystem_v2.ViewModels
             }
         }
 
+        // ── Resolve ───────────────────────────────────────────────────────────
         private bool CanMarkResolved()
         {
             if (SelectedTicket == null) return false;
@@ -155,14 +207,12 @@ namespace AdminSystem_v2.ViewModels
             {
                 try
                 {
-                    int ticketId = SelectedTicket.TicketId;
+                    int ticketId = SelectedTicket!.TicketId;
                     await _ticketService.ResolveTicketAsync(ticketId, user.UserId);
                     await LoadTicketsAsync();
-                    var refreshed = Tickets.FirstOrDefault(t => t.TicketId == ticketId);
+                    var refreshed = _allTickets.FirstOrDefault(t => t.TicketId == ticketId);
                     if (refreshed != null)
-                    {
                         SelectedTicket = refreshed;
-                    }
                 }
                 catch (System.Exception ex)
                 {

@@ -13,15 +13,15 @@
 
         <!-- ── NAV BUTTON ── -->
         <Style x:Key="NavButton" TargetType="Button">
-            <Setter Property="Background"              Value="Transparent"/>
-            <Setter Property="Foreground"              Value="#9CA3AF"/>
-            <Setter Property="BorderBrush"             Value="Transparent"/>
-            <Setter Property="BorderThickness"         Value="0"/>
-            <Setter Property="Height"                  Value="40"/>
+            <Setter Property="Background"                 Value="Transparent"/>
+            <Setter Property="Foreground"                 Value="#9CA3AF"/>
+            <Setter Property="BorderBrush"                Value="Transparent"/>
+            <Setter Property="BorderThickness"            Value="0"/>
+            <Setter Property="Height"                     Value="44"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Padding"                 Value="12,0"/>
-            <Setter Property="FontSize"                Value="13"/>
-            <Setter Property="Cursor"                  Value="Hand"/>
+            <Setter Property="Padding"                    Value="16,0"/>
+            <Setter Property="FontSize"                   Value="13"/>
+            <Setter Property="Cursor"                     Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -29,14 +29,16 @@
                                 Background="{TemplateBinding Background}"
                                 BorderThickness="3,0,0,0"
                                 BorderBrush="{TemplateBinding BorderBrush}"
+                                CornerRadius="0,6,6,0"
+                                Margin="0,1,8,1"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background"   Value="#1F2937"/>
-                                <Setter TargetName="Bd" Property="BorderBrush"  Value="#DC2626"/>
-                                <Setter Property="Foreground"                   Value="#F9FAFB"/>
+                                <Setter TargetName="Bd" Property="Background"  Value="#1E2D45"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#DC2626"/>
+                                <Setter Property="Foreground"                   Value="#E5E7EB"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -46,39 +48,41 @@
 
         <!-- ── SIDEBAR SECTION LABEL ── -->
         <Style x:Key="SectionLabel" TargetType="TextBlock">
-            <Setter Property="Foreground"   Value="#4B5563"/>
-            <Setter Property="FontSize"     Value="10"/>
-            <Setter Property="FontWeight"   Value="SemiBold"/>
-            <Setter Property="Margin"       Value="12,10,12,4"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="FontSize"   Value="10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin"     Value="16,12,12,4"/>
         </Style>
 
         <!-- ── SIDEBAR SEPARATOR ── -->
         <Style x:Key="SidebarSep" TargetType="Separator">
-            <Setter Property="Background" Value="#374151"/>
+            <Setter Property="Background" Value="#1E2D45"/>
             <Setter Property="Height"     Value="1"/>
-            <Setter Property="Margin"     Value="12,4"/>
+            <Setter Property="Margin"     Value="12,6"/>
         </Style>
 
         <!-- ── GHOST BUTTON (sign out / exit) ── -->
         <Style x:Key="GhostButton" TargetType="Button">
-            <Setter Property="Background"              Value="Transparent"/>
-            <Setter Property="BorderThickness"         Value="0"/>
-            <Setter Property="Height"                  Value="40"/>
+            <Setter Property="Background"                 Value="Transparent"/>
+            <Setter Property="BorderThickness"            Value="0"/>
+            <Setter Property="Height"                     Value="44"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Padding"                 Value="12,0"/>
-            <Setter Property="FontSize"                Value="13"/>
-            <Setter Property="Cursor"                  Value="Hand"/>
+            <Setter Property="Padding"                    Value="16,0"/>
+            <Setter Property="FontSize"                   Value="13"/>
+            <Setter Property="Cursor"                     Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bd"
                                 Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}">
+                                Padding="{TemplateBinding Padding}"
+                                CornerRadius="0,6,6,0"
+                                Margin="0,1,8,1">
                             <ContentPresenter VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#1F2937"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#1E2D45"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -93,7 +97,7 @@
          ══════════════════════════════════════ -->
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="230"/>
             <ColumnDefinition Width="*" MinWidth="400"/>
         </Grid.ColumnDefinitions>
 
@@ -101,25 +105,31 @@
              COL 0 — SIDEBAR
              ═══════════════════════════════ -->
         <Border Grid.Column="0"
-                Background="#1F2937"
+                Background="#0F1829"
                 BorderThickness="0,0,1,0"
-                BorderBrush="#374151">
+                BorderBrush="#1E2D45">
             <DockPanel LastChildFill="True">
 
                 <!-- Brand header -->
-                <Border DockPanel.Dock="Top"
-                        Background="#DC2626"
-                        Height="60">
+                <Border DockPanel.Dock="Top" Height="64">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#7F0000" Offset="0"/>
+                            <GradientStop Color="#DC2626" Offset="0.6"/>
+                            <GradientStop Color="#B91C1C" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
                     <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                        <Border Width="28" Height="28"
-                                Background="#B91C1C"
-                                CornerRadius="6"
-                                Margin="0,0,8,0">
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Margin="16,0">
+                        <Border Width="32" Height="32"
+                                Background="#991B1B"
+                                CornerRadius="8"
+                                Margin="0,0,10,0">
                             <TextBlock Text="T"
                                        Foreground="White"
-                                       FontSize="16" FontWeight="Bold"
+                                       FontSize="18" FontWeight="Bold"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"/>
                         </Border>
@@ -127,39 +137,60 @@
                             <TextBlock Text="TAURUS"
                                        Foreground="White"
                                        FontSize="14" FontWeight="Bold"/>
-                            <TextBlock Text="BIKE SHOP"
+                            <TextBlock Text="BIKE SHOP ADMIN"
                                        Foreground="#FECACA"
-                                       FontSize="9"/>
+                                       FontSize="9" FontWeight="SemiBold"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
 
                 <!-- Admin profile card -->
                 <Border DockPanel.Dock="Top"
-                        Background="#111827"
-                        Padding="12,10">
-                    <StackPanel Orientation="Horizontal">
-                        <Border Width="32" Height="32"
-                                CornerRadius="16"
+                        Background="#1A2234"
+                        Padding="16,12"
+                        BorderBrush="#1E2D45"
+                        BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Avatar -->
+                        <Border Grid.Column="0"
+                                Width="36" Height="36"
+                                CornerRadius="18"
                                 Background="#DC2626">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="8" Opacity="0.5"
+                                                  ShadowDepth="0" Color="#DC2626"/>
+                            </Border.Effect>
                             <TextBlock Text="{Binding UserInitials}"
                                        Foreground="White"
                                        FontSize="14" FontWeight="Bold"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"/>
                         </Border>
-                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+
+                        <StackPanel Grid.Column="1"
+                                    Margin="12,0,0,0"
+                                    VerticalAlignment="Center">
                             <TextBlock Text="{Binding UserFullName}"
                                        Foreground="#F9FAFB"
-                                       FontSize="13" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding UserRole}"
-                                       Foreground="#6B7280"
-                                       FontSize="11"/>
+                                       FontSize="13" FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <!-- Role badge -->
+                            <Border CornerRadius="3" Padding="5,1"
+                                    Background="#1E3A5F"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,3,0,0">
+                                <TextBlock Text="{Binding UserRole}"
+                                           Foreground="#60A5FA"
+                                           FontSize="10" FontWeight="SemiBold"/>
+                            </Border>
                         </StackPanel>
-                    </StackPanel>
+                    </Grid>
                 </Border>
-
-                <Separator Style="{StaticResource SidebarSep}" DockPanel.Dock="Top"/>
 
                 <!-- Exit + Sign out pinned to bottom -->
                 <StackPanel DockPanel.Dock="Bottom">
@@ -186,12 +217,19 @@
                                        FontSize="13" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
+
+                    <!-- Version tag -->
+                    <TextBlock Text="Admin System v2"
+                               Foreground="#1E2D45"
+                               FontSize="10"
+                               HorizontalAlignment="Center"
+                               Margin="0,6,0,8"/>
                 </StackPanel>
 
                 <!-- Nav items -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel>
+                    <StackPanel Margin="0,4,0,0">
 
                         <TextBlock Text="MODULES" Style="{StaticResource SectionLabel}"/>
 
@@ -202,16 +240,16 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Dashboard">
-                                            <Setter Property="Background"  Value="#1F2937"/>
-                                <Setter Property="Foreground"  Value="#F9FAFB"/>
-                                <Setter Property="BorderBrush" Value="#DC2626"/>
+                                            <Setter Property="Background"  Value="#1E3A5F"/>
+                                            <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                            <Setter Property="BorderBrush" Value="#3B82F6"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#x229E;" Foreground="#DC2626"
-                                           FontSize="14" Margin="0,0,8,0"
+                                           FontSize="14" Margin="0,0,10,0"
                                            VerticalAlignment="Center"/>
                                 <TextBlock Text="Dashboard" FontSize="13"
                                            VerticalAlignment="Center"/>
@@ -228,17 +266,17 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="POS">
-                                            <Setter Property="Background"  Value="#1F2937"/>
+                                            <Setter Property="Background"  Value="#1E3A5F"/>
                                             <Setter Property="Foreground"  Value="#F9FAFB"/>
-                                            <Setter Property="BorderBrush" Value="#DC2626"/>
+                                            <Setter Property="BorderBrush" Value="#3B82F6"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#x1F4B3;" FontSize="13"
-                                           Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="POS" FontSize="13"
+                                           Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Point of Sale" FontSize="13"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -250,16 +288,16 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Orders">
-                                            <Setter Property="Background"  Value="#1F2937"/>
-                                <Setter Property="Foreground"  Value="#F9FAFB"/>
-                                <Setter Property="BorderBrush" Value="#DC2626"/>
+                                            <Setter Property="Background"  Value="#1E3A5F"/>
+                                            <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                            <Setter Property="BorderBrush" Value="#3B82F6"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#x1F4E6;" FontSize="13"
-                                           Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                           Margin="0,0,10,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Orders" FontSize="13"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
@@ -272,16 +310,16 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Reports">
-                                            <Setter Property="Background"  Value="#1F2937"/>
-                                <Setter Property="Foreground"  Value="#F9FAFB"/>
-                                <Setter Property="BorderBrush" Value="#DC2626"/>
+                                            <Setter Property="Background"  Value="#1E3A5F"/>
+                                            <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                            <Setter Property="BorderBrush" Value="#3B82F6"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#x1F4CA;" FontSize="13"
-                                           Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                           Margin="0,0,10,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Reports" FontSize="13"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
@@ -294,16 +332,16 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Vouchers">
-                                            <Setter Property="Background"  Value="#1F2937"/>
+                                            <Setter Property="Background"  Value="#1E3A5F"/>
                                             <Setter Property="Foreground"  Value="#F9FAFB"/>
-                                            <Setter Property="BorderBrush" Value="#DC2626"/>
+                                            <Setter Property="BorderBrush" Value="#3B82F6"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#x1F3AB;" FontSize="13"
-                                           Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                           Margin="0,0,10,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Vouchers" FontSize="13"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
@@ -316,16 +354,16 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Payment Accounts">
-                                            <Setter Property="Background"  Value="#1F2937"/>
+                                            <Setter Property="Background"  Value="#1E3A5F"/>
                                             <Setter Property="Foreground"  Value="#F9FAFB"/>
-                                            <Setter Property="BorderBrush" Value="#DC2626"/>
+                                            <Setter Property="BorderBrush" Value="#3B82F6"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="&#x1F4B3;" FontSize="13"
-                                           Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="&#x1F4B0;" FontSize="13"
+                                           Margin="0,0,10,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Payment Accounts" FontSize="13"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
@@ -341,44 +379,44 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Products">
-                                            <Setter Property="Background"  Value="#1F2937"/>
-                                <Setter Property="Foreground"  Value="#F9FAFB"/>
-                                <Setter Property="BorderBrush" Value="#DC2626"/>
+                                            <Setter Property="Background"  Value="#1E3A5F"/>
+                                            <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                            <Setter Property="BorderBrush" Value="#3B82F6"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#x1F6CD;" FontSize="13"
-                                           Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                 <TextBlock Text="Products" FontSize="13"
-                                            VerticalAlignment="Center"/>
-                             </StackPanel>
-                         </Button>
-                         
-                         <!-- Support -->
-                         <Button Command="{Binding NavigateCommand}"
-                                 CommandParameter="Support Tickets">
-                             <Button.Style>
-                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
-                                     <Style.Triggers>
-                                         <DataTrigger Binding="{Binding ActivePage}" Value="Support Tickets">
-                                             <Setter Property="Background"  Value="#1F2937"/>
-                                             <Setter Property="Foreground"  Value="#F9FAFB"/>
-                                             <Setter Property="BorderBrush" Value="#DC2626"/>
-                                         </DataTrigger>
-                                     </Style.Triggers>
-                                 </Style>
-                             </Button.Style>
-                             <StackPanel Orientation="Horizontal">
-                                 <TextBlock Text="&#x1F4AC;" FontSize="13"
-                                            Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                 <TextBlock Text="Support" FontSize="13"
-                                            VerticalAlignment="Center"/>
-                             </StackPanel>
-                         </Button>
+                                           Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Products" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
 
-                         <Separator Style="{StaticResource SidebarSep}"/>
+                        <!-- Support -->
+                        <Button Command="{Binding NavigateCommand}"
+                                CommandParameter="Support Tickets">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ActivePage}" Value="Support Tickets">
+                                            <Setter Property="Background"  Value="#1E3A5F"/>
+                                            <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                            <Setter Property="BorderBrush" Value="#3B82F6"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#x1F4AC;" FontSize="13"
+                                           Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Support" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Separator Style="{StaticResource SidebarSep}"/>
                         <TextBlock Text="TEAM" Style="{StaticResource SectionLabel}"/>
 
                         <!-- Staff (Admin only) -->
@@ -389,16 +427,16 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Staff">
-                                            <Setter Property="Background"  Value="#1F2937"/>
-                                <Setter Property="Foreground"  Value="#F9FAFB"/>
-                                <Setter Property="BorderBrush" Value="#DC2626"/>
+                                            <Setter Property="Background"  Value="#1E3A5F"/>
+                                            <Setter Property="Foreground"  Value="#F9FAFB"/>
+                                            <Setter Property="BorderBrush" Value="#3B82F6"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#x1F465;" FontSize="13"
-                                           Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                           Margin="0,0,10,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Staff" FontSize="13"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
@@ -421,10 +459,10 @@
 
             <!-- Top bar -->
             <Border Grid.Row="0"
-                    Background="#1F2937"
+                    Background="#1A2234"
                     BorderThickness="0,0,0,1"
-                    BorderBrush="#374151">
-                <Grid Margin="20,0">
+                    BorderBrush="#1E2D45">
+                <Grid Margin="24,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -435,19 +473,39 @@
                                    Foreground="#F9FAFB"
                                    FontSize="16" FontWeight="SemiBold"/>
                         <TextBlock Text="{Binding PageBreadcrumb}"
-                                   Foreground="#6B7280"
+                                   Foreground="#4B5563"
                                    FontSize="11" Margin="0,2,0,0"/>
                     </StackPanel>
 
-                    <TextBlock Grid.Column="1"
-                               Text="{Binding UserFullName}"
-                               Foreground="#9CA3AF"
-                               FontSize="13"
-                               VerticalAlignment="Center"/>
+                    <!-- Right side: user info chip -->
+                    <Border Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Background="#0F1829"
+                            CornerRadius="20"
+                            Padding="10,6"
+                            BorderBrush="#1E2D45"
+                            BorderThickness="1">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="22" Height="22"
+                                    CornerRadius="11"
+                                    Background="#DC2626"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="{Binding UserInitials}"
+                                           Foreground="White"
+                                           FontSize="10" FontWeight="Bold"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="{Binding UserFullName}"
+                                       Foreground="#9CA3AF"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
                 </Grid>
             </Border>
 
-            <!-- Page content — DataTemplate resolves the correct View per ViewModel type -->
+            <!-- Page content -->
             <ContentControl Grid.Row="1"
                             Content="{Binding CurrentViewModel}"/>
         </Grid>

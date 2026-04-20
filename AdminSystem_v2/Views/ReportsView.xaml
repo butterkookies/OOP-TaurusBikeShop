@@ -82,10 +82,10 @@
 
         <!-- ── Stat card ── -->
         <Style x:Key="StatCard" TargetType="Border">
-            <Setter Property="Background"      Value="#1F2937"/>
-            <Setter Property="CornerRadius"    Value="8"/>
+            <Setter Property="Background"      Value="#1A2234"/>
+            <Setter Property="CornerRadius"    Value="10"/>
             <Setter Property="Padding"         Value="20"/>
-            <Setter Property="BorderBrush"     Value="#374151"/>
+            <Setter Property="BorderBrush"     Value="#2D3748"/>
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
 
@@ -93,12 +93,12 @@
         <Style x:Key="ReportGrid" TargetType="DataGrid">
             <Setter Property="AutoGenerateColumns"      Value="False"/>
             <Setter Property="IsReadOnly"               Value="True"/>
-            <Setter Property="Background"               Value="#1F2937"/>
+            <Setter Property="Background"               Value="#1A2234"/>
             <Setter Property="Foreground"               Value="#E5E7EB"/>
-            <Setter Property="BorderBrush"              Value="#374151"/>
+            <Setter Property="BorderBrush"              Value="#2D3748"/>
             <Setter Property="BorderThickness"          Value="1"/>
-            <Setter Property="RowBackground"            Value="#1F2937"/>
-            <Setter Property="AlternatingRowBackground" Value="#172032"/>
+            <Setter Property="RowBackground"            Value="#1A2234"/>
+            <Setter Property="AlternatingRowBackground" Value="#0F1829"/>
             <Setter Property="GridLinesVisibility"      Value="Horizontal"/>
             <Setter Property="HorizontalGridLinesBrush" Value="#374151"/>
             <Setter Property="HeadersVisibility"        Value="Column"/>
@@ -146,7 +146,7 @@
         <!-- ══════════════════════════════════════
              ROW 0 — SECTION TAB BAR
              ══════════════════════════════════════ -->
-        <Border Grid.Row="0" Background="#1F2937"
+        <Border Grid.Row="0" Background="#1A2234"
                 BorderBrush="#374151" BorderThickness="0,0,0,1">
             <StackPanel Orientation="Horizontal">
 
@@ -225,11 +225,23 @@
                                 <Run Text="{Binding SourceLabel, Mode=OneWay}" Foreground="#9CA3AF"/>
                             </TextBlock>
                         </StackPanel>
+                        <Button Grid.Column="1"
+                                Command="{Binding ExportSalesReportCommand}"
+                                Style="{StaticResource SecondaryButton}"
+                                VerticalAlignment="Bottom"
+                                ToolTip="Export the current sales report to Excel (.xlsx)">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#x2B07;" FontSize="12" Margin="0,0,6,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Export to Excel" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
                     </Grid>
 
                     <!-- ── Source toggle + Period toggle ── -->
-                    <Border Background="#1F2937" CornerRadius="8" Padding="16,12"
-                            BorderThickness="1" BorderBrush="#374151" Margin="0,0,0,16">
+                    <Border Background="#1A2234" CornerRadius="10" Padding="16,12"
+                            BorderThickness="1" BorderBrush="#2D3748" Margin="0,0,0,16">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -384,22 +396,22 @@
                                            FontSize="10" FontWeight="SemiBold"
                                            VerticalAlignment="Center" Width="70"/>
                                 <DatePicker SelectedDate="{Binding FromDate}"
-                                            Width="150" Height="32"
-                                            Background="#111827" Foreground="#F9FAFB"
+                                            Width="150" Height="36"
+                                            Background="#0D1526" Foreground="#F9FAFB"
                                             BorderBrush="#374151" FontSize="13"
                                             Margin="0,0,16,0"/>
                                 <TextBlock Text="TO" Foreground="#6B7280"
                                            FontSize="10" FontWeight="SemiBold"
                                            VerticalAlignment="Center" Margin="0,0,12,0"/>
                                 <DatePicker SelectedDate="{Binding ToDate}"
-                                            Width="150" Height="32"
-                                            Background="#111827" Foreground="#F9FAFB"
+                                            Width="150" Height="36"
+                                            Background="#0D1526" Foreground="#F9FAFB"
                                             BorderBrush="#374151" FontSize="13"
                                             Margin="0,0,16,0"/>
                                 <Button Content="Run Report"
                                         Command="{Binding RunSalesReportCommand}"
                                         Style="{StaticResource PrimaryButton}"
-                                        Height="32" Width="110"
+                                        Height="36" Width="120"
                                         VerticalAlignment="Center"/>
                             </StackPanel>
 

@@ -22,28 +22,35 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Search box with placeholder overlay -->
-                <Grid Grid.Column="0" VerticalAlignment="Center">
-                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-
-                             x:Name="ProductSearchBox"/>
-                    <TextBlock Text="Search products by name..."
-                               Foreground="#4B5563" FontSize="13"
-                               Margin="12,0" VerticalAlignment="Center"
-                               IsHitTestVisible="False">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SearchText}" Value="">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding SearchText}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                <Grid Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
+                    <Border CornerRadius="8" BorderThickness="1" BorderBrush="#374151" Background="#111827" Height="36">
+                        <Grid>
+                            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                     x:Name="ProductSearchBox"
+                                     Background="Transparent" Foreground="White"
+                                     BorderThickness="0"
+                                     Padding="12,0" VerticalContentAlignment="Center"
+                                     FontSize="13"/>
+                            <TextBlock Text="Search products by name..."
+                                       Foreground="#4B5563" FontSize="13"
+                                       Margin="14,0" VerticalAlignment="Center"
+                                       IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SearchText}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding SearchText}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </Border>
                 </Grid>
 
                 <!-- Add button -->
@@ -98,7 +105,7 @@
         <!-- ── Main two-panel layout ────────────────────────────────────── -->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="320" MinWidth="240"/>
+                <ColumnDefinition Width="400" MinWidth="300"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -203,7 +210,8 @@
                 </StackPanel>
 
                 <!-- Edit form -->
-                <StackPanel Margin="28,20" MaxWidth="680">
+                <Border Background="#1A2234" CornerRadius="8" Margin="28,20" MaxWidth="720" Padding="32" BorderBrush="#374151" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <StackPanel>
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
                             <Setter Property="Visibility" Value="Visible"/>
@@ -216,8 +224,8 @@
                     </StackPanel.Style>
 
                     <!-- Section heading -->
-                    <TextBlock FontSize="16" FontWeight="SemiBold" Foreground="White"
-                               Margin="0,0,0,16">
+                    <TextBlock FontSize="22" FontWeight="SemiBold" Foreground="White"
+                               Margin="0,0,0,24">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Text" Value="Edit Product"/>
@@ -231,22 +239,22 @@
                     </TextBlock>
 
                     <!-- Name -->
-                    <TextBlock Text="Product Name *" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Product Name *" Style="{StaticResource FieldLabel}" Margin="0,0,0,6"/>
                     <TextBox Text="{Binding EditProduct.Name, UpdateSourceTrigger=PropertyChanged}"
- Margin="0,0,0,12"/>
+ Height="36" Padding="12,0" VerticalContentAlignment="Center" Margin="0,0,0,20"/>
 
                     <!-- Short description -->
-                    <TextBlock Text="Short Description" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Short Description" Style="{StaticResource FieldLabel}" Margin="0,0,0,6"/>
                     <TextBox Text="{Binding EditProduct.ShortDescription, UpdateSourceTrigger=PropertyChanged}"
- Margin="0,0,0,12"/>
+ Height="36" Padding="12,0" VerticalContentAlignment="Center" Margin="0,0,0,20"/>
 
                     <!-- Full description -->
-                    <TextBlock Text="Description" Style="{StaticResource FieldLabel}"/>
+                    <TextBlock Text="Description" Style="{StaticResource FieldLabel}" Margin="0,0,0,6"/>
                     <TextBox Text="{Binding EditProduct.Description, UpdateSourceTrigger=PropertyChanged}"
- Height="80"
+ Height="80" Padding="12,8"
                              TextWrapping="Wrap" AcceptsReturn="True"
                              VerticalScrollBarVisibility="Auto"
-                             Margin="0,0,0,12"/>
+                             Margin="0,0,0,20"/>
 
                     <!-- Price + Category row -->
                     <Grid Margin="0,0,0,12">
@@ -257,16 +265,16 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="Price (PHP) *" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="Price (PHP) *" Style="{StaticResource FieldLabel}" Margin="0,0,0,6"/>
                             <TextBox Text="{Binding EditProduct.Price, UpdateSourceTrigger=PropertyChanged}"
-/>
+ Height="36" Padding="12,0" VerticalContentAlignment="Center" Margin="0,0,0,20"/>
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="Category *" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="Category *" Style="{StaticResource FieldLabel}" Margin="0,0,0,6"/>
                             <ComboBox ItemsSource="{Binding Categories}"
                                       SelectedValuePath="CategoryId"
-                                      SelectedValue="{Binding EditProduct.CategoryId}">
+                                      SelectedValue="{Binding EditProduct.CategoryId}" Height="36" Padding="12,4" VerticalContentAlignment="Center" Margin="0,0,0,20">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Name}"/>
@@ -285,10 +293,10 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="Brand" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="Brand" Style="{StaticResource FieldLabel}" Margin="0,0,0,6"/>
                             <ComboBox ItemsSource="{Binding Brands}"
                                       SelectedValuePath="BrandId"
-                                      SelectedValue="{Binding EditProduct.BrandId}">
+                                      SelectedValue="{Binding EditProduct.BrandId}" Height="36" Padding="12,4" VerticalContentAlignment="Center" Margin="0,0,0,20">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding BrandName}"/>
@@ -534,14 +542,15 @@
                                 </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="REORDER" Width="80"
                                                     Binding="{Binding ReorderThreshold}"/>
-                                <DataGridTemplateColumn Header="ADJUST" Width="80">
+
+                                <DataGridTemplateColumn Header="EDIT" Width="70">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Button Content="Adjust"
-                                                    Command="{Binding DataContext.OpenAdjustCommand,
+                                            <Button Content="Edit"
+                                                    Command="{Binding DataContext.OpenEditVariantCommand,
                                                         RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}"
-                                                    Style="{StaticResource SecondaryButton}"
+                                                    Style="{StaticResource PrimaryButton}"
                                                     FontSize="11" Padding="6,2" Height="24"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -550,46 +559,11 @@
                         </DataGrid>
                     </StackPanel>
                 </StackPanel>
+                </Border>
               </Grid>
             </ScrollViewer>
         </Grid>
 
-        <!-- ── Stock-adjust overlay ─────────────────────────────────────── -->
-        <Grid Grid.Row="0" Grid.RowSpan="3" Panel.ZIndex="20"
-              Background="#CC111827"
-              Visibility="{Binding IsAdjustingStock, Converter={StaticResource BoolToVis}}">
-            <Border Background="#1F2937" CornerRadius="10" BorderBrush="#374151"
-                    BorderThickness="1" Padding="28" Width="380"
-                    HorizontalAlignment="Center" VerticalAlignment="Center">
-                <StackPanel>
-                    <TextBlock Text="Adjust Stock" FontSize="16" FontWeight="SemiBold"
-                               Foreground="White" Margin="0,0,0,6"/>
-                    <TextBlock Text="{Binding AdjustTarget.VariantName}"
-                               Foreground="#9CA3AF" FontSize="13" Margin="0,0,0,20"/>
-
-                    <TextBlock Text="Change Quantity (negative to reduce)"
-                               Style="{StaticResource FieldLabel}"/>
-                    <TextBox Text="{Binding AdjustQty, UpdateSourceTrigger=PropertyChanged}"
- Margin="0,0,0,12"/>
-
-                    <TextBlock Text="Change Type" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox ItemsSource="{Binding AdjustTypes}"
-                              SelectedItem="{Binding AdjustType}"
- Margin="0,0,0,12"/>
-
-                    <TextBlock Text="Notes (optional)" Style="{StaticResource FieldLabel}"/>
-                    <TextBox Text="{Binding AdjustNotes, UpdateSourceTrigger=PropertyChanged}"
- Margin="0,0,0,20"/>
-
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Content="Cancel" Command="{Binding CancelAdjustCommand}"
-                                Style="{StaticResource SecondaryButton}" Width="80"/>
-                        <Button Content="Confirm" Command="{Binding ConfirmAdjustCommand}"
-                                Style="{StaticResource PrimaryButton}" Width="90" Margin="12,0,0,0"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-        </Grid>
 
         <!-- ── Add-variant overlay ──────────────────────────────────────── -->
         <Grid Grid.Row="0" Grid.RowSpan="3" Panel.ZIndex="20"
@@ -632,6 +606,68 @@
                         <Button Content="Cancel" Command="{Binding CancelVariantCommand}"
                                 Style="{StaticResource SecondaryButton}" Width="80"/>
                         <Button Content="Save" Command="{Binding SaveVariantCommand}"
+                                Style="{StaticResource PrimaryButton}" Width="80" Margin="12,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+        <!-- ── Edit-variant overlay ──────────────────────────────────────── -->
+        <Grid Grid.Row="0" Grid.RowSpan="3" Panel.ZIndex="20"
+              Background="#CC111827"
+              Visibility="{Binding IsEditingVariant, Converter={StaticResource BoolToVis}}">
+            <Border Background="#1F2937" CornerRadius="10" BorderBrush="#374151"
+                    BorderThickness="1" Padding="28" Width="400"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Edit Variant" FontSize="16" FontWeight="SemiBold"
+                               Foreground="White" Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding EditVariant.VariantName}"
+                               Foreground="#9CA3AF" FontSize="13" Margin="0,0,0,20"/>
+
+                    <TextBlock Text="Variant Name *" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding EditVariant.VariantName, UpdateSourceTrigger=PropertyChanged}"
+ Margin="0,0,0,12"/>
+
+                    <TextBlock Text="SKU" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding EditVariant.SKU, UpdateSourceTrigger=PropertyChanged}"
+ Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Reorder At" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding EditVariant.ReorderThreshold, UpdateSourceTrigger=PropertyChanged}"
+ Margin="0,0,0,12"/>
+
+                    <Border BorderBrush="#374151" BorderThickness="0,1,0,0" Margin="0,4,0,16" Padding="0,16,0,0">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <TextBlock Text="Adjust Stock" FontSize="14" FontWeight="SemiBold" Foreground="White" />
+                                <TextBlock Text="{Binding EditVariant.StockQuantity, StringFormat=' (Current: {0})'}" FontSize="13" Foreground="#9CA3AF" VerticalAlignment="Bottom" />
+                            </StackPanel>
+
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Quantity Change (+/-)" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox Text="{Binding AdjustQty, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Type" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox ItemsSource="{Binding AdjustTypes}" SelectedItem="{Binding AdjustType}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="Notes (optional)" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding AdjustNotes, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,20"/>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Cancel" Command="{Binding CancelEditVariantCommand}"
+                                Style="{StaticResource SecondaryButton}" Width="80"/>
+                        <Button Content="Save" Command="{Binding SaveEditVariantCommand}"
                                 Style="{StaticResource PrimaryButton}" Width="80" Margin="12,0,0,0"/>
                     </StackPanel>
                 </StackPanel>

@@ -249,6 +249,7 @@ namespace AdminSystem_v2.ViewModels
         public ICommand BulkCancelCommand          { get; }
         public ICommand DeselectAllCommand         { get; }
         public ICommand CloseDetailCommand         { get; }
+        public ICommand OpenPaymentProofCommand    { get; }
 
         // ── Constructor ───────────────────────────────────────────────────────
 
@@ -278,6 +279,25 @@ namespace AdminSystem_v2.ViewModels
                 _selectedRow     = null;
                 OnPropertyChanged(nameof(SelectedRow));
                 IsDetailVisible  = false;
+            });
+
+            OpenPaymentProofCommand   = new RelayCommand<string>(url => 
+            {
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = url,
+                            UseShellExecute = true
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[Orders] Open proof failed: {ex}");
+                    }
+                }
             });
         }
 

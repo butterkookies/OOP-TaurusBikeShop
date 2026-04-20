@@ -12,6 +12,7 @@ namespace AdminSystem_v2.ViewModels
     public class ReportViewModel : BaseViewModel
     {
         private readonly IReportService _reportService;
+        private readonly IExcelExportService _excelExportService;
 
         // ── Active section tab ────────────────────────────────────────────────
 
@@ -98,6 +99,7 @@ namespace AdminSystem_v2.ViewModels
             "Weekly"  => "WEEKLY BREAKDOWN",
             "Monthly" => "MONTHLY BREAKDOWN",
             "Yearly"  => "YEARLY BREAKDOWN",
+            "Custom"  => "CUSTOM BREAKDOWN",
             _         => "DAILY BREAKDOWN"
         };
 
@@ -209,12 +211,14 @@ namespace AdminSystem_v2.ViewModels
 
         public ICommand RunSalesReportCommand   { get; }
         public ICommand RefreshInventoryCommand { get; }
+        public ICommand ExportSalesReportCommand { get; }
 
         // ── Constructor ───────────────────────────────────────────────────────
 
-        public ReportViewModel(IReportService reportService)
+        public ReportViewModel(IReportService reportService, IExcelExportService excelExportService)
         {
             _reportService = reportService;
+            _excelExportService = excelExportService;
 
             ShowSalesTabCommand     = new RelayCommand(() => SwitchTab("Sales"));
             ShowInventoryTabCommand = new RelayCommand(() => SwitchTab("Inventory"));
@@ -231,6 +235,53 @@ namespace AdminSystem_v2.ViewModels
 
             RunSalesReportCommand   = new RelayCommand(async () => await LoadSalesAsync());
             RefreshInventoryCommand = new RelayCommand(async () => await LoadInventoryAsync());
+            ExportSalesReportCommand = new RelayCommand(ExportSalesReport);
+        }
+
+        // ── Export ────────────────────────────────────────────────────────────
+
+        private void ExportSalesReport()
+        {
+            if (SalesSummary == null || DailySales.Count == 0)
+            {
+                ShowError("Run the sales report first before exporting.");
+                return;
+            }
+
+            var defaultName = $"SalesReport_{SourceType}_{Period}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Title       = "Export Sales Report",
+                Filter      = "Excel Workbook (*.xlsx)|*.xlsx",
+                FileName    = defaultName,
+                DefaultExt  = ".xlsx",
+                AddExtension = true,
+            };
+
+            if (dialog.ShowDialog() != true) return;
+
+            ClearMessages();
+            try
+            {
+                var export = new SalesReportExport
+                {
+                    SourceLabel = SourceLabel,
+                    PeriodLabel = Period,
+                    FromDate    = FromDate,
+                    ToDate      = ToDate,
+                    Summary     = SalesSummary,
+                    Breakdown   = DailySales.ToList(),
+                    TopProducts = TopProducts.ToList(),
+                };
+
+                _excelExportService.ExportSalesReport(dialog.FileName, export);
+                ShowSuccess($"Exported to {dialog.FileName}");
+            }
+            catch (Exception ex)
+            {
+                ShowError("Failed to export report. The file may be open in another program.");
+                System.Diagnostics.Debug.WriteLine($"[Reports/Export] {ex}");
+            }
         }
 
         // ── Navigation entry point ────────────────────────────────────────────
@@ -273,18 +324,50 @@ namespace AdminSystem_v2.ViewModels
                 bool? walkIn = WalkInFlag;
                 string groupBy = GroupBy;
 
-                // Run all queries in parallel
-                var summaryTask = _reportService.GetSalesSummaryAsync(FromDate.Date, exclusiveTo, walkIn);
-                var dailyTask   = _reportService.GetDailySalesAsync(FromDate.Date, exclusiveTo, walkIn);
-                var topTask     = _reportService.GetTopProductsAsync(FromDate.Date, exclusiveTo, 10, walkIn);
+                // Run all queries in parallel.
+                // GetChartDataAsync (DESC-reversed below) is reused for the breakdown table
+                // so we make one call per source rather than a separate GetDailySalesAsync
+                // which was always grouping by Day regardless of the selected Period.
+                var summaryTask     = _reportService.GetSalesSummaryAsync(FromDate.Date, exclusiveTo, walkIn);
+                var topTask         = _reportService.GetTopProductsAsync(FromDate.Date, exclusiveTo, 10, walkIn);
                 var chartOnlineTask = _reportService.GetChartDataAsync(FromDate.Date, exclusiveTo, groupBy, false);
                 var chartWalkInTask = _reportService.GetChartDataAsync(FromDate.Date, exclusiveTo, groupBy, true);
 
-                await Task.WhenAll(summaryTask, dailyTask, topTask, chartOnlineTask, chartWalkInTask);
+                await Task.WhenAll(summaryTask, topTask, chartOnlineTask, chartWalkInTask);
 
                 SalesSummary = summaryTask.Result;
-                DailySales   = new ObservableCollection<DailySales>(dailyTask.Result);
                 TopProducts  = new ObservableCollection<TopProduct>(topTask.Result);
+
+                // Build the breakdown table from the appropriate chart data set,
+                // reversed so most-recent period appears first.
+                var breakdownSource = walkIn switch
+                {
+                    null  => chartOnlineTask.Result.Concat(chartWalkInTask.Result)
+                                 .GroupBy(d => d.SaleDate)
+                                 .Select(g => new DailySales
+                                 {
+                                     SaleDate   = g.Key,
+                                     OrderCount = g.Sum(d => d.OrderCount),
+                                     Revenue    = g.Sum(d => d.Revenue)
+                                 }),
+                    false => chartOnlineTask.Result,
+                    true  => chartWalkInTask.Result,
+                };
+
+                string displayFormat = groupBy switch
+                {
+                    "Month" => "MMM yyyy",
+                    "Year"  => "yyyy",
+                    "Week"  => "'Wk of' MMM d, yyyy",
+                    _       => "MMM d, yyyy"
+                };
+
+                var breakdownItems = breakdownSource
+                    .OrderByDescending(d => d.SaleDate)
+                    .ToList();
+                breakdownItems.ForEach(d => d.DisplayFormat = displayFormat);
+
+                DailySales = new ObservableCollection<DailySales>(breakdownItems);
 
                 ChartModel = BuildChartModel(
                     chartOnlineTask.Result.ToList(),

@@ -95,6 +95,47 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- ── Search input TextBox (single-line, dark) ── -->
+        <Style x:Key="SearchTextBox" TargetType="TextBox">
+            <Setter Property="Background"       Value="#111827"/>
+            <Setter Property="Foreground"       Value="#F9FAFB"/>
+            <Setter Property="CaretBrush"       Value="#3B82F6"/>
+            <Setter Property="SelectionBrush"   Value="#3B82F6"/>
+            <Setter Property="SelectionOpacity" Value="0.3"/>
+            <Setter Property="BorderBrush"      Value="#374151"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="Padding"          Value="8,6"/>
+            <Setter Property="FontSize"         Value="12"/>
+            <Setter Property="FontFamily"       Value="Segoe UI, Inter, Arial"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                SnapsToDevicePixels="True"
+                                Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3B82F6"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4B5563"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -106,16 +147,17 @@
         <!-- ══════════════════════════════════════
              COL 0 — TICKETS LIST
              ══════════════════════════════════════ -->
-        <Border Grid.Column="0" Background="#1F2937"
+        <Border Grid.Column="0" Background="#1A2234"
                 BorderBrush="#374151" BorderThickness="0,0,1,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="56"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                 <!-- List header -->
-                <Border Grid.Row="0" Background="#1F2937"
+                <Border Grid.Row="0" Background="#1A2234"
                         BorderBrush="#374151" BorderThickness="0,0,0,1" Padding="20,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -126,22 +168,84 @@
                             <TextBlock Text="Support Tickets" Foreground="#F9FAFB"
                                        FontSize="14" FontWeight="SemiBold"
                                        VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBlock Text="{Binding Tickets.Count, StringFormat='({0})'}"
+                            <TextBlock Text="{Binding FilteredCount, StringFormat='({0})'}"
                                        Foreground="#6B7280" FontSize="12" VerticalAlignment="Center"/>
                         </StackPanel>
                         <Button Grid.Column="1" Command="{Binding LoadTicketsCommand}"
                                 ToolTip="Refresh tickets"
                                 Background="Transparent" BorderThickness="0"
-                                Cursor="Hand" Padding="8,0">
+                                Cursor="Hand" Height="36" Padding="12,0">
                             <TextBlock Text="&#x21BB;" Foreground="#9CA3AF"
                                        FontSize="16" VerticalAlignment="Center"/>
                         </Button>
                     </Grid>
                 </Border>
 
+                <!-- Search bar -->
+                <Border Grid.Row="1" Background="#1A2234"
+                        BorderBrush="#374151" BorderThickness="0,0,0,1"
+                        Padding="12,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Icon + TextBox composite -->
+                        <Border Grid.Column="0"
+                                Background="#111827" CornerRadius="6"
+                                BorderBrush="#374151" BorderThickness="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="&#x1F50D;"
+                                           FontSize="12" Foreground="#4B5563"
+                                           VerticalAlignment="Center" Margin="8,0,4,0"/>
+                                <TextBox Grid.Column="1"
+                                         Style="{StaticResource SearchTextBox}"
+                                         BorderThickness="0" Background="Transparent"
+                                         Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Search by subject, name, email, category or status"
+                                         Height="36" Padding="0,0,12,0"
+                                         VerticalContentAlignment="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Clear (×) button, visible only when query is non-empty -->
+                        <Button Grid.Column="1"
+                                Command="{Binding ClearSearchCommand}"
+                                Content="×" FontSize="16"
+                                Foreground="#6B7280"
+                                Background="Transparent" BorderThickness="0"
+                                Cursor="Hand" Padding="6,0" Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                ToolTip="Clear search">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SearchQuery.Length}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
+                </Border>
+
                 <!-- List -->
-                <ListView Grid.Row="1"
-                          ItemsSource="{Binding Tickets}"
+                <ListView Grid.Row="2"
+                          ItemsSource="{Binding FilteredTickets}"
                           SelectedItem="{Binding SelectedTicket}"
                           Background="#1F2937"
                           BorderThickness="0"
@@ -235,12 +339,12 @@
                 </ListView>
 
                 <!-- Empty state -->
-                <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Tickets.Count}" Value="0">
+                                <DataTrigger Binding="{Binding FilteredCount}" Value="0">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -248,7 +352,7 @@
                     </StackPanel.Style>
                     <TextBlock Text="&#x1F4AC;" FontSize="32"
                                HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                    <TextBlock Text="No support tickets."
+                    <TextBlock Text="No tickets found."
                                Foreground="#4B5563" FontSize="13"
                                HorizontalAlignment="Center"/>
                 </StackPanel>
@@ -288,7 +392,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- Detail header -->
-                <Border Grid.Row="0" Background="#1F2937"
+                <Border Grid.Row="0" Background="#1A2234"
                         BorderBrush="#374151" BorderThickness="0,0,0,1"
                         Padding="24,16">
                     <Grid>
@@ -376,7 +480,7 @@
 
                             <Button Content="✓ Mark Resolved"
                                     Command="{Binding MarkResolvedCommand}"
-                                    VerticalAlignment="Top">
+                                    VerticalAlignment="Top" Height="36" Padding="12,0">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
                                         <Setter Property="Background" Value="#065F46"/>
@@ -402,7 +506,7 @@
                     <StackPanel Margin="24,20">
 
                         <!-- Original description bubble (customer) -->
-                        <Border Background="#1F2937" Padding="14" CornerRadius="10"
+                        <Border Background="#1A2234" Padding="14" CornerRadius="10"
                                 BorderBrush="#374151" BorderThickness="1"
                                 Margin="0,0,0,14" HorizontalAlignment="Left"
                                 MaxWidth="640">
@@ -449,7 +553,7 @@
                                     <Grid Margin="0,0,0,14">
 
                                         <!-- Customer reply (left, grey) -->
-                                        <Border Background="#1F2937" Padding="14" CornerRadius="10"
+                                        <Border Background="#1A2234" Padding="14" CornerRadius="10"
                                                 BorderBrush="#374151" BorderThickness="1"
                                                 HorizontalAlignment="Left" MaxWidth="640">
                                             <Border.Style>
@@ -548,7 +652,7 @@
                 </ScrollViewer>
 
                 <!-- Reply composer -->
-                <Border Grid.Row="2" Background="#1F2937"
+                <Border Grid.Row="2" Background="#1A2234"
                         BorderBrush="#374151" BorderThickness="0,1,0,0"
                         Padding="24,16">
                     <Border.Style>
@@ -580,7 +684,7 @@
                                 Command="{Binding ReplyCommand}"
                                 Content="Send Reply"
                                 Style="{StaticResource PrimaryButton}"
-                                MinWidth="110"
+                                MinWidth="110" Height="36" Padding="12,0"
                                 Margin="10,0,0,0"
                                 VerticalAlignment="Bottom"/>
                     </Grid>

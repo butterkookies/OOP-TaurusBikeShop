@@ -18,7 +18,7 @@
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#1F2937"/>
+                    <Setter Property="Background" Value="#1A2234"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="#1E3A5F"/>
@@ -79,7 +79,7 @@
         <!-- ══════════════════════════════════════
              ROW 0 — TOOLBAR
              ══════════════════════════════════════ -->
-        <Border Grid.Row="0" Background="#1F2937"
+        <Border Grid.Row="0" Background="#1A2234"
                 BorderBrush="#374151" BorderThickness="0,0,0,1" Padding="20,0">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -96,7 +96,7 @@
                 <Button Grid.Column="1" Command="{Binding RefreshCommand}"
                         ToolTip="Refresh orders list"
                         Background="Transparent" BorderThickness="0"
-                        Cursor="Hand" Padding="8,0">
+                        Cursor="Hand" Height="36" Padding="12,0">
                     <TextBlock Text="&#x21BB;" Foreground="#9CA3AF"
                                FontSize="16" VerticalAlignment="Center"/>
                 </Button>
@@ -120,7 +120,7 @@
              ROW 2 — STATUS BADGE BAR
              Dynamic count badges, double as filter chips.
              ══════════════════════════════════════ -->
-        <Border Grid.Row="2" Background="#1F2937" Padding="16,10"
+        <Border Grid.Row="2" Background="#1A2234" Padding="16,10"
                 BorderBrush="#374151" BorderThickness="0,0,0,1">
             <ScrollViewer HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Disabled">
@@ -208,7 +208,7 @@
                     <Border CornerRadius="6" Padding="12,6">
                         <Border.Style>
                             <Style TargetType="Border">
-                                <Setter Property="Background" Value="#1F2937"/>
+                                <Setter Property="Background" Value="#1A2234"/>
                                 <Setter Property="BorderThickness" Value="1"/>
                                 <Setter Property="BorderBrush" Value="Transparent"/>
                                 <Style.Triggers>
@@ -242,7 +242,7 @@
                     <Border CornerRadius="6" Padding="12,6">
                         <Border.Style>
                             <Style TargetType="Border">
-                                <Setter Property="Background" Value="#1F2937"/>
+                                <Setter Property="Background" Value="#1A2234"/>
                                 <Setter Property="BorderThickness" Value="1"/>
                                 <Setter Property="BorderBrush" Value="Transparent"/>
                                 <Style.Triggers>
@@ -280,7 +280,7 @@
                     <Border CornerRadius="6" Padding="12,6">
                         <Border.Style>
                             <Style TargetType="Border">
-                                <Setter Property="Background" Value="#1F2937"/>
+                                <Setter Property="Background" Value="#1A2234"/>
                                 <Setter Property="BorderThickness" Value="1"/>
                                 <Setter Property="BorderBrush" Value="Transparent"/>
                                 <Style.Triggers>
@@ -359,13 +359,13 @@
                                VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <ComboBox ItemsSource="{Binding BulkStatuses}"
                               SelectedItem="{Binding SelectedBulkStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              Width="140" Height="26" Margin="0,0,12,0"
+                              Width="140" Height="36" Padding="12,0" Margin="0,0,12,0"
                               VerticalContentAlignment="Center" 
                               ToolTip="Select target status"/>
                     
                     <Button Content="Apply Update"
                             Command="{Binding ApplyBulkUpdateCommand}"
-                            Style="{StaticResource PrimaryButton}"
+                            Style="{StaticResource PrimaryButton}" Height="36" Padding="12,0"
                             Margin="0,0,6,0"/>
                 </StackPanel>
             </DockPanel>
@@ -415,7 +415,7 @@
 
                     <DataGrid.ColumnHeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="Background"      Value="#1F2937"/>
+                            <Setter Property="Background"      Value="#1A2234"/>
                             <Setter Property="Foreground"      Value="#9CA3AF"/>
                             <Setter Property="FontSize"        Value="11"/>
                             <Setter Property="FontWeight"      Value="SemiBold"/>
@@ -597,7 +597,7 @@
                             </StackPanel>
                             <!-- Status badge (large) -->
                             <Border Grid.Column="1" CornerRadius="6" Padding="10,5"
-                                    Background="#1F2937" VerticalAlignment="Top" Margin="0,0,8,0">
+                                    Background="#1A2234" VerticalAlignment="Top" Margin="0,0,8,0">
                                 <StackPanel Orientation="Horizontal">
                                     <Ellipse Width="7" Height="7" Margin="0,0,6,0"
                                              VerticalAlignment="Center">
@@ -992,11 +992,14 @@
                                     </TextBlock.Style>
                                 </TextBlock>
 
-                                <!-- Proof URL (copyable) -->
-                                <TextBlock Text="{Binding PaymentProofUrl}" Foreground="#60A5FA"
-                                           FontSize="10" TextWrapping="Wrap" TextTrimming="None"
-                                           Margin="0,0,0,4" Cursor="IBeam"
-                                           ToolTip="{Binding PaymentProofUrl}"/>
+                                <!-- Proof URL Button -->
+                                <Button Command="{Binding DataContext.OpenPaymentProofCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding PaymentProofUrl}"
+                                        Content="Open Payment Proof in Browser"
+                                        Style="{StaticResource PrimaryButton}"
+                                        Margin="0,0,0,4"
+                                        HorizontalAlignment="Left"
+                                        ToolTip="{Binding PaymentProofUrl}"/>
                             </StackPanel>
                         </Border>
 

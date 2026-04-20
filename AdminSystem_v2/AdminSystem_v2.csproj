@@ -18,6 +18,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.0" />
+    <PackageReference Include="ClosedXML" Version="0.102.3" />
   </ItemGroup>
 
   <ItemGroup>

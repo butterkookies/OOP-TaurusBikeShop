@@ -74,20 +74,7 @@ namespace AdminSystem_v2.ViewModels
             set => SetProperty(ref _brands, value);
         }
 
-        // ── Stock-adjustment overlay ──────────────────────────────────────
-        private bool _isAdjustingStock;
-        public  bool IsAdjustingStock
-        {
-            get => _isAdjustingStock;
-            set => SetProperty(ref _isAdjustingStock, value);
-        }
 
-        private ProductVariant? _adjustTarget;
-        public  ProductVariant? AdjustTarget
-        {
-            get => _adjustTarget;
-            set => SetProperty(ref _adjustTarget, value);
-        }
 
         private int _adjustQty;
         public  int AdjustQty
@@ -157,39 +144,54 @@ namespace AdminSystem_v2.ViewModels
             set => SetProperty(ref _newVariant, value);
         }
 
+        // ── Edit-variant overlay ──────────────────────────────────────────
+        private bool _isEditingVariant;
+        public  bool IsEditingVariant
+        {
+            get => _isEditingVariant;
+            set => SetProperty(ref _isEditingVariant, value);
+        }
+
+        private ProductVariant? _editVariant;
+        public  ProductVariant? EditVariant
+        {
+            get => _editVariant;
+            set => SetProperty(ref _editVariant, value);
+        }
+
         // ── Commands ──────────────────────────────────────────────────────
-        public ICommand RefreshCommand        { get; }
-        public ICommand AddNewCommand         { get; }
-        public ICommand SaveCommand           { get; }
-        public ICommand CancelEditCommand     { get; }
-        public ICommand DeactivateCommand     { get; }
-        public ICommand OpenAdjustCommand     { get; }
-        public ICommand ConfirmAdjustCommand  { get; }
-        public ICommand CancelAdjustCommand   { get; }
-        public ICommand OpenAddVariantCommand { get; }
-        public ICommand SaveVariantCommand    { get; }
-        public ICommand CancelVariantCommand  { get; }
-        public ICommand AddImageCommand       { get; }
-        public ICommand RemoveImageCommand    { get; }
+        public ICommand RefreshCommand           { get; }
+        public ICommand AddNewCommand            { get; }
+        public ICommand SaveCommand              { get; }
+        public ICommand CancelEditCommand        { get; }
+        public ICommand DeactivateCommand        { get; }
+        public ICommand OpenAddVariantCommand    { get; }
+        public ICommand SaveVariantCommand       { get; }
+        public ICommand CancelVariantCommand     { get; }
+        public ICommand OpenEditVariantCommand   { get; }
+        public ICommand SaveEditVariantCommand   { get; }
+        public ICommand CancelEditVariantCommand { get; }
+        public ICommand AddImageCommand          { get; }
+        public ICommand RemoveImageCommand       { get; }
 
         public ProductViewModel(IProductService productService)
         {
             _productService = productService;
 
-            RefreshCommand        = new RelayCommand(async () => await LoadAsync());
-            AddNewCommand         = new RelayCommand(BeginAdd);
-            SaveCommand           = new RelayCommand(async () => await SaveAsync(), () => IsEditing);
-            CancelEditCommand     = new RelayCommand(CancelEdit,   () => IsEditing);
-            DeactivateCommand     = new RelayCommand<Product>(async p => await DeactivateAsync(p));
-            OpenAdjustCommand     = new RelayCommand<ProductVariant>(OpenAdjust);
-            ConfirmAdjustCommand  = new RelayCommand(async () => await ConfirmAdjustAsync(), () => IsAdjustingStock);
-            CancelAdjustCommand   = new RelayCommand(() => IsAdjustingStock = false);
-            OpenAddVariantCommand = new RelayCommand(OpenAddVariant, () => EditProduct != null && EditProduct.ProductId > 0);
-            SaveVariantCommand    = new RelayCommand(async () => await SaveVariantAsync(), () => IsAddingVariant);
-            CancelVariantCommand  = new RelayCommand(() => IsAddingVariant = false);
-            AddImageCommand       = new RelayCommand(async () => await AddImageAsync(),
-                                        () => EditProduct?.ProductId > 0 && !string.IsNullOrWhiteSpace(NewImageUrl));
-            RemoveImageCommand    = new RelayCommand<ProductImage>(async img => await RemoveImageAsync(img));
+            RefreshCommand           = new RelayCommand(async () => await LoadAsync());
+            AddNewCommand            = new RelayCommand(BeginAdd);
+            SaveCommand              = new RelayCommand(async () => await SaveAsync(), () => IsEditing);
+            CancelEditCommand        = new RelayCommand(CancelEdit,   () => IsEditing);
+            DeactivateCommand        = new RelayCommand<Product>(async p => await DeactivateAsync(p));
+            OpenAddVariantCommand    = new RelayCommand(OpenAddVariant, () => EditProduct != null && EditProduct.ProductId > 0);
+            SaveVariantCommand       = new RelayCommand(async () => await SaveVariantAsync(), () => IsAddingVariant);
+            CancelVariantCommand     = new RelayCommand(() => IsAddingVariant = false);
+            OpenEditVariantCommand   = new RelayCommand<ProductVariant>(OpenEditVariant);
+            SaveEditVariantCommand   = new RelayCommand(async () => await SaveEditVariantAsync(), () => IsEditingVariant);
+            CancelEditVariantCommand = new RelayCommand(() => IsEditingVariant = false);
+            AddImageCommand          = new RelayCommand(async () => await AddImageAsync(),
+                                           () => EditProduct?.ProductId > 0 && !string.IsNullOrWhiteSpace(NewImageUrl));
+            RemoveImageCommand       = new RelayCommand<ProductImage>(async img => await RemoveImageAsync(img));
         }
 
         // ── Called by MainWindowViewModel when navigating here ────────────
@@ -255,8 +257,8 @@ namespace AdminSystem_v2.ViewModels
             EditProduct = CloneProduct(product);
             IsEditing   = true;
             ClearMessages();
-            IsAdjustingStock = false;
             IsAddingVariant  = false;
+            IsEditingVariant = false;
             NewImageUrl      = string.Empty;
 
             // Images load separately — they don't block selection
@@ -268,8 +270,8 @@ namespace AdminSystem_v2.ViewModels
             SelectedProduct  = null;
             EditProduct      = new Product { IsActive = true, Currency = "PHP" };
             IsEditing        = true;
-            IsAdjustingStock = false;
             IsAddingVariant  = false;
+            IsEditingVariant = false;
             EditImages       = new ObservableCollection<ProductImage>();
             NewImageUrl      = string.Empty;
             ClearMessages();
@@ -342,45 +344,7 @@ namespace AdminSystem_v2.ViewModels
             }
         }
 
-        private void OpenAdjust(ProductVariant? variant)
-        {
-            if (variant == null) return;
-            AdjustTarget     = variant;
-            AdjustQty        = 0;
-            AdjustType       = InventoryChangeTypes.Adjustment;
-            AdjustNotes      = string.Empty;
-            IsAdjustingStock = true;
-        }
 
-        private async Task ConfirmAdjustAsync()
-        {
-            if (AdjustTarget == null) return;
-            IsLoading = true;
-            try
-            {
-                await _productService.AdjustStockAsync(
-                    AdjustTarget.ProductVariantId, AdjustQty, AdjustType, AdjustNotes);
-
-                IsAdjustingStock = false;
-                ShowSuccess("Stock adjusted.");
-                await RefreshListAsync();
-
-                // Re-select the same product so variant table refreshes
-                if (SelectedProduct != null)
-                {
-                    var refreshed = Products.FirstOrDefault(p => p.ProductId == SelectedProduct.ProductId);
-                    if (refreshed != null) OnProductSelected(refreshed);
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Adjustment failed: {ex.Message}");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
-        }
 
         private void OpenAddVariant()
         {
@@ -409,6 +373,67 @@ namespace AdminSystem_v2.ViewModels
             catch (Exception ex)
             {
                 ShowError($"Add variant failed: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        private void OpenEditVariant(ProductVariant? variant)
+        {
+            if (variant == null) return;
+            // Shallow clone so edits don't mutate the grid row until saved
+            EditVariant = new ProductVariant
+            {
+                ProductVariantId = variant.ProductVariantId,
+                ProductId        = variant.ProductId,
+                VariantName      = variant.VariantName,
+                SKU              = variant.SKU,
+                StockQuantity    = variant.StockQuantity,
+                ReorderThreshold = variant.ReorderThreshold,
+                IsActive         = variant.IsActive,
+            };
+
+            // Reset adjust fields
+            AdjustQty   = 0;
+            AdjustType  = InventoryChangeTypes.Adjustment;
+            AdjustNotes = string.Empty;
+
+            IsEditingVariant = true;
+        }
+
+        private async Task SaveEditVariantAsync()
+        {
+            if (EditVariant == null) return;
+            if (string.IsNullOrWhiteSpace(EditVariant.VariantName))
+            { ShowError("Variant name is required."); return; }
+
+            IsLoading = true;
+            try
+            {
+                await _productService.UpdateVariantAsync(EditVariant);
+
+                if (AdjustQty != 0)
+                {
+                    await _productService.AdjustStockAsync(
+                        EditVariant.ProductVariantId, AdjustQty, AdjustType, AdjustNotes);
+                }
+
+                IsEditingVariant = false;
+                ShowSuccess("Variant updated.");
+                await RefreshListAsync();
+
+                // Re-select to refresh the variant list in the edit panel
+                if (SelectedProduct != null)
+                {
+                    var refreshed = Products.FirstOrDefault(p => p.ProductId == SelectedProduct.ProductId);
+                    if (refreshed != null) OnProductSelected(refreshed);
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Update variant failed: {ex.Message}");
             }
             finally
             {

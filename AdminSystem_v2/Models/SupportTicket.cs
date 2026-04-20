@@ -5,14 +5,14 @@ namespace AdminSystem_v2.Models
         public int TicketId { get; set; }
         public int UserId { get; set; }
         public int? OrderId { get; set; }
-        public string TicketSource { get; set; }
-        public string TicketCategory { get; set; }
-        public string Subject { get; set; }
-        public string Description { get; set; }
-        public string AttachmentUrl { get; set; }
-        public string AttachmentBucket { get; set; }
-        public string AttachmentPath { get; set; }
-        public string TicketStatus { get; set; }
+        public string TicketSource { get; set; } = string.Empty;
+        public string TicketCategory { get; set; } = string.Empty;
+        public string Subject { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string? AttachmentUrl { get; set; }
+        public string? AttachmentBucket { get; set; }
+        public string? AttachmentPath { get; set; }
+        public string TicketStatus { get; set; } = string.Empty;
         public int? AssignedToUserId { get; set; }
         public DateTime? ResolvedAt { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -20,9 +20,9 @@ namespace AdminSystem_v2.Models
 
         // Navigation properties
         // Added properties to hold joined data for the UI
-        public string UserFullName { get; set; }
-        public string UserEmail { get; set; }
-        public string AssignedToFullName { get; set; }
+        public string? UserFullName { get; set; }
+        public string? UserEmail { get; set; }
+        public string? AssignedToFullName { get; set; }
     }
 
     public class SupportTicketReply
@@ -31,13 +31,13 @@ namespace AdminSystem_v2.Models
         public int TicketId { get; set; }
         public int UserId { get; set; }
         public bool IsAdminReply { get; set; }
-        public string Message { get; set; }
-        public string AttachmentUrl { get; set; }
-        public string AttachmentBucket { get; set; }
-        public string AttachmentPath { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string? AttachmentUrl { get; set; }
+        public string? AttachmentBucket { get; set; }
+        public string? AttachmentPath { get; set; }
         public DateTime CreatedAt { get; set; }
 
         // UI Helpers
-        public string UserFullName { get; set; }
+        public string? UserFullName { get; set; }
     }
 }

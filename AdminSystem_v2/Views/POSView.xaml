@@ -101,57 +101,35 @@
                     <RowDefinition Height="*"/>     <!-- results -->
                 </Grid.RowDefinitions>
 
-                <!-- Search header -->
-                <Border Grid.Row="0"
-                        Background="#1F2937"
-                        BorderThickness="0,0,0,1"
-                        BorderBrush="#374151"
-                        Padding="16,12">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Product Search"
-                                       Foreground="#F9FAFB"
-                                       FontSize="14" FontWeight="SemiBold"/>
-                            <TextBlock Text="Search by name, variant, or SKU"
-                                       Foreground="#6B7280"
-                                       FontSize="11" Margin="0,2,0,0"/>
-                        </StackPanel>
-
-                        <!-- Error / Success inline message -->
-                        <TextBlock Grid.Column="1"
-                                   Text="{Binding ErrorMessage}"
-                                   Foreground="#EF4444" FontSize="12"
-                                   VerticalAlignment="Center"
-                                   Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}"/>
-                        <TextBlock Grid.Column="1"
-                                   Text="{Binding SuccessMessage}"
-                                   Foreground="#22C55E" FontSize="12"
-                                   VerticalAlignment="Center"
-                                   Visibility="{Binding HasSuccess, Converter={StaticResource BoolToVis}}"/>
-                    </Grid>
-                </Border>
-
                 <!-- Search box -->
-                <Border Grid.Row="1"
-                        Background="#1F2937" Padding="10,8"
+                <Border Grid.Row="0" Grid.RowSpan="2"
+                        Background="#1A2234" Padding="12,8"
                         BorderBrush="#374151" BorderThickness="0,0,0,1">
                     <Grid>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0">
-                            <TextBox
-                                     Text="{Binding ProductSearch, UpdateSourceTrigger=PropertyChanged}"
-                                     x:Name="POSProductSearchBox"/>
+
+                        <!-- Search icon -->
+                        <TextBlock Grid.Column="0" Text="&#x1F50D;"
+                                   FontSize="14" Foreground="#4B5563"
+                                   VerticalAlignment="Center"
+                                   Margin="4,0,8,0"/>
+
+                        <!-- Input + placeholder overlay -->
+                        <Grid Grid.Column="1">
+                            <TextBox Text="{Binding ProductSearch, UpdateSourceTrigger=PropertyChanged}"
+                                     x:Name="POSProductSearchBox"
+                                     Height="36" Padding="0,0" VerticalContentAlignment="Center"
+                                     Background="Transparent" BorderThickness="0"
+                                     Foreground="White" FontSize="13"
+                                     CaretBrush="White"/>
                             <TextBlock Text="Search by name, variant, or SKU..."
                                        Foreground="#4B5563" FontSize="13"
-                                       Margin="12,0" VerticalAlignment="Center"
+                                       Margin="2,0" VerticalAlignment="Center"
                                        IsHitTestVisible="False">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
@@ -168,13 +146,27 @@
                                 </TextBlock.Style>
                             </TextBlock>
                         </Grid>
-                        <Button Grid.Column="1"
+
+                        <!-- Error / Success inline -->
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding ErrorMessage}"
+                                   Foreground="#EF4444" FontSize="12"
+                                   VerticalAlignment="Center" Margin="8,0"
+                                   Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}"/>
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding SuccessMessage}"
+                                   Foreground="#22C55E" FontSize="12"
+                                   VerticalAlignment="Center" Margin="8,0"
+                                   Visibility="{Binding HasSuccess, Converter={StaticResource BoolToVis}}"/>
+
+                        <!-- Clear button -->
+                        <Button Grid.Column="3"
                                 Style="{StaticResource SecondaryButton}"
-                                MinWidth="40" Padding="0"
+                                MinWidth="36" Height="28" Padding="0"
                                 ToolTip="Clear search"
                                 Margin="6,0,0,0"
                                 Click="ClearProductSearch_Click">
-                            <TextBlock Text="&#x2715;" FontSize="12" Foreground="#9CA3AF"
+                            <TextBlock Text="&#x2715;" FontSize="11" Foreground="#9CA3AF"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Button>
                     </Grid>
@@ -207,7 +199,7 @@
                     <ItemsControl ItemsSource="{Binding SearchResults}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="#1F2937"
+                                <Border Background="#1A2234"
                                         BorderBrush="#374151"
                                         BorderThickness="1"
                                         CornerRadius="8"
@@ -263,7 +255,7 @@
             <!-- ─────────────────────────────────────────
                  COL 2 — CART + PAYMENT PANEL
                  ───────────────────────────────────────── -->
-            <Grid Grid.Column="2" Background="#1F2937">
+            <Grid Grid.Column="2" Background="#1A2234">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>   <!-- customer row -->
                     <RowDefinition Height="Auto"/>   <!-- cart header -->
@@ -322,10 +314,11 @@
                                         <Grid Grid.Row="0">
                                             <TextBox
                                                      Text="{Binding CustomerSearch, UpdateSourceTrigger=PropertyChanged}"
-                                                     x:Name="CustomerSearchBox"/>
+                                                     x:Name="CustomerSearchBox"
+                                                     Height="36" Padding="12,0" VerticalContentAlignment="Center"/>
                                             <TextBlock Text="Search customers..."
                                                        Foreground="#4B5563" FontSize="13"
-                                                       Margin="12,0" VerticalAlignment="Center"
+                                                       Margin="14,0" VerticalAlignment="Center"
                                                        IsHitTestVisible="False">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
@@ -526,7 +519,7 @@
                                          x:Name="VoucherCodeBox"
 
                                          Text="{Binding VoucherCodeInput, UpdateSourceTrigger=PropertyChanged}"
-                                         Padding="8,4"
+                                         Height="36" Padding="12,0" VerticalContentAlignment="Center"
                                          FontSize="12"
                                          CharacterCasing="Upper"
                                          GotFocus="VoucherInput_GotFocus"
@@ -538,7 +531,7 @@
                                 <!-- Applied badge (visible when voucher applied) -->
                                 <Border Grid.Column="0"
                                         Background="#064E3B" CornerRadius="4"
-                                        Padding="8,4" MinHeight="30"
+                                        Padding="8,4" Height="36"
                                         VerticalAlignment="Center"
                                         Visibility="{Binding HasVoucherApplied,
                                             Converter={StaticResource BoolToVis}}">
@@ -557,7 +550,6 @@
                                 <!-- Apply button (visible when no voucher applied) -->
                                 <Button Grid.Column="1" Margin="4,0,0,0"
                                         Style="{StaticResource PayBtn}"
-                                        Padding="10,0" MinHeight="30"
                                         Command="{Binding ApplyVoucherCommand}"
                                         Visibility="{Binding HasVoucherApplied,
                                             Converter={StaticResource BoolToVis},
@@ -567,7 +559,7 @@
 
                                 <!-- Remove button (visible when voucher applied) -->
                                 <Button Grid.Column="1" Margin="4,0,0,0"
-                                        MinHeight="30" Padding="10,0"
+                                        Height="36" Padding="12,0"
                                         Background="#7F1D1D" Foreground="#FCA5A5"
                                         BorderThickness="0" Cursor="Hand"
                                         Command="{Binding RemoveVoucherCommand}"
@@ -822,7 +814,7 @@
                             <TextBox Grid.Column="1"
 
                                      Text="{Binding CashReceivedText, UpdateSourceTrigger=PropertyChanged}"
-                                     Padding="8,4" FontSize="12"
+                                     Height="36" Padding="12,0" VerticalContentAlignment="Center" FontSize="12"
                                      TextAlignment="Right"/>
                         </Grid>
 
@@ -888,7 +880,7 @@
             <Rectangle Fill="#D9000000"/>
 
             <!-- Receipt card -->
-            <Border Background="#1F2937"
+            <Border Background="#1A2234"
                     BorderBrush="#374151"
                     BorderThickness="1"
                     CornerRadius="12"

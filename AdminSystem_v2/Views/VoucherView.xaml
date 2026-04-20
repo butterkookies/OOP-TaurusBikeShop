@@ -39,9 +39,9 @@
 
         <!-- ── Card border ── -->
         <Style x:Key="Card" TargetType="Border">
-            <Setter Property="Background"      Value="#1F2937"/>
-            <Setter Property="CornerRadius"    Value="8"/>
-            <Setter Property="BorderBrush"     Value="#374151"/>
+            <Setter Property="Background"      Value="#1A2234"/>
+            <Setter Property="CornerRadius"    Value="10"/>
+            <Setter Property="BorderBrush"     Value="#2D3748"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding"         Value="20"/>
         </Style>
@@ -50,12 +50,12 @@
         <Style x:Key="VGrid" TargetType="DataGrid">
             <Setter Property="AutoGenerateColumns"      Value="False"/>
             <Setter Property="IsReadOnly"               Value="True"/>
-            <Setter Property="Background"               Value="#1F2937"/>
+            <Setter Property="Background"               Value="#1A2234"/>
             <Setter Property="Foreground"               Value="#E5E7EB"/>
-            <Setter Property="BorderBrush"              Value="#374151"/>
+            <Setter Property="BorderBrush"              Value="#2D3748"/>
             <Setter Property="BorderThickness"          Value="1"/>
-            <Setter Property="RowBackground"            Value="#1F2937"/>
-            <Setter Property="AlternatingRowBackground" Value="#172032"/>
+            <Setter Property="RowBackground"            Value="#1A2234"/>
+            <Setter Property="AlternatingRowBackground" Value="#0F1829"/>
             <Setter Property="GridLinesVisibility"      Value="Horizontal"/>
             <Setter Property="HorizontalGridLinesBrush" Value="#374151"/>
             <Setter Property="HeadersVisibility"        Value="Column"/>
@@ -129,7 +129,7 @@
         <!-- ══════════════════════════════════════
              ROW 0 — TAB BAR
              ══════════════════════════════════════ -->
-        <Border Grid.Row="0" Background="#1F2937"
+        <Border Grid.Row="0" Background="#1A2234"
                 BorderBrush="#374151" BorderThickness="0,0,0,1">
             <StackPanel Orientation="Horizontal">
 
@@ -215,29 +215,46 @@
                         </Grid.ColumnDefinitions>
 
                         <!-- Search box with placeholder overlay -->
-                        <Grid Grid.Column="0">
-                            <TextBox Text="{Binding ListSearch, UpdateSourceTrigger=PropertyChanged}"
-
-                                     x:Name="VoucherListSearch"/>
-                            <TextBlock Text="Search vouchers by code..."
-                                       Foreground="#4B5563" FontSize="13"
-                                       Margin="12,0" VerticalAlignment="Center"
-                                       IsHitTestVisible="False">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ListSearch}" Value="">
-                                                <Setter Property="Visibility" Value="Visible"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding ListSearch}" Value="{x:Null}">
-                                                <Setter Property="Visibility" Value="Visible"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Grid>
+                        <Border Grid.Column="0"
+                                Background="#0D1526" CornerRadius="8"
+                                BorderBrush="#374151" BorderThickness="1"
+                                Height="36" Padding="10,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="&#x1F50D;"
+                                           FontSize="13" Foreground="#4B5563"
+                                           VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <Grid Grid.Column="1">
+                                    <TextBox Text="{Binding ListSearch, UpdateSourceTrigger=PropertyChanged}"
+                                             x:Name="VoucherListSearch"
+                                             Background="Transparent" Foreground="White"
+                                             BorderThickness="0" FontSize="13"
+                                             Padding="0" VerticalContentAlignment="Center"
+                                             CaretBrush="White"/>
+                                    <TextBlock Text="Search vouchers by code..."
+                                               Foreground="#4B5563" FontSize="13"
+                                               Margin="2,0" VerticalAlignment="Center"
+                                               IsHitTestVisible="False">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ListSearch}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding ListSearch}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </Grid>
+                        </Border>
 
                         <Button Grid.Column="1"
                                 Command="{Binding RefreshCommand}"
@@ -369,8 +386,8 @@
 
                 <!-- ── Right: Create / Edit form panel ── -->
                 <Border Grid.Column="1" Width="380"
-                        Background="#1F2937"
-                        BorderBrush="#374151" BorderThickness="1,0,0,0"
+                        Background="#1A2234"
+                        BorderBrush="#2D3748" BorderThickness="1,0,0,0"
                         Visibility="{Binding IsFormOpen, Converter={StaticResource BoolToVis}}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="24">
@@ -688,7 +705,7 @@
 />
                                             <TextBlock Text="Search users..."
                                                        Foreground="#4B5563" FontSize="13"
-                                                       Margin="12,0" VerticalAlignment="Center"
+                                                       Margin="14,0" VerticalAlignment="Center"
                                                        IsHitTestVisible="False">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
@@ -707,8 +724,8 @@
                                         </Grid>
                                         <!-- Dropdown results -->
                                         <Border Margin="0,38,0,0" Panel.ZIndex="20"
-                                                Background="#1F2937" BorderBrush="#374151"
-                                                BorderThickness="1" CornerRadius="0,0,6,6"
+                                                Background="#1A2234" BorderBrush="#374151"
+                                                BorderThickness="1" CornerRadius="0,0,8,8"
                                                 Visibility="{Binding IsUserDropdownOpen, Converter={StaticResource BoolToVis}}">
                                             <ItemsControl ItemsSource="{Binding UserResults}"
                                                           MaxHeight="200">
