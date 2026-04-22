@@ -27,10 +27,11 @@
                            class="cal-input text-center text-2xl tracking-[0.5em] font-mono"
                            maxlength="6" inputmode="numeric" autocomplete="one-time-code"
                            pattern="[0-9]{6}" placeholder="______" required
-                           aria-label="6-digit verification code" />
+                           aria-label="6-digit verification code"
+                           aria-invalid="false" aria-describedby="otp-error" />
                 </div>
 
-                <p class="cal-field-error text-center" id="otp-error" role="alert" style="display:none;"></p>
+                <p class="cal-field-error text-center" id="otp-error" role="alert"></p>
 
                 <button type="submit" class="btn-dark btn-full mt-2" id="otp-verify-btn">
                     Verify Code
@@ -53,3 +54,28 @@
 
     </div>
 </div>
+
+<script>
+(function () {
+    var input  = document.getElementById('otp-code-input');
+    var errEl  = document.getElementById('otp-error');
+    var form   = document.getElementById('otp-verify-form');
+    if (!input || !form) return;
+
+    input.addEventListener('input', function () {
+        if (input.checkValidity()) {
+            input.setAttribute('aria-invalid', 'false');
+            if (errEl) errEl.textContent = '';
+        }
+    });
+
+    form.addEventListener('submit', function (e) {
+        if (!input.checkValidity()) {
+            e.preventDefault();
+            input.setAttribute('aria-invalid', 'true');
+            if (errEl) errEl.textContent = 'Please enter the 6-digit code sent to your email.';
+            input.focus();
+        }
+    });
+})();
+</script>

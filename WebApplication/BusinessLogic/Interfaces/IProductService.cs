@@ -62,6 +62,7 @@ public interface IProductService
     /// </summary>
     Task<IReadOnlyList<ProductViewModel>> GetFeaturedAsync(
         int count,
+        IReadOnlyCollection<int> wishlistProductIds,
         CancellationToken cancellationToken = default);
 
     /// <summary>

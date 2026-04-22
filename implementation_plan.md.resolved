@@ -1,0 +1,56 @@
+# Order Status Filter Optimization
+
+## Goal
+The goal is to ensure that order status filters in the Admin System correctly distinguish between "Pickup" and "Home Delivery" orders. Specifically:
+- **Ready for Pickup** and **Picked Up** should only contain orders of type **Pickup**.
+- **Out for Delivery** and **Delivered** should only contain orders of type **Home Delivery**.
+
+Currently, these filters show both types, leading to redundant and confusing data in the UI.
+
+## Proposed Changes
+
+### [AdminSystem_v2]
+
+#### [MODIFY] [OrderRepository.cs](file:///c:/Users/user/Documents/ANDREI_FILES/PDM_FILES/2ND%20YEAR/2ND%20SEM/OOP/OOP-TaurusBikeShop/AdminSystem_v2/Repositories/OrderRepository.cs)
+Update the repository logic to enforce delivery type constraints for specific statuses in both the count generation and the order list retrieval.
+
+- **[GetStatusCountsAsync](file:///c:/Users/user/Documents/ANDREI_FILES/PDM_FILES/2ND%20YEAR/2ND%20SEM/OOP/OOP-TaurusBikeShop/AdminSystem_v2/Services/OrderService.cs#27-29)**: Update the SQL query to filter counts by delivery type for relevant statuses.
+    ```sql
+    SELECT 
+        o.OrderStatus, 
+        COUNT(*) AS Cnt
+    FROM [Order] o
+    LEFT JOIN PickupOrder po ON o.OrderId = po.OrderId
+    WHERE o.IsWalkIn = 0
+      AND (
+        (o.OrderStatus IN ('ReadyForPickup', 'PickedUp') AND po.PickupOrderId IS NOT NULL)
+        OR (o.OrderStatus IN ('OutForDelivery', 'Delivered') AND po.PickupOrderId IS NULL)
+        /* All other statuses show both types */
+        OR (o.OrderStatus NOT IN ('ReadyForPickup', 'PickedUp', 'OutForDelivery', 'Delivered'))
+      )
+    GROUP BY o.OrderStatus
+    ```
+- **[GetOrdersAsync](file:///c:/Users/user/Documents/ANDREI_FILES/PDM_FILES/2ND%20YEAR/2ND%20SEM/OOP/OOP-TaurusBikeShop/AdminSystem_v2/Services/OrderService.cs#12-14)**: Add logic to override the `typeFilter` when a specific status is provided that implies a specific type.
+    ```csharp
+    if (statusFilter == OrderStatuses.ReadyForPickup || statusFilter == OrderStatuses.PickedUp)
+        typeFilter = OrderTypes.Pickup;
+    else if (statusFilter == OrderStatuses.OutForDelivery || statusFilter == OrderStatuses.Delivered)
+        typeFilter = OrderTypes.Delivery;
+    ```
+
+## Verification Plan
+
+### Automated Tests
+- This project primarily uses manual verification for UI state changes.
+
+### Manual Verification
+1.  **Verify Badge Counts**:
+    - Open the Orders view.
+    - Check the counts for "Ready for Pickup", "Picked Up", "Out for Delivery", and "Delivered".
+    - Ensure they only count orders of the correct delivery type.
+2.  **Verify Filtered List**:
+    - Click on the "Ready for Pickup" badge.
+    - Verify that only orders with "Delivery Type: Pickup" are shown in the list.
+    - Repeat for "Picked Up", "Out for Delivery", and "Delivered" badges.
+3.  **Verify Cross-Filtering**:
+    - Ensure that selecting the "All" badge still allows manual filtering by Type (Top-right dropdown) if available.

@@ -33,7 +33,9 @@
 
                 <div class="mb-5">
                     <label asp-for="Category" class="cal-label">Category</label>
-                    <select asp-for="Category" class="cal-input cal-select" required>
+                    <select asp-for="Category" class="cal-input cal-select" required
+                            aria-invalid="@(ViewData.ModelState["Category"]?.Errors.Count > 0 ? "true" : "false")"
+                            aria-describedby="Category-error">
                         <option value="">— Select a category —</option>
                         <option value="@TicketCategories.DamagedItem">Damaged Item</option>
                         <option value="@TicketCategories.WrongItem">Wrong Item Received</option>
@@ -43,24 +45,28 @@
                         <option value="@TicketCategories.ReturnRefund">Return / Refund</option>
                         <option value="@TicketCategories.General">General</option>
                     </select>
-                    <span asp-validation-for="Category" class="cal-field-error"></span>
+                    <span asp-validation-for="Category" id="Category-error" role="alert" class="cal-field-error"></span>
                 </div>
 
                 <div class="mb-5">
                     <label asp-for="Subject" class="cal-label">Subject</label>
-                    <input asp-for="Subject" class="cal-input" placeholder="Brief summary of your issue" maxlength="200" />
-                    <span asp-validation-for="Subject" class="cal-field-error"></span>
+                    <input asp-for="Subject" class="cal-input" placeholder="Brief summary of your issue" maxlength="200"
+                           aria-invalid="@(ViewData.ModelState["Subject"]?.Errors.Count > 0 ? "true" : "false")"
+                           aria-describedby="Subject-error" />
+                    <span asp-validation-for="Subject" id="Subject-error" role="alert" class="cal-field-error"></span>
                 </div>
 
                 <div class="mb-6">
                     <label asp-for="Description" class="cal-label">Message</label>
                     <textarea asp-for="Description" class="cal-input cal-textarea" rows="6"
                               placeholder="Describe your issue in detail."
-                              maxlength="5000"></textarea>
+                              maxlength="5000"
+                              aria-invalid="@(ViewData.ModelState["Description"]?.Errors.Count > 0 ? "true" : "false")"
+                              aria-describedby="msg-char-count-label Description-error"></textarea>
                     <div class="flex justify-end mt-1">
-                        <span class="text-xs text-mid-gray"><span id="msg-char-count">0</span> / 5000</span>
+                        <span class="text-xs text-mid-gray" id="msg-char-count-label" aria-live="polite"><span id="msg-char-count">0</span> / 5000</span>
                     </div>
-                    <span asp-validation-for="Description" class="cal-field-error"></span>
+                    <span asp-validation-for="Description" id="Description-error" role="alert" class="cal-field-error"></span>
                 </div>
 
                 <div class="flex gap-3">

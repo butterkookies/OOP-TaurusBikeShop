@@ -73,20 +73,24 @@
                     </div>
 
                     <div class="mb-5">
-                        <label class="cal-label">GCash Number <span class="text-xs text-mid-gray font-normal">(11 digits)</span></label>
-                        <input type="text" name="gcashNumber" class="cal-input" placeholder="09xxxxxxxxx"
-                               maxlength="11" inputmode="numeric" pattern="[0-9]{11}" />
+                        <label class="cal-label" for="gcash-number">GCash Number <span class="text-xs text-mid-gray font-normal">(11 digits)</span></label>
+                        <input type="text" name="gcashNumber" id="gcash-number" class="cal-input" placeholder="09xxxxxxxxx"
+                               maxlength="11" inputmode="numeric" pattern="[0-9]{11}"
+                               aria-invalid="false" aria-describedby="gcash-number-error" />
+                        <span id="gcash-number-error" role="alert" class="cal-field-error"></span>
                     </div>
 
                     <div class="mb-5">
-                        <label class="cal-label">Reference Number <span class="text-xs text-mid-gray font-normal">(13 digits)</span></label>
-                        <input type="text" name="referenceNumber" class="cal-input" placeholder="GCash reference number"
-                               maxlength="13" inputmode="numeric" pattern="[0-9]{1,13}" />
+                        <label class="cal-label" for="gcash-ref">Reference Number <span class="text-xs text-mid-gray font-normal">(13 digits)</span></label>
+                        <input type="text" name="referenceNumber" id="gcash-ref" class="cal-input" placeholder="GCash reference number"
+                               maxlength="13" inputmode="numeric" pattern="[0-9]{1,13}"
+                               aria-invalid="false" aria-describedby="gcash-ref-error" />
+                        <span id="gcash-ref-error" role="alert" class="cal-field-error"></span>
                     </div>
 
                     <div>
                         <label class="cal-label">Payment Screenshot</label>
-                        <div class="cal-file-drop" id="file-drop-zone">
+                        <div class="cal-file-drop" id="file-drop-zone" aria-describedby="file-error">
                             <input type="file" name="screenshotFile" accept="image/jpeg,image/png,.jpg,.jpeg,.png"
                                    class="cal-file-drop__input" id="payment-file-input"
                                    style="display:none" data-required="true" />
@@ -99,6 +103,7 @@
                             <!-- File info (hidden until file is attached) -->
                             <div class="cal-file-drop__info" style="display:none"></div>
                         </div>
+                        <span id="file-error" role="alert" class="cal-field-error"></span>
                     </div>
                 </div>
 
@@ -152,19 +157,23 @@
                     </div>
 
                     <div class="mb-5">
-                        <label class="cal-label">Depositor Name</label>
-                        <input type="text" name="depositorName" class="cal-input" placeholder="Full name on account" required />
+                        <label class="cal-label" for="depositor-name">Depositor Name</label>
+                        <input type="text" name="depositorName" id="depositor-name" class="cal-input" placeholder="Full name on account" required
+                               aria-invalid="false" aria-describedby="depositor-name-error" />
+                        <span id="depositor-name-error" role="alert" class="cal-field-error"></span>
                     </div>
 
                     <div class="mb-5">
-                        <label class="cal-label">BPI Reference Number <span class="cal-label-opt">(optional · 10 digits)</span></label>
-                        <input type="text" name="bpiReferenceNumber" class="cal-input" placeholder="BPI transaction reference"
-                               maxlength="10" inputmode="numeric" pattern="[0-9]{0,10}" />
+                        <label class="cal-label" for="bpi-ref">BPI Reference Number <span class="cal-label-opt">(optional · 10 digits)</span></label>
+                        <input type="text" name="bpiReferenceNumber" id="bpi-ref" class="cal-input" placeholder="BPI transaction reference"
+                               maxlength="10" inputmode="numeric" pattern="[0-9]{0,10}"
+                               aria-invalid="false" aria-describedby="bpi-ref-error" />
+                        <span id="bpi-ref-error" role="alert" class="cal-field-error"></span>
                     </div>
 
                     <div>
                         <label class="cal-label">Deposit Slip / Screenshot</label>
-                        <div class="cal-file-drop" id="file-drop-zone">
+                        <div class="cal-file-drop" id="file-drop-zone" aria-describedby="file-error">
                             <input type="file" name="depositSlipFile" accept="image/jpeg,image/png,.jpg,.jpeg,.png"
                                    class="cal-file-drop__input" id="payment-file-input"
                                    style="display:none" data-required="true" />
@@ -177,6 +186,7 @@
                             <!-- File info (hidden until file is attached) -->
                             <div class="cal-file-drop__info" style="display:none"></div>
                         </div>
+                        <span id="file-error" role="alert" class="cal-field-error"></span>
                     </div>
                 </div>
 
@@ -385,31 +395,52 @@
                 });
             });
 
+            // ── Per-field ARIA clear-on-input ──────────────────
+            document.querySelectorAll('input[aria-invalid]').forEach(function (el) {
+                el.addEventListener('input', function () {
+                    if (el.checkValidity()) {
+                        el.setAttribute('aria-invalid', 'false');
+                        var errEl = document.getElementById(el.getAttribute('aria-describedby') || '');
+                        if (errEl) errEl.textContent = '';
+                    }
+                });
+            });
+
             // ── Submit handler ───────────────────────────────────────────
             document.querySelectorAll('.payment-submit-btn').forEach(function (btn) {
                 btn.addEventListener('click', function () {
                     var form = btn.closest('form');
                     if (!form) return;
 
-                    // Validate the hidden file input manually — reportValidity()
-                    // silently fails on display:none required controls.
-                    var fileField = form.querySelector('input[type="file"][data-required="true"]');
+                    var firstInvalid = null;
+                    var dropZone     = form.querySelector('.cal-file-drop');
+                    var fileField    = form.querySelector('input[type="file"][data-required="true"]');
+                    var fileErrEl    = document.getElementById('file-error');
+
+                    // Validate the hidden file input manually
                     if (fileField && fileField.files.length === 0) {
-                        var dropZone = form.querySelector('.cal-file-drop');
-                        if (dropZone) {
-                            dropZone.classList.add('is-invalid');
-                            dropZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                        return;
+                        if (dropZone) dropZone.classList.add('is-invalid');
+                        if (fileErrEl) fileErrEl.textContent = 'Please attach a payment screenshot.';
+                        firstInvalid = firstInvalid || dropZone;
+                    } else {
+                        if (dropZone) dropZone.classList.remove('is-invalid');
+                        if (fileErrEl) fileErrEl.textContent = '';
                     }
 
-                    // Let the browser validate the remaining visible fields.
-                    var otherInvalid = false;
-                    form.querySelectorAll('input, textarea, select').forEach(function (el) {
-                        if (el === fileField) return;
-                        if (!el.checkValidity()) otherInvalid = true;
+                    // Per-field ARIA validation
+                    form.querySelectorAll('input[aria-invalid]').forEach(function (el) {
+                        var valid  = el.checkValidity();
+                        var errEl  = document.getElementById(el.getAttribute('aria-describedby') || '');
+                        el.setAttribute('aria-invalid', valid ? 'false' : 'true');
+                        if (errEl) errEl.textContent = valid ? '' : (el.validationMessage || 'Please check this field.');
+                        if (!valid && !firstInvalid) firstInvalid = el;
                     });
-                    if (otherInvalid && !form.reportValidity()) return;
+
+                    if (firstInvalid) {
+                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        if (typeof firstInvalid.focus === 'function') firstInvalid.focus({ preventScroll: true });
+                        return;
+                    }
 
                     btn.disabled = true;
                     btn.textContent = 'Submitting\u2026';

@@ -140,10 +140,14 @@
                 }
                 else
                 {
-                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" id="product-grid" data-reveal="delay-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" id="product-grid">
+                        @{ int delayIndex = 1; }
                         @foreach (WebApplication.Models.ViewModels.ProductViewModel product in Model)
                         {
-                            @await Html.PartialAsync("~/Views/Customer/Partials/_ProductCard.cshtml", product)
+                            <div data-reveal="delay-@(delayIndex)">
+                                @await Html.PartialAsync("~/Views/Customer/Partials/_ProductCard.cshtml", product)
+                            </div>
+                            delayIndex = delayIndex >= 3 ? 1 : delayIndex + 1;
                         }
                     </div>
 

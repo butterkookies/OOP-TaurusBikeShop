@@ -79,14 +79,22 @@
                         </div>
                     }
                     <div class="flex justify-between">
-                        <span class="text-mid-gray">Shipping (@Model.DeliveryMethod)</span>
-                        <span class="text-charcoal dark:text-white">@Model.FormattedShippingFee</span>
+                        <span class="text-mid-gray">Shipping</span>
+                        <span class="text-mid-gray italic">
+                            @(Model.DeliveryMethod == "Pickup" ? "Free" : "Paid to courier")
+                        </span>
                     </div>
                     <hr class="cal-divider !my-3" />
                     <div class="flex justify-between font-semibold text-base">
-                        <span class="text-charcoal dark:text-white">Grand Total</span>
+                        <span class="text-charcoal dark:text-white">Total (excl. shipping)</span>
                         <span class="font-display text-charcoal dark:text-white">@Model.FormattedGrandTotal</span>
                     </div>
+                    @if (Model.DeliveryMethod != "Pickup")
+                    {
+                        <p class="text-xs text-mid-gray mt-1 leading-relaxed">
+                            Shipping fees are collected by the courier (Lalamove / LBC) and are not included in your online payment.
+                        </p>
+                    }
                 </div>
             </div>
 

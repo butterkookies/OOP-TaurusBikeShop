@@ -37,9 +37,9 @@
 
     @* Qty stepper *@
     <div class="cal-qty shrink-0">
-        <button type="button" class="cal-qty-btn" data-action="decrease" data-cart-item-id="@Model.CartItemId" aria-label="Decrease quantity">−</button>
+        <button type="button" class="cal-qty-btn touch-manipulation active:bg-gray-100 dark:active:bg-neutral-800 transition-colors" data-action="decrease" data-cart-item-id="@Model.CartItemId" aria-label="Decrease quantity">−</button>
         <input type="number" class="cal-qty-val" value="@Model.Quantity" min="1" max="@Model.StockQuantity" data-cart-item-id="@Model.CartItemId" data-max-stock="@Model.StockQuantity" aria-label="Quantity" />
-        <button type="button" class="cal-qty-btn" data-action="increase" data-cart-item-id="@Model.CartItemId" aria-label="Increase quantity">+</button>
+        <button type="button" class="cal-qty-btn touch-manipulation active:bg-gray-100 dark:active:bg-neutral-800 transition-colors" data-action="increase" data-cart-item-id="@Model.CartItemId" aria-label="Increase quantity">+</button>
     </div>
 
     @* Line total *@

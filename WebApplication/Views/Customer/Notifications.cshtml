@@ -155,7 +155,7 @@
                     @if (Model.HasPreviousPage)
                     {
                         <a asp-action="Notifications" asp-route-page="@(Model.CurrentPage - 1)"
-                           class="px-4 py-2 text-sm font-medium rounded-lg bg-white text-charcoal hover:bg-light-gray transition-colors dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-white/10">
+                           class="px-4 py-2 text-sm font-medium rounded-lg bg-white text-charcoal hover:bg-light-gray transition-colors dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-white/10">
                             ← Previous
                         </a>
                     }
@@ -165,7 +165,7 @@
                     @if (Model.HasNextPage)
                     {
                         <a asp-action="Notifications" asp-route-page="@(Model.CurrentPage + 1)"
-                           class="px-4 py-2 text-sm font-medium rounded-lg bg-white text-charcoal hover:bg-light-gray transition-colors dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-white/10">
+                           class="px-4 py-2 text-sm font-medium rounded-lg bg-white text-charcoal hover:bg-light-gray transition-colors dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-white/10">
                             Next →
                         </a>
                     }

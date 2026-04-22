@@ -160,13 +160,10 @@ public sealed class OrderService : IOrderService
                 orderNumber = await GenerateOrderNumberAsync(cancellationToken);
 
                 // ── 3. Calculate totals ────────────────────────────────────────
-                decimal subTotal = selectedItems.Sum(i => i.PriceAtAdd * i.Quantity);
-                decimal shippingFee = vm.DeliveryMethod switch
-                {
-                    "Lalamove" => CheckoutViewModel.LalamoveFee,
-                    "LBC"      => CheckoutViewModel.LBCFee,
-                    _          => CheckoutViewModel.PickupFee
-                };
+                decimal subTotal    = selectedItems.Sum(i => i.PriceAtAdd * i.Quantity);
+                // Shipping is paid directly to the courier (Lalamove / LBC)
+                // by the customer — it is never included in the online payment.
+                decimal shippingFee = 0m;
 
                 // ── 4. Create Order row ────────────────────────────────────────
                 order = new()
@@ -696,8 +693,28 @@ public sealed class OrderService : IOrderService
 
     private async Task<string> GenerateOrderNumberAsync(CancellationToken ct)
     {
-        string year   = DateTime.UtcNow.Year.ToString();
-        int    count  = await _context.Orders.CountAsync(ct);
+        string year  = DateTime.UtcNow.Year.ToString();
+        int    count = await _context.Orders.CountAsync(ct);
         return $"TBS-{year}-{(count + 1):D5}";
+    }
+
+    /// <summary>
+    /// Resolves the appropriate courier for a delivery order based on province.
+    /// Metro Manila / NCR / Bulacan (or null province) → Lalamove.
+    /// All other provinces → LBC.
+    /// </summary>
+    private static string ResolveCourier(Address address)
+    {
+        var province = address.Province?.Trim();
+        if (string.IsNullOrEmpty(province))
+            return "Lalamove"; // Default: assume local area when province is unset
+
+        var lalamoveAreas = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Metro Manila", "NCR", "National Capital Region",
+            "Bulacan"
+        };
+
+        return lalamoveAreas.Contains(province) ? "Lalamove" : "LBC";
     }
 }

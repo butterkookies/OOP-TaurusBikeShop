@@ -12,7 +12,9 @@
         @* Star rating picker *@
         <div class="mb-5">
             <label class="cal-label">Your Rating</label>
-            <div class="cal-star-picker" role="radiogroup" aria-label="Select rating">
+            <div class="cal-star-picker" id="rating-picker" role="radiogroup" aria-label="Select rating"
+                 aria-invalid="@(ViewData.ModelState["Rating"]?.Errors.Count > 0 ? "true" : "false")"
+                 aria-describedby="Rating-error">
                 @for (int i = 5; i >= 1; i--)
                 {
                     <input type="radio" name="Rating" id="star-@i" value="@i"
@@ -21,7 +23,7 @@
                            title="@i star@(i != 1 ? "s" : "")" aria-label="@i star@(i != 1 ? "s" : "")">★</label>
                 }
             </div>
-            <span asp-validation-for="Rating" class="cal-field-error"></span>
+            <span asp-validation-for="Rating" id="Rating-error" role="alert" class="cal-field-error"></span>
         </div>
 
         @* Comment *@
@@ -33,15 +35,13 @@
                       class="cal-input cal-textarea"
                       rows="4"
                       placeholder="Share your experience with this product…"
-                      maxlength="1000"></textarea>
+                      maxlength="1000"
+                      aria-invalid="@(ViewData.ModelState["Comment"]?.Errors.Count > 0 ? "true" : "false")"
+                      aria-describedby="Comment-error"></textarea>
             <div class="flex justify-end mt-1">
                 <span class="text-xs text-mid-gray"><span id="review-char-count">0</span> / 1000</span>
             </div>
-            <span asp-validation-for="Comment" class="cal-field-error"></span>
-        </div>
-
-        <div id="rating-warning" class="mb-4 p-3 bg-error/10 border border-error/20 rounded-lg text-sm text-error" style="display:none;">
-            Please select a star rating before submitting your review.
+            <span asp-validation-for="Comment" id="Comment-error" role="alert" class="cal-field-error"></span>
         </div>
 
         <button type="submit" class="btn-dark">Submit Review</button>
@@ -50,27 +50,33 @@
 
 <script>
 (function () {
-    var form = document.getElementById('review-form');
+    var form      = document.getElementById('review-form');
     if (!form) return;
+
+    var picker    = document.getElementById('rating-picker');
+    var ratingErr = document.getElementById('Rating-error');
+    var textarea  = form.querySelector('textarea[name="Comment"]');
+    var charEl    = document.getElementById('review-char-count');
+
+    if (textarea && charEl) {
+        charEl.textContent = textarea.value.length;
+        textarea.addEventListener('input', function () { charEl.textContent = this.value.length; });
+    }
 
     form.addEventListener('submit', function (e) {
         var selected = form.querySelector('input[name="Rating"]:checked');
-        var warning = document.getElementById('rating-warning');
         if (!selected) {
             e.preventDefault();
-            if (warning) warning.style.display = 'block';
-            var picker = form.querySelector('.cal-star-picker');
-            if (picker) picker.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            return;
+            if (picker)    picker.setAttribute('aria-invalid', 'true');
+            if (ratingErr) ratingErr.textContent = 'Please select a star rating before submitting your review.';
+            if (picker)    picker.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-        if (warning) warning.style.display = 'none';
     });
 
-    var radios = form.querySelectorAll('input[name="Rating"]');
-    radios.forEach(function (radio) {
+    form.querySelectorAll('input[name="Rating"]').forEach(function (radio) {
         radio.addEventListener('change', function () {
-            var warning = document.getElementById('rating-warning');
-            if (warning) warning.style.display = 'none';
+            if (picker)    picker.setAttribute('aria-invalid', 'false');
+            if (ratingErr) ratingErr.textContent = '';
         });
     });
 })();

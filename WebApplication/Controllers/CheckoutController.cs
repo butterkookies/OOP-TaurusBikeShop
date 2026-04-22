@@ -12,8 +12,10 @@ using WebApplication.Models.ViewModels;
 namespace WebApplication.Controllers;
 
 /// <summary>
-/// Handles the checkout flow: address selection, delivery method,
-/// payment method selection, and order submission.
+/// Handles the checkout flow: address selection, fulfilment method
+/// (Delivery or Pickup), payment method selection, and order submission.
+/// The specific delivery courier (Lalamove or LBC) is auto-assigned
+/// server-side in <see cref="IOrderService"/> based on the customer's province.
 /// Flowchart: Part 3 — Cart &amp; Checkout.
 /// </summary>
 [Authorize]
@@ -190,32 +192,6 @@ public sealed class CheckoutController : Controller
             TempData["error"] = "An unexpected error occurred. Please try again.";
             return RedirectToAction(nameof(Index));
         }
-    }
-
-    // =========================================================================
-    // AJAX GET /Checkout/GetShippingFee
-    // =========================================================================
-
-    /// <summary>
-    /// Returns the shipping fee for the selected delivery method.
-    /// Called by <c>checkout.js</c> when the customer changes delivery method.
-    /// </summary>
-    [HttpGet]
-    public IActionResult GetShippingFee(string method)
-    {
-        decimal fee = method switch
-        {
-            "Lalamove" => CheckoutViewModel.LalamoveFee,
-            "LBC"      => CheckoutViewModel.LBCFee,
-            "Pickup"   => CheckoutViewModel.PickupFee,
-            _          => 0m
-        };
-
-        return Json(ApiResponse.Ok(new
-        {
-            fee,
-            formattedFee = fee == 0 ? "Free" : $"₱{fee:N2}"
-        }));
     }
 
     // =========================================================================

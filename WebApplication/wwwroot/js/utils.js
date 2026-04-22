@@ -45,7 +45,15 @@ function showToast(type, message) {
     toast.setAttribute('role', 'alert');
     toast.innerHTML = icons[safeType] + '<span>' + message + '</span>';
 
-    document.body.appendChild(toast);
+    var container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'fixed top-[80px] right-4 z-[2000] flex flex-col gap-3 pointer-events-none md:right-6';
+        document.body.appendChild(container);
+    }
+    
+    container.appendChild(toast);
 
     setTimeout(function () {
         toast.style.opacity = '0';

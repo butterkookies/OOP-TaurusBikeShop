@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication.BusinessLogic.Interfaces;
+using System.Security.Claims;
 using WebApplication.Models;
 using WebApplication.Models.ViewModels;
 
@@ -15,15 +16,18 @@ namespace WebApplication.Controllers;
 public sealed class HomeController : Controller
 {
     private readonly IProductService _productService;
+    private readonly IWishlistService _wishlistService;
     private readonly ILogger<HomeController> _logger;
 
     private const int FeaturedProductCount = 8;
 
     public HomeController(
         IProductService productService,
+        IWishlistService wishlistService,
         ILogger<HomeController> logger)
     {
         _productService = productService ?? throw new ArgumentNullException(nameof(productService));
+        _wishlistService = wishlistService ?? throw new ArgumentNullException(nameof(wishlistService));
         _logger         = logger         ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -36,8 +40,15 @@ public sealed class HomeController : Controller
     {
         try
         {
+            IReadOnlyCollection<int> wishlistIds = [];
+            string? userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdClaim, out int userId))
+            {
+                wishlistIds = await _wishlistService.GetProductIdsAsync(userId, cancellationToken);
+            }
+
             IReadOnlyList<ProductViewModel> featured =
-                await _productService.GetFeaturedAsync(FeaturedProductCount, cancellationToken);
+                await _productService.GetFeaturedAsync(FeaturedProductCount, wishlistIds, cancellationToken);
 
             return View(featured);
         }

@@ -1837,7 +1837,7 @@ ALTER TABLE [dbo].[Notification]  WITH CHECK ADD  CONSTRAINT [CK_Notif_Status] C
 GO
 ALTER TABLE [dbo].[Notification] CHECK CONSTRAINT [CK_Notif_Status]
 GO
-ALTER TABLE [dbo].[Notification]  WITH CHECK ADD  CONSTRAINT [CK_Notif_Type] CHECK  (([NotifType]='VoucherAssigned' OR [NotifType]='OTPCode' OR [NotifType]='PendingOrderAlert' OR [NotifType]='LowStockAlert' OR [NotifType]='SupportTicketResolved' OR [NotifType]='SupportTicketReply' OR [NotifType]='SupportTicketCreated' OR [NotifType]='WishlistRestock' OR [NotifType]='DeliveryConfirmation' OR [NotifType]='DeliveryDelay' OR [NotifType]='PickupExpiry' OR [NotifType]='ReadyForPickup' OR [NotifType]='TrackingUpdate' OR [NotifType]='PaymentHeld' OR [NotifType]='PaymentRejected' OR [NotifType]='PaymentReceived' OR [NotifType]='OrderConfirmation' OR [NotifType]='WelcomeEmail'))
+ALTER TABLE [dbo].[Notification]  WITH CHECK ADD  CONSTRAINT [CK_Notif_Type] CHECK  (([NotifType]='OrderAutoCancelled' OR [NotifType]='PendingOrderReminder' OR [NotifType]='VoucherAssigned' OR [NotifType]='OTPCode' OR [NotifType]='PendingOrderAlert' OR [NotifType]='LowStockAlert' OR [NotifType]='SupportTicketResolved' OR [NotifType]='SupportTicketReply' OR [NotifType]='SupportTicketCreated' OR [NotifType]='WishlistRestock' OR [NotifType]='DeliveryConfirmation' OR [NotifType]='DeliveryDelay' OR [NotifType]='PickupExpiry' OR [NotifType]='ReadyForPickup' OR [NotifType]='TrackingUpdate' OR [NotifType]='PaymentHeld' OR [NotifType]='PaymentRejected' OR [NotifType]='PaymentReceived' OR [NotifType]='OrderConfirmation' OR [NotifType]='WelcomeEmail'))
 GO
 ALTER TABLE [dbo].[Notification] CHECK CONSTRAINT [CK_Notif_Type]
 GO

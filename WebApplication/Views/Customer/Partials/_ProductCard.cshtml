@@ -1,7 +1,7 @@
 @* WebApplication/Views/Customer/Partials/_ProductCard.cshtml *@
 @model WebApplication.Models.ViewModels.ProductViewModel
 
-<div class="cal-card overflow-hidden group hover:-translate-y-0.5 flex flex-col @(Model.IsOutOfStock ? "opacity-70" : "")" data-product-id="@Model.ProductId">
+<div class="cal-card overflow-hidden group hover:-translate-y-1 hover:shadow-card-hover transition-all duration-300 flex flex-col @(Model.IsOutOfStock ? "opacity-70" : "")" data-product-id="@Model.ProductId">
 
     @* ── Image zone ── *@
     <div class="relative">
@@ -71,7 +71,7 @@
             @if (!Model.IsOutOfStock)
             {
                 <button type="button"
-                        class="btn-dark btn-sm catalog-add-to-cart"
+                        class="btn-dark btn-sm catalog-add-to-cart active:scale-95 transition-transform"
                         data-product-id="@Model.ProductId"
                         aria-label="Add @Model.Name to cart">
                     Add to Cart

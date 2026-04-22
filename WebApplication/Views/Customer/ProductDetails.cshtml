@@ -22,7 +22,7 @@
             @* ==================== IMAGE GALLERY ==================== *@
             <div>
                 @* Main image *@
-                <div class="aspect-square bg-light-gray dark:bg-neutral-900 rounded-2xl overflow-hidden flex items-center justify-center">
+                <div class="aspect-square bg-light-gray dark:bg-neutral-800 rounded-2xl overflow-hidden flex items-center justify-center">
                     @if (Model.PrimaryImageUrl != null)
                     {
                         <img src="@Model.PrimaryImageUrl" alt="@Model.Name"
@@ -169,7 +169,7 @@
                 @if (!Model.IsOutOfStock)
                 {
                     <div id="buy-now-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
-                        <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl max-w-md w-full mx-4 p-8">
+                        <div class="cal-card-static rounded-2xl max-w-md w-full mx-4 p-8">
                             <h3 class="font-display text-xl font-semibold text-charcoal dark:text-white mb-2">Ready to buy?</h3>
                             <p class="text-sm text-mid-gray mb-6">
                                 <strong class="text-charcoal dark:text-white">@Model.Name</strong> will be added to your cart.
@@ -179,7 +179,7 @@
                                     Proceed to Checkout
                                 </button>
                                 <a asp-controller="Product" asp-action="List"
-                                   class="btn-lg w-full text-center font-semibold rounded-lg border border-border-ring dark:border-white/15 text-charcoal dark:text-white hover:bg-light-gray dark:hover:bg-white/5 transition-colors">
+                                   class="btn-lg flex items-center justify-center w-full font-semibold rounded-lg border border-border-ring dark:border-white/15 text-charcoal dark:text-white hover:bg-light-gray dark:hover:bg-white/5 transition-colors">
                                     Continue Browsing
                                 </a>
                             </div>

@@ -30,19 +30,19 @@ public sealed class CheckoutViewModel
     public IReadOnlyList<Address> SavedAddresses { get; set; } = [];
 
     /// <summary>
-    /// Delivery method chosen by the customer.
-    /// Values: "Lalamove", "LBC", "Pickup".
+    /// Fulfilment method chosen by the customer.
+    /// Values: "Delivery", "Pickup".
+    /// The specific courier (Lalamove vs LBC) is auto-assigned server-side
+    /// based on the delivery address province.
     /// </summary>
     [Required(ErrorMessage = "Please select a delivery method.")]
     [Display(Name = "Delivery Method")]
     public string DeliveryMethod { get; set; } = string.Empty;
 
     /// <summary>
-    /// Estimated shipping fee for the selected delivery method.
-    /// Displayed read-only — not editable by customer.
-    /// Set by <c>CheckoutController</c> based on <see cref="DeliveryMethod"/>.
+    /// Always ₱0 in the online payment — shipping is paid to the courier directly.
     /// </summary>
-    public decimal ShippingFee { get; set; }
+    public decimal ShippingFee => 0m;
 
     // -------------------------------------------------------------------------
     // Payment
@@ -86,32 +86,25 @@ public sealed class CheckoutViewModel
     /// <summary>Cart items for the read-only order summary sidebar.</summary>
     public IReadOnlyList<CartItemViewModel> CartItems { get; set; } = [];
 
-    /// <summary>Cart subtotal before discount and shipping.</summary>
+    /// <summary>Cart subtotal before discount. Shipping is excluded (paid to courier).</summary>
     public decimal SubTotal { get; set; }
 
     /// <summary>Formatted subtotal string.</summary>
     public string FormattedSubTotal => $"₱{SubTotal:N2}";
 
-    /// <summary>Formatted shipping fee string.</summary>
+    /// <summary>
+    /// Shipping display label — "Free" for Pickup, "Paid to courier" for Delivery.
+    /// </summary>
     public string FormattedShippingFee =>
-        ShippingFee == 0 ? "TBD" : $"₱{ShippingFee:N2}";
+        DeliveryMethod == "Pickup" ? "Free" : "Paid to courier";
 
-    /// <summary>Grand total: SubTotal − DiscountAmount + ShippingFee.</summary>
-    public decimal GrandTotal => SubTotal - DiscountAmount + ShippingFee;
+    /// <summary>
+    /// Grand total for online payment: SubTotal − DiscountAmount only.
+    /// Shipping is excluded — paid directly to the courier.
+    /// </summary>
+    public decimal GrandTotal => SubTotal - DiscountAmount;
 
     /// <summary>Formatted grand total string.</summary>
     public string FormattedGrandTotal => $"₱{GrandTotal:N2}";
 
-    // -------------------------------------------------------------------------
-    // Shipping fee table (constants used by controller and view)
-    // -------------------------------------------------------------------------
-
-    /// <summary>Lalamove base shipping fee (PHP).</summary>
-    public const decimal LalamoveFee = 150m;
-
-    /// <summary>LBC base shipping fee (PHP).</summary>
-    public const decimal LBCFee = 120m;
-
-    /// <summary>In-store pickup — no shipping fee.</summary>
-    public const decimal PickupFee = 0m;
 }

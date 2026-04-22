@@ -33,6 +33,12 @@ namespace AdminSystem_v2.Repositories
         public async Task<IEnumerable<Order>> GetOrdersAsync(string? statusFilter = null,
                                                               string? typeFilter = null)
         {
+            // Statuses that imply a specific delivery type override any passed typeFilter
+            if (statusFilter == OrderStatuses.ReadyForPickup || statusFilter == OrderStatuses.PickedUp)
+                typeFilter = OrderTypes.Pickup;
+            else if (statusFilter == OrderStatuses.OutForDelivery || statusFilter == OrderStatuses.Delivered)
+                typeFilter = OrderTypes.Delivery;
+
             bool applyStatusFilter = !string.IsNullOrEmpty(statusFilter)
                                   && statusFilter != "All";
             bool applyTypeFilter   = !string.IsNullOrEmpty(typeFilter)
@@ -285,10 +291,18 @@ namespace AdminSystem_v2.Repositories
         public async Task<Dictionary<string, int>> GetStatusCountsAsync()
         {
             const string sql =
-                @"SELECT OrderStatus, COUNT(*) AS Cnt
-                  FROM [Order]
-                  WHERE IsWalkIn = 0
-                  GROUP BY OrderStatus";
+                @"SELECT
+                      o.OrderStatus,
+                      COUNT(*) AS Cnt
+                  FROM [Order] o
+                  LEFT JOIN PickupOrder po ON o.OrderId = po.OrderId
+                  WHERE o.IsWalkIn = 0
+                    AND (
+                        (o.OrderStatus IN ('ReadyForPickup', 'PickedUp') AND po.PickupOrderId IS NOT NULL)
+                        OR (o.OrderStatus IN ('OutForDelivery', 'Delivered') AND po.PickupOrderId IS NULL)
+                        OR (o.OrderStatus NOT IN ('ReadyForPickup', 'PickedUp', 'OutForDelivery', 'Delivered'))
+                    )
+                  GROUP BY o.OrderStatus";
 
             await using var conn = GetConnection();
             var rows = await conn.QueryAsync<StatusCountRow>(sql);

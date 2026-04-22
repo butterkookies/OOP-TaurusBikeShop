@@ -407,29 +407,36 @@ namespace AdminSystem_v2.ViewModels
             int total = counts.Values.Sum();
             StatusBadges = new List<StatusBadge>
             {
-                Badge("All",                              "All Orders",          total,                                                          0x37,0x41,0x51, 0xD1,0xD5,0xDB),
-                Badge(OrderStatuses.Pending,              "Pending",             counts.GetValueOrDefault(OrderStatuses.Pending),                 0x29,0x21,0x00, 0xF5,0x9E,0x0B),
-                Badge(OrderStatuses.PaymentVerification,  "Payment Verification",counts.GetValueOrDefault(OrderStatuses.PaymentVerification),     0x2D,0x1A,0x00, 0xFB,0x92,0x3C),
-                Badge(OrderStatuses.Processing,           "Processing",          counts.GetValueOrDefault(OrderStatuses.Processing),              0x1F,0x12,0x00, 0xF9,0x73,0x16),
-                Badge(OrderStatuses.OnHold,               "On Hold",             counts.GetValueOrDefault(OrderStatuses.OnHold),                  0x1A,0x10,0x2E, 0xC0,0x84,0xFC),
-                Badge(OrderStatuses.ReadyForPickup,       "Ready for Pickup",    counts.GetValueOrDefault(OrderStatuses.ReadyForPickup),          0x0F,0x1E,0x3D, 0x60,0xA5,0xFA),
-                Badge(OrderStatuses.PickedUp,             "Picked Up",           counts.GetValueOrDefault(OrderStatuses.PickedUp),                0x0A,0x1F,0x0E, 0x34,0xD3,0x99),
-                Badge(OrderStatuses.OutForDelivery,       "Out for Delivery",    counts.GetValueOrDefault(OrderStatuses.OutForDelivery),           0x1A,0x0A,0x3D, 0xA7,0x8B,0xFA),
-                Badge(OrderStatuses.Delivered,            "Delivered",           counts.GetValueOrDefault(OrderStatuses.Delivered),               0x0A,0x1F,0x0E, 0x34,0xD3,0x99),
-                Badge(OrderStatuses.Cancelled,            "Cancelled",           counts.GetValueOrDefault(OrderStatuses.Cancelled),               0x1F,0x00,0x00, 0xF8,0x71,0x71),
+                // All Orders: Neutral (#9CA3AF)
+                Badge("All", "All Orders", total, 0x9C, 0xA3, 0xAF),
+                
+                // Attention: Soft Orange (#F6AD55)
+                Badge(OrderStatuses.Pending, "Pending", counts.GetValueOrDefault(OrderStatuses.Pending), 0xF6, 0xAD, 0x55),
+                Badge(OrderStatuses.PaymentVerification, "Payment Verification", counts.GetValueOrDefault(OrderStatuses.PaymentVerification), 0xF6, 0xAD, 0x55),
+                Badge(OrderStatuses.OnHold, "On Hold", counts.GetValueOrDefault(OrderStatuses.OnHold), 0xF6, 0xAD, 0x55),
+                
+                // In Progress: Light Blue (#63B3ED)
+                Badge(OrderStatuses.Processing, "Processing", counts.GetValueOrDefault(OrderStatuses.Processing), 0x63, 0xB3, 0xED),
+                Badge(OrderStatuses.ReadyForPickup, "Ready for Pickup", counts.GetValueOrDefault(OrderStatuses.ReadyForPickup), 0x63, 0xB3, 0xED),
+                Badge(OrderStatuses.OutForDelivery, "Out for Delivery", counts.GetValueOrDefault(OrderStatuses.OutForDelivery), 0x63, 0xB3, 0xED),
+                
+                // Success: Soft Green (#68D391)
+                Badge(OrderStatuses.PickedUp, "Picked Up", counts.GetValueOrDefault(OrderStatuses.PickedUp), 0x68, 0xD3, 0x91),
+                Badge(OrderStatuses.Delivered, "Delivered", counts.GetValueOrDefault(OrderStatuses.Delivered), 0x68, 0xD3, 0x91),
+                
+                // Danger: Soft Red (#FC8181)
+                Badge(OrderStatuses.Cancelled, "Cancelled", counts.GetValueOrDefault(OrderStatuses.Cancelled), 0xFC, 0x81, 0x81),
             };
         }
 
         private static StatusBadge Badge(
             string label, string display, int count,
-            byte bgR, byte bgG, byte bgB,
-            byte fgR, byte fgG, byte fgB) => new()
+            byte accR, byte accG, byte accB) => new()
         {
             Label        = label,
             DisplayLabel = display,
             Count        = count,
-            Background   = new SolidColorBrush(Color.FromRgb(bgR, bgG, bgB)),
-            Foreground   = new SolidColorBrush(Color.FromRgb(fgR, fgG, fgB)),
+            AccentColor  = new SolidColorBrush(Color.FromRgb(accR, accG, accB))
         };
 
         // ── Order detail loading ──────────────────────────────────────────────

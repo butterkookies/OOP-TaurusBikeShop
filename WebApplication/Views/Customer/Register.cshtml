@@ -25,7 +25,7 @@
             @if (!ViewData.ModelState.IsValid)
             {
                 <div class="mb-6 p-3 bg-error/10 border border-error/20 rounded-lg text-sm text-error" role="alert">
-                    <div asp-validation-summary="All"></div>
+                    <div asp-validation-summary="ModelOnly"></div>
                 </div>
             }
 
@@ -38,25 +38,33 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label asp-for="FirstName" class="cal-label">First Name</label>
-                            <input asp-for="FirstName" class="cal-input" autocomplete="given-name" placeholder="Juan" />
-                            <span asp-validation-for="FirstName" class="cal-field-error"></span>
+                            <input asp-for="FirstName" class="cal-input" autocomplete="given-name" placeholder="Juan"
+                                   aria-invalid="@(ViewData.ModelState["FirstName"]?.Errors.Count > 0 ? "true" : "false")"
+                                   aria-describedby="FirstName-error" />
+                            <span asp-validation-for="FirstName" id="FirstName-error" role="alert" class="cal-field-error"></span>
                         </div>
                         <div>
                             <label asp-for="LastName" class="cal-label">Last Name</label>
-                            <input asp-for="LastName" class="cal-input" autocomplete="family-name" placeholder="Dela Cruz" />
-                            <span asp-validation-for="LastName" class="cal-field-error"></span>
+                            <input asp-for="LastName" class="cal-input" autocomplete="family-name" placeholder="Dela Cruz"
+                                   aria-invalid="@(ViewData.ModelState["LastName"]?.Errors.Count > 0 ? "true" : "false")"
+                                   aria-describedby="LastName-error" />
+                            <span asp-validation-for="LastName" id="LastName-error" role="alert" class="cal-field-error"></span>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                         <div>
                             <label asp-for="Email" class="cal-label">Email Address</label>
-                            <input asp-for="Email" class="cal-input" type="email" autocomplete="email" placeholder="you@example.com" />
-                            <span asp-validation-for="Email" class="cal-field-error"></span>
+                            <input asp-for="Email" class="cal-input" type="email" autocomplete="email" placeholder="you@example.com"
+                                   aria-invalid="@(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "true" : "false")"
+                                   aria-describedby="Email-error" />
+                            <span asp-validation-for="Email" id="Email-error" role="alert" class="cal-field-error"></span>
                         </div>
                         <div>
                             <label asp-for="PhoneNumber" class="cal-label">Phone Number</label>
-                            <input asp-for="PhoneNumber" class="cal-input" type="tel" autocomplete="tel" placeholder="09XXXXXXXXX" />
-                            <span asp-validation-for="PhoneNumber" class="cal-field-error"></span>
+                            <input asp-for="PhoneNumber" class="cal-input" type="tel" autocomplete="tel" placeholder="09XXXXXXXXX"
+                                   aria-invalid="@(ViewData.ModelState["PhoneNumber"]?.Errors.Count > 0 ? "true" : "false")"
+                                   aria-describedby="PhoneNumber-error" />
+                            <span asp-validation-for="PhoneNumber" id="PhoneNumber-error" role="alert" class="cal-field-error"></span>
                         </div>
                     </div>
                 </fieldset>
@@ -66,25 +74,33 @@
                     <legend class="font-display text-base font-semibold text-charcoal dark:text-white mb-4" style="letter-spacing:0.2px">Default Shipping Address</legend>
                     <div class="mb-4">
                         <label asp-for="Street" class="cal-label">Street Address</label>
-                        <input asp-for="Street" class="cal-input" autocomplete="street-address" placeholder="House no., Street, Barangay" />
-                        <span asp-validation-for="Street" class="cal-field-error"></span>
+                        <input asp-for="Street" class="cal-input" autocomplete="street-address" placeholder="House no., Street, Barangay"
+                               aria-invalid="@(ViewData.ModelState["Street"]?.Errors.Count > 0 ? "true" : "false")"
+                               aria-describedby="Street-error" />
+                        <span asp-validation-for="Street" id="Street-error" role="alert" class="cal-field-error"></span>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-[1fr_100px_1fr] gap-4">
                         <div class="col-span-2 sm:col-span-1">
                             <label asp-for="City" class="cal-label">City / Municipality</label>
-                            <input asp-for="City" class="cal-input" autocomplete="address-level2" placeholder="Manila" />
-                            <span asp-validation-for="City" class="cal-field-error"></span>
+                            <input asp-for="City" class="cal-input" autocomplete="address-level2" placeholder="Manila"
+                                   aria-invalid="@(ViewData.ModelState["City"]?.Errors.Count > 0 ? "true" : "false")"
+                                   aria-describedby="City-error" />
+                            <span asp-validation-for="City" id="City-error" role="alert" class="cal-field-error"></span>
                         </div>
                         <div>
                             <label asp-for="PostalCode" class="cal-label">Postal Code</label>
                             <input asp-for="PostalCode" class="cal-input" autocomplete="postal-code" placeholder="1000"
                                    maxlength="4" pattern="\d{4}" inputmode="numeric"
+                                   aria-invalid="@(ViewData.ModelState["PostalCode"]?.Errors.Count > 0 ? "true" : "false")"
+                                   aria-describedby="PostalCode-hint PostalCode-error"
                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)" />
-                            <span asp-validation-for="PostalCode" class="cal-field-error"></span>
+                            <span id="PostalCode-hint" class="sr-only">4-digit Philippine postal code</span>
+                            <span asp-validation-for="PostalCode" id="PostalCode-error" role="alert" class="cal-field-error"></span>
                         </div>
                         <div>
                             <label asp-for="Province" class="cal-label">Province <span class="cal-label-opt">(optional)</span></label>
-                            <input asp-for="Province" class="cal-input" autocomplete="address-level1" placeholder="Metro Manila" />
+                            <input asp-for="Province" class="cal-input" autocomplete="address-level1" placeholder="Metro Manila"
+                                   aria-invalid="@(ViewData.ModelState["Province"]?.Errors.Count > 0 ? "true" : "false")" />
                         </div>
                     </div>
                 </fieldset>
@@ -95,13 +111,36 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label asp-for="Password" class="cal-label">Password</label>
-                            <input asp-for="Password" class="cal-input" type="password" autocomplete="new-password" placeholder="Minimum 8 characters" />
-                            <span asp-validation-for="Password" class="cal-field-error"></span>
+                            <div class="relative">
+                                <input asp-for="Password" class="cal-input pr-11" type="password" autocomplete="new-password" placeholder="Minimum 8 characters"
+                                       id="register-password-input"
+                                       aria-invalid="@(ViewData.ModelState["Password"]?.Errors.Count > 0 ? "true" : "false")"
+                                       aria-describedby="Password-hint Password-error" />
+                                <button type="button"
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white"
+                                        aria-label="Show password" aria-pressed="false" data-target="register-password-input"
+                                        onclick="(function(b){var i=document.getElementById(b.dataset.target);if(!i)return;var show=i.type==='password';i.type=show?'text':'password';b.setAttribute('aria-pressed',show?'true':'false');b.setAttribute('aria-label',show?'Hide password':'Show password');})(this)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </button>
+                            </div>
+                            <span id="Password-hint" class="sr-only">Minimum 8 characters</span>
+                            <span asp-validation-for="Password" id="Password-error" role="alert" class="cal-field-error"></span>
                         </div>
                         <div>
                             <label asp-for="ConfirmPassword" class="cal-label">Confirm Password</label>
-                            <input asp-for="ConfirmPassword" class="cal-input" type="password" autocomplete="new-password" placeholder="Repeat your password" />
-                            <span asp-validation-for="ConfirmPassword" class="cal-field-error"></span>
+                            <div class="relative">
+                                <input asp-for="ConfirmPassword" class="cal-input pr-11" type="password" autocomplete="new-password" placeholder="Repeat your password"
+                                       id="register-confirm-password-input"
+                                       aria-invalid="@(ViewData.ModelState["ConfirmPassword"]?.Errors.Count > 0 ? "true" : "false")"
+                                       aria-describedby="ConfirmPassword-error" />
+                                <button type="button"
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white"
+                                        aria-label="Show password" aria-pressed="false" data-target="register-confirm-password-input"
+                                        onclick="(function(b){var i=document.getElementById(b.dataset.target);if(!i)return;var show=i.type==='password';i.type=show?'text':'password';b.setAttribute('aria-pressed',show?'true':'false');b.setAttribute('aria-label',show?'Hide password':'Show password');})(this)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </button>
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" id="ConfirmPassword-error" role="alert" class="cal-field-error"></span>
                         </div>
                     </div>
                 </fieldset>

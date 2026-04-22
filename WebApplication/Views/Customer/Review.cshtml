@@ -85,8 +85,11 @@
 
                         @* Star rating *@
                         <div class="mb-6">
-                            <p class="cal-label mb-3">Your Rating</p>
-                            <div class="cal-star-picker" id="starSelector" role="radiogroup" aria-label="Rate this product from 1 to 5 stars">
+                            <p class="cal-label mb-3" id="ratingGroupLabel">Your Rating</p>
+                            <div class="cal-star-picker" id="starSelector" role="radiogroup"
+                                 aria-labelledby="ratingGroupLabel"
+                                 aria-invalid="false"
+                                 aria-describedby="ratingLabel">
                                 @for (int i = 5; i >= 1; i--)
                                 {
                                     <input type="radio" id="star@(i)" name="Rating" value="@i" class="cal-star-picker__input" required />
@@ -104,10 +107,13 @@
                             <textarea class="cal-input cal-textarea" id="comment" name="Comment" rows="5"
                                       maxlength="1000"
                                       placeholder="Describe the quality, fit, performance, and anything else riders should know…"
-                                      required></textarea>
+                                      required
+                                      aria-invalid="false"
+                                      aria-describedby="charCountLabel comment-error"></textarea>
                             <div class="flex justify-end mt-1">
-                                <span class="text-xs text-mid-gray"><span id="charCount">0</span> / 1000</span>
+                                <span class="text-xs text-mid-gray" id="charCountLabel" aria-live="polite"><span id="charCount">0</span> / 1000</span>
                             </div>
+                            <span id="comment-error" role="alert" class="cal-field-error"></span>
                         </div>
 
                         <button type="submit" class="btn-dark btn-lg" id="submitBtn">
@@ -208,15 +214,45 @@
     }
 
     /* Submit: validation */
-    var reviewForm = document.getElementById('reviewForm');
-    var submitBtn  = document.getElementById('submitBtn');
+    var reviewForm  = document.getElementById('reviewForm');
+    var submitBtn   = document.getElementById('submitBtn');
+    var starGroup   = document.getElementById('starSelector');
+    var commentEl   = document.getElementById('comment');
+    var commentErr  = document.getElementById('comment-error');
+
+    radios.forEach(function (r) {
+        r.addEventListener('change', function () {
+            if (starGroup) starGroup.setAttribute('aria-invalid', 'false');
+        });
+    });
+    if (commentEl && commentErr) {
+        commentEl.addEventListener('input', function () {
+            if (this.value.trim().length > 0) {
+                this.setAttribute('aria-invalid', 'false');
+                commentErr.textContent = '';
+            }
+        });
+    }
+
     if (reviewForm && submitBtn) {
         reviewForm.addEventListener('submit', function (e) {
             var selected = document.querySelector('#starSelector input[type="radio"]:checked');
+            var commentOk = commentEl && commentEl.value.trim().length > 0;
+            var firstInvalid = null;
             if (!selected) {
-                e.preventDefault();
+                if (starGroup) starGroup.setAttribute('aria-invalid', 'true');
                 if (ratingLabel) ratingLabel.textContent = 'Please select a star rating to continue.';
-                document.getElementById('starSelector').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstInvalid = firstInvalid || starGroup;
+            }
+            if (!commentOk) {
+                if (commentEl) commentEl.setAttribute('aria-invalid', 'true');
+                if (commentErr) commentErr.textContent = 'Please share a few words about your experience.';
+                firstInvalid = firstInvalid || commentEl;
+            }
+            if (firstInvalid) {
+                e.preventDefault();
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (firstInvalid.focus) firstInvalid.focus({ preventScroll: true });
             }
         });
     }

@@ -132,7 +132,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <!-- Borderless button wrapper — the styled Border is the visible pill -->
+                            <!-- Borderless button wrapper -->
                             <Button Command="{Binding DataContext.SelectStatusCommand,
                                               RelativeSource={RelativeSource AncestorType=UserControl}}"
                                     CommandParameter="{Binding Label}"
@@ -144,14 +144,19 @@
                                         <ContentPresenter/>
                                     </ControlTemplate>
                                 </Button.Template>
-                                <Border CornerRadius="8" Padding="12,7"
-                                        Background="{Binding Background}">
+                                
+                                <Border CornerRadius="18" Padding="12,0" Height="36">
                                     <Border.Style>
                                         <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#242D40"/>
                                             <Setter Property="BorderThickness" Value="1"/>
-                                            <Setter Property="BorderBrush"     Value="Transparent"/>
+                                            <Setter Property="BorderBrush" Value="Transparent"/>
+                                            <!-- Mute opacity if Count is 0 -->
                                             <Style.Triggers>
-                                                <!-- Highlight the active filter -->
+                                                <DataTrigger Binding="{Binding Count}" Value="0">
+                                                    <Setter Property="Opacity" Value="0.6"/>
+                                                </DataTrigger>
+                                                <!-- Highlight active filter -->
                                                 <DataTrigger Value="True">
                                                     <DataTrigger.Binding>
                                                         <MultiBinding Converter="{StaticResource EqualityConverter}">
@@ -160,20 +165,56 @@
                                                             <Binding Path="Label"/>
                                                         </MultiBinding>
                                                     </DataTrigger.Binding>
-                                                    <Setter Property="BorderBrush" Value="White"/>
+                                                    <Setter Property="Background" Value="#313B53"/>
+                                                    <Setter Property="BorderBrush" Value="#4B5563"/>
                                                 </DataTrigger>
+                                                <!-- Hover effect if not active -->
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Background" Value="#2C364C"/>
+                                                </MultiDataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Border.Style>
+                                    
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding DisplayLabel}"
-                                                   Foreground="{Binding Foreground}"
-                                                   FontSize="12" FontWeight="SemiBold"
-                                                   VerticalAlignment="Center"/>
-                                        <Border CornerRadius="6" Padding="6,2" Margin="7,0,0,0"
-                                                Background="#22FFFFFF">
+                                        <!-- Semantic Accent Dot -->
+                                        <Ellipse Width="6" Height="6" Fill="{Binding AccentColor}" 
+                                                 VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                                 
+                                        <!-- Label text -->
+                                        <TextBlock Text="{Binding DisplayLabel}" FontSize="12" FontWeight="SemiBold"
+                                                   VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#A0AEC0"/>
+                                                    <Style.Triggers>
+                                                        <!-- Active filter text -->
+                                                        <DataTrigger Value="True">
+                                                            <DataTrigger.Binding>
+                                                                <MultiBinding Converter="{StaticResource EqualityConverter}">
+                                                                    <Binding Path="DataContext.SelectedStatusFilter"
+                                                                             RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                                    <Binding Path="Label"/>
+                                                                </MultiBinding>
+                                                            </DataTrigger.Binding>
+                                                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        
+                                        <!-- Badge Count -->
+                                        <Border CornerRadius="4" Padding="6,2" Margin="6,0,0,0"
+                                                VerticalAlignment="Center">
+                                            <Border.Background>
+                                                <SolidColorBrush Color="{Binding AccentColor.Color}" Opacity="0.15"/>
+                                            </Border.Background>
                                             <TextBlock Text="{Binding Count}"
-                                                       Foreground="{Binding Foreground}"
+                                                       Foreground="{Binding AccentColor}"
                                                        FontSize="11" FontWeight="Bold"
                                                        VerticalAlignment="Center"/>
                                         </Border>
@@ -195,6 +236,82 @@
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Order Type:" Foreground="#6B7280" FontSize="12"
                            VerticalAlignment="Center" Margin="0,0,12,0"/>
+
+                <!-- All -->
+                <Button Command="{Binding SelectTypeCommand}" CommandParameter="All"
+                        Background="Transparent" BorderThickness="0" Cursor="Hand"
+                        Padding="0" Margin="0,0,6,0" FocusVisualStyle="{x:Null}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <ContentPresenter/>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <Border CornerRadius="6" Padding="12,6">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#1A2234"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <MultiBinding Converter="{StaticResource EqualityConverter}">
+                                                <Binding Path="DataContext.SelectedTypeFilter"
+                                                         RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                <Binding Source="All"/>
+                                            </MultiBinding>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="BorderBrush" Value="#9CA3AF"/>
+                                        <Setter Property="Background" Value="#374151"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8" Fill="#9CA3AF" Margin="0,0,6,0"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Text="All" Foreground="#D1D5DB" FontSize="12" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
+                </Button>
+
+                <!-- Delivery -->
+                <Button Command="{Binding SelectTypeCommand}" CommandParameter="Delivery"
+                        Background="Transparent" BorderThickness="0" Cursor="Hand"
+                        Padding="0" Margin="0,0,6,0" FocusVisualStyle="{x:Null}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <ContentPresenter/>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <Border CornerRadius="6" Padding="12,6">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#1A2234"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <MultiBinding Converter="{StaticResource EqualityConverter}">
+                                                <Binding Path="DataContext.SelectedTypeFilter"
+                                                         RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                <Binding Source="Delivery"/>
+                                            </MultiBinding>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="BorderBrush" Value="#93C5FD"/>
+                                        <Setter Property="Background" Value="#1E3A5F"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8" Fill="#93C5FD" Margin="0,0,6,0"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Text="Delivery" Foreground="#D1D5DB" FontSize="12" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
+                </Button>
 
                 <!-- Pickup -->
                 <Button Command="{Binding SelectTypeCommand}" CommandParameter="Pickup"

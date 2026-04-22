@@ -22,5 +22,8 @@ namespace AdminSystem_v2.ViewModels
 
         /// <summary>Badge text and border-highlight brush.</summary>
         public Brush Foreground    { get; init; } = Brushes.Gray;
+
+        /// <summary>Semantic accent color (used for the dot and number badge).</summary>
+        public Brush AccentColor   { get; init; } = Brushes.Gray;
     }
 }

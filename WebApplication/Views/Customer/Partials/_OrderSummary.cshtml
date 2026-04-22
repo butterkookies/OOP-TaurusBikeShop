@@ -34,19 +34,17 @@
             <span class="text-success" id="checkout-discount-row">−₱@Model.DiscountAmount.ToString("N2")</span>
         </div>
 
-        <div class="flex justify-between">
+        <div class="flex justify-between" id="checkout-shipping-row">
             <span class="text-mid-gray">Shipping</span>
-            <span class="text-charcoal dark:text-white" id="checkout-shipping-fee">
-                @(Model.ShippingFee > 0 ? $"₱{Model.ShippingFee:N2}" : "TBD")
-            </span>
+            <span class="text-mid-gray italic" id="checkout-shipping-fee">@Model.FormattedShippingFee</span>
         </div>
     </div>
 
     <hr class="cal-divider" />
 
     <div class="flex justify-between text-base font-semibold">
-        <span class="text-charcoal dark:text-white">Total</span>
-        <span class="font-display text-charcoal dark:text-white" id="checkout-grand-total-row">@Model.FormattedSubTotal</span>
+        <span class="text-charcoal dark:text-white">Total (excl. shipping)</span>
+        <span class="font-display text-charcoal dark:text-white" id="checkout-grand-total-row">@Model.FormattedGrandTotal</span>
     </div>
 
     <p class="text-xs text-mid-gray text-center mt-4">GCash &bull; Bank Transfer</p>

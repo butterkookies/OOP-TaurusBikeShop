@@ -23,7 +23,7 @@
             @if (!ViewData.ModelState.IsValid)
             {
                 <div class="mb-6 p-3 bg-error/10 border border-error/20 rounded-lg text-sm text-error" role="alert">
-                    <div asp-validation-summary="All"></div>
+                    <div asp-validation-summary="ModelOnly"></div>
                 </div>
             }
 
@@ -38,8 +38,10 @@
                            class="cal-input"
                            type="email"
                            autocomplete="email"
-                           placeholder="you@example.com" />
-                    <span asp-validation-for="Email" class="cal-field-error"></span>
+                           placeholder="you@example.com"
+                           aria-invalid="@(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "true" : "false")"
+                           aria-describedby="Email-error" />
+                    <span asp-validation-for="Email" id="Email-error" role="alert" class="cal-field-error"></span>
                 </div>
 
                 <div class="mb-6">
@@ -50,16 +52,19 @@
                                type="password"
                                autocomplete="current-password"
                                placeholder="Enter your password"
-                               id="password-input" />
+                               id="password-input"
+                               aria-invalid="@(ViewData.ModelState["Password"]?.Errors.Count > 0 ? "true" : "false")"
+                               aria-describedby="Password-error" />
                         <button type="button"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-mid-gray hover:text-charcoal transition-colors dark:hover:text-white"
-                                aria-label="Toggle password visibility"
+                                aria-label="Show password"
+                                aria-pressed="false"
                                 data-target="password-input"
-                                onclick="(function(b){var i=document.getElementById(b.dataset.target);if(i){i.type=i.type==='password'?'text':'password'}})(this)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                onclick="(function(b){var i=document.getElementById(b.dataset.target);if(!i)return;var show=i.type==='password';i.type=show?'text':'password';b.setAttribute('aria-pressed',show?'true':'false');b.setAttribute('aria-label',show?'Hide password':'Show password');})(this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
-                    <span asp-validation-for="Password" class="cal-field-error"></span>
+                    <span asp-validation-for="Password" id="Password-error" role="alert" class="cal-field-error"></span>
                 </div>
 
                 <button type="submit" class="btn-dark btn-full">

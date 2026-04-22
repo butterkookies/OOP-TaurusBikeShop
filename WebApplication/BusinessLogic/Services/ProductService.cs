@@ -133,13 +133,14 @@ public sealed class ProductService : IProductService
     /// <inheritdoc/>
     public async Task<IReadOnlyList<ProductViewModel>> GetFeaturedAsync(
         int count,
+        IReadOnlyCollection<int> wishlistProductIds,
         CancellationToken cancellationToken = default)
     {
         IReadOnlyList<Product> products =
             await _productRepo.GetFeaturedAsync(count, cancellationToken);
 
         return products
-            .Select(p => MapToViewModel(p, []))
+            .Select(p => MapToViewModel(p, wishlistProductIds))
             .ToList()
             .AsReadOnly();
     }

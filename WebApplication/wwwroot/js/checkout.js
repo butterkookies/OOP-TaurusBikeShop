@@ -13,12 +13,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ── Pickup details panel toggle ────────────────────────
+    // ── Pickup details / Courier info panel toggle ─────────
     var pickupDetails = document.getElementById('pickup-details');
-    if (pickupDetails) {
+    var courierInfo   = document.getElementById('courier-info');
+    if (pickupDetails || courierInfo) {
         document.querySelectorAll('input[name="DeliveryMethod"]').forEach(function (radio) {
             radio.addEventListener('change', function () {
-                pickupDetails.style.display = radio.value === 'Pickup' && radio.checked ? 'block' : 'none';
+                var isPickup = radio.value === 'Pickup' && radio.checked;
+                if (pickupDetails) pickupDetails.style.display = isPickup ? 'block' : 'none';
+                if (courierInfo)   courierInfo.style.display   = isPickup ? 'none'  : 'block';
             });
         });
     }

@@ -794,21 +794,26 @@
 
   /* ═══════ TOAST / NOTIFICATION ═══════ */
   .cal-toast {
-    position: fixed;
-    top: 80px;
-    right: 16px;
-    z-index: 2000;
+    position: relative;
     background: #ffffff;
-    border-radius: 12px;
-    box-shadow: var(--shadow-card);
-    padding: 14px 20px;
-    max-width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 12px 16px;
+    width: 320px;
     display: flex;
     align-items: center;
     gap: 10px;
     font-size: 14px;
+    font-weight: 500;
     color: #242424;
-    animation: toastIn 0.3s ease-out;
+    animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: auto;
+  }
+
+  .dark .cal-toast {
+    background: #1c1c1c;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .cal-toast--success {

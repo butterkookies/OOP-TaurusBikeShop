@@ -7,24 +7,26 @@
     string? toastInfo    = TempData["info"]    as string;
 }
 
+<div id="toast-container" class="fixed top-[80px] right-4 z-[2000] flex flex-col gap-3 pointer-events-none md:right-6">
 @if (!string.IsNullOrEmpty(toastError))
 {
-    <div class="cal-toast cal-toast--error" data-autodismiss="6000" role="alert">
+    <div class="cal-toast cal-toast--error transition-all duration-300 ease-out pointer-events-auto" data-autodismiss="5000" role="alert">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
         <span>@toastError</span>
     </div>
 }
 @if (!string.IsNullOrEmpty(toastSuccess))
 {
-    <div class="cal-toast cal-toast--success" data-autodismiss="5000" role="alert">
+    <div class="cal-toast cal-toast--success transition-all duration-300 ease-out pointer-events-auto" data-autodismiss="5000" role="alert">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         <span>@toastSuccess</span>
     </div>
 }
 @if (!string.IsNullOrEmpty(toastInfo))
 {
-    <div class="cal-toast cal-toast--info" data-autodismiss="5000" role="alert">
+    <div class="cal-toast cal-toast--info transition-all duration-300 ease-out pointer-events-auto" data-autodismiss="5000" role="alert">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
         <span>@toastInfo</span>
     </div>
 }
+</div>
