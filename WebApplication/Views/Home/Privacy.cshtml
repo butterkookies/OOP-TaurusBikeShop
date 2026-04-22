@@ -3,54 +3,74 @@
     ViewData["Title"] = "Privacy Policy";
 }
 
-<div class="container tbs-legal-page">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <h1 class="tbs-legal-page__title">Privacy Policy</h1>
-            <p class="tbs-legal-page__date">Last updated: @DateTime.Now.Year</p>
+<section class="min-h-screen bg-white dark:bg-midnight pt-32 pb-24">
+    <div class="max-w-[800px] mx-auto px-6">
+        
+        <div class="mb-16 border-b border-charcoal/10 dark:border-white/10 pb-8" data-reveal>
+            <h1 class="font-display text-4xl md:text-5xl font-semibold text-charcoal dark:text-white tracking-tight">
+                Privacy Policy
+            </h1>
+            <p class="text-sm font-medium tracking-widest uppercase text-mid-gray mt-4">
+                Last updated: @DateTime.Now.Year
+            </p>
+        </div>
 
-            <section class="tbs-legal-page__section">
-                <h2>Information We Collect</h2>
-                <p>
+        <div class="flex flex-col gap-12" data-reveal="delay-1">
+            <section>
+                <h2 class="font-display text-2xl font-semibold text-charcoal dark:text-white mb-4">
+                    1. Information We Collect
+                </h2>
+                <p class="text-lg text-mid-gray leading-relaxed">
                     When you register or place an order, we collect your name, email address,
                     phone number, and shipping address. Payment transactions are processed
-                    via GCash or bank transfer — we do not store card details.
+                    via GCash or bank transfer — we do not store any card details.
                 </p>
             </section>
 
-            <section class="tbs-legal-page__section">
-                <h2>How We Use Your Information</h2>
-                <p>
-                    Your information is used to process orders, send order confirmations and
-                    delivery updates, respond to support requests, and improve our service.
-                    We do not sell your personal data to third parties.
+            <section>
+                <h2 class="font-display text-2xl font-semibold text-charcoal dark:text-white mb-4">
+                    2. How We Use Your Information
+                </h2>
+                <p class="text-lg text-mid-gray leading-relaxed">
+                    Your information is carefully used to process orders, send order confirmations, provide
+                    live delivery updates, respond to support requests, and improve our service.
+                    We strictly do not sell your personal data to third parties.
                 </p>
             </section>
 
-            <section class="tbs-legal-page__section">
-                <h2>Delivery Partners</h2>
-                <p>
-                    Your name and shipping address are shared with Lalamove or LBC as required
-                    to fulfil your delivery. These couriers have their own privacy policies.
+            <section>
+                <h2 class="font-display text-2xl font-semibold text-charcoal dark:text-white mb-4">
+                    3. Delivery Partners
+                </h2>
+                <p class="text-lg text-mid-gray leading-relaxed">
+                    Your name and shipping address are shared securely with logistics partners such as Lalamove or LBC 
+                    strictly as required to fulfil your delivery routing. These couriers operate under their own terms and privacy policies.
                 </p>
             </section>
 
-            <section class="tbs-legal-page__section">
-                <h2>Data Retention</h2>
-                <p>
-                    Order records and associated personal data are retained for a minimum of
-                    five years for legal and accounting compliance. You may request deletion
-                    of your account data by contacting our support team.
+            <section>
+                <h2 class="font-display text-2xl font-semibold text-charcoal dark:text-white mb-4">
+                    4. Data Retention
+                </h2>
+                <p class="text-lg text-mid-gray leading-relaxed">
+                    Order records and associated personal data are safely retained for a minimum of
+                    five years for internal accounting compliance. You may request data isolation or full
+                    deletion of your account footprint by contacting our support team.
                 </p>
             </section>
 
-            <section class="tbs-legal-page__section">
-                <h2>Contact</h2>
-                <p>
-                    For privacy-related questions, please
-                    <a asp-controller="Support" asp-action="Create">contact our support team</a>.
+            <section class="mt-8 p-8 rounded-2xl bg-light-gray dark:bg-white/[0.03] border border-charcoal/5 dark:border-white/5">
+                <h2 class="font-display text-xl font-semibold text-charcoal dark:text-white mb-3">
+                    Questions about your data?
+                </h2>
+                <p class="text-mid-gray mb-6">
+                    We're here to help. Reach out to our dedicated privacy and support team for any inquiries.
                 </p>
+                <a asp-controller="Support" asp-action="Create" class="inline-flex items-center justify-center h-[42px] px-6 rounded-md bg-charcoal text-white dark:bg-white dark:text-charcoal font-medium text-sm transition-transform hover:-translate-y-0.5">
+                    Contact Support
+                </a>
             </section>
+
         </div>
     </div>
-</div>
+</section>
