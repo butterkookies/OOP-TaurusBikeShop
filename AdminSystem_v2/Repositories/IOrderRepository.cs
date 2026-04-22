@@ -48,5 +48,12 @@ namespace AdminSystem_v2.Repositories
         /// transitions order from PaymentVerification to OnHold and payment to VerificationRejected.
         /// </summary>
         Task HoldPaymentAsync(int orderId, string? expectedCurrentStatus = null);
+
+        /// <summary>
+        /// Auto-cancels any Pending orders older than 24 hours, unlocks their inventory,
+        /// and logs the transitions. Returns the number of orders that were cancelled.
+        /// Called at the start of each order list load to ensure stale orders are cleaned up.
+        /// </summary>
+        Task<int> AutoCancelExpiredPendingOrdersAsync();
     }
 }

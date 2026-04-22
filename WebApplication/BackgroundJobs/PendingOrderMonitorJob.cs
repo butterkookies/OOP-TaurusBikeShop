@@ -82,6 +82,10 @@ public sealed class PendingOrderMonitorJob : BackgroundService
         AppDbContext         context       = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         INotificationService notifications = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
+        // ── Best-effort start log ──────────────────────────────────────────
+        // If this fails we MUST clear the change tracker so the dirty
+        // SystemLog entity (still in Added state) does not contaminate the
+        // SaveChangesAsync call that commits the actual cancellations.
         try
         {
             await context.SystemLogs.AddAsync(new SystemLog
@@ -96,18 +100,28 @@ public sealed class PendingOrderMonitorJob : BackgroundService
         {
             _logger.LogWarning(ex, "{Job} could not write start log — DB may be unavailable.",
                 nameof(PendingOrderMonitorJob));
+
+            // ★ FIX: Clear the change tracker so the failed SystemLog entity
+            // does not cause every subsequent SaveChangesAsync to also fail,
+            // which was the root cause of orders never being auto-cancelled.
+            context.ChangeTracker.Clear();
         }
 
         try
         {
-            DateTime now              = DateTime.UtcNow;
+            // NOTE: OrderDate is stored in LOCAL time (UTC+8) by the web app,
+            // so we must use DateTime.Now (not UtcNow) to compute thresholds.
+            DateTime now              = DateTime.Now;
             DateTime cancelThreshold  = now - CancelAfter;                   // older than this → cancel
             DateTime reminderThreshold = now - (CancelAfter - ReminderLeadTime); // older than this → remind
 
             // -- 1. Auto-cancel orders past the 24h mark --
+            // ★ FIX: Include Items + Variants so we can unlock inventory.
             List<Order> expiredOrders = await context.Orders
                 .AsTracking()
                 .Include(o => o.User)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Variant)
                 .Where(o => o.OrderStatus == OrderStatuses.Pending
                          && o.OrderDate   < cancelThreshold)
                 .ToListAsync(cancellationToken);
@@ -117,10 +131,38 @@ public sealed class PendingOrderMonitorJob : BackgroundService
                 order.OrderStatus = OrderStatuses.Cancelled;
                 order.UpdatedAt   = now;
 
+                // ★ FIX: Unlock inventory — restore StockQuantity and write
+                // InventoryLog Unlock entries, matching OrderService.CancelOrderAsync.
+                foreach (OrderItem item in order.Items)
+                {
+                    if (item.ProductVariantId is null) continue;
+
+                    ProductVariant? variant = item.Variant
+                        ?? await context.ProductVariants
+                            .AsTracking()
+                            .FirstOrDefaultAsync(
+                                v => v.ProductVariantId == item.ProductVariantId,
+                                cancellationToken);
+
+                    if (variant != null)
+                        variant.StockQuantity += item.Quantity;
+
+                    await context.InventoryLogs.AddAsync(new InventoryLog
+                    {
+                        ProductId        = item.ProductId,
+                        ProductVariantId = item.ProductVariantId,
+                        OrderId          = order.OrderId,
+                        ChangeQuantity   = item.Quantity,
+                        ChangeType       = InventoryChangeTypes.Unlock,
+                        Notes            = $"Stock unlocked — Order #{order.OrderNumber} auto-cancelled (24h pending timeout).",
+                        CreatedAt        = now
+                    }, cancellationToken);
+                }
+
                 await context.SystemLogs.AddAsync(new SystemLog
                 {
                     EventType        = SystemLogEvents.OrderStatusChange,
-                    EventDescription = $"Order {order.OrderNumber} (ID {order.OrderId}): Pending \u2192 Cancelled (24h pending timeout).",
+                    EventDescription = $"Order {order.OrderNumber} (ID {order.OrderId}): Pending → Cancelled (24h pending timeout).",
                     CreatedAt        = now
                 }, cancellationToken);
             }
@@ -142,8 +184,8 @@ public sealed class PendingOrderMonitorJob : BackgroundService
                          && !alreadyReminded.Contains(o.OrderId))
                 .ToListAsync(cancellationToken);
 
-            // Commit cancellations before firing notifications so a mail failure
-            // never rolls back a status transition.
+            // Commit cancellations + inventory unlocks before firing notifications
+            // so a mail failure never rolls back a status transition.
             await context.SaveChangesAsync(cancellationToken);
 
             // -- 3. Notify customers of cancellations --

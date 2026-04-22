@@ -43,6 +43,16 @@ public sealed class OrderViewModel
     public string FormattedSubTotal   => $"₱{SubTotal:N2}";
     public string FormattedShippingFee=> $"₱{ShippingFee:N2}";
     public string FormattedOrderDate  => OrderDate.ToString("MMMM d, yyyy h:mm tt");
+
+    // ── 24-hour cancellation countdown ─────────────────────────────────
+    /// <summary>The deadline after which this pending order will be auto-cancelled.</summary>
+    public DateTime CancellationDeadline => OrderDate.AddHours(24);
+
+    /// <summary>True when the order is Pending and the countdown should be displayed.</summary>
+    public bool ShowCancellationTimer => OrderStatus == "Pending";
+
+    /// <summary>ISO 8601 deadline string for the JavaScript countdown timer.</summary>
+    public string CancellationDeadlineIso => CancellationDeadline.ToString("o");
 }
 
 /// <summary>Single line item within an order view model.</summary>

@@ -530,5 +530,138 @@ namespace AdminSystem_v2.Repositories
             public string Email       { get; set; } = string.Empty;
             public string OrderNumber { get; set; } = string.Empty;
         }
+
+        // ── Auto-cancel expired pending orders ─────────────────────────────────
+
+        /// <summary>
+        /// Auto-cancels any Pending orders older than 24 hours, unlocks their
+        /// inventory, and logs the transitions. Matches the WebApplication's
+        /// PendingOrderMonitorJob behaviour so the AdminSystem can independently
+        /// enforce the 24-hour policy even when the web app isn't running.
+        /// </summary>
+        public async Task<int> AutoCancelExpiredPendingOrdersAsync()
+        {
+            await using var conn = GetConnection();
+            await using var tx   = await conn.BeginTransactionAsync();
+            try
+            {
+                // 1 — Find all pending orders older than 24 hours
+                // NOTE: OrderDate is stored in LOCAL time (UTC+8) by the web app,
+                // but SQL Server GETUTCDATE() returns actual UTC.  We must compare
+                // against a local-time threshold to avoid an 8-hour mismatch that
+                // would cause orders to appear 8h younger than they really are.
+                var expiredOrders = (await conn.QueryAsync<ExpiredOrderRow>(
+                    @"SELECT o.OrderId, o.OrderNumber, o.UserId, u.Email AS CustomerEmail
+                      FROM [Order] o
+                      INNER JOIN [User] u ON o.UserId = u.UserId
+                      WHERE o.IsWalkIn = 0
+                        AND o.OrderStatus = @Status
+                        AND o.OrderDate < DATEADD(HOUR, -24, DATEADD(HOUR, 8, GETUTCDATE()))",
+                    new { Status = OrderStatuses.Pending }, tx)).ToList();
+
+                if (expiredOrders.Count == 0)
+                {
+                    await tx.CommitAsync();
+                    return 0;
+                }
+
+                foreach (var order in expiredOrders)
+                {
+                    // 2 — Unlock inventory: restore StockQuantity for each order item
+                    var items = await conn.QueryAsync<LockedItemRow>(
+                        @"SELECT oi.OrderItemId, oi.ProductId, oi.ProductVariantId, oi.Quantity
+                          FROM OrderItem oi
+                          WHERE oi.OrderId = @OrderId AND oi.ProductVariantId IS NOT NULL",
+                        new { order.OrderId }, tx);
+
+                    foreach (var item in items)
+                    {
+                        // Restore stock
+                        await conn.ExecuteAsync(
+                            @"UPDATE ProductVariant
+                              SET StockQuantity = StockQuantity + @Qty
+                              WHERE ProductVariantId = @VariantId",
+                            new { Qty = item.Quantity, VariantId = item.ProductVariantId }, tx);
+
+                        // Write InventoryLog Unlock entry
+                        await conn.ExecuteAsync(
+                            @"INSERT INTO InventoryLog
+                                (ProductId, ProductVariantId, OrderId, ChangeQuantity, ChangeType, Notes, CreatedAt)
+                              VALUES
+                                (@ProductId, @VariantId, @OrderId, @Qty, 'Unlock',
+                                 @Notes, GETUTCDATE())",
+                            new
+                            {
+                                item.ProductId,
+                                VariantId = item.ProductVariantId,
+                                order.OrderId,
+                                Qty = item.Quantity,
+                                Notes = $"Stock unlocked — Order #{order.OrderNumber} auto-cancelled (24h pending timeout)."
+                            }, tx);
+                    }
+
+                    // 3 — Set order status to Cancelled
+                    await conn.ExecuteAsync(
+                        @"UPDATE [Order]
+                          SET OrderStatus = @NewStatus, UpdatedAt = GETUTCDATE()
+                          WHERE OrderId = @OrderId",
+                        new { order.OrderId, NewStatus = OrderStatuses.Cancelled }, tx);
+
+                    // 4 — Queue notification for the customer
+                    await conn.ExecuteAsync(
+                        @"INSERT INTO Notification
+                            (UserId, OrderId, Channel, NotifType, Recipient,
+                             Subject, Body, Status, RetryCount, CreatedAt, IsRead)
+                          VALUES
+                            (@UserId, @OrderId, 'Email', 'OrderAutoCancelled', @Email,
+                             @Subject, @Body, 'Pending', 0, GETUTCDATE(), 0)",
+                        new
+                        {
+                            order.UserId,
+                            order.OrderId,
+                            Email   = order.CustomerEmail,
+                            Subject = $"Order {order.OrderNumber} cancelled — payment not received",
+                            Body    = $"Your order {order.OrderNumber} has been cancelled because payment " +
+                                      $"was not submitted within 24 hours of placing it. If you still want " +
+                                      $"the items, please place a new order."
+                        }, tx);
+
+                    // 5 — Audit log
+                    await LogStatusTransitionAsync(conn, tx, order.OrderId,
+                        OrderStatuses.Pending, OrderStatuses.Cancelled,
+                        success: true, "Auto-cancelled: 24h pending timeout (AdminSystem)");
+                }
+
+                // 6 — SystemLog entry
+                await conn.ExecuteAsync(
+                    @"INSERT INTO SystemLog (EventType, EventDescription, CreatedAt)
+                      VALUES ('OrderStatusChange', @Desc, GETUTCDATE())",
+                    new { Desc = $"AdminSystem auto-cancelled {expiredOrders.Count} expired pending order(s)." }, tx);
+
+                await tx.CommitAsync();
+                return expiredOrders.Count;
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
+        }
+
+        private sealed class ExpiredOrderRow
+        {
+            public int    OrderId       { get; set; }
+            public string OrderNumber   { get; set; } = string.Empty;
+            public int    UserId        { get; set; }
+            public string CustomerEmail { get; set; } = string.Empty;
+        }
+
+        private sealed class LockedItemRow
+        {
+            public int  OrderItemId      { get; set; }
+            public int  ProductId        { get; set; }
+            public int  ProductVariantId { get; set; }
+            public int  Quantity         { get; set; }
+        }
     }
 }

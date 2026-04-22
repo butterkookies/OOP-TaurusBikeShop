@@ -313,6 +313,22 @@ namespace AdminSystem_v2.ViewModels
             ClearMessages();
             try
             {
+                // ★ Auto-cancel expired pending orders before loading the list.
+                // This ensures the admin always sees accurate statuses, even if
+                // the WebApplication's background job hasn't run.
+                try
+                {
+                    int cancelled = await _orderService.AutoCancelExpiredPendingOrdersAsync();
+                    if (cancelled > 0)
+                        System.Diagnostics.Debug.WriteLine(
+                            $"[Orders] Auto-cancelled {cancelled} expired pending order(s).");
+                }
+                catch (Exception ex)
+                {
+                    // Best-effort — don't block the order list from loading
+                    System.Diagnostics.Debug.WriteLine($"[Orders] Auto-cancel failed: {ex.Message}");
+                }
+
                 string? statusFilter = SelectedStatusFilter == "All" ? null : SelectedStatusFilter;
                 string? typeFilter   = SelectedTypeFilter   == "All" ? null : SelectedTypeFilter;
 

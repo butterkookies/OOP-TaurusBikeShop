@@ -27,10 +27,150 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8" data-reveal>
             <div>
                 <h1 class="font-display text-2xl md:text-3xl font-semibold text-charcoal dark:text-white">Order @Model.OrderNumber</h1>
-                <p class="text-sm text-mid-gray mt-1">Placed @Model.OrderDate.ToString("MMMM d, yyyy")</p>
+                <p class="text-sm text-mid-gray mt-1">Placed @Model.OrderDate.ToString("MMMM d, yyyy") at @Model.OrderDate.ToString("h:mm tt")</p>
             </div>
             @await Html.PartialAsync("~/Views/Customer/Partials/_OrderStatusBadge.cshtml", Model.OrderStatus)
         </div>
+
+        @* ── Cancellation Countdown Timer (Pending orders only) ── *@
+        @if (Model.ShowCancellationTimer)
+        {
+            <div id="countdown-banner"
+                 class="cal-card-static overflow-hidden mb-6 border border-amber-400/30 dark:border-amber-400/20"
+                 data-reveal="delay-0"
+                 data-deadline="@Model.CancellationDeadlineIso">
+
+                <div class="px-6 py-5">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="shrink-0 w-9 h-9 rounded-full bg-amber-400/15 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="text-amber-500" id="countdown-icon">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-charcoal dark:text-white">Payment deadline</p>
+                            <p class="text-xs text-mid-gray mt-0.5">
+                                Submit payment proof before the timer runs out to avoid cancellation.
+                            </p>
+                        </div>
+                    </div>
+
+                    @* Timer display *@
+                    <div class="flex items-center gap-4">
+                        <div id="countdown-display" class="flex items-baseline gap-1.5 font-mono tabular-nums">
+                            <span class="inline-flex flex-col items-center">
+                                <span id="cd-hours" class="text-2xl font-bold text-amber-600 dark:text-amber-400 transition-colors">--</span>
+                                <span class="text-[10px] uppercase tracking-wider text-mid-gray font-sans">hrs</span>
+                            </span>
+                            <span class="text-xl font-bold text-mid-gray pb-4">:</span>
+                            <span class="inline-flex flex-col items-center">
+                                <span id="cd-minutes" class="text-2xl font-bold text-amber-600 dark:text-amber-400 transition-colors">--</span>
+                                <span class="text-[10px] uppercase tracking-wider text-mid-gray font-sans">min</span>
+                            </span>
+                            <span class="text-xl font-bold text-mid-gray pb-4">:</span>
+                            <span class="inline-flex flex-col items-center">
+                                <span id="cd-seconds" class="text-2xl font-bold text-amber-600 dark:text-amber-400 transition-colors">--</span>
+                                <span class="text-[10px] uppercase tracking-wider text-mid-gray font-sans">sec</span>
+                            </span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-right text-xs text-mid-gray mb-1" id="cd-percent-label">-- remaining</div>
+                            <div class="h-2 rounded-full bg-light-gray dark:bg-neutral-800 overflow-hidden">
+                                <div id="cd-progress" class="h-full rounded-full bg-amber-400 transition-all duration-1000 ease-linear" style="width:100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* Expired state (hidden by default) *@
+                <div id="countdown-expired" class="hidden px-6 py-5">
+                    <div class="flex items-center gap-3">
+                        <div class="shrink-0 w-9 h-9 rounded-full bg-red-400/15 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                 class="text-red-500">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-red-600 dark:text-red-400">Payment deadline expired</p>
+                            <p class="text-xs text-mid-gray mt-0.5">This order will be automatically cancelled shortly.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+            (function() {
+                const banner   = document.getElementById('countdown-banner');
+                const deadline = new Date(banner.dataset.deadline);
+                const placed   = new Date(deadline.getTime() - 24 * 60 * 60 * 1000);
+                const totalMs  = 24 * 60 * 60 * 1000;
+
+                const cdH = document.getElementById('cd-hours');
+                const cdM = document.getElementById('cd-minutes');
+                const cdS = document.getElementById('cd-seconds');
+                const prog = document.getElementById('cd-progress');
+                const pctLabel = document.getElementById('cd-percent-label');
+
+                const digits = [cdH, cdM, cdS];
+                const icon = document.getElementById('countdown-icon');
+
+                function pad(n) { return n.toString().padStart(2, '0'); }
+
+                function tick() {
+                    const now = new Date();
+                    let remaining = deadline - now;
+
+                    if (remaining <= 0) {
+                        // Expired
+                        banner.querySelector('.px-6.py-5').classList.add('hidden');
+                        document.getElementById('countdown-expired').classList.remove('hidden');
+                        banner.classList.remove('border-amber-400/30', 'dark:border-amber-400/20');
+                        banner.classList.add('border-red-400/30', 'dark:border-red-400/20');
+                        return;
+                    }
+
+                    const hours   = Math.floor(remaining / 3600000);
+                    const minutes = Math.floor((remaining % 3600000) / 60000);
+                    const seconds = Math.floor((remaining % 60000) / 1000);
+
+                    cdH.textContent = pad(hours);
+                    cdM.textContent = pad(minutes);
+                    cdS.textContent = pad(seconds);
+
+                    // Progress bar
+                    const pct = Math.max(0, (remaining / totalMs) * 100);
+                    prog.style.width = pct.toFixed(2) + '%';
+                    pctLabel.textContent = Math.round(pct) + '% remaining';
+
+                    // Color transitions: amber → red when < 4 hours
+                    const urgent = remaining < 4 * 60 * 60 * 1000;
+                    digits.forEach(el => {
+                        el.classList.toggle('text-amber-600', !urgent);
+                        el.classList.toggle('dark:text-amber-400', !urgent);
+                        el.classList.toggle('text-red-600', urgent);
+                        el.classList.toggle('dark:text-red-400', urgent);
+                    });
+                    prog.classList.toggle('bg-amber-400', !urgent);
+                    prog.classList.toggle('bg-red-500', urgent);
+                    if (icon) {
+                        icon.classList.toggle('text-amber-500', !urgent);
+                        icon.classList.toggle('text-red-500', urgent);
+                    }
+
+                    requestAnimationFrame(() => setTimeout(tick, 1000));
+                }
+
+                tick();
+            })();
+            </script>
+        }
 
         <div class="space-y-6">
 

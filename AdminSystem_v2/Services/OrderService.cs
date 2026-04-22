@@ -32,5 +32,8 @@ namespace AdminSystem_v2.Services
 
         public Task HoldPaymentAsync(int orderId, string? expectedCurrentStatus = null)
             => _repo.HoldPaymentAsync(orderId, expectedCurrentStatus);
+
+        public Task<int> AutoCancelExpiredPendingOrdersAsync()
+            => _repo.AutoCancelExpiredPendingOrdersAsync();
     }
 }

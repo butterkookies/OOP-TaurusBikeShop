@@ -28,5 +28,8 @@ namespace AdminSystem_v2.Services
 
         /// <summary>Holds the payment on discrepancy: moves order to OnHold, payment to VerificationRejected.</summary>
         Task HoldPaymentAsync(int orderId, string? expectedCurrentStatus = null);
+
+        /// <summary>Auto-cancels expired pending orders (24h) and returns the count of cancelled orders.</summary>
+        Task<int> AutoCancelExpiredPendingOrdersAsync();
     }
 }
