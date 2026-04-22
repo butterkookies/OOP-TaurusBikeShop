@@ -25,20 +25,25 @@
                 @foreach (WebApplication.Models.ViewModels.OrderViewModel order in Model)
                 {
                     <a asp-controller="Order" asp-action="Detail" asp-route-orderId="@order.OrderId"
-                       class="flex items-center px-5 py-4 hover:bg-surface-hover transition-colors gap-4 group dark:hover:bg-white/[0.03]">
+                       class="px-5 py-4 hover:bg-surface-hover transition-colors group dark:hover:bg-white/[0.03]"
+                       style="display:grid; grid-template-columns:1fr 180px 130px 16px; gap:1rem; align-items:center;">
 
-                        <div class="flex-1 min-w-0">
+                        @* Order number + date *@
+                        <div class="min-w-0">
                             <p class="text-sm font-medium text-charcoal dark:text-white">@order.OrderNumber</p>
                             <p class="text-xs text-mid-gray mt-0.5">@order.OrderDate.ToString("MMM d, yyyy") &middot; @order.ItemCount item@(order.ItemCount != 1 ? "s" : "")</p>
                         </div>
 
-                        <div class="hidden sm:block">
+                        @* Status badge — fixed 180px column, badge centered *@
+                        <div style="display:flex; justify-content:center; align-items:center;">
                             @await Html.PartialAsync("~/Views/Customer/Partials/_OrderStatusBadge.cshtml", order.OrderStatus)
                         </div>
 
-                        <p class="text-sm font-semibold text-charcoal dark:text-white whitespace-nowrap">@order.FormattedGrandTotal</p>
+                        @* Price — right-aligned *@
+                        <p class="text-sm font-semibold text-charcoal dark:text-white whitespace-nowrap text-right">@order.FormattedGrandTotal</p>
 
-                        <svg class="shrink-0 text-mid-gray group-hover:text-charcoal transition-colors dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        @* Chevron *@
+                        <svg class="text-mid-gray group-hover:text-charcoal transition-colors dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                     </a>
                 }
             </div>

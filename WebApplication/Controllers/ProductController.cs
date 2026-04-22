@@ -90,7 +90,7 @@ public sealed class ProductController : Controller
 
             ViewData["Title"]       = "Product Catalog";
             ViewBag.Brands          = brands;
-            ViewBag.Categories      = categories;
+            ViewBag.Categories      = categories.Where(c => c.Name != "Bicycles & Parts").ToList();
             ViewBag.CurrentPage     = page;
             ViewBag.TotalPages      = totalPages;
             ViewBag.TotalCount      = totalCount;
