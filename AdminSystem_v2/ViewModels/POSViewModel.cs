@@ -9,6 +9,7 @@ namespace AdminSystem_v2.ViewModels
     public class POSViewModel : BaseViewModel
     {
         private readonly IPOSService _pos;
+        private readonly IReceiptPrintService _printService;
         private int _walkInUserId;
 
         private int    CashierId   => App.CurrentUser?.UserId    ?? 0;
@@ -205,6 +206,7 @@ namespace AdminSystem_v2.ViewModels
         public ICommand ToggleCustomerDropdownCommand { get; }
         public ICommand CompleteSaleCommand       { get; }
         public ICommand NewSaleCommand            { get; }
+        public ICommand PrintReceiptCommand       { get; }
         public ICommand ApplyVoucherCommand            { get; }
         public ICommand RemoveVoucherCommand           { get; }
         public ICommand LoadVoucherSuggestionsCommand  { get; }
@@ -213,9 +215,10 @@ namespace AdminSystem_v2.ViewModels
 
         // ── Constructor ───────────────────────────────────────────────────────
 
-        public POSViewModel(IPOSService pos)
+        public POSViewModel(IPOSService pos, IReceiptPrintService printService)
         {
-            _pos = pos;
+            _pos          = pos;
+            _printService = printService;
 
             AddToCartCommand          = new RelayCommand<POSProductItem>(AddToCart);
             RemoveFromCartCommand     = new RelayCommand<POSCartItem>(RemoveFromCart);
@@ -227,6 +230,7 @@ namespace AdminSystem_v2.ViewModels
             ToggleCustomerDropdownCommand = new RelayCommand(() => IsCustomerDropdownOpen = !IsCustomerDropdownOpen);
             CompleteSaleCommand       = new RelayCommand(async () => await CompleteSaleAsync(), CanCompleteSale);
             NewSaleCommand            = new RelayCommand(StartNewSale);
+            PrintReceiptCommand       = new RelayCommand(() => { if (LastResult != null) _printService.PrintReceipt(LastResult); });
             ApplyVoucherCommand           = new RelayCommand(async () => await ApplyVoucherAsync());
             RemoveVoucherCommand          = new RelayCommand(RemoveVoucher);
             LoadVoucherSuggestionsCommand = new RelayCommand(async () => await LoadVoucherSuggestionsAsync());
@@ -575,6 +579,13 @@ namespace AdminSystem_v2.ViewModels
                 result.CashierName = CashierName;
                 LastResult         = result;
                 IsReceiptVisible   = true;
+
+                // Auto-print receipt to default printer
+                try { _printService.PrintReceipt(result); }
+                catch (Exception printEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[POS] Receipt print failed: {printEx.Message}");
+                }
             }
             catch (InvalidOperationException ex)
             {

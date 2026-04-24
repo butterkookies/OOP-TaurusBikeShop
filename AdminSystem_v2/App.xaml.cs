@@ -41,8 +41,9 @@ namespace AdminSystem_v2
             IStorePaymentAccountService paymentAcctSvc = new StorePaymentAccountService(paymentAcctRepo);
             ISupportTicketService supportTicketSvc = new SupportTicketService(supportTicketRepo);
             IExcelExportService excelExportSvc = new ExcelExportService();
+            IReceiptPrintService receiptPrintSvc = new ReceiptPrintService();
 
-            ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc, voucherSvc, paymentAcctSvc, supportTicketSvc, excelExportSvc);
+            ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc, voucherSvc, paymentAcctSvc, supportTicketSvc, excelExportSvc, receiptPrintSvc);
         }
 
         private void ShowLogin(IAuthService authSvc,
@@ -56,14 +57,15 @@ namespace AdminSystem_v2
                                IVoucherService voucherSvc,
                                IStorePaymentAccountService paymentAcctSvc,
                                ISupportTicketService supportTicketSvc,
-                               IExcelExportService excelExportSvc)
+                               IExcelExportService excelExportSvc,
+                               IReceiptPrintService receiptPrintSvc)
         {
             var loginVm   = new LoginViewModel(authSvc, dialogSvc);
             var loginView = new LoginView(loginVm);
 
             loginVm.LoginSucceeded += () =>
             {
-                ShowMain(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc, voucherSvc, paymentAcctSvc, supportTicketSvc, excelExportSvc);
+                ShowMain(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc, voucherSvc, paymentAcctSvc, supportTicketSvc, excelExportSvc, receiptPrintSvc);
                 loginView.Close();
             };
 
@@ -81,14 +83,15 @@ namespace AdminSystem_v2
                               IVoucherService voucherSvc,
                               IStorePaymentAccountService paymentAcctSvc,
                               ISupportTicketService supportTicketSvc,
-                              IExcelExportService excelExportSvc)
+                              IExcelExportService excelExportSvc,
+                              IReceiptPrintService receiptPrintSvc)
         {
             var dashboardVm = new DashboardViewModel(productSvc, inventorySvc, orderSvc);
             var productVm   = new ProductViewModel(productSvc);
             var orderVm     = new OrderViewModel(orderSvc, dialogSvc);
             var reportVm    = new ReportViewModel(reportSvc, excelExportSvc);
             var staffVm     = new StaffViewModel(userSvc, dialogSvc);
-            var posVm       = new POSViewModel(posSvc);
+            var posVm       = new POSViewModel(posSvc, receiptPrintSvc);
             var voucherVm   = new VoucherViewModel(voucherSvc, dialogSvc);
             var paymentAcctVm = new StorePaymentAccountViewModel(paymentAcctSvc, dialogSvc);
             var supportTicketsVm = new SupportTicketsViewModel(supportTicketSvc, dialogSvc);
@@ -99,7 +102,7 @@ namespace AdminSystem_v2
             mainVm.SignOutRequested += () =>
             {
                 mainView.Close();
-                ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc, voucherSvc, paymentAcctSvc, supportTicketSvc, excelExportSvc);
+                ShowLogin(authSvc, productSvc, inventorySvc, orderSvc, reportSvc, userSvc, dialogSvc, posSvc, voucherSvc, paymentAcctSvc, supportTicketSvc, excelExportSvc, receiptPrintSvc);
             };
 
             mainView.Show();

@@ -83,10 +83,13 @@ document.addEventListener('DOMContentLoaded', function () {
     var selectAllEl = document.getElementById('cart-select-all');
     if (selectAllEl) {
         selectAllEl.addEventListener('change', function () {
+            // Clear indeterminate so subsequent clicks toggle cleanly
+            selectAllEl.indeterminate = false;
+            var isChecked = selectAllEl.checked;
             document.querySelectorAll('.cart-item-select').forEach(function (cb) {
-                cb.checked = selectAllEl.checked;
+                cb.checked = isChecked;
                 var id = cb.dataset.cartItemId;
-                if (cb.checked) uncheckedIds.delete(id);
+                if (isChecked) uncheckedIds.delete(id);
                 else uncheckedIds.add(id);
             });
             saveUnchecked(uncheckedIds);

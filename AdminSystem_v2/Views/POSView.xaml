@@ -1055,6 +1055,15 @@
                                     HorizontalAlignment="Center">
                             <Button Style="{StaticResource PrimaryButton}"
                                     Width="140" Height="38"
+                                    Command="{Binding PrintReceiptCommand}"
+                                    Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="🖨" FontSize="13" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Print Receipt" FontSize="13" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource PrimaryButton}"
+                                    Width="140" Height="38"
                                     Command="{Binding NewSaleCommand}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="🛒" FontSize="13" Margin="0,0,6,0"/>
