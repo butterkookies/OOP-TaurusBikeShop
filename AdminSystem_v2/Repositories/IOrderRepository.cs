@@ -55,5 +55,15 @@ namespace AdminSystem_v2.Repositories
         /// Called at the start of each order list load to ensure stale orders are cleaned up.
         /// </summary>
         Task<int> AutoCancelExpiredPendingOrdersAsync();
+
+        /// <summary>
+        /// Ships a Processing delivery order via the specified courier.
+        /// Generates a simulated tracking number / booking reference, inserts a
+        /// <c>Delivery</c> row and the appropriate courier sub-row, advances the order
+        /// status to <c>OutForDelivery</c>, and queues both an email and an in-app
+        /// <c>TrackingUpdate</c> notification that includes the tracking link and fee.
+        /// </summary>
+        /// <param name="courier">"Lalamove" or "LBC" — must match <c>Couriers</c> constants.</param>
+        Task ShipOrderAsync(int orderId, string courier, string? expectedCurrentStatus = null);
     }
 }

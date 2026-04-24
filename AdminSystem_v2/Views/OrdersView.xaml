@@ -831,161 +831,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- ── Delivery / Pickup info ── -->
-                        <Border Background="#1E1E1E" CornerRadius="8" Padding="14"
-                                Margin="0,0,0,16" BorderThickness="1" BorderBrush="#2E2E2E">
-                            <StackPanel>
-                                <TextBlock Text="{Binding DeliveryType, StringFormat='{}{0} INFO'}"
-                                           Style="{StaticResource SectionLabel}"/>
-
-                                <!-- Pickup details -->
-                                <StackPanel DataContext="{Binding Pickup}">
-                                    <StackPanel.Style>
-                                        <Style TargetType="StackPanel">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding DataContext.DeliveryType,
-                                                             RelativeSource={RelativeSource AncestorType=ScrollViewer}}"
-                                                             Value="Pickup">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </StackPanel.Style>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="0">
-                                            <TextBlock Text="Ready At"   Style="{StaticResource FieldLabel}"/>
-                                            <TextBlock Style="{StaticResource FieldValue}">
-                                                <TextBlock.Text>
-                                                    <Binding Path="PickupReadyAt"
-                                                             TargetNullValue="Not yet set"
-                                                             StringFormat="{}{0:MMM d, h:mm tt}"/>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="1">
-                                            <TextBlock Text="Expires At" Style="{StaticResource FieldLabel}"/>
-                                            <TextBlock Style="{StaticResource FieldValue}">
-                                                <TextBlock.Text>
-                                                    <Binding Path="PickupExpiresAt"
-                                                             TargetNullValue="Not yet set"
-                                                             StringFormat="{}{0:MMM d, h:mm tt}"/>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-                                        </StackPanel>
-                                    </Grid>
-                                    <TextBlock Text="Confirmed At" Style="{StaticResource FieldLabel}"/>
-                                    <TextBlock Style="{StaticResource FieldValue}">
-                                        <TextBlock.Text>
-                                            <Binding Path="PickupConfirmedAt"
-                                                     TargetNullValue="Not yet confirmed"
-                                                     StringFormat="{}{0:MMM d, yyyy  h:mm tt}"/>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </StackPanel>
-
-                                <!-- Delivery details -->
-                                <StackPanel DataContext="{Binding Delivery}">
-                                    <StackPanel.Style>
-                                        <Style TargetType="StackPanel">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding DataContext.DeliveryType,
-                                                             RelativeSource={RelativeSource AncestorType=ScrollViewer}}"
-                                                             Value="Delivery">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </StackPanel.Style>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="0">
-                                            <TextBlock Text="Courier"        Style="{StaticResource FieldLabel}"/>
-                                            <TextBlock Text="{Binding Courier, TargetNullValue='Not assigned'}"
-                                                       Style="{StaticResource FieldValue}"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="1">
-                                            <TextBlock Text="Courier Status" Style="{StaticResource FieldLabel}"/>
-                                            <TextBlock Text="{Binding DeliveryStatus, TargetNullValue='&#x2014;'}"
-                                                       Style="{StaticResource FieldValue}"/>
-                                        </StackPanel>
-                                    </Grid>
-                                    <TextBlock Text="Tracking"     Style="{StaticResource FieldLabel}"/>
-                                    <TextBlock Text="{Binding TrackingInfo, TargetNullValue='&#x2014;'}"
-                                               Style="{StaticResource FieldValue}"/>
-                                    <TextBlock Text="Est. Delivery" Style="{StaticResource FieldLabel}"/>
-                                    <TextBlock Style="{StaticResource FieldValue}">
-                                        <TextBlock.Text>
-                                            <Binding Path="EstimatedDeliveryTime"
-                                                     TargetNullValue="Not set"
-                                                     StringFormat="{}{0:MMM d, yyyy}"/>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </StackPanel>
-
-                                <!-- No courier yet placeholder -->
-                                <TextBlock Foreground="#4A4A4A" FontSize="13"
-                                           Text="No courier assigned yet."
-                                           HorizontalAlignment="Center"
-                                           Margin="0,4">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding DataContext.DeliveryType,
-                                                                   RelativeSource={RelativeSource AncestorType=ScrollViewer}}"
-                                                                   Value="Delivery"/>
-                                                        <Condition Binding="{Binding DataContext.SelectedOrder.Delivery,
-                                                                   RelativeSource={RelativeSource AncestorType=UserControl},
-                                                                   Converter={StaticResource BoolToVis}}"
-                                                                   Value="Collapsed"/>
-                                                    </MultiDataTrigger.Conditions>
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </MultiDataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-
-                                <!-- Delivery Instructions (optional — shown when non-empty) -->
-                                <StackPanel>
-                                    <StackPanel.Style>
-                                        <Style TargetType="StackPanel">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                            <Style.Triggers>
-                                                <!-- Collapse when empty string -->
-                                                <DataTrigger Binding="{Binding DataContext.SelectedOrder.DeliveryInstructions,
-                                                             RelativeSource={RelativeSource AncestorType=UserControl},
-                                                             TargetNullValue=''}" Value="">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                                <!-- Collapse when null -->
-                                                <DataTrigger Binding="{Binding DataContext.SelectedOrder.DeliveryInstructions,
-                                                             RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Null}">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </StackPanel.Style>
-                                    <TextBlock Text="Delivery Instructions" Style="{StaticResource FieldLabel}" Margin="0,8,0,2"/>
-                                    <TextBlock Text="{Binding DataContext.SelectedOrder.DeliveryInstructions,
-                                               RelativeSource={RelativeSource AncestorType=UserControl},
-                                               TargetNullValue='&#x2014;'}"
-                                               Style="{StaticResource FieldValue}" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-
                         <!-- ── Order items ── -->
                         <TextBlock Text="ORDER ITEMS" Style="{StaticResource SectionLabel}"/>
 
@@ -1191,13 +1036,27 @@
                                             Style="{StaticResource PrimaryButton}"
                                             Margin="0,0,8,8"/>
 
-                                    <Button Content="Mark as Out for Delivery"
-                                            Command="{Binding DataContext.MarkOutForDeliveryCommand,
+                                    <!-- Ship via Lalamove -->
+                                    <Button Content="🚀 Ship via Lalamove"
+                                            Command="{Binding DataContext.ShipWithLalamoveCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             Visibility="{Binding DataContext.CanMarkOutForDelivery,
                                                         RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}"
                                             Style="{StaticResource PrimaryButton}"
-                                            Margin="0,0,8,8"/>
+                                            Background="#1A3A2A" BorderBrush="#34D399"
+                                            Margin="0,0,8,8"
+                                            ToolTip="Generates a simulated Lalamove booking ref and notifies the customer"/>
+
+                                    <!-- Ship via LBC -->
+                                    <Button Content="📦 Ship via LBC"
+                                            Command="{Binding DataContext.ShipWithLBCCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Visibility="{Binding DataContext.CanMarkOutForDelivery,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}"
+                                            Style="{StaticResource PrimaryButton}"
+                                            Background="#1A2A3A" BorderBrush="#60A5FA"
+                                            Margin="0,0,8,8"
+                                            ToolTip="Generates a simulated LBC tracking number and notifies the customer"/>
 
                                     <Button Content="Mark as Delivered"
                                             Command="{Binding DataContext.MarkDeliveredCommand,

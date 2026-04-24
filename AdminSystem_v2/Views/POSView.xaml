@@ -199,12 +199,24 @@
                     <ItemsControl ItemsSource="{Binding SearchResults}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="#1C1C1C"
-                                        BorderBrush="#2E2E2E"
-                                        BorderThickness="1"
-                                        CornerRadius="8"
+                                <Border CornerRadius="8"
                                         Padding="12,10"
-                                        Margin="0,0,0,8">
+                                        Margin="0,0,0,8"
+                                        BorderThickness="1">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#1C1C1C"/>
+                                            <Setter Property="BorderBrush" Value="#2E2E2E"/>
+                                            <Setter Property="Opacity" Value="1"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding InStock}" Value="False">
+                                                    <Setter Property="Background" Value="#161616"/>
+                                                    <Setter Property="BorderBrush" Value="#251515"/>
+                                                    <Setter Property="Opacity" Value="0.65"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -213,20 +225,61 @@
 
                                         <StackPanel Grid.Column="0">
                                             <TextBlock Text="{Binding DisplayName}"
-                                                       Foreground="#F9FAFB"
                                                        FontSize="13" FontWeight="SemiBold"
-                                                       TextTrimming="CharacterEllipsis"/>
+                                                       TextTrimming="CharacterEllipsis">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#F9FAFB"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding InStock}" Value="False">
+                                                                <Setter Property="Foreground" Value="#6B7280"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
                                             <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                                                 <TextBlock Text="{Binding UnitPrice, StringFormat='₱{0:N2}'}"
-                                                           Foreground="#DC2626"
-                                                           FontSize="13" FontWeight="Bold"/>
-                                                <Border Background="#2E2E2E"
-                                                        CornerRadius="4"
+                                                           FontSize="13" FontWeight="Bold">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="#DC2626"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding InStock}" Value="False">
+                                                                    <Setter Property="Foreground" Value="#6B4444"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <Border CornerRadius="4"
                                                         Padding="6,2"
                                                         Margin="8,0,0,0">
-                                                    <TextBlock Text="{Binding StockLabel}"
-                                                               Foreground="#9CA3AF"
-                                                               FontSize="11"/>
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#2E2E2E"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding InStock}" Value="False">
+                                                                    <Setter Property="Background" Value="#3D1515"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock FontSize="11">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Text" Value="{Binding StockLabel}"/>
+                                                                <Setter Property="Foreground" Value="#9CA3AF"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding InStock}" Value="False">
+                                                                        <Setter Property="Text" Value="OUT OF STOCK"/>
+                                                                        <Setter Property="Foreground" Value="#F87171"/>
+                                                                        <Setter Property="FontWeight" Value="Bold"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
                                                 </Border>
                                             </StackPanel>
                                         </StackPanel>
@@ -238,7 +291,18 @@
                                                     RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}"
                                                 IsEnabled="{Binding InStock}">
-                                            <TextBlock Text="+ Add" FontSize="12" FontWeight="SemiBold"/>
+                                            <TextBlock FontSize="12" FontWeight="SemiBold">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text" Value="+ Add"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding InStock}" Value="False">
+                                                                <Setter Property="Text" Value="Sold Out"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
                                         </Button>
                                     </Grid>
                                 </Border>

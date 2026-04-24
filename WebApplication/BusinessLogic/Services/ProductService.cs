@@ -190,6 +190,15 @@ public sealed class ProductService : IProductService
         CancellationToken cancellationToken = default)
         => await _productRepo.GetActiveCategoriesAsync(cancellationToken);
 
+    /// <inheritdoc/>
+    public async Task<int> GetTotalStockAsync(CancellationToken cancellationToken = default)
+    {
+        return await _productRepo.Context.ProductVariants
+            .AsNoTracking()
+            .Where(v => v.IsActive && v.Product.IsActive)
+            .SumAsync(v => v.StockQuantity, cancellationToken);
+    }
+
     // =========================================================================
     // Private mapping helpers
     // =========================================================================

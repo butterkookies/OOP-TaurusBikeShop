@@ -101,8 +101,9 @@ namespace AdminSystem_v2.ViewModels
         {
             if (string.IsNullOrEmpty(page)) return;
 
-            // Block non-Admin users from the Staff page
-            if (page == PageNames.Staff && !IsAdmin) return;
+            // Block non-Admin users from restricted pages
+            if (page == PageNames.Staff          && !IsAdmin) return;
+            if (page == PageNames.PaymentAccounts && !IsAdmin) return;
 
             CurrentViewModel = page switch
             {

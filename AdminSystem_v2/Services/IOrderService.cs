@@ -31,5 +31,12 @@ namespace AdminSystem_v2.Services
 
         /// <summary>Auto-cancels expired pending orders (24h) and returns the count of cancelled orders.</summary>
         Task<int> AutoCancelExpiredPendingOrdersAsync();
+
+        /// <summary>
+        /// Ships a Processing delivery order via the specified courier (Lalamove or LBC).
+        /// Generates simulated tracking data, inserts Delivery + sub-row, advances order to
+        /// OutForDelivery, and queues both Email and InApp TrackingUpdate notifications.
+        /// </summary>
+        Task ShipOrderAsync(int orderId, string courier, string? expectedCurrentStatus = null);
     }
 }

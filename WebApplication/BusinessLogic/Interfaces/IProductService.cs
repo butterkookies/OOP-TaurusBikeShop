@@ -101,4 +101,9 @@ public interface IProductService
     /// </summary>
     Task<IReadOnlyList<WebApplication.Models.Entities.Category>> GetActiveCategoriesAsync(
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns the total sum of stock quantity across all active variants of active products.
+    /// </summary>
+    Task<int> GetTotalStockAsync(CancellationToken cancellationToken = default);
 }

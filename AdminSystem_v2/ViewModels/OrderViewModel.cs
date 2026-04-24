@@ -263,7 +263,9 @@ namespace AdminSystem_v2.ViewModels
         public ICommand MarkProcessingCommand      { get; }
         public ICommand MarkReadyForPickupCommand  { get; }
         public ICommand ConfirmPickupCommand       { get; }
-        public ICommand MarkOutForDeliveryCommand   { get; }
+        public ICommand MarkOutForDeliveryCommand   { get; }  // kept for bulk ops
+        public ICommand ShipWithLalamoveCommand     { get; }
+        public ICommand ShipWithLBCCommand          { get; }
         public ICommand MarkDeliveredCommand       { get; }
         public ICommand CancelOrderCommand         { get; }
         public ICommand ApprovePaymentCommand      { get; }
@@ -293,6 +295,8 @@ namespace AdminSystem_v2.ViewModels
             MarkReadyForPickupCommand = new RelayCommand(async () => await MarkReadyForPickupAsync(),  () => CanMarkReadyForPickup);
             ConfirmPickupCommand      = new RelayCommand(async () => await ConfirmPickupAsync(),       () => CanConfirmPickup);
             MarkOutForDeliveryCommand = new RelayCommand(async () => await MarkOutForDeliveryAsync(),  () => CanMarkOutForDelivery);
+            ShipWithLalamoveCommand   = new RelayCommand(async () => await ShipOrderAsync("Lalamove"), () => CanMarkOutForDelivery);
+            ShipWithLBCCommand        = new RelayCommand(async () => await ShipOrderAsync("LBC"),      () => CanMarkOutForDelivery);
             MarkDeliveredCommand      = new RelayCommand(async () => await MarkDeliveredAsync(),       () => CanMarkDelivered);
             CancelOrderCommand        = new RelayCommand(async () => await CancelOrderAsync(),         () => CanCancelOrder);
             ApprovePaymentCommand     = new RelayCommand(async () => await ApprovePaymentAsync(),      () => CanApprovePayment);
@@ -583,6 +587,19 @@ namespace AdminSystem_v2.ViewModels
                 $"Order {SelectedOrder.OrderNumber} marked as Out for Delivery.");
         }
 
+        private async Task ShipOrderAsync(string courier)
+        {
+            if (SelectedOrder == null) return;
+            string label = courier == "Lalamove" ? "Lalamove" : "LBC Express";
+            if (!_dialog.Confirm(
+                    $"Ship order {SelectedOrder.OrderNumber} via {label}?\n" +
+                    $"A simulated tracking reference will be generated and the customer will be notified.",
+                    $"Ship via {label}")) return;
+            await ExecuteOrderActionAsync(
+                () => _orderService.ShipOrderAsync(SelectedOrder.OrderId, courier, SelectedOrder.OrderStatus),
+                $"Order {SelectedOrder.OrderNumber} shipped via {label}. Customer notified.");
+        }
+
         private async Task MarkDeliveredAsync()
         {
             if (SelectedOrder == null) return;
@@ -760,6 +777,8 @@ namespace AdminSystem_v2.ViewModels
             OnPropertyChanged(nameof(CanCancelOrder));
             OnPropertyChanged(nameof(CanApprovePayment));
             OnPropertyChanged(nameof(CanHoldPayment));
+            // ShipWithLalamoveCommand / ShipWithLBCCommand share CanMarkOutForDelivery;
+            // CommandManager.RequerySuggested (used by RelayCommand) re-evaluates them automatically.
         }
     }
 }

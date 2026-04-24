@@ -347,9 +347,10 @@
                             </StackPanel>
                         </Button>
 
-                        <!-- Payment Accounts -->
+                        <!-- Payment Accounts (Admin only) -->
                         <Button Command="{Binding NavigateCommand}"
-                                CommandParameter="Payment Accounts">
+                                CommandParameter="Payment Accounts"
+                                Visibility="{Binding IsAdmin, Converter={StaticResource BoolToVis}}">
                             <Button.Style>
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>

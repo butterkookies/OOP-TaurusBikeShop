@@ -51,28 +51,23 @@ public sealed class HomeController : Controller
                 wishlistIds = await _wishlistService.GetProductIdsAsync(userId, cancellationToken);
             }
 
-            Task<IReadOnlyList<ProductViewModel>> featuredTask =
-                _productService.GetFeaturedAsync(FeaturedProductCount, wishlistIds, cancellationToken);
+            IReadOnlyList<ProductViewModel> featuredProducts =
+                await _productService.GetFeaturedAsync(FeaturedProductCount, wishlistIds, cancellationToken);
 
-            Task<(IReadOnlyList<ProductViewModel>, int TotalCount)> countTask =
-                _productService.GetFilteredAsync(
-                    null, null, null, null, null,
-                    1, 1, [], false, cancellationToken);
+            int totalStock = await _productService.GetTotalStockAsync(cancellationToken);
 
-            Task<IReadOnlyList<Brand>> brandsTask =
-                _brandService.GetAllActiveBrandsAsync(cancellationToken);
+            IReadOnlyList<Brand> brands =
+                await _brandService.GetAllActiveBrandsAsync(cancellationToken);
 
-            Task<IReadOnlyList<Category>> categoriesTask =
-                _productService.GetActiveCategoriesAsync(cancellationToken);
-
-            await Task.WhenAll(featuredTask, countTask, brandsTask, categoriesTask);
+            IReadOnlyList<Category> categories =
+                await _productService.GetActiveCategoriesAsync(cancellationToken);
 
             return View(new HomeIndexViewModel
             {
-                FeaturedProducts = featuredTask.Result,
-                ProductCount     = countTask.Result.TotalCount,
-                BrandCount       = brandsTask.Result.Count,
-                CategoryCount    = categoriesTask.Result.Count,
+                FeaturedProducts = featuredProducts,
+                ProductCount     = totalStock,
+                BrandCount       = brands.Count,
+                CategoryCount    = categories.Count,
             });
         }
         catch (Exception ex)

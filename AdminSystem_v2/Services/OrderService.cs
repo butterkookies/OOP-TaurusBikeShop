@@ -35,5 +35,8 @@ namespace AdminSystem_v2.Services
 
         public Task<int> AutoCancelExpiredPendingOrdersAsync()
             => _repo.AutoCancelExpiredPendingOrdersAsync();
+
+        public Task ShipOrderAsync(int orderId, string courier, string? expectedCurrentStatus = null)
+            => _repo.ShipOrderAsync(orderId, courier, expectedCurrentStatus);
     }
 }
