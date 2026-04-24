@@ -27,6 +27,7 @@ namespace AdminSystem_v2.Services
         public Task<POSOrderResult> CreatePOSSaleAsync(
             int    userId,
             int    cashierId,
+            int?   posSessionId,
             string customerName,
             List<POSCartItem> items,
             string  paymentMethod,
@@ -34,7 +35,16 @@ namespace AdminSystem_v2.Services
             decimal discountAmount,
             string? voucherCode)
             => _repo.CreatePOSSaleAsync(
-                userId, cashierId, customerName,
+                userId, cashierId, posSessionId, customerName,
                 items, paymentMethod, cashReceived, discountAmount, voucherCode);
+
+        public Task<POSSession?> GetActiveSessionAsync(int cashierId)
+            => _repo.GetActiveSessionAsync(cashierId);
+
+        public Task<int> OpenSessionAsync(int cashierId, string terminalName)
+            => _repo.OpenSessionAsync(cashierId, terminalName);
+
+        public Task CloseSessionAsync(int sessionId)
+            => _repo.CloseSessionAsync(sessionId);
     }
 }

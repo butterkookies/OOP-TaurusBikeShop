@@ -198,11 +198,49 @@ namespace AdminSystem_v2.Repositories
             };
         }
 
+        // ── Session management ────────────────────────────────────────────────
+
+        public async Task<POSSession?> GetActiveSessionAsync(int cashierId)
+        {
+            const string sql =
+                @"SELECT TOP 1
+                      POSSessionId, UserId, TerminalName,
+                      ShiftStart, ShiftEnd, TotalSales
+                  FROM POS_Session
+                  WHERE UserId = @CashierId AND ShiftEnd IS NULL
+                  ORDER BY ShiftStart DESC";
+
+            await using var conn = GetConnection();
+            return await conn.QueryFirstOrDefaultAsync<POSSession>(sql, new { CashierId = cashierId });
+        }
+
+        public async Task<int> OpenSessionAsync(int cashierId, string terminalName)
+        {
+            const string sql =
+                @"INSERT INTO POS_Session (UserId, TerminalName, ShiftStart, TotalSales, CreatedAt)
+                  VALUES (@UserId, @TerminalName, GETUTCDATE(), 0, GETUTCDATE());
+                  SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+            await using var conn = GetConnection();
+            return await conn.ExecuteScalarAsync<int>(sql,
+                new { UserId = cashierId, TerminalName = terminalName });
+        }
+
+        public async Task CloseSessionAsync(int sessionId)
+        {
+            const string sql =
+                "UPDATE POS_Session SET ShiftEnd = GETUTCDATE() WHERE POSSessionId = @Id";
+
+            await using var conn = GetConnection();
+            await conn.ExecuteAsync(sql, new { Id = sessionId });
+        }
+
         // ── Atomic POS sale ───────────────────────────────────────────────────
 
         public async Task<POSOrderResult> CreatePOSSaleAsync(
             int    userId,
             int    cashierId,
+            int?   posSessionId,
             string customerName,
             List<POSCartItem> items,
             string  paymentMethod,
@@ -247,20 +285,22 @@ namespace AdminSystem_v2.Repositories
                           (UserId, OrderNumber, OrderDate, OrderStatus,
                            SubTotal, DiscountAmount, ShippingFee,
                            ContactPhone, DeliveryInstructions, IsWalkIn,
-                           FulfillmentType, PaymentMethod, CreatedAt, UpdatedAt)
+                           FulfillmentType, PaymentMethod, POSSessionId, CreatedAt, UpdatedAt)
                       VALUES
                           (@UserId, @OrderNumber, GETUTCDATE(), @Status,
                            @SubTotal, @Discount, 0,
                            NULL, NULL, 1,
-                           'WalkIn', N'Cash', GETUTCDATE(), GETUTCDATE());
+                           'WalkIn', @PaymentMethod, @POSSessionId, GETUTCDATE(), GETUTCDATE());
                       SELECT CAST(SCOPE_IDENTITY() AS INT);",
                     new
                     {
-                        UserId      = userId,
-                        OrderNumber = orderNumber,
-                        Status      = OrderStatuses.Delivered,
-                        SubTotal    = subtotal,
-                        Discount    = discountAmount
+                        UserId       = userId,
+                        OrderNumber  = orderNumber,
+                        Status       = OrderStatuses.Delivered,
+                        SubTotal     = subtotal,
+                        Discount     = discountAmount,
+                        PaymentMethod = paymentMethod,
+                        POSSessionId  = posSessionId
                     }, tx);
 
                 // 5 — Insert OrderItems + deduct stock + log inventory
@@ -343,6 +383,16 @@ namespace AdminSystem_v2.Repositories
                                 Discount  = discountAmount
                             }, tx);
                     }
+                }
+
+                // 8 — Increment running TotalSales on the open session
+                if (posSessionId.HasValue)
+                {
+                    await conn.ExecuteAsync(
+                        @"UPDATE POS_Session
+                          SET TotalSales = TotalSales + @Amount
+                          WHERE POSSessionId = @Id",
+                        new { Amount = grandTotal, Id = posSessionId.Value }, tx);
                 }
 
                 await tx.CommitAsync();

@@ -28,18 +28,29 @@ namespace AdminSystem_v2.Repositories
 
         /// <summary>
         /// Atomic POS checkout: creates Order + OrderItems, deducts stock,
-        /// logs InventoryLog entries, records Payment, and records VoucherUsage
-        /// when a voucher is applied — all in one transaction.
+        /// logs InventoryLog entries, records Payment, records VoucherUsage
+        /// when a voucher is applied, and updates POS_Session.TotalSales —
+        /// all in one transaction.
         /// Throws InvalidOperationException when stock is insufficient.
         /// </summary>
         Task<POSOrderResult> CreatePOSSaleAsync(
             int    userId,
             int    cashierId,
+            int?   posSessionId,
             string customerName,
             List<POSCartItem> items,
             string  paymentMethod,
             decimal cashReceived,
             decimal discountAmount,
             string? voucherCode);
+
+        /// <summary>Returns the open session for this cashier, or null if none.</summary>
+        Task<POSSession?> GetActiveSessionAsync(int cashierId);
+
+        /// <summary>Opens a new shift and returns the new POSSessionId.</summary>
+        Task<int> OpenSessionAsync(int cashierId, string terminalName);
+
+        /// <summary>Closes the shift by setting ShiftEnd.</summary>
+        Task CloseSessionAsync(int sessionId);
     }
 }

@@ -178,6 +178,34 @@ namespace AdminSystem_v2.ViewModels
         public decimal GrandTotal  => Math.Max(0m, Subtotal - DiscountAmount);
         public decimal Change      => IsCashPayment ? Math.Max(0m, CashReceived - GrandTotal) : 0m;
 
+        // ── Session ───────────────────────────────────────────────────────────
+
+        private POSSession? _activeSession;
+        public POSSession? ActiveSession
+        {
+            get => _activeSession;
+            private set
+            {
+                SetProperty(ref _activeSession, value);
+                OnPropertyChanged(nameof(HasActiveSession));
+                OnPropertyChanged(nameof(SessionTerminalName));
+                OnPropertyChanged(nameof(SessionShiftStart));
+                OnPropertyChanged(nameof(SessionTotalSales));
+            }
+        }
+
+        public bool      HasActiveSession    => _activeSession != null;
+        public string    SessionTerminalName => _activeSession?.TerminalName ?? string.Empty;
+        public DateTime? SessionShiftStart   => _activeSession?.ShiftStart.ToLocalTime();
+        public decimal   SessionTotalSales   => _activeSession?.TotalSales   ?? 0m;
+
+        private string _terminalNameInput = "POS-TERMINAL-01";
+        public string TerminalNameInput
+        {
+            get => _terminalNameInput;
+            set => SetProperty(ref _terminalNameInput, value);
+        }
+
         // ── Receipt ───────────────────────────────────────────────────────────
 
         private bool _isReceiptVisible;
@@ -212,6 +240,8 @@ namespace AdminSystem_v2.ViewModels
         public ICommand LoadVoucherSuggestionsCommand  { get; }
         public ICommand SelectVoucherCommand           { get; }
         public ICommand CloseVoucherDropdownCommand    { get; }
+        public ICommand OpenSessionCommand             { get; }
+        public ICommand CloseSessionCommand            { get; }
 
         // ── Constructor ───────────────────────────────────────────────────────
 
@@ -236,6 +266,8 @@ namespace AdminSystem_v2.ViewModels
             LoadVoucherSuggestionsCommand = new RelayCommand(async () => await LoadVoucherSuggestionsAsync());
             SelectVoucherCommand          = new RelayCommand<POSVoucherSuggestion>(SelectVoucher);
             CloseVoucherDropdownCommand   = new RelayCommand(() => IsVoucherDropdownOpen = false);
+            OpenSessionCommand            = new RelayCommand(async () => await OpenShiftAsync());
+            CloseSessionCommand           = new RelayCommand(async () => await CloseShiftAsync(), () => HasActiveSession && !IsLoading);
         }
 
         // ── Called by MainWindowViewModel on navigate ─────────────────────────
@@ -245,10 +277,68 @@ namespace AdminSystem_v2.ViewModels
             try
             {
                 _walkInUserId = await _pos.GetWalkInUserIdAsync();
+                ActiveSession = await _pos.GetActiveSessionAsync(CashierId);
             }
             catch (Exception ex)
             {
-                ShowError($"Could not resolve walk-in user: {ex.Message}");
+                ShowError($"Could not load POS data: {ex.Message}");
+            }
+        }
+
+        // ── Session ───────────────────────────────────────────────────────────
+
+        private async Task OpenShiftAsync()
+        {
+            if (string.IsNullOrWhiteSpace(TerminalNameInput))
+            {
+                ShowError("Please enter a terminal name.");
+                return;
+            }
+
+            IsLoading = true;
+            ClearMessages();
+            try
+            {
+                string terminal = TerminalNameInput.Trim();
+                int sessionId   = await _pos.OpenSessionAsync(CashierId, terminal);
+                ActiveSession   = new POSSession
+                {
+                    POSSessionId = sessionId,
+                    UserId       = CashierId,
+                    TerminalName = terminal,
+                    ShiftStart   = DateTime.UtcNow,
+                    TotalSales   = 0m
+                };
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Failed to open shift: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        private async Task CloseShiftAsync()
+        {
+            if (_activeSession == null) return;
+
+            IsLoading = true;
+            ClearMessages();
+            try
+            {
+                await _pos.CloseSessionAsync(_activeSession.POSSessionId);
+                ActiveSession = null;
+                StartNewSale();
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Failed to close shift: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
@@ -547,11 +637,13 @@ namespace AdminSystem_v2.ViewModels
 
         // ── Checkout ──────────────────────────────────────────────────────────
 
-        private bool CanCompleteSale() => CartItems.Count > 0 && !IsLoading && !IsCardPayment;
+        private bool CanCompleteSale() =>
+            CartItems.Count > 0 && !IsLoading && !IsCardPayment && HasActiveSession;
 
         private async Task CompleteSaleAsync()
         {
             if (CartItems.Count == 0)   { ShowError("Cart is empty.");                               return; }
+            if (!HasActiveSession)      { ShowError("No active session. Open a shift first.");        return; }
             if (IsCardPayment)          { ShowError("Card payment is not yet available.");            return; }
             if (IsCashPayment && CashReceived < GrandTotal)
             {
@@ -569,6 +661,7 @@ namespace AdminSystem_v2.ViewModels
                 var result = await _pos.CreatePOSSaleAsync(
                     userId,
                     CashierId,
+                    _activeSession?.POSSessionId,
                     CustomerDisplayName,
                     CartItems.ToList(),
                     SelectedPaymentMethod,
@@ -579,6 +672,13 @@ namespace AdminSystem_v2.ViewModels
                 result.CashierName = CashierName;
                 LastResult         = result;
                 IsReceiptVisible   = true;
+
+                // Keep local TotalSales in sync without a round-trip
+                if (_activeSession != null)
+                {
+                    _activeSession.TotalSales += result.GrandTotal;
+                    OnPropertyChanged(nameof(SessionTotalSales));
+                }
             }
             catch (InvalidOperationException ex)
             {

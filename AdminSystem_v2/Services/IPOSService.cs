@@ -13,11 +13,16 @@ namespace AdminSystem_v2.Services
         Task<POSOrderResult> CreatePOSSaleAsync(
             int    userId,
             int    cashierId,
+            int?   posSessionId,
             string customerName,
             List<POSCartItem> items,
             string  paymentMethod,
             decimal cashReceived,
             decimal discountAmount,
             string? voucherCode);
+
+        Task<POSSession?> GetActiveSessionAsync(int cashierId);
+        Task<int>         OpenSessionAsync(int cashierId, string terminalName);
+        Task              CloseSessionAsync(int sessionId);
     }
 }

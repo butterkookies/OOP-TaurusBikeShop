@@ -82,14 +82,61 @@
     <Grid>
 
         <!-- ══════════════════════════════════════════════
-             MAIN LAYOUT — Product Search | Cart+Payment
+             OUTER WRAPPER — Session bar + main POS layout
              ══════════════════════════════════════════════ -->
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="1"/>   <!-- divider -->
-                <ColumnDefinition Width="400"/>
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Session info bar (visible when a shift is open) -->
+            <Border Grid.Row="0"
+                    Background="#111111"
+                    BorderBrush="#2E2E2E"
+                    BorderThickness="0,0,0,1"
+                    Padding="14,8"
+                    Visibility="{Binding HasActiveSession, Converter={StaticResource BoolToVis}}">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse Width="8" Height="8" Fill="#22C55E"
+                                 Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding SessionTerminalName}"
+                                   Foreground="#F9FAFB" FontSize="12" FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="·" Foreground="#4A4A4A" FontSize="12"
+                                   Margin="8,0" VerticalAlignment="Center"/>
+                        <TextBlock Foreground="#9CA3AF" FontSize="12" VerticalAlignment="Center">
+                            <Run Text="Shift started "/>
+                            <Run Text="{Binding SessionShiftStart, StringFormat='{}{0:HH:mm}', Mode=OneWay}"/>
+                        </TextBlock>
+                        <TextBlock Text="·" Foreground="#4A4A4A" FontSize="12"
+                                   Margin="8,0" VerticalAlignment="Center"/>
+                        <TextBlock Foreground="#22C55E" FontSize="12" VerticalAlignment="Center">
+                            <Run Text="₱"/>
+                            <Run Text="{Binding SessionTotalSales, StringFormat='{}{0:N2}', Mode=OneWay}"/>
+                            <Run Text=" sales"/>
+                        </TextBlock>
+                    </StackPanel>
+                    <Button HorizontalAlignment="Right"
+                            Style="{StaticResource DangerButton}"
+                            Height="28" Padding="12,0" FontSize="11"
+                            Command="{Binding CloseSessionCommand}"
+                            IsEnabled="{Binding IsNotLoading}">
+                        <TextBlock Text="Close Shift" FontWeight="SemiBold"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- ══════════════════════════════════════════════
+                 MAIN LAYOUT — Product Search | Cart+Payment
+                 ══════════════════════════════════════════════ -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1"/>   <!-- divider -->
+                    <ColumnDefinition Width="400"/>
+                </Grid.ColumnDefinitions>
 
             <!-- ─────────────────────────────────────────
                  COL 0 — PRODUCT SEARCH PANEL
@@ -934,6 +981,88 @@
                     </StackPanel>
                 </Border>
             </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- ══════════════════════════════════════════════
+             SESSION GATE OVERLAY (shown when no shift is open)
+             ══════════════════════════════════════════════ -->
+        <Grid Visibility="{Binding HasActiveSession,
+                               Converter={StaticResource BoolToVis},
+                               ConverterParameter=Invert}">
+            <Rectangle Fill="#D9000000"/>
+            <Border Background="#1C1C1C"
+                    BorderBrush="#2E2E2E"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    MaxWidth="420"
+                    Padding="0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <StackPanel Margin="32,28">
+
+                    <!-- Icon -->
+                    <Border Width="48" Height="48"
+                            BorderBrush="#2E2E2E"
+                            BorderThickness="1"
+                            CornerRadius="24"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,14">
+                        <TextBlock Text="&#x1F5A5;" FontSize="22"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+
+                    <TextBlock Text="Open Shift"
+                               Foreground="#F9FAFB"
+                               FontSize="18" FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,4"/>
+                    <TextBlock Text="Enter a terminal name to begin your shift."
+                               Foreground="#6B7280" FontSize="13"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               Margin="0,0,0,20"/>
+
+                    <TextBlock Text="TERMINAL NAME"
+                               Foreground="#4A4A4A"
+                               FontSize="10" FontWeight="SemiBold"
+                               Margin="0,0,0,4"/>
+                    <TextBox Text="{Binding TerminalNameInput, UpdateSourceTrigger=PropertyChanged}"
+                             Height="36" Padding="12,0"
+                             VerticalContentAlignment="Center"
+                             FontSize="13"
+                             Margin="0,0,0,8"/>
+
+                    <!-- Error message -->
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               Foreground="#F87171" FontSize="12"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,8"
+                               Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}"/>
+
+                    <Button MinHeight="40"
+                            Command="{Binding OpenSessionCommand}"
+                            IsEnabled="{Binding IsNotLoading}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                                <Setter Property="Background" Value="#DC2626"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#B91C1C"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Background" Value="#4A4A4A"/>
+                                        <Setter Property="Foreground" Value="#6B7280"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <TextBlock Text="Open Shift" FontSize="14" FontWeight="Bold"/>
+                    </Button>
+
+                </StackPanel>
+            </Border>
         </Grid>
 
         <!-- ══════════════════════════════════════════════
