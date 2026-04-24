@@ -1,0 +1,71 @@
+# POS Receipt Printing for Walk-in Sales
+
+After a POS sale is completed, a receipt should be automatically generated and printed. The receipt overlay already exists on-screen but there is **no print functionality** — no print button, no print service, and no printing infrastructure.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Printer compatibility**: The implementation uses WPF's built-in `PrintDialog` + `FlowDocument` API — this works with any Windows-installed printer (thermal printers, Epson L3210, etc.). No third-party NuGet packages are needed. The receipt will be formatted to fit a **58mm or 80mm thermal paper width** by default (configurable).
+
+> [!WARNING]
+> **Auto-print behavior**: The receipt will print **automatically** after every successful sale via [CompleteSaleAsync](file:///c:/Andrei.dev/Projects/OOP-TaurusBikeShop/AdminSystem_v2/ViewModels/POSViewModel.cs#548-592). A "Print Receipt" button will also be added to the receipt overlay for reprints. If this auto-print-on-every-sale behavior is not desired, let me know.
+
+## Proposed Changes
+
+### Print Service
+
+#### [NEW] [IReceiptPrintService.cs](file:///c:/Andrei.dev/Projects/OOP-TaurusBikeShop/AdminSystem_v2/Services/IReceiptPrintService.cs)
+
+Interface with a single method:
+```csharp
+void PrintReceipt(POSOrderResult result);
+```
+
+#### [NEW] [ReceiptPrintService.cs](file:///c:/Andrei.dev/Projects/OOP-TaurusBikeShop/AdminSystem_v2/Services/ReceiptPrintService.cs)
+
+Implementation that:
+1. Builds a WPF `FlowDocument` formatted as a receipt (store name, order number, items table, totals, payment info, date/time, "Thank you" footer)
+2. Uses `PrintDialog.PrintDocument()` to send silently to the **default printer** (no dialog popup — important for POS workflow speed)
+3. Paper width defaults to 80mm (≈302px at 96 DPI), adjustable via a constant
+4. Gracefully handles printer errors (logs to Debug, shows no crash)
+
+---
+
+### ViewModel Changes
+
+#### [MODIFY] [POSViewModel.cs](file:///c:/Andrei.dev/Projects/OOP-TaurusBikeShop/AdminSystem_v2/ViewModels/POSViewModel.cs)
+
+- Inject `IReceiptPrintService` via constructor (alongside existing `IPOSService`)
+- Add `PrintReceiptCommand` (ICommand) that calls `_printService.PrintReceipt(LastResult)`
+- In [CompleteSaleAsync](file:///c:/Andrei.dev/Projects/OOP-TaurusBikeShop/AdminSystem_v2/ViewModels/POSViewModel.cs#548-592), after setting `IsReceiptVisible = true`, auto-call `_printService.PrintReceipt(result)` wrapped in try/catch
+
+---
+
+### View Changes
+
+#### [MODIFY] [POSView.xaml](file:///c:/Andrei.dev/Projects/OOP-TaurusBikeShop/AdminSystem_v2/Views/POSView.xaml)
+
+In the receipt overlay actions area (line ~1054), add a **"🖨 Print Receipt"** button next to the existing "New Sale" button, bound to `PrintReceiptCommand`.
+
+---
+
+### DI Registration
+
+#### [MODIFY] [App.xaml.cs](file:///c:/Andrei.dev/Projects/OOP-TaurusBikeShop/AdminSystem_v2/App.xaml.cs)
+
+- Instantiate `ReceiptPrintService` in [OnStartup](file:///c:/Andrei.dev/Projects/OOP-TaurusBikeShop/AdminSystem_v2/App.xaml.cs#15-47)
+- Pass `IReceiptPrintService` through [ShowLogin](file:///c:/Andrei.dev/Projects/OOP-TaurusBikeShop/AdminSystem_v2/App.xaml.cs#48-72) → [ShowMain](file:///c:/Andrei.dev/Projects/OOP-TaurusBikeShop/AdminSystem_v2/App.xaml.cs#73-107) → [POSViewModel](file:///c:/Andrei.dev/Projects/OOP-TaurusBikeShop/AdminSystem_v2/ViewModels/POSViewModel.cs#216-236) constructor
+
+## Verification Plan
+
+### Automated Tests
+- `dotnet build` to confirm no compile errors (command: `dotnet build c:\Andrei.dev\Projects\OOP-TaurusBikeShop\AdminSystem_v2\AdminSystem_v2.csproj`)
+
+### Manual Verification
+1. Launch AdminSystem_v2 and log in
+2. Navigate to the POS page
+3. Add items to cart, select "Cash" payment, enter cash received ≥ total
+4. Click "Complete Sale"
+5. **Expected**: Receipt overlay appears, and the receipt is sent to the default printer automatically
+6. Click "🖨 Print Receipt" on the overlay → receipt reprints
+7. If no printer is connected, verify no crash occurs (error is silently logged)

@@ -1,573 +1,1087 @@
+// =============================================================================
+//  Taurus Bike Shop — Complete DBML Schema
+//  Source: Taurus_seed_5.sql  (SQL Server 2022, schema v11.0)
+//  Generated: 2026-04-24
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+//  ENUMS (derived from CHECK constraints)
+// ---------------------------------------------------------------------------
+
+Enum OrderStatus {
+  Pending
+  PendingVerification
+  OnHold
+  Processing
+  ReadyForPickup
+  PickedUp
+  OutForDelivery
+  Delivered
+  Cancelled
+}
+
+Enum FulfillmentType {
+  Delivery
+  Pickup
+  WalkIn
+}
+
+Enum PaymentMethod {
+  GCash
+  BankTransfer
+  Cash
+}
+
+Enum PaymentStage {
+  Upfront
+  Confirmation
+}
+
+Enum PaymentStatus {
+  Pending
+  VerificationPending
+  VerificationRejected
+  Completed
+  Failed
+}
+
+Enum DeliveryStatus {
+  Pending
+  PickedUp
+  InTransit
+  Delivered
+  Failed
+}
+
+Enum Courier {
+  Lalamove
+  LBC
+}
+
+Enum NotifChannel {
+  SMS
+  Email
+  InApp
+}
+
+Enum NotifStatus {
+  Pending
+  Sent
+  Failed
+}
+
+Enum TicketSource {
+  Customer
+  Admin
+  System
+}
+
+Enum TicketCategory {
+  DamagedItem
+  WrongItem
+  DeliveryIssue
+  PaymentIssue
+  ReturnRefund
+  ProductInquiry
+  General
+}
+
+Enum TicketStatus {
+  Open
+  InProgress
+  AwaitingResponse
+  Resolved
+  Closed
+}
+
+Enum SupportTaskType {
+  ShipReplacement
+  ArrangeReturn
+  ContactSupplier
+  Other
+}
+
+Enum SupportTaskStatus {
+  Pending
+  InProgress
+  Done
+  Cancelled
+}
+
+Enum RefundStatus {
+  Pending
+  Approved
+  Rejected
+  Completed
+}
+
+Enum RefundMethod {
+  OriginalPayment
+  StoreCredit
+  Cash
+}
+
+Enum DiscountType {
+  Percentage
+  Fixed
+}
+
+Enum Currency {
+  PHP
+  USD
+  EUR
+}
+
+Enum RoleName {
+  Admin
+  Manager
+  Cashier
+  Staff
+  Customer
+}
+
+Enum AddressLabel {
+  Home
+  Work
+  Other
+}
+
+Enum ImageType {
+  Full
+  Medium
+  Thumbnail
+}
+
+Enum InventoryChangeType {
+  Purchase
+  Sale
+  Return
+  Adjustment
+  Damage
+  Loss
+  Lock
+  Unlock
+}
+
+Enum PurchaseOrderStatus {
+  Pending
+  Received
+  Cancelled
+}
+
+Enum StorePaymentAccountMethod {
+  GCash
+  BankTransfer
+}
+
+// ---------------------------------------------------------------------------
+//  TABLES
+// ---------------------------------------------------------------------------
+
 Table User {
-  UserId int [primary key, not null]
-  Email varchar
-  PasswordHash varchar
-  FirstName varchar [not null]
-  LastName varchar [not null]
-  PhoneNumber varchar
+  UserId int [pk, increment, not null]
+  Email nvarchar(255)
+  PasswordHash nvarchar(255)
+  FirstName nvarchar(100) [not null]
+  LastName nvarchar(100) [not null]
+  PhoneNumber nvarchar(20)
   DefaultAddressId int
-  IsActive bit [not null]
-  IsWalkIn bit [not null]
-  CreatedAt timestamp [not null]
-  LastLoginAt timestamp
-  FailedLoginAttempts int [not null]
-  LockoutUntil timestamp
-  IsDeleted bit [not null]
-}
+  IsActive bit [not null, default: 1]
+  IsWalkIn bit [not null, default: 0]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+  LastLoginAt datetime2
+  FailedLoginAttempts int [not null, default: 0]
+  LockoutUntil datetime2
+  IsDeleted bit [not null, default: 0]
 
-Table Order {
-  OrderId int [primary key, not null]
-  UserId int
-  OrderNumber varchar [not null]
-  OrderDate timestamp [not null]
-  OrderStatus varchar [not null]
-  SubTotal decimal [not null]
-  DiscountAmount decimal [not null]
-  ShippingFee decimal [not null]
-  ShippingAddressId int
-  ContactPhone varchar
-  DeliveryInstructions varchar
-  IsWalkIn bit [not null]
-  CreatedAt timestamp [not null]
-  UpdatedAt timestamp
-  IsDeleted bit [not null]
-  FulfillmentType varchar [not null]
-  GuestSessionId int
-  CartId int
-  POSSessionId int
-  PaymentMethod varchar [not null]
-}
+  Note: 'CK: IsWalkIn=1 OR (Email IS NOT NULL AND PasswordHash IS NOT NULL)'
 
-Table OrderItem {
-  OrderItemId int [primary key, not null]
-  OrderId int [not null]
-  ProductId int [not null]
-  ProductVariantId int
-  Quantity int [not null]
-  UnitPrice decimal [not null]
-}
-
-Table PickupOrder {
-  PickupOrderId int [primary key, not null]
-  OrderId int [not null]
-  PickupReadyAt timestamp
-  PickupExpiresAt timestamp
-  PickupConfirmedAt timestamp
+  indexes {
+    Email [unique, name: 'UX_User_Email', note: 'WHERE Email IS NOT NULL AND IsWalkIn=0']
+    IsActive [name: 'IX_User_IsActive']
+    IsDeleted [name: 'IX_User_IsDeleted', note: 'WHERE IsDeleted=0']
+    IsWalkIn [name: 'IX_User_IsWalkIn']
+    PhoneNumber [name: 'IX_User_PhoneNumber']
+    DefaultAddressId [name: 'IX_User_DefaultAddressId', note: 'WHERE DefaultAddressId IS NOT NULL']
+  }
 }
 
 Table Address {
-  AddressId int [primary key, not null]
+  AddressId int [pk, increment, not null]
   UserId int [not null]
-  Label varchar [not null]
-  Street varchar [not null]
-  City varchar [not null]
-  PostalCode varchar [not null]
-  Province varchar
-  Country varchar [not null]
-  IsDefault bit [not null]
-  IsSnapshot bit [not null]
-  CreatedAt timestamp [not null]
-}
+  Label nvarchar(50) [not null, default: 'Home', note: 'Home | Work | Other']
+  Street nvarchar(500) [not null]
+  City nvarchar(100) [not null]
+  PostalCode nvarchar(20) [not null]
+  Province nvarchar(100)
+  Country nvarchar(100) [not null, default: 'Philippines']
+  IsDefault bit [not null, default: 0]
+  IsSnapshot bit [not null, default: 0]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
 
-Table Payment {
-  PaymentId int [primary key, not null]
-  OrderId int [not null]
-  PaymentMethod varchar [not null]
-  PaymentStage varchar [not null]
-  PaymentStatus varchar [not null]
-  Amount decimal [not null]
-  PaymentDate timestamp
-  CreatedAt timestamp [not null]
-  IsDeleted bit [not null]
-  PaidToAccountName varchar
-  PaidToAccountNumber varchar
-  PaidToBankName varchar
-}
-
-Table GCashPayment {
-  PaymentId int [not null]
-  GcashTransactionId varchar
-  ScreenshotUrl varchar
-  StorageBucket varchar
-  StoragePath varchar
-  SubmittedAt timestamp
-}
-
-Table BankTransferPayment {
-  PaymentId int [not null]
-  BpiReferenceNumber varchar
-  ProofUrl varchar
-  ProofStorageBucket varchar
-  ProofStoragePath varchar
-  VerifiedByUserId int
-  VerificationNotes varchar
-  VerifiedAt timestamp
-  VerificationDeadline timestamp
-  SubmittedAt timestamp
-}
-
-Table VoucherUsage {
-  VoucherUsageId int [primary key, not null]
-  VoucherId int [not null]
-  UserId int [not null]
-  OrderId int [not null]
-  DiscountAmount decimal [not null]
-  UsedAt timestamp [not null]
-}
-
-Table ProductImage {
-  ProductImageId int [primary key, not null]
-  ProductId int [not null]
-  StorageBucket varchar [not null]
-  StoragePath varchar [not null]
-  ImageUrl varchar [not null]
-  ImageType varchar [not null]
-  IsPrimary bit [not null]
-  DisplayOrder int [not null]
-  AltText varchar
-  FileSizeBytes int
-  MimeType varchar
-  Width int
-  Height int
-  UploadedByUserId int
-  CreatedAt timestamp [not null]
-}
-
-Table Category {
-  CategoryId int [primary key, not null]
-  CategoryCode varchar [not null]
-  Name varchar [not null]
-  Description varchar
-  ParentCategoryId int
-  IsActive bit [not null]
-  DisplayOrder int [not null]
-}
-
-Table Brand {
-  BrandId int [primary key, not null]
-  BrandName varchar [not null]
-  Country varchar
-  Website varchar
-  Description varchar
-  IsActive bit [not null]
-  CreatedAt timestamp [not null]
-}
-
-Table Product {
-  ProductId int [primary key, not null]
-  CategoryId int [not null]
-  BrandId int
-  SKU varchar
-  Name varchar [not null]
-  ShortDescription varchar
-  Description varchar
-  Price decimal [not null]
-  Currency varchar [not null]
-  Material varchar
-  Color varchar
-  WheelSize varchar
-  SpeedCompatibility varchar
-  BoostCompatible bit
-  TubelessReady bit
-  AxleStandard varchar
-  SuspensionTravel varchar
-  BrakeType varchar
-  AdditionalSpecs varchar
-  IsActive bit [not null]
-  IsFeatured bit [not null]
-  CreatedAt timestamp [not null]
-  UpdatedAt timestamp
-}
-
-Table ProductVariant {
-  ProductVariantId int [primary key, not null]
-  ProductId int [not null]
-  VariantName varchar [not null]
-  SKU varchar
-  AdditionalPrice decimal [not null]
-  StockQuantity int [not null]
-  IsActive bit [not null]
-  CreatedAt timestamp [not null]
-  UpdatedAt timestamp
-  ReorderThreshold int [not null]
-}
-
-Table Notification {
-  NotificationId int [primary key, not null]
-  UserId int [not null]
-  OrderId int
-  TicketId int
-  Channel varchar [not null]
-  NotifType varchar [not null]
-  Recipient varchar [not null]
-  Subject varchar
-  Body varchar
-  Status varchar [not null]
-  RetryCount int [not null]
-  SentAt timestamp
-  FailureReason varchar
-  CreatedAt timestamp [not null]
-  IsRead bit [not null]
-  ReadAt timestamp
-}
-
-Table SupportTicket {
-  TicketId int [primary key, not null]
-  UserId int [not null]
-  OrderId int
-  TicketSource varchar [not null]
-  TicketCategory varchar [not null]
-  Subject varchar [not null]
-  Description varchar
-  AttachmentUrl varchar
-  AttachmentBucket varchar
-  AttachmentPath varchar
-  TicketStatus varchar [not null]
-  AssignedToUserId int
-  ResolvedAt timestamp
-  CreatedAt timestamp [not null]
-  UpdatedAt timestamp
-}
-
-Table LBCDelivery {
-  DeliveryId int [not null]
-  TrackingNumber varchar
-}
-
-Table Delivery {
-  DeliveryId int [primary key, not null]
-  OrderId int [not null]
-  Courier varchar [not null]
-  DeliveryStatus varchar [not null]
-  IsDelayed bit [not null]
-  DelayedUntil timestamp
-  EstimatedDeliveryTime timestamp
-  ActualDeliveryTime timestamp
-  CreatedAt timestamp [not null]
-}
-
-Table LalamoveDelivery {
-  DeliveryId int [not null]
-  BookingRef varchar
-  DriverName varchar
-  DriverPhone varchar
-}
-
-Table Supplier {
-  SupplierId int [primary key, not null]
-  Name varchar [not null]
-  ContactPerson varchar
-  PhoneNumber varchar
-  Email varchar
-  Address varchar
-  IsActive bit [not null]
-  CreatedAt timestamp [not null]
-}
-
-Table PurchaseOrder {
-  PurchaseOrderId int [primary key, not null]
-  SupplierId int [not null]
-  OrderDate timestamp [not null]
-  ExpectedDeliveryDate timestamp
-  Status varchar [not null]
-  CreatedByUserId int
-  CreatedAt timestamp [not null]
-}
-
-Table PurchaseOrderItem {
-  PurchaseOrderItemId int [primary key, not null]
-  PurchaseOrderId int [not null]
-  ProductId int [not null]
-  ProductVariantId int
-  Quantity int [not null]
-  UnitPrice decimal [not null]
-}
-
-Table __EFMigrationsHistory {
-  MigrationId varchar [not null]
-  ProductVersion varchar [not null]
-}
-
-Table ActiveSession {
-  SessionId int [primary key, not null]
-  UserId int [not null]
-  RefreshToken varchar [not null]
-  DeviceInfo varchar
-  IpAddress varchar
-  IsRevoked bit [not null]
-  ExpiresAt timestamp [not null]
-  CreatedAt timestamp [not null]
-  RevokedAt timestamp
-}
-
-Table Cart {
-  CartId int [primary key, not null]
-  UserId int
-  GuestSessionId int
-  CreatedAt timestamp [not null]
-  LastUpdatedAt timestamp
-  IsCheckedOut bit [not null]
-}
-
-Table CartItem {
-  CartItemId int [primary key, not null]
-  CartId int [not null]
-  ProductId int [not null]
-  ProductVariantId int
-  Quantity int [not null]
-  PriceAtAdd decimal [not null]
-  AddedAt timestamp [not null]
-}
-
-Table GuestSession {
-  GuestSessionId int [primary key, not null]
-  SessionToken varchar [not null]
-  Email varchar
-  PhoneNumber varchar
-  ConvertedToUserId int
-  ExpiresAt timestamp [not null]
-  CreatedAt timestamp [not null]
-}
-
-Table InventoryLog {
-  InventoryLogId bigint [primary key, not null]
-  ProductId int [not null]
-  ProductVariantId int
-  ChangeQuantity int [not null]
-  ChangeType varchar [not null]
-  OrderId int
-  PurchaseOrderId int
-  ChangedByUserId int
-  Notes varchar
-  CreatedAt timestamp [not null]
-}
-
-Table OrderStatusAudit {
-  AuditId bigint [primary key, not null]
-  OrderId int [not null]
-  FromStatus varchar [not null]
-  ToStatus varchar [not null]
-  Success bit [not null]
-  Reason varchar
-  CreatedAt timestamp [not null]
-}
-
-Table OTPVerification {
-  OTPId int [primary key, not null]
-  Email varchar [not null]
-  OTPCode varchar [not null]
-  IsUsed bit [not null]
-  ExpiresAt timestamp [not null]
-  CreatedAt timestamp [not null]
-}
-
-Table POS_Session {
-  POSSessionId int [primary key, not null]
-  UserId int [not null]
-  TerminalName varchar [not null]
-  ShiftStart timestamp [not null]
-  ShiftEnd timestamp
-  TotalSales decimal [not null]
-  CreatedAt timestamp [not null]
-}
-
-Table PriceHistory {
-  PriceHistoryId int [primary key, not null]
-  ProductId int [not null]
-  OldPrice decimal [not null]
-  NewPrice decimal [not null]
-  ChangedAt timestamp [not null]
-  ChangedByUserId int
-  Notes varchar
-}
-
-Table Refund {
-  RefundId int [primary key, not null]
-  OrderId int [not null]
-  PaymentId int
-  RefundAmount decimal [not null]
-  RefundReason varchar [not null]
-  RefundStatus varchar [not null]
-  RefundMethod varchar
-  RequestedByUserId int
-  ApprovedByUserId int
-  TicketId int
-  Notes varchar
-  CreatedAt timestamp [not null]
-  ProcessedAt timestamp
-}
-
-Table Review {
-  ReviewId int [primary key, not null]
-  UserId int [not null]
-  ProductId int [not null]
-  OrderId int [not null]
-  Rating int [not null]
-  Comment varchar
-  IsVerifiedPurchase bit [not null]
-  CreatedAt timestamp [not null]
+  indexes {
+    UserId [name: 'IX_Address_UserId']
+    (UserId, IsDefault) [name: 'IX_Address_IsDefault', note: 'WHERE IsDefault=1']
+    IsSnapshot [name: 'IX_Address_IsSnapshot']
+  }
 }
 
 Table Role {
-  RoleId int [primary key, not null]
-  RoleName varchar [not null]
-  Description varchar
-  CreatedAt timestamp [not null]
-}
+  RoleId int [pk, increment, not null]
+  RoleName nvarchar(50) [unique, not null, note: 'Admin | Manager | Cashier | Staff | Customer']
+  Description nvarchar(255)
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
 
-Table StorePaymentAccount {
-  StorePaymentAccountId int [primary key, not null]
-  PaymentMethod varchar [not null]
-  AccountName varchar [not null]
-  AccountNumber varchar [not null]
-  BankName varchar
-  QrImageUrl varchar
-  Instructions varchar
-  IsActive bit [not null]
-  DisplayOrder int [not null]
-  CreatedAt timestamp [not null]
-  UpdatedAt timestamp [not null]
-}
-
-Table SupportTask {
-  TaskId int [primary key, not null]
-  TicketId int [not null]
-  AssignedToUserId int
-  TaskType varchar [not null]
-  TaskStatus varchar [not null]
-  DueDate timestamp
-  Notes varchar
-  CreatedAt timestamp [not null]
-  CompletedAt timestamp
-}
-
-Table SupportTicketReply {
-  ReplyId bigint [primary key, not null]
-  TicketId int [not null]
-  UserId int [not null]
-  IsAdminReply bit [not null]
-  Message varchar [not null]
-  AttachmentUrl varchar
-  AttachmentBucket varchar
-  AttachmentPath varchar
-  CreatedAt timestamp [not null]
-}
-
-Table SystemLog {
-  SystemLogId bigint [primary key, not null]
-  UserId int
-  EventType varchar [not null]
-  EventDescription varchar
-  CreatedAt timestamp [not null]
+  indexes {
+    RoleName [name: 'IX_Role_RoleName']
+  }
 }
 
 Table UserRole {
-  UserRoleId int [primary key, not null]
+  UserRoleId int [pk, increment, not null]
   UserId int [not null]
   RoleId int [not null]
-  AssignedAt timestamp [not null]
+  AssignedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    (UserId, RoleId) [unique, name: 'UX_UserRole_Pair']
+    UserId [name: 'IX_UserRole_UserId']
+    RoleId [name: 'IX_UserRole_RoleId']
+  }
+}
+
+Table ActiveSession {
+  SessionId int [pk, increment, not null]
+  UserId int [not null]
+  RefreshToken nvarchar(500) [unique, not null]
+  DeviceInfo nvarchar(500)
+  IpAddress nvarchar(50)
+  IsRevoked bit [not null, default: 0]
+  ExpiresAt datetime2 [not null]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+  RevokedAt datetime2
+
+  indexes {
+    (UserId, ExpiresAt) [name: 'IX_ActiveSession_Active', note: 'WHERE IsRevoked=0']
+    UserId [name: 'IX_ActiveSession_UserId']
+    RefreshToken [unique, name: 'UX_ActiveSession_Token']
+  }
+}
+
+Table OTPVerification {
+  OTPId int [pk, increment, not null]
+  Email nvarchar(255) [not null]
+  OTPCode nvarchar(128) [not null]
+  IsUsed bit [not null, default: 0]
+  ExpiresAt datetime2 [not null]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+  UserId int
+
+  indexes {
+    Email [name: 'IX_OTP_Email']
+    ExpiresAt [name: 'IX_OTP_ExpiresAt']
+  }
+}
+
+Table GuestSession {
+  GuestSessionId int [pk, increment, not null]
+  SessionToken nvarchar(100) [unique, not null, note: 'CK: len >= 32']
+  Email nvarchar(255)
+  PhoneNumber nvarchar(20)
+  ConvertedToUserId int
+  ExpiresAt datetime2 [not null]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    SessionToken [name: 'IX_GuestSession_Token']
+    ExpiresAt [name: 'IX_GuestSession_ExpiresAt']
+  }
+}
+
+// --- Catalog ---
+
+Table Category {
+  CategoryId int [pk, increment, not null]
+  CategoryCode varchar(20) [unique, not null]
+  Name nvarchar(100) [not null]
+  Description nvarchar(500)
+  ParentCategoryId int
+  IsActive bit [not null, default: 1]
+  DisplayOrder int [not null, default: 0]
+
+  indexes {
+    ParentCategoryId [name: 'IX_Category_ParentCategoryId']
+    DisplayOrder [name: 'IX_Category_DisplayOrder']
+  }
+}
+
+Table Brand {
+  BrandId int [pk, increment, not null]
+  BrandName nvarchar(100) [unique, not null]
+  Country nvarchar(100)
+  Website nvarchar(255)
+  Description nvarchar(500)
+  IsActive bit [not null, default: 1]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+}
+
+Table Product {
+  ProductId int [pk, increment, not null]
+  CategoryId int [not null]
+  BrandId int
+  SKU varchar(50) [note: 'Unique where NOT NULL']
+  Name nvarchar(200) [not null]
+  ShortDescription nvarchar(300)
+  Description nvarchar(max)
+  Price decimal(10,2) [not null, note: 'CK: >= 0']
+  Currency char(3) [not null, default: 'PHP', note: 'PHP | USD | EUR']
+  Material nvarchar(100)
+  Color nvarchar(100)
+  WheelSize nvarchar(20)
+  SpeedCompatibility nvarchar(50)
+  BoostCompatible bit
+  TubelessReady bit
+  AxleStandard nvarchar(50)
+  SuspensionTravel nvarchar(50)
+  BrakeType nvarchar(100)
+  AdditionalSpecs nvarchar(1000) [note: 'JSON validated via CK']
+  IsActive bit [not null, default: 1]
+  IsFeatured bit [not null, default: 0]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+  UpdatedAt datetime2
+
+  indexes {
+    CategoryId [name: 'IX_Product_CategoryId']
+    BrandId [name: 'IX_Product_BrandId']
+    SKU [unique, name: 'UX_Product_SKU', note: 'WHERE SKU IS NOT NULL']
+    Name [name: 'IX_Product_Name']
+    (Price, IsActive) [name: 'IX_Product_Price']
+  }
+}
+
+Table ProductVariant {
+  ProductVariantId int [pk, increment, not null]
+  ProductId int [not null]
+  VariantName nvarchar(100) [not null]
+  SKU nvarchar(50) [note: 'Unique where NOT NULL']
+  AdditionalPrice decimal(10,2) [not null, default: 0, note: 'CK: >= 0']
+  StockQuantity int [not null, default: 0, note: 'CK: >= 0']
+  IsActive bit [not null, default: 1]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+  UpdatedAt datetime2
+  ReorderThreshold int [not null, default: 5, note: 'CK: >= 0']
+
+  indexes {
+    ProductId [name: 'IX_ProductVariant_ProductId']
+    SKU [unique, name: 'UX_ProductVariant_SKU', note: 'WHERE SKU IS NOT NULL']
+    ReorderThreshold [name: 'IX_ProductVariant_ReorderThreshold']
+  }
+}
+
+Table ProductImage {
+  ProductImageId int [pk, increment, not null]
+  ProductId int [not null]
+  StorageBucket nvarchar(200) [not null]
+  StoragePath nvarchar(1000) [not null]
+  ImageUrl nvarchar(1000) [not null]
+  ImageType nvarchar(50) [not null, note: 'Full | Medium | Thumbnail']
+  IsPrimary bit [not null, default: 0]
+  DisplayOrder int [not null, default: 0, note: 'CK: >= 0']
+  AltText nvarchar(200)
+  FileSizeBytes int
+  MimeType nvarchar(50)
+  Width int
+  Height int
+  UploadedByUserId int
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    ProductId [name: 'IX_ProductImage_ProductId']
+    ProductId [unique, name: 'UX_ProductImage_Primary', note: 'WHERE IsPrimary=1']
+    IsPrimary [name: 'IX_ProductImage_IsPrimary']
+    ImageType [name: 'IX_ProductImage_ImageType']
+    DisplayOrder [name: 'IX_ProductImage_DisplayOrder']
+  }
+}
+
+Table PriceHistory {
+  PriceHistoryId int [pk, increment, not null]
+  ProductId int [not null]
+  OldPrice decimal(10,2) [not null]
+  NewPrice decimal(10,2) [not null]
+  ChangedAt datetime2 [not null, default: `sysdatetime()`]
+  ChangedByUserId int
+  Notes nvarchar(500)
+
+  indexes {
+    (ProductId, ChangedAt) [name: 'IX_PriceHistory_ProductId']
+    ChangedAt [name: 'IX_PriceHistory_ChangedAt']
+  }
+}
+
+// --- Cart & Checkout ---
+
+Table Cart {
+  CartId int [pk, increment, not null]
+  UserId int
+  GuestSessionId int
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+  LastUpdatedAt datetime2
+  IsCheckedOut bit [not null, default: 0]
+
+  Note: 'CK: exactly one of UserId or GuestSessionId must be set'
+
+  indexes {
+    UserId [name: 'IX_Cart_UserId']
+    GuestSessionId [name: 'IX_Cart_GuestSessionId']
+    UserId [unique, name: 'UX_Cart_User_Active', note: 'WHERE IsCheckedOut=0 AND UserId IS NOT NULL']
+    GuestSessionId [unique, name: 'UX_Cart_Guest_Active', note: 'WHERE IsCheckedOut=0 AND GuestSessionId IS NOT NULL']
+  }
+}
+
+Table CartItem {
+  CartItemId int [pk, increment, not null]
+  CartId int [not null]
+  ProductId int [not null]
+  ProductVariantId int
+  Quantity int [not null, note: 'CK: > 0']
+  PriceAtAdd decimal(10,2) [not null, note: 'CK: >= 0']
+  AddedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    CartId [name: 'IX_CartItem_CartId']
+    ProductId [name: 'IX_CartItem_ProductId']
+    ProductVariantId [name: 'IX_CartItem_ProductVariantId']
+    (CartId, ProductId, ProductVariantId) [name: 'IX_CartItem_CartId_Product']
+  }
+}
+
+// --- Orders ---
+
+Table "Order" {
+  OrderId int [pk, increment, not null]
+  UserId int
+  OrderNumber nvarchar(50) [unique, not null]
+  OrderDate datetime2 [not null, default: `sysdatetime()`]
+  OrderStatus nvarchar(50) [not null, note: 'See enum OrderStatus']
+  SubTotal decimal(10,2) [not null, note: 'CK: >= 0']
+  DiscountAmount decimal(10,2) [not null, default: 0, note: 'CK: >= 0']
+  ShippingFee decimal(10,2) [not null, default: 0, note: 'CK: >= 0']
+  ShippingAddressId int
+  ContactPhone nvarchar(20)
+  DeliveryInstructions nvarchar(500)
+  IsWalkIn bit [not null, default: 0]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+  UpdatedAt datetime2
+  IsDeleted bit [not null, default: 0]
+  FulfillmentType nvarchar(20) [not null, default: 'Delivery', note: 'Delivery | Pickup | WalkIn']
+  GuestSessionId int
+  CartId int
+  POSSessionId int
+  TotalAmount decimal(10,2) [not null, note: 'COMPUTED PERSISTED: (SubTotal - DiscountAmount) + ShippingFee']
+  PaymentMethod nvarchar(50) [not null, note: 'GCash | BankTransfer | Cash']
+
+  Note: 'CK: UserId IS NOT NULL OR GuestSessionId IS NOT NULL'
+
+  indexes {
+    OrderNumber [name: 'IX_Order_OrderNumber']
+    OrderDate [name: 'IX_Order_OrderDate']
+    OrderStatus [name: 'IX_Order_OrderStatus']
+    FulfillmentType [name: 'IX_Order_FulfillmentType']
+    IsWalkIn [name: 'IX_Order_IsWalkIn']
+    IsDeleted [name: 'IX_Order_IsDeleted', note: 'WHERE IsDeleted=0']
+    UserId [name: 'IX_Order_UserId']
+    (UserId, OrderStatus) [name: 'IX_Order_UserId_Status', note: 'INCLUDE(OrderDate,TotalAmount,FulfillmentType) WHERE IsDeleted=0']
+    ShippingAddressId [name: 'IX_Order_ShippingAddressId', note: 'WHERE ShippingAddressId IS NOT NULL']
+    CartId [name: 'IX_Order_CartId', note: 'WHERE CartId IS NOT NULL']
+    POSSessionId [name: 'IX_Order_POSSessionId', note: 'WHERE POSSessionId IS NOT NULL']
+  }
+}
+
+Table OrderItem {
+  OrderItemId int [pk, increment, not null]
+  OrderId int [not null]
+  ProductId int [not null]
+  ProductVariantId int
+  Quantity int [not null, note: 'CK: > 0']
+  UnitPrice decimal(10,2) [not null, note: 'CK: >= 0']
+
+  indexes {
+    OrderId [name: 'IX_OrderItem_OrderId']
+    ProductId [name: 'IX_OrderItem_ProductId']
+    ProductVariantId [name: 'IX_OrderItem_ProductVariantId']
+  }
+}
+
+Table OrderStatusAudit {
+  AuditId bigint [pk, increment, not null]
+  OrderId int [not null]
+  FromStatus nvarchar(50) [not null]
+  ToStatus nvarchar(50) [not null]
+  Success bit [not null, default: 1]
+  Reason nvarchar(500)
+  CreatedAt datetime2 [not null, default: `getutcdate()`]
+
+  indexes {
+    (OrderId, CreatedAt) [name: 'IX_OrderStatusAudit_OrderId']
+  }
+}
+
+Table PickupOrder {
+  PickupOrderId int [pk, increment, not null]
+  OrderId int [unique, not null]
+  PickupReadyAt datetime2
+  PickupExpiresAt datetime2
+  PickupConfirmedAt datetime2
+
+  indexes {
+    PickupExpiresAt [name: 'IX_PickupOrder_ExpiresAt', note: 'WHERE PickupExpiresAt IS NOT NULL']
+  }
+}
+
+// --- Payments ---
+
+Table Payment {
+  PaymentId int [pk, increment, not null]
+  OrderId int [not null]
+  PaymentMethod nvarchar(50) [not null, note: 'GCash | BankTransfer | Cash']
+  PaymentStage nvarchar(20) [not null, default: 'Upfront', note: 'Upfront | Confirmation']
+  PaymentStatus nvarchar(50) [not null, note: 'See enum PaymentStatus']
+  Amount decimal(10,2) [not null, note: 'CK: >= 0']
+  PaymentDate datetime2
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+  IsDeleted bit [not null, default: 0]
+  PaidToAccountName nvarchar(150)
+  PaidToAccountNumber nvarchar(50)
+  PaidToBankName nvarchar(100)
+  StorePaymentAccountId int
+
+  indexes {
+    OrderId [name: 'IX_Payment_OrderId']
+    PaymentMethod [name: 'IX_Payment_Method']
+    PaymentStage [name: 'IX_Payment_Stage']
+    PaymentStatus [name: 'IX_Payment_Status']
+    IsDeleted [name: 'IX_Payment_IsDeleted', note: 'WHERE IsDeleted=0']
+  }
+}
+
+Table GCashPayment {
+  PaymentId int [pk, not null]
+  GcashTransactionId nvarchar(255) [note: 'Unique where NOT NULL']
+  ScreenshotUrl nvarchar(1000)
+  StorageBucket nvarchar(200)
+  StoragePath nvarchar(1000)
+  SubmittedAt datetime2
+
+  indexes {
+    GcashTransactionId [unique, name: 'UX_GCashPayment_TxnId', note: 'WHERE GcashTransactionId IS NOT NULL']
+  }
+}
+
+Table BankTransferPayment {
+  PaymentId int [pk, not null]
+  BpiReferenceNumber nvarchar(255) [note: 'Unique where NOT NULL']
+  ProofUrl nvarchar(1000)
+  ProofStorageBucket nvarchar(200)
+  ProofStoragePath nvarchar(1000)
+  VerifiedByUserId int
+  VerificationNotes nvarchar(500)
+  VerifiedAt datetime2
+  VerificationDeadline datetime2
+  SubmittedAt datetime2
+
+  indexes {
+    BpiReferenceNumber [unique, name: 'UX_BTP_BpiRef', note: 'WHERE BpiReferenceNumber IS NOT NULL']
+    VerificationDeadline [name: 'IX_BTP_VerificationDeadline', note: 'WHERE VerificationDeadline IS NOT NULL']
+  }
+}
+
+Table StorePaymentAccount {
+  StorePaymentAccountId int [pk, increment, not null]
+  PaymentMethod nvarchar(50) [not null, note: 'GCash | BankTransfer']
+  AccountName nvarchar(150) [not null]
+  AccountNumber nvarchar(50) [not null, note: 'CK: GCash=11 digits starting 09, BankTransfer=10 digits']
+  BankName nvarchar(100)
+  QrImageUrl nvarchar(1000)
+  Instructions nvarchar(500)
+  IsActive bit [not null, default: 1]
+  DisplayOrder int [not null, default: 0]
+  CreatedAt datetime2 [not null, default: `sysutcdatetime()`]
+  UpdatedAt datetime2 [not null, default: `sysutcdatetime()`]
+
+  indexes {
+    (PaymentMethod, DisplayOrder) [name: 'IX_StorePaymentAccount_Method']
+    PaymentMethod [unique, name: 'UX_StorePaymentAccount_ActivePerMethod', note: 'WHERE IsActive=1']
+  }
+}
+
+// --- Delivery ---
+
+Table Delivery {
+  DeliveryId int [pk, increment, not null]
+  OrderId int [unique, not null]
+  Courier nvarchar(20) [not null, note: 'Lalamove | LBC']
+  DeliveryStatus nvarchar(50) [not null, default: 'Pending', note: 'See enum DeliveryStatus']
+  IsDelayed bit [not null, default: 0]
+  DelayedUntil datetime2
+  EstimatedDeliveryTime datetime2
+  ActualDeliveryTime datetime2
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    OrderId [unique, name: 'UX_Delivery_Order']
+    Courier [name: 'IX_Delivery_Courier']
+    DeliveryStatus [name: 'IX_Delivery_Status']
+    IsDelayed [name: 'IX_Delivery_IsDelayed', note: 'WHERE IsDelayed=1']
+  }
+}
+
+Table LalamoveDelivery {
+  DeliveryId int [pk, not null]
+  BookingRef nvarchar(255)
+  DriverName nvarchar(100)
+  DriverPhone nvarchar(20)
+
+  indexes {
+    BookingRef [name: 'IX_LalamoveDelivery_BookingRef', note: 'WHERE BookingRef IS NOT NULL']
+  }
+}
+
+Table LBCDelivery {
+  DeliveryId int [pk, not null]
+  TrackingNumber nvarchar(255)
+
+  indexes {
+    TrackingNumber [name: 'IX_LBCDelivery_TrackingNumber', note: 'WHERE TrackingNumber IS NOT NULL']
+  }
+}
+
+// --- Vouchers & Discounts ---
+
+Table Voucher {
+  VoucherId int [pk, increment, not null]
+  Code nvarchar(50) [unique, not null]
+  Description nvarchar(500)
+  DiscountType nvarchar(20) [not null, note: 'Percentage | Fixed']
+  DiscountValue decimal(10,2) [not null, note: 'CK: > 0']
+  MinimumOrderAmount decimal(10,2) [note: 'CK: NULL or >= 0']
+  MaxUses int [note: 'CK: NULL or > 0']
+  MaxUsesPerUser int [note: 'CK: NULL or > 0']
+  StartDate datetime2 [not null]
+  EndDate datetime2
+  IsActive bit [not null, default: 1]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    Code [name: 'IX_Voucher_Code']
+    IsActive [name: 'IX_Voucher_IsActive']
+    StartDate [name: 'IX_Voucher_StartDate']
+    EndDate [name: 'IX_Voucher_EndDate', note: 'WHERE EndDate IS NOT NULL']
+  }
 }
 
 Table UserVoucher {
-  UserVoucherId int [primary key, not null]
+  UserVoucherId int [pk, increment, not null]
   UserId int [not null]
   VoucherId int [not null]
-  AssignedAt timestamp [not null]
-  ExpiresAt timestamp
+  AssignedAt datetime2 [not null, default: `sysdatetime()`]
+  ExpiresAt datetime2
+
+  indexes {
+    (UserId, VoucherId) [unique, name: 'UX_UserVoucher_Pair']
+    UserId [name: 'IX_UserVoucher_UserId']
+    VoucherId [name: 'IX_UserVoucher_VoucherId']
+  }
 }
 
-Table Voucher {
-  VoucherId int [primary key, not null]
-  Code varchar [not null]
-  Description varchar
-  DiscountType varchar [not null]
-  DiscountValue decimal [not null]
-  MinimumOrderAmount decimal
-  MaxUses int
-  MaxUsesPerUser int
-  StartDate timestamp [not null]
-  EndDate timestamp
-  IsActive bit [not null]
-  CreatedAt timestamp [not null]
+Table VoucherUsage {
+  VoucherUsageId int [pk, increment, not null]
+  VoucherId int [not null]
+  UserId int [not null]
+  OrderId int [not null]
+  DiscountAmount decimal(10,2) [not null, note: 'CK: >= 0']
+  UsedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    VoucherId [name: 'IX_VoucherUsage_VoucherId']
+    UserId [name: 'IX_VoucherUsage_UserId']
+    OrderId [name: 'IX_VoucherUsage_OrderId']
+  }
+}
+
+// --- Inventory & Suppliers ---
+
+Table InventoryLog {
+  InventoryLogId bigint [pk, increment, not null]
+  ProductId int [not null]
+  ProductVariantId int
+  ChangeQuantity int [not null]
+  ChangeType nvarchar(50) [not null, note: 'Purchase|Sale|Return|Adjustment|Damage|Loss|Lock|Unlock']
+  OrderId int
+  PurchaseOrderId int
+  ChangedByUserId int
+  Notes nvarchar(500)
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    ProductId [name: 'IX_InvLog_ProductId']
+    ProductVariantId [name: 'IX_InvLog_ProductVariantId']
+    OrderId [name: 'IX_InvLog_OrderId']
+    PurchaseOrderId [name: 'IX_InvLog_PurchaseOrderId']
+    ChangeType [name: 'IX_InvLog_ChangeType']
+    CreatedAt [name: 'IX_InvLog_CreatedAt']
+  }
+}
+
+Table Supplier {
+  SupplierId int [pk, increment, not null]
+  Name nvarchar(200) [not null]
+  ContactPerson nvarchar(100)
+  PhoneNumber nvarchar(20)
+  Email nvarchar(255) [note: 'Unique where NOT NULL']
+  Address nvarchar(500)
+  IsActive bit [not null, default: 1]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    Email [unique, name: 'UX_Supplier_Email', note: 'WHERE Email IS NOT NULL']
+    IsActive [name: 'IX_Supplier_IsActive']
+  }
+}
+
+Table PurchaseOrder {
+  PurchaseOrderId int [pk, increment, not null]
+  SupplierId int [not null]
+  OrderDate datetime2 [not null, default: `sysdatetime()`]
+  ExpectedDeliveryDate datetime2
+  Status nvarchar(50) [not null, default: 'Pending', note: 'Pending | Received | Cancelled']
+  CreatedByUserId int
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    SupplierId [name: 'IX_PurchaseOrder_SupplierId']
+    OrderDate [name: 'IX_PurchaseOrder_OrderDate']
+    Status [name: 'IX_PurchaseOrder_Status']
+    CreatedByUserId [name: 'IX_PurchaseOrder_CreatedByUserId']
+  }
+}
+
+Table PurchaseOrderItem {
+  PurchaseOrderItemId int [pk, increment, not null]
+  PurchaseOrderId int [not null]
+  ProductId int [not null]
+  ProductVariantId int
+  Quantity int [not null, note: 'CK: > 0']
+  UnitPrice decimal(10,2) [not null, note: 'CK: >= 0']
+
+  indexes {
+    PurchaseOrderId [name: 'IX_POItem_PurchaseOrderId']
+    ProductId [name: 'IX_POItem_ProductId']
+    ProductVariantId [name: 'IX_POItem_ProductVariantId']
+  }
+}
+
+// --- Support ---
+
+Table SupportTicket {
+  TicketId int [pk, increment, not null]
+  UserId int [not null]
+  OrderId int
+  TicketSource nvarchar(50) [not null, default: 'Customer', note: 'Customer | Admin | System']
+  TicketCategory nvarchar(100) [not null, note: 'DamagedItem|WrongItem|DeliveryIssue|PaymentIssue|ReturnRefund|ProductInquiry|General']
+  Subject nvarchar(200) [not null]
+  Description nvarchar(max)
+  AttachmentUrl nvarchar(1000)
+  AttachmentBucket nvarchar(200)
+  AttachmentPath nvarchar(1000)
+  TicketStatus nvarchar(50) [not null, default: 'Open', note: 'Open|InProgress|AwaitingResponse|Resolved|Closed']
+  AssignedToUserId int
+  ResolvedAt datetime2
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+  UpdatedAt datetime2
+
+  indexes {
+    UserId [name: 'IX_Ticket_UserId']
+    OrderId [name: 'IX_Ticket_OrderId', note: 'WHERE OrderId IS NOT NULL']
+    TicketStatus [name: 'IX_Ticket_Status']
+    TicketCategory [name: 'IX_Ticket_Category']
+    AssignedToUserId [name: 'IX_Ticket_AssignedTo', note: 'WHERE AssignedToUserId IS NOT NULL']
+    CreatedAt [name: 'IX_Ticket_CreatedAt']
+  }
+}
+
+Table SupportTicketReply {
+  ReplyId bigint [pk, increment, not null]
+  TicketId int [not null]
+  UserId int [not null]
+  IsAdminReply bit [not null, default: 0]
+  Message nvarchar(max) [not null]
+  AttachmentUrl nvarchar(1000)
+  AttachmentBucket nvarchar(200)
+  AttachmentPath nvarchar(1000)
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    TicketId [name: 'IX_Reply_TicketId']
+    UserId [name: 'IX_Reply_UserId']
+    CreatedAt [name: 'IX_Reply_CreatedAt']
+  }
+}
+
+Table SupportTask {
+  TaskId int [pk, increment, not null]
+  TicketId int [not null]
+  AssignedToUserId int
+  TaskType nvarchar(50) [not null, note: 'ShipReplacement|ArrangeReturn|ContactSupplier|Other']
+  TaskStatus nvarchar(20) [not null, default: 'Pending', note: 'Pending|InProgress|Done|Cancelled']
+  DueDate datetime2
+  Notes nvarchar(500)
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+  CompletedAt datetime2
+
+  indexes {
+    TicketId [name: 'IX_SupportTask_TicketId']
+    AssignedToUserId [name: 'IX_SupportTask_AssignedToUserId', note: 'WHERE AssignedToUserId IS NOT NULL']
+    TaskStatus [name: 'IX_SupportTask_TaskStatus']
+    DueDate [name: 'IX_SupportTask_DueDate', note: 'WHERE DueDate IS NOT NULL']
+  }
+}
+
+// --- Refund ---
+
+Table Refund {
+  RefundId int [pk, increment, not null]
+  OrderId int [not null]
+  PaymentId int
+  RefundAmount decimal(10,2) [not null, note: 'CK: > 0']
+  RefundReason nvarchar(500) [not null]
+  RefundStatus nvarchar(50) [not null, default: 'Pending', note: 'Pending|Approved|Rejected|Completed']
+  RefundMethod nvarchar(50) [note: 'NULL or OriginalPayment|StoreCredit|Cash']
+  RequestedByUserId int
+  ApprovedByUserId int
+  TicketId int
+  Notes nvarchar(500)
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+  ProcessedAt datetime2
+
+  indexes {
+    OrderId [name: 'IX_Refund_OrderId']
+    RefundStatus [name: 'IX_Refund_Status', note: 'WHERE RefundStatus IN (Pending, Approved)']
+    TicketId [name: 'IX_Refund_TicketId', note: 'WHERE TicketId IS NOT NULL']
+  }
+}
+
+// --- Reviews & Wishlist ---
+
+Table Review {
+  ReviewId int [pk, increment, not null]
+  UserId int [not null]
+  ProductId int [not null]
+  OrderId int [not null]
+  Rating int [not null, note: 'CK: 1-5']
+  Comment nvarchar(1000)
+  IsVerifiedPurchase bit [not null, default: 0]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    UserId [name: 'IX_Review_UserId']
+    ProductId [name: 'IX_Review_ProductId']
+    OrderId [name: 'IX_Review_OrderId']
+    Rating [name: 'IX_Review_Rating']
+  }
 }
 
 Table Wishlist {
-  WishlistId int [primary key, not null]
+  WishlistId int [pk, increment, not null]
   UserId int [not null]
   ProductId int [not null]
-  AddedAt timestamp [not null]
+  AddedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    (UserId, ProductId) [unique, name: 'UX_Wishlist_UserProduct']
+    UserId [name: 'IX_Wishlist_UserId']
+    ProductId [name: 'IX_Wishlist_ProductId']
+  }
 }
 
-Ref: ActiveSession.UserId > User.UserId
-Ref: Address.UserId > User.UserId
-Ref: BankTransferPayment.VerifiedByUserId > User.UserId
-Ref: BankTransferPayment.PaymentId > Payment.PaymentId
-Ref: Cart.GuestSessionId > GuestSession.GuestSessionId
-Ref: Cart.UserId > User.UserId
-Ref: CartItem.CartId > Cart.CartId
-Ref: CartItem.ProductId > Product.ProductId
-Ref: CartItem.ProductVariantId > ProductVariant.ProductVariantId
-Ref: Category.ParentCategoryId > Category.CategoryId
-Ref: Delivery.OrderId > Order.OrderId
-Ref: GCashPayment.PaymentId > Payment.PaymentId
-Ref: GuestSession.ConvertedToUserId > User.UserId
-Ref: InventoryLog.OrderId > Order.OrderId
-Ref: InventoryLog.ProductId > Product.ProductId
-Ref: InventoryLog.PurchaseOrderId > PurchaseOrder.PurchaseOrderId
-Ref: InventoryLog.ChangedByUserId > User.UserId
-Ref: InventoryLog.ProductVariantId > ProductVariant.ProductVariantId
-Ref: LalamoveDelivery.DeliveryId > Delivery.DeliveryId
-Ref: LBCDelivery.DeliveryId > Delivery.DeliveryId
-Ref: Notification.OrderId > Order.OrderId
-Ref: Notification.TicketId > SupportTicket.TicketId
-Ref: Notification.UserId > User.UserId
-Ref: Order.CartId > Cart.CartId
-Ref: Order.GuestSessionId > GuestSession.GuestSessionId
-Ref: Order.POSSessionId > POS_Session.POSSessionId
-Ref: Order.ShippingAddressId > Address.AddressId
-Ref: Order.UserId > User.UserId
-Ref: OrderItem.OrderId > Order.OrderId
-Ref: OrderItem.ProductId > Product.ProductId
-Ref: OrderItem.ProductVariantId > ProductVariant.ProductVariantId
-Ref: OrderStatusAudit.OrderId > Order.OrderId
-Ref: Payment.OrderId > Order.OrderId
-Ref: PickupOrder.OrderId > Order.OrderId
-Ref: POS_Session.UserId > User.UserId
-Ref: PriceHistory.ProductId > Product.ProductId
-Ref: PriceHistory.ChangedByUserId > User.UserId
-Ref: Product.BrandId > Brand.BrandId
-Ref: Product.CategoryId > Category.CategoryId
-Ref: ProductImage.ProductId > Product.ProductId
-Ref: ProductImage.UploadedByUserId > User.UserId
-Ref: ProductVariant.ProductId > Product.ProductId
-Ref: PurchaseOrder.SupplierId > Supplier.SupplierId
-Ref: PurchaseOrder.CreatedByUserId > User.UserId
-Ref: PurchaseOrderItem.PurchaseOrderId > PurchaseOrder.PurchaseOrderId
-Ref: PurchaseOrderItem.ProductId > Product.ProductId
-Ref: PurchaseOrderItem.ProductVariantId > ProductVariant.ProductVariantId
-Ref: Refund.ApprovedByUserId > User.UserId
-Ref: Refund.OrderId > Order.OrderId
-Ref: Refund.PaymentId > Payment.PaymentId
-Ref: Refund.RequestedByUserId > User.UserId
-Ref: Refund.TicketId > SupportTicket.TicketId
-Ref: Review.OrderId > Order.OrderId
-Ref: Review.ProductId > Product.ProductId
-Ref: Review.UserId > User.UserId
-Ref: SupportTask.AssignedToUserId > User.UserId
-Ref: SupportTask.TicketId > SupportTicket.TicketId
-Ref: SupportTicket.AssignedToUserId > User.UserId
-Ref: SupportTicket.OrderId > Order.OrderId
-Ref: SupportTicket.UserId > User.UserId
-Ref: SupportTicketReply.TicketId > SupportTicket.TicketId
-Ref: SupportTicketReply.UserId > User.UserId
-Ref: SystemLog.UserId > User.UserId
-Ref: User.DefaultAddressId > Address.AddressId
-Ref: UserRole.RoleId > Role.RoleId
-Ref: UserRole.UserId > User.UserId
-Ref: UserVoucher.UserId > User.UserId
-Ref: UserVoucher.VoucherId > Voucher.VoucherId
-Ref: VoucherUsage.OrderId > Order.OrderId
-Ref: VoucherUsage.UserId > User.UserId
-Ref: VoucherUsage.VoucherId > Voucher.VoucherId
-Ref: Wishlist.ProductId > Product.ProductId
-Ref: Wishlist.UserId > User.UserId
+// --- Notifications ---
+
+Table Notification {
+  NotificationId int [pk, increment, not null]
+  UserId int [not null]
+  OrderId int
+  TicketId int
+  Channel nvarchar(20) [not null, note: 'SMS | Email | InApp']
+  NotifType nvarchar(100) [not null, note: 'WelcomeEmail|OrderConfirmation|PaymentReceived|...']
+  Recipient nvarchar(255) [not null]
+  Subject nvarchar(255)
+  Body nvarchar(max)
+  Status nvarchar(20) [not null, default: 'Pending', note: 'Pending | Sent | Failed']
+  RetryCount int [not null, default: 0]
+  SentAt datetime2
+  FailureReason nvarchar(500)
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+  IsRead bit [not null, default: 0]
+  ReadAt datetime2
+
+  indexes {
+    UserId [name: 'IX_Notif_UserId']
+    (UserId, IsRead) [name: 'IX_Notif_UserId_Unread', note: 'INCLUDE(NotifType,Subject,CreatedAt) WHERE IsRead=0']
+    OrderId [name: 'IX_Notif_OrderId', note: 'WHERE OrderId IS NOT NULL']
+    TicketId [name: 'IX_Notif_TicketId', note: 'WHERE TicketId IS NOT NULL']
+    Channel [name: 'IX_Notif_Channel']
+    Status [name: 'IX_Notif_Status']
+    (Status, CreatedAt) [name: 'IX_Notif_Pending', note: 'WHERE Status=Pending']
+    CreatedAt [name: 'IX_Notif_CreatedAt']
+  }
+}
+
+// --- POS ---
+
+Table POS_Session {
+  POSSessionId int [pk, increment, not null]
+  UserId int [not null]
+  TerminalName nvarchar(50) [not null]
+  ShiftStart datetime2 [not null]
+  ShiftEnd datetime2
+  TotalSales decimal(10,2) [not null, default: 0]
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    UserId [name: 'IX_POS_Session_UserId']
+    ShiftStart [name: 'IX_POS_Session_ShiftStart']
+    ShiftEnd [name: 'IX_POS_Session_ShiftEnd']
+  }
+}
+
+// --- System ---
+
+Table SystemLog {
+  SystemLogId bigint [pk, increment, not null]
+  UserId int
+  EventType nvarchar(100) [not null, note: 'Login|Logout|AccessDenied|UserCreated|...']
+  EventDescription nvarchar(1000)
+  CreatedAt datetime2 [not null, default: `sysdatetime()`]
+
+  indexes {
+    UserId [name: 'IX_SystemLog_UserId']
+    EventType [name: 'IX_SystemLog_EventType']
+    CreatedAt [name: 'IX_SystemLog_CreatedAt']
+  }
+}
+
+Table __EFMigrationsHistory {
+  MigrationId nvarchar(150) [pk, not null]
+  ProductVersion nvarchar(32) [not null]
+}
+
+// =============================================================================
+//  REFERENCES (Foreign Keys)
+// =============================================================================
+
+// --- User & Auth ---
+Ref FK_User_DefaultAddress:       User.DefaultAddressId           > Address.AddressId
+Ref FK_ActiveSession_User:        ActiveSession.UserId            > User.UserId
+Ref FK_OTPVerification_User:      OTPVerification.UserId          > User.UserId
+Ref FK_GuestSession_User:         GuestSession.ConvertedToUserId  > User.UserId
+
+// --- RBAC ---
+Ref FK_UserRole_User:             UserRole.UserId                 > User.UserId
+Ref FK_UserRole_Role:             UserRole.RoleId                 > Role.RoleId
+
+// --- Address ---
+Ref FK_Address_User:              Address.UserId                  > User.UserId
+
+// --- Catalog ---
+Ref FK_Category_Parent:           Category.ParentCategoryId       > Category.CategoryId
+Ref FK_Product_Category:          Product.CategoryId              > Category.CategoryId
+Ref FK_Product_Brand:             Product.BrandId                 > Brand.BrandId
+Ref FK_ProductVariant_Product:    ProductVariant.ProductId        > Product.ProductId
+Ref FK_ProductImage_Product:      ProductImage.ProductId          > Product.ProductId
+Ref FK_ProductImage_Uploader:     ProductImage.UploadedByUserId   > User.UserId
+Ref FK_PriceHistory_Product:      PriceHistory.ProductId          > Product.ProductId
+Ref FK_PriceHistory_User:         PriceHistory.ChangedByUserId    > User.UserId
+
+// --- Cart ---
+Ref FK_Cart_User:                 Cart.UserId                     > User.UserId
+Ref FK_Cart_GuestSession:         Cart.GuestSessionId             > GuestSession.GuestSessionId
+Ref FK_CartItem_Cart:             CartItem.CartId                 > Cart.CartId           [delete: cascade]
+Ref FK_CartItem_Product:          CartItem.ProductId              > Product.ProductId
+Ref FK_CartItem_Variant:          CartItem.ProductVariantId       > ProductVariant.ProductVariantId
+
+// --- Orders ---
+Ref FK_Order_User:                "Order".UserId                  > User.UserId
+Ref FK_Order_ShipAddress:         "Order".ShippingAddressId       > Address.AddressId
+Ref FK_Order_GuestSession:        "Order".GuestSessionId          > GuestSession.GuestSessionId
+Ref FK_Order_Cart:                "Order".CartId                  > Cart.CartId
+Ref FK_Order_POSSession:          "Order".POSSessionId            > POS_Session.POSSessionId
+Ref FK_OrderItem_Order:           OrderItem.OrderId               > "Order".OrderId
+Ref FK_OrderItem_Product:         OrderItem.ProductId             > Product.ProductId
+Ref FK_OrderItem_Variant:         OrderItem.ProductVariantId      > ProductVariant.ProductVariantId
+Ref FK_OrderStatusAudit_Order:    OrderStatusAudit.OrderId        > "Order".OrderId
+Ref FK_PickupOrder_Order:         PickupOrder.OrderId             > "Order".OrderId       [delete: cascade]
+
+// --- Payments ---
+Ref FK_Payment_Order:             Payment.OrderId                 > "Order".OrderId
+Ref FK_Payment_StorePaymentAcct:  Payment.StorePaymentAccountId   > StorePaymentAccount.StorePaymentAccountId
+Ref FK_GCashPayment_Pmt:          GCashPayment.PaymentId          > Payment.PaymentId     [delete: cascade]
+Ref FK_BankTransferPayment_Pmt:   BankTransferPayment.PaymentId   > Payment.PaymentId     [delete: cascade]
+Ref FK_BankTransferPayment_Admin: BankTransferPayment.VerifiedByUserId > User.UserId
+
+// --- Delivery ---
+Ref FK_Delivery_Order:            Delivery.OrderId                > "Order".OrderId
+Ref FK_LalamoveDelivery_Base:     LalamoveDelivery.DeliveryId     > Delivery.DeliveryId   [delete: cascade]
+Ref FK_LBCDelivery_Base:          LBCDelivery.DeliveryId          > Delivery.DeliveryId   [delete: cascade]
+
+// --- Vouchers ---
+Ref FK_UserVoucher_User:          UserVoucher.UserId              > User.UserId
+Ref FK_UserVoucher_Voucher:       UserVoucher.VoucherId           > Voucher.VoucherId
+Ref FK_VoucherUsage_Voucher:      VoucherUsage.VoucherId          > Voucher.VoucherId
+Ref FK_VoucherUsage_User:         VoucherUsage.UserId             > User.UserId
+Ref FK_VoucherUsage_Order:        VoucherUsage.OrderId            > "Order".OrderId
+
+// --- Inventory & Suppliers ---
+Ref FK_InvLog_Product:            InventoryLog.ProductId          > Product.ProductId
+Ref FK_InvLog_Variant:            InventoryLog.ProductVariantId   > ProductVariant.ProductVariantId
+Ref FK_InvLog_Order:              InventoryLog.OrderId            > "Order".OrderId
+Ref FK_InvLog_PurchaseOrder:      InventoryLog.PurchaseOrderId    > PurchaseOrder.PurchaseOrderId
+Ref FK_InvLog_User:               InventoryLog.ChangedByUserId    > User.UserId
+Ref FK_PurchaseOrder_Supplier:    PurchaseOrder.SupplierId        > Supplier.SupplierId
+Ref FK_PurchaseOrder_User:        PurchaseOrder.CreatedByUserId   > User.UserId
+Ref FK_POItem_PO:                 PurchaseOrderItem.PurchaseOrderId > PurchaseOrder.PurchaseOrderId [delete: cascade]
+Ref FK_POItem_Product:            PurchaseOrderItem.ProductId     > Product.ProductId
+Ref FK_POItem_Variant:            PurchaseOrderItem.ProductVariantId > ProductVariant.ProductVariantId
+
+// --- Support ---
+Ref FK_Ticket_User:               SupportTicket.UserId            > User.UserId
+Ref FK_Ticket_Order:              SupportTicket.OrderId           > "Order".OrderId
+Ref FK_Ticket_AssignedTo:         SupportTicket.AssignedToUserId  > User.UserId
+Ref FK_Reply_Ticket:              SupportTicketReply.TicketId     > SupportTicket.TicketId [delete: cascade]
+Ref FK_Reply_User:                SupportTicketReply.UserId       > User.UserId
+Ref FK_SupportTask_Ticket:        SupportTask.TicketId            > SupportTicket.TicketId [delete: cascade]
+Ref FK_SupportTask_AssignedTo:    SupportTask.AssignedToUserId    > User.UserId
+
+// --- Refund ---
+Ref FK_Refund_Order:              Refund.OrderId                  > "Order".OrderId
+Ref FK_Refund_Payment:            Refund.PaymentId                > Payment.PaymentId
+Ref FK_Refund_RequestedBy:        Refund.RequestedByUserId        > User.UserId
+Ref FK_Refund_ApprovedBy:         Refund.ApprovedByUserId         > User.UserId
+Ref FK_Refund_Ticket:             Refund.TicketId                 > SupportTicket.TicketId
+
+// --- Reviews & Wishlist ---
+Ref FK_Review_User:               Review.UserId                   > User.UserId
+Ref FK_Review_Product:            Review.ProductId                > Product.ProductId
+Ref FK_Review_Order:              Review.OrderId                  > "Order".OrderId
+Ref FK_Wishlist_User:             Wishlist.UserId                 > User.UserId
+Ref FK_Wishlist_Product:          Wishlist.ProductId              > Product.ProductId
+
+// --- Notifications ---
+Ref FK_Notif_User:                Notification.UserId             > User.UserId
+Ref FK_Notif_Order:               Notification.OrderId            > "Order".OrderId
+Ref FK_Notif_Ticket:              Notification.TicketId           > SupportTicket.TicketId
+
+// --- POS ---
+Ref FK_POS_Session_User:          POS_Session.UserId              > User.UserId
+
+// --- System ---
+Ref FK_SystemLog_User:            SystemLog.UserId                > User.UserId

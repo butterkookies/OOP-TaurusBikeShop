@@ -1,125 +1,52 @@
-**BATCH 2 — ACTION BUTTONS & STATUS CONTROL ISSUES / REQUIREMENTS**
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
 
----
+Sample DBML schema:
 
-### 1. Pending Tab — Action Buttons Behavior
+Table follows {
+  following_user_id integer
+  followed_user_id integer
+  created_at timestamp
+}
 
-**Current Issue / Unclear Design:**
+Table users {
+  id integer [primary key]
+  username varchar
+  role varchar
+  created_at timestamp
+}
 
-* No defined standard for available actions in `Pending` status.
-* System behavior for handling unpaid/unconfirmed orders is not clearly enforced.
+Table posts {
+  id integer [primary key]
+  title varchar
+  body text [note: 'Content of the post']
+  user_id integer [not null]
+  status varchar
+  created_at timestamp
+}
 
-**Required Clarification / Decision Point:**
+Ref user_posts: posts.user_id > users.id // many-to-one
 
-* Determine correct action buttons for `Pending`:
+Ref: users.id < follows.following_user_id
 
-  * Option A: No actions allowed (system-controlled only)
-  * Option B: Allow `Cancel Order` only (manual override by admin)
+Ref: users.id < follows.followed_user_id
 
-**AI Evaluation Task:**
+Records users(id, username, role) {
+  0, 'Alice', 'admin'
+  1, 'Bob', 'moderator'
+  2, 'Candice', 'moderator'
+  3, 'David', 'member'
+}
 
-* Determine industry-standard behavior for `Pending` orders in order management systems.
-* Validate whether admins should be allowed to manually cancel unpaid orders or if cancellation should be fully automated (e.g., via timeout rules like 24-hour expiry).
+Records follows(following_user_id, followed_user_id, created_at) {
+  1, 0, '2026-01-01'
+  3, 2, '2026-02-28'
+}
 
----
+Records posts(id, title, user_id) {
+  0, 'Welcome to the forum!', 0
+  1, 'Guidelines', 1
+  2, 'Hello all!', 3
+}
 
-### 2. Payment Verification — Action Buttons & Visibility
-
-**Required Actions:**
-
-* `Approve Payment` → moves order to `Processing`
-* `Hold Payment` → moves order to `On Hold`
-
-**Current Issue / Decision Gap:**
-
-* Uncertainty whether `Cancel Order` should be available in this state.
-
-**AI Evaluation Tasks:**
-
-* Determine if exposing `Cancel Order` during `Payment Verification` is standard practice.
-* Evaluate risk of premature cancellation vs maintaining structured payment validation flow.
-
-**Notification Requirement:**
-
-* System must support sending notifications when status changes occur.
-
-**AI Task:**
-
-* Verify capability and best practice for:
-
-  * Email notifications
-  * In-app notifications
-* Ensure notifications trigger on:
-
-  * Payment approval
-  * Payment hold
-  * Any status transition
-
----
-
-### 3. Bulk “Select All” Status Update — Constraint Enforcement
-
-**Current Issue:**
-
-* Bulk status update allows invalid or illogical transitions.
-* Example:
-
-  * Orders in `Processing` can be updated to:
-
-    * `Processing` (redundant)
-    * `Picked Up` (invalid skip)
-    * Other inconsistent states
-
-**Required Behavior:**
-
-* Enforce **strict status transition rules** in dropdown.
-* Disable all invalid or illogical target statuses.
-
-**Example Constraint:**
-
-* If current status = `Processing`
-
-  * Allowed: `Ready for Pickup`
-  * Disallowed:
-
-    * `Processing` (same state)
-    * `Picked Up` (skips step)
-    * Any unrelated status
-
-**AI Evaluation Task:**
-
-* Define a **valid state transition map** for all order statuses.
-* Ensure:
-
-  * No backward transitions unless explicitly allowed
-  * No skipping of required intermediate states
-  * No redundant selections
-
----
-
-### 4. Global Question — Cancel Order Availability
-
-**System-Wide Concern:**
-
-* Whether `Cancel Order` should exist across multiple statuses or be restricted.
-
-**AI Evaluation Task:**
-
-* Determine standard practices for:
-
-  * When cancellation is allowed
-  * Which statuses permit cancellation (e.g., Pending, Payment Verification, Processing)
-* Identify:
-
-  * Risks of allowing cancellation at later stages
-  * Whether cancellation should be replaced with other states (e.g., “Return”, “Failed”, “Rejected”)
-
----
-
-**Summary of Batch 2 Focus:**
-
-* Define correct action buttons per status
-* Enforce strict and logical status transitions
-* Standardize cancellation rules
-* Ensure notification system integration
-* Prevent invalid bulk updates through constraints
+Convert Taurus_seed_5.sql to a complete DBML format, so i can make diagrams. 
