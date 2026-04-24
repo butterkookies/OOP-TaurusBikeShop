@@ -441,5 +441,15 @@ public sealed class PaymentService : IPaymentService
             userId:    userId,
             orderId:   orderId,
             cancellationToken: ct);
+
+        await _notifications.QueueAsync(
+            channel:   NotifChannels.InApp,
+            notifType: notifType,
+            recipient: user.Email,
+            subject:   subject,
+            body:      body,
+            userId:    userId,
+            orderId:   orderId,
+            cancellationToken: ct);
     }
 }

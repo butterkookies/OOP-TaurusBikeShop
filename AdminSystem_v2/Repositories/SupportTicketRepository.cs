@@ -106,7 +106,53 @@ namespace AdminSystem_v2.Repositories
                      @AttachmentUrl, @AttachmentBucket, @AttachmentPath, GETUTCDATE());
                 SELECT CAST(SCOPE_IDENTITY() AS BIGINT);";
 
-            return await conn.ExecuteScalarAsync<long>(sql, reply);
+            long replyId = await conn.ExecuteScalarAsync<long>(sql, reply);
+
+            await conn.ExecuteAsync(
+                "UPDATE SupportTicket SET UpdatedAt = GETUTCDATE() WHERE TicketId = @TicketId",
+                new { reply.TicketId });
+
+            // When admin replies, send Email + InApp notifications to the customer
+            if (reply.IsAdminReply)
+            {
+                var owner = await conn.QueryFirstOrDefaultAsync<TicketOwnerInfo>(
+                    @"SELECT t.UserId, t.Subject, u.Email, u.FirstName
+                      FROM SupportTicket t
+                      JOIN [User] u ON t.UserId = u.UserId
+                      WHERE t.TicketId = @TicketId",
+                    new { reply.TicketId });
+
+                if (owner is not null && !string.IsNullOrWhiteSpace(owner.Email))
+                {
+                    string subject = $"Support replied — Ticket #{reply.TicketId}: {owner.Subject}";
+                    string body    = $"Hi {owner.FirstName}, the support team has replied to your ticket " +
+                                     $"\"{owner.Subject}\". Log in to view the response.\n\n— Taurus Bike Shop";
+
+                    await conn.ExecuteAsync(
+                        @"INSERT INTO Notification
+                            (UserId, TicketId, Channel, NotifType, Recipient, Subject, Body, Status, RetryCount, CreatedAt, IsRead)
+                          VALUES
+                            (@UserId, @TicketId, 'Email', 'SupportTicketReply', @Email, @Subject, @Body, 'Pending', 0, GETUTCDATE(), 0)",
+                        new { UserId = owner.UserId, TicketId = reply.TicketId, Email = owner.Email, Subject = subject, Body = body });
+
+                    await conn.ExecuteAsync(
+                        @"INSERT INTO Notification
+                            (UserId, TicketId, Channel, NotifType, Recipient, Subject, Body, Status, RetryCount, CreatedAt, IsRead)
+                          VALUES
+                            (@UserId, @TicketId, 'InApp', 'SupportTicketReply', @Email, @Subject, @Body, 'Sent', 0, GETUTCDATE(), 0)",
+                        new { UserId = owner.UserId, TicketId = reply.TicketId, Email = owner.Email, Subject = subject, Body = body });
+                }
+            }
+
+            return replyId;
+        }
+
+        private sealed class TicketOwnerInfo
+        {
+            public int    UserId    { get; set; }
+            public string Subject   { get; set; } = string.Empty;
+            public string Email     { get; set; } = string.Empty;
+            public string FirstName { get; set; } = string.Empty;
         }
     }
 }

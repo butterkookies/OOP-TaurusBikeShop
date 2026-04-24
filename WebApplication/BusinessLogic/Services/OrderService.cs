@@ -326,6 +326,16 @@ public sealed class OrderService : IOrderService
                     userId:    userId,
                     orderId:   order.OrderId,
                     cancellationToken: cancellationToken);
+
+                await _notifications.QueueAsync(
+                    channel:   NotifChannels.InApp,
+                    notifType: NotifTypes.OrderConfirmation,
+                    recipient: user.Email,
+                    subject:   $"Order Confirmed — {orderNumber}",
+                    body:      $"Your order {orderNumber} has been received and is being processed.",
+                    userId:    userId,
+                    orderId:   order.OrderId,
+                    cancellationToken: cancellationToken);
             }
         }
         catch (Exception notifEx)
@@ -601,6 +611,16 @@ public sealed class OrderService : IOrderService
                         $"We hope you enjoy your purchase! If you have any concerns, please " +
                         $"contact our support team from your order detail page.\n\n" +
                         $"— Taurus Bike Shop",
+                    userId:            userId,
+                    orderId:           orderId,
+                    cancellationToken: cancellationToken);
+
+                await _notifications.QueueAsync(
+                    channel:   NotifChannels.InApp,
+                    notifType: NotifTypes.DeliveryConfirmation,
+                    recipient: user.Email,
+                    subject:   $"Delivery confirmed — Order {order.OrderNumber}",
+                    body:      $"Thank you for confirming receipt of your order {order.OrderNumber}. We hope you enjoy your purchase!",
                     userId:            userId,
                     orderId:           orderId,
                     cancellationToken: cancellationToken);

@@ -499,6 +499,24 @@ namespace AdminSystem_v2.Repositories
                     Subject = subject,
                     Body = body,
                 }, tx);
+
+            // Also insert InApp so the notification bell updates immediately
+            await conn.ExecuteAsync(
+                @"INSERT INTO Notification
+                    (UserId, OrderId, Channel, NotifType, Recipient,
+                     Subject, Body, Status, RetryCount, CreatedAt, IsRead)
+                  VALUES
+                    (@UserId, @OrderId, 'InApp', @NotifType, @Email,
+                     @Subject, @Body, 'Sent', 0, GETUTCDATE(), 0)",
+                new
+                {
+                    info.UserId,
+                    OrderId = orderId,
+                    NotifType = notifType,
+                    info.Email,
+                    Subject = subject,
+                    Body = body,
+                }, tx);
         }
 
         /// <summary>

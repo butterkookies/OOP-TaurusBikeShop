@@ -191,6 +191,17 @@ public sealed class SupportService : ISupportService
                         userId:    userId,
                         ticketId:  ticketId,
                         cancellationToken: cancellationToken);
+
+                    await _notifications.QueueAsync(
+                        channel:   NotifChannels.InApp,
+                        notifType: NotifTypes.SupportTicketReply,
+                        recipient: user.Email,
+                        subject:   $"Reply sent — Ticket #{ticketId}: {ticket.Subject}",
+                        body:      $"Your reply to support ticket \"{ticket.Subject}\" has been recorded. " +
+                                   $"Our team will respond as soon as possible.",
+                        userId:    userId,
+                        ticketId:  ticketId,
+                        cancellationToken: cancellationToken);
                 }
             }
             catch (Exception notifEx)
@@ -270,6 +281,17 @@ public sealed class SupportService : ISupportService
                                    $"Category: {category.Trim()}\n" +
                                    $"Subject: {subject.Trim()}\n\n" +
                                    $"— Taurus Bike Shop",
+                        userId:    userId,
+                        ticketId:  created.TicketId,
+                        cancellationToken: cancellationToken);
+
+                    await _notifications.QueueAsync(
+                        channel:   NotifChannels.InApp,
+                        notifType: NotifTypes.SupportTicketCreated,
+                        recipient: user.Email,
+                        subject:   $"Ticket #{created.TicketId} created: {subject.Trim()}",
+                        body:      $"Your support ticket \"{subject.Trim()}\" has been created. " +
+                                   $"Our team will review it shortly.",
                         userId:    userId,
                         ticketId:  created.TicketId,
                         cancellationToken: cancellationToken);

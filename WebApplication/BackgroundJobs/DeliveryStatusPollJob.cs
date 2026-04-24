@@ -347,6 +347,16 @@ public sealed class DeliveryStatusPollJob : BackgroundService
                     userId:            userId,
                     orderId:           orderId,
                     cancellationToken: cancellationToken);
+
+                await notifications.QueueAsync(
+                    channel:           NotifChannels.InApp,
+                    notifType:         NotifTypes.DeliveryConfirmation,
+                    recipient:         customerEmail,
+                    subject:           $"Your order has been delivered \u2014 {orderNumber}",
+                    body:              $"Your order {orderNumber} has been successfully delivered. Thank you for shopping with Taurus Bike Shop!",
+                    userId:            userId,
+                    orderId:           orderId,
+                    cancellationToken: cancellationToken);
             }
             else if (newStatus == DeliveryStatuses.Failed)
             {
@@ -358,6 +368,16 @@ public sealed class DeliveryStatusPollJob : BackgroundService
                     subject:           $"Delivery attempt failed \u2014 {orderNumber}",
                     body:              $"A delivery attempt for order {orderNumber} was unsuccessful. " +
                                        $"Please contact us to arrange a reschedule or an alternative pickup.",
+                    userId:            userId,
+                    orderId:           orderId,
+                    cancellationToken: cancellationToken);
+
+                await notifications.QueueAsync(
+                    channel:           NotifChannels.InApp,
+                    notifType:         NotifTypes.TrackingUpdate,
+                    recipient:         customerEmail,
+                    subject:           $"Delivery attempt failed \u2014 {orderNumber}",
+                    body:              $"A delivery attempt for order {orderNumber} was unsuccessful. Please contact us to reschedule.",
                     userId:            userId,
                     orderId:           orderId,
                     cancellationToken: cancellationToken);

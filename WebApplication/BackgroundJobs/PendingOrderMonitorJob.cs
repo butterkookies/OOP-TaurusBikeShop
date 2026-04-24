@@ -212,6 +212,16 @@ public sealed class PendingOrderMonitorJob : BackgroundService
                         userId:            order.UserId,
                         orderId:           order.OrderId,
                         cancellationToken: cancellationToken);
+
+                    await notifications.QueueAsync(
+                        channel:           NotifChannels.InApp,
+                        notifType:         NotifTypes.OrderAutoCancelled,
+                        recipient:         customerEmail,
+                        subject:           $"Order {order.OrderNumber} cancelled",
+                        body:              $"Your order {order.OrderNumber} was cancelled because payment was not submitted within 24 hours.",
+                        userId:            order.UserId,
+                        orderId:           order.OrderId,
+                        cancellationToken: cancellationToken);
                 }
                 catch (Exception ex) when (ex is not OperationCanceledException)
                 {
@@ -244,6 +254,16 @@ public sealed class PendingOrderMonitorJob : BackgroundService
                         body:              $"Your order {order.OrderNumber} is still awaiting payment and will be " +
                                            $"automatically cancelled at {cancelAt:MMMM d, yyyy h:mm tt} UTC " +
                                            $"if we do not receive proof of payment. Please submit your payment proof to avoid cancellation.",
+                        userId:            order.UserId,
+                        orderId:           order.OrderId,
+                        cancellationToken: cancellationToken);
+
+                    await notifications.QueueAsync(
+                        channel:           NotifChannels.InApp,
+                        notifType:         NotifTypes.PendingOrderReminder,
+                        recipient:         customerEmail,
+                        subject:           $"Payment reminder — Order {order.OrderNumber}",
+                        body:              $"Your order {order.OrderNumber} is awaiting payment and will be cancelled at {cancelAt:MMMM d, yyyy h:mm tt} UTC if unpaid.",
                         userId:            order.UserId,
                         orderId:           order.OrderId,
                         cancellationToken: cancellationToken);

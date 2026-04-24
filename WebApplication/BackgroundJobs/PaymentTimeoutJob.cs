@@ -188,6 +188,16 @@ public sealed class PaymentTimeoutJob : BackgroundService
                         userId:            order.UserId,
                         orderId:           order.OrderId,
                         cancellationToken: cancellationToken);
+
+                    await notifications.QueueAsync(
+                        channel:           NotifChannels.InApp,
+                        notifType:         NotifTypes.PaymentHeld,
+                        recipient:         customerEmail,
+                        subject:           $"Action Required \u2014 Order {order.OrderNumber} On Hold",
+                        body:              $"Your order {order.OrderNumber} has been placed on hold. Please contact us to resolve this.",
+                        userId:            order.UserId,
+                        orderId:           order.OrderId,
+                        cancellationToken: cancellationToken);
                 }
                 catch (Exception ex) when (ex is not OperationCanceledException)
                 {
