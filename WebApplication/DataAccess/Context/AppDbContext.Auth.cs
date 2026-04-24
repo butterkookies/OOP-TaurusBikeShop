@@ -163,4 +163,29 @@ public sealed partial class AppDbContext
                 .OnDelete(DeleteBehavior.NoAction);
         });
     }
+
+    private static void ConfigureActiveSession(ModelBuilder mb)
+    {
+        mb.Entity<ActiveSession>(e =>
+        {
+            e.ToTable("ActiveSession");
+            e.HasKey(a => a.SessionId);
+
+            e.HasIndex(a => new { a.UserId, a.ExpiresAt })
+                .HasFilter("[IsRevoked] = 0")
+                .HasDatabaseName("IX_ActiveSession_Active");
+
+            e.HasIndex(a => a.UserId)
+                .HasDatabaseName("IX_ActiveSession_UserId");
+
+            e.HasIndex(a => a.RefreshToken)
+                .IsUnique()
+                .HasDatabaseName("UX_ActiveSession_Token");
+
+            e.HasOne(a => a.User)
+                .WithMany(u => u.ActiveSessions)
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+    }
 }

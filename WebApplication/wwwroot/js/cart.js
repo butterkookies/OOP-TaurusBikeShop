@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function recomputeSelectionTotals() {
-        var rows = document.querySelectorAll('#cart-items-list [data-cart-item-id]');
+        var rows = document.querySelectorAll('#cart-items-list div[data-cart-item-id]');
         var subtotal = 0;
         var selectedCount = 0;
         var totalRows = rows.length;

@@ -162,4 +162,57 @@ public sealed class UserRepository : Repository<User>
             .Include(u => u.Addresses.Where(a => !a.IsSnapshot))
             .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
     }
+
+    /// <summary>
+    /// Creates a new ActiveSession record in the database for a logged-in user.
+    /// </summary>
+    /// <param name="userId">The ID of the user logging in.</param>
+    /// <param name="refreshToken">The session GUID/Token assigned.</param>
+    /// <param name="ipAddress">The IP address of the client.</param>
+    /// <param name="deviceInfo">The User-Agent of the client.</param>
+    /// <param name="expiresInDays">Session validity duration.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    public async Task CreateActiveSessionAsync(
+        int userId,
+        string refreshToken,
+        string? ipAddress,
+        string? deviceInfo,
+        int expiresInDays = 30,
+        CancellationToken cancellationToken = default)
+    {
+        ActiveSession session = new()
+        {
+            UserId = userId,
+            RefreshToken = refreshToken,
+            IpAddress = ipAddress,
+            DeviceInfo = deviceInfo,
+            IsRevoked = false,
+            ExpiresAt = DateTime.UtcNow.AddDays(expiresInDays),
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await Context.ActiveSessions.AddAsync(session, cancellationToken);
+        await Context.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Revokes an active session by its RefreshToken/SessionId preventing reuse.
+    /// </summary>
+    /// <param name="refreshToken">The token of the session to revoke.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    public async Task RevokeActiveSessionAsync(
+        string refreshToken,
+        CancellationToken cancellationToken = default)
+    {
+        ActiveSession? session = await Context.ActiveSessions
+            .AsTracking()
+            .FirstOrDefaultAsync(s => s.RefreshToken == refreshToken && !s.IsRevoked, cancellationToken);
+
+        if (session is null)
+            return;
+
+        session.IsRevoked = true;
+        session.RevokedAt = DateTime.UtcNow;
+        await Context.SaveChangesAsync(cancellationToken);
+    }
 }

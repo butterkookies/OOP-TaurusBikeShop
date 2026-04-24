@@ -387,6 +387,35 @@ public sealed class UserService : IUserService
     // Private helpers
     // =========================================================================
 
+    /// <inheritdoc/>
+    public async Task<string> RegisterActiveSessionAsync(
+        int userId,
+        string? ipAddress,
+        string? deviceInfo,
+        CancellationToken cancellationToken = default)
+    {
+        string refreshToken = Guid.NewGuid().ToString("N");
+
+        await _userRepo.CreateActiveSessionAsync(
+            userId,
+            refreshToken,
+            ipAddress,
+            deviceInfo,
+            expiresInDays: 30, // Default validity of 30 days
+            cancellationToken);
+
+        return refreshToken;
+    }
+
+    /// <inheritdoc/>
+    public async Task RevokeActiveSessionAsync(
+        string refreshToken,
+        CancellationToken cancellationToken = default)
+    {
+        if (!string.IsNullOrWhiteSpace(refreshToken))
+            await _userRepo.RevokeActiveSessionAsync(refreshToken, cancellationToken);
+    }
+
     /// <summary>
     /// Generates a cryptographically random 6-digit OTP code.
     /// Uses <see cref="RandomNumberGenerator"/> for unpredictability.

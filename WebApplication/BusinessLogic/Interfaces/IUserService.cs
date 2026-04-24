@@ -180,6 +180,22 @@ public interface IUserService
         int userId,
         int addressId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registers a new active session for the authenticated user and returns the RefreshToken.
+    /// </summary>
+    Task<string> RegisterActiveSessionAsync(
+        int userId,
+        string? ipAddress,
+        string? deviceInfo,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Revokes an existing active session.
+    /// </summary>
+    Task RevokeActiveSessionAsync(
+        string refreshToken,
+        CancellationToken cancellationToken = default);
 }
 
 /// <summary>

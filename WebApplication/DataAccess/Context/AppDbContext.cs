@@ -43,6 +43,7 @@ public sealed partial class AppDbContext : DbContext
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<OTPVerification> OTPVerifications => Set<OTPVerification>();
     public DbSet<GuestSession> GuestSessions => Set<GuestSession>();
+    public DbSet<ActiveSession> ActiveSessions => Set<ActiveSession>();
 
     // Group 2 — Product Catalog
     public DbSet<Category> Categories => Set<Category>();
@@ -114,6 +115,7 @@ public sealed partial class AppDbContext : DbContext
         ConfigureAddress(modelBuilder);
         ConfigureOTPVerification(modelBuilder);
         ConfigureGuestSession(modelBuilder);
+        ConfigureActiveSession(modelBuilder);
         ConfigureCategory(modelBuilder);
         ConfigureBrand(modelBuilder);
         ConfigureProduct(modelBuilder);

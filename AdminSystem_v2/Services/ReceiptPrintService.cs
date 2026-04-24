@@ -1,3 +1,4 @@
+using System.Printing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -8,16 +9,35 @@ using AdminSystem_v2.Models;
 namespace AdminSystem_v2.Services
 {
     /// <summary>
-    /// Builds a WPF FlowDocument receipt and sends it to the printer via PrintDialog.
-    /// Uses WPF Table layout for columns — no character-padding hacks.
+    /// Silently prints a receipt to the default printer on A4 paper — no dialog shown.
+    /// Layout is fixed to A4 dimensions so output is identical on every printer.
     /// </summary>
     public class ReceiptPrintService : IReceiptPrintService
     {
-        private const double PageMargin = 14;
-        private const double ValueColW  = 92;   // right column for label-value rows (fits ₱99,999.99)
-        private const double QtyColW    = 28;
-        private const double PriceColW  = 70;
-        private const double TotalColW  = 70;
+        // A4 at WPF's 96 DPI (device-independent pixels): 210mm × 297mm
+        private const double A4Width  = 793.7;
+        private const double A4Height = 1122.5;
+
+        // We simulate an 80mm wide thermal receipt. 80mm ~ 302 pixels (at 96 DPI).
+        // We'll use 320 pixels for a comfortable layout without breaking words unnecessarily.
+        private const double ReceiptWidth = 320.0;
+
+        // Side margins are calculated to perfectly center the 320px column on the A4 sheet
+        private static readonly double SideMargin = (A4Width - ReceiptWidth) / 2.0;
+
+        private static Thickness BlockMargin(double top, double bottom)
+        {
+            return new Thickness(SideMargin, top, SideMargin, bottom);
+        }
+
+        // Keep page padding strict to vertical only, letting block margins handle horizontal bounds
+        private static readonly Thickness PagePadding = new(0, 50, 0, 50);
+
+        // Table column widths sized for 12pt font on narrow 320px layout
+        private const double ValueColW = 100;   // right column for totals/values rows
+        private const double QtyColW   = 35;
+        private const double PriceColW = 75;
+        private const double TotalColW = 75;
 
         public void PrintReceipt(POSOrderResult result)
         {
@@ -33,50 +53,48 @@ namespace AdminSystem_v2.Services
 
         private void PrintOnUIThread(POSOrderResult result)
         {
-            var dlg = new PrintDialog();
-            if (dlg.ShowDialog() != true) return;
-
-            double pageW = dlg.PrintableAreaWidth;
-            double pageH = dlg.PrintableAreaHeight;
-
-            var doc = BuildReceipt(result, pageW);
+            var doc = BuildReceipt(result);
             var paginator = ((IDocumentPaginatorSource)doc).DocumentPaginator;
-            paginator.PageSize = new Size(pageW, pageH);
+            paginator.PageSize = new Size(A4Width, A4Height);
 
+            // Create dialog for default printer but DO NOT show it — prints silently
+            var dlg = new PrintDialog();
+            dlg.PrintTicket.PageMediaSize   = new PageMediaSize(PageMediaSizeName.ISOA4);
+            dlg.PrintTicket.PageOrientation = PageOrientation.Portrait;
             dlg.PrintDocument(paginator, $"Receipt #{result.OrderNumber}");
         }
 
         // ── Document builder ─────────────────────────────────────────────────
 
-        private static FlowDocument BuildReceipt(POSOrderResult result, double pageWidth)
+        private static FlowDocument BuildReceipt(POSOrderResult result)
         {
             var doc = new FlowDocument
             {
-                PageWidth   = pageWidth,
-                PagePadding = new Thickness(PageMargin),
-                FontFamily  = new FontFamily("Consolas, Courier New"),
-                FontSize    = 10,
+                PageWidth   = A4Width,
+                PagePadding = PagePadding,
+                FontFamily  = new FontFamily("Segoe UI, Arial"),
+                FontSize    = 12,
                 Foreground  = Brushes.Black,
                 ColumnWidth = double.MaxValue
             };
 
-            // Header
-            AddCenteredBold(doc, "TAURUS BIKE SHOP", 14);
-            AddCentered(doc, "Your trusted bike partner", 8);
+            // ── Header ───────────────────────────────────────────────────────
+            AddCenteredBold(doc, "TAURUS BIKE SHOP", 20);
+            AddCentered(doc, "Your trusted bike partner", 11);
             AddSeparator(doc);
 
-            // Order info
-            AddLabelValue(doc, "Order #:",   result.OrderNumber);
-            AddLabelValue(doc, "Date:",      result.CompletedAt.ToString("MMM dd, yyyy hh:mm tt"));
-            AddLabelValue(doc, "Cashier:",   result.CashierName);
-            AddLabelValue(doc, "Customer:",  result.CustomerName);
+            // ── Order info ───────────────────────────────────────────────────
+            AddLabelValue(doc, "Order #:",  result.OrderNumber);
+            AddLabelValue(doc, "Date:",     result.CompletedAt.ToString("MMM dd, yyyy hh:mm tt"));
+            AddLabelValue(doc, "Cashier:",  result.CashierName);
+            AddLabelValue(doc, "Customer:", result.CustomerName);
             AddSeparator(doc);
 
-            // Items
+            // ── Items ────────────────────────────────────────────────────────
             doc.Blocks.Add(BuildItemsTable(result.Items));
             AddSeparator(doc);
 
-            // Totals
+            // ── Totals ───────────────────────────────────────────────────────
             AddLabelValue(doc, "Subtotal:", $"₱{result.Subtotal:N2}");
 
             if (result.HasDiscount)
@@ -88,9 +106,9 @@ namespace AdminSystem_v2.Services
             }
 
             AddThinSeparator(doc);
-            AddLabelValueBold(doc, "TOTAL:", $"₱{result.GrandTotal:N2}", 12);
+            AddLabelValueBold(doc, "TOTAL:", $"₱{result.GrandTotal:N2}", 15);
 
-            // Payment
+            // ── Payment ──────────────────────────────────────────────────────
             AddLabelValue(doc, "Payment:", result.PaymentMethod);
 
             if (result.IsCashMethod)
@@ -100,8 +118,8 @@ namespace AdminSystem_v2.Services
             }
 
             AddSeparator(doc);
-            AddCentered(doc, "Thank you for your purchase!", 10);
-            AddCentered(doc, "Please come again", 8);
+            AddCentered(doc, "Thank you for your purchase!", 12);
+            AddCentered(doc, "Please come again", 10);
 
             return doc;
         }
@@ -110,9 +128,11 @@ namespace AdminSystem_v2.Services
 
         private static Table BuildItemsTable(List<POSCartItem> items)
         {
-            var table = new Table { FontSize = 9, Margin = new Thickness(0, 2, 0, 2), CellSpacing = 0 };
+            var table = new Table { FontSize = 11, Margin = BlockMargin(4, 4), CellSpacing = 0 };
 
-            table.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
+            // Explicit width for ItemCol to prevent any table stretching
+            double itemColW = ReceiptWidth - QtyColW - PriceColW - TotalColW;
+            table.Columns.Add(new TableColumn { Width = new GridLength(itemColW) });
             table.Columns.Add(new TableColumn { Width = new GridLength(QtyColW) });
             table.Columns.Add(new TableColumn { Width = new GridLength(PriceColW) });
             table.Columns.Add(new TableColumn { Width = new GridLength(TotalColW) });
@@ -130,10 +150,10 @@ namespace AdminSystem_v2.Services
             foreach (var item in items)
             {
                 var row = new TableRow();
-                row.Cells.Add(Cell(item.DisplayName,               TextAlignment.Left));
-                row.Cells.Add(Cell(item.Quantity.ToString(),        TextAlignment.Center));
-                row.Cells.Add(Cell($"₱{item.UnitPrice:N2}",   TextAlignment.Right));
-                row.Cells.Add(Cell($"₱{item.LineTotal:N2}",   TextAlignment.Right));
+                row.Cells.Add(Cell(item.DisplayName,         TextAlignment.Left));
+                row.Cells.Add(Cell(item.Quantity.ToString(), TextAlignment.Center));
+                row.Cells.Add(Cell($"₱{item.UnitPrice:N2}", TextAlignment.Right));
+                row.Cells.Add(Cell($"₱{item.LineTotal:N2}", TextAlignment.Right));
                 bodyGroup.Rows.Add(row);
             }
             table.RowGroups.Add(bodyGroup);
@@ -145,14 +165,14 @@ namespace AdminSystem_v2.Services
             new(new Paragraph(new Run(text))
             {
                 TextAlignment = align,
-                Margin        = new Thickness(0, 1, 2, 1)
+                Margin        = new Thickness(0, 2, 4, 2)
             });
 
         // ── Label-value rows ─────────────────────────────────────────────────
 
         private static void AddLabelValue(FlowDocument doc, string label, string value)
         {
-            var table = TwoColTable(9, new Thickness(0, 1, 0, 1));
+            var table = TwoColTable(12, 2, 2);
             var rg    = new TableRowGroup();
             var row   = new TableRow();
             row.Cells.Add(Cell(label, TextAlignment.Left));
@@ -164,7 +184,7 @@ namespace AdminSystem_v2.Services
 
         private static void AddLabelValueBold(FlowDocument doc, string label, string value, double fontSize)
         {
-            var table = TwoColTable(fontSize, new Thickness(0, 4, 0, 4));
+            var table = TwoColTable(fontSize, 6, 6);
             table.FontWeight = FontWeights.Bold;
             var rg   = new TableRowGroup();
             var row  = new TableRow();
@@ -175,10 +195,11 @@ namespace AdminSystem_v2.Services
             doc.Blocks.Add(table);
         }
 
-        private static Table TwoColTable(double fontSize, Thickness margin)
+        private static Table TwoColTable(double fontSize, double top, double bottom)
         {
-            var t = new Table { FontSize = fontSize, Margin = margin, CellSpacing = 0 };
-            t.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
+            var t = new Table { FontSize = fontSize, Margin = BlockMargin(top, bottom), CellSpacing = 0 };
+            double labelColW = ReceiptWidth - ValueColW;
+            t.Columns.Add(new TableColumn { Width = new GridLength(labelColW) });
             t.Columns.Add(new TableColumn { Width = new GridLength(ValueColW) });
             return t;
         }
@@ -192,7 +213,7 @@ namespace AdminSystem_v2.Services
                 TextAlignment = TextAlignment.Center,
                 FontWeight    = FontWeights.Bold,
                 FontSize      = fontSize,
-                Margin        = new Thickness(0, 2, 0, 0)
+                Margin        = BlockMargin(4, 0)
             });
         }
 
@@ -202,7 +223,7 @@ namespace AdminSystem_v2.Services
             {
                 TextAlignment = TextAlignment.Center,
                 FontSize      = fontSize,
-                Margin        = new Thickness(0, 0, 0, 2)
+                Margin        = BlockMargin(0, 4)
             });
         }
 
@@ -214,7 +235,7 @@ namespace AdminSystem_v2.Services
                 Fill                = Brushes.Black,
                 HorizontalAlignment = HorizontalAlignment.Stretch
             })
-            { Margin = new Thickness(0, 5, 0, 5) });
+            { Margin = BlockMargin(6, 6) });
         }
 
         private static void AddThinSeparator(FlowDocument doc)
@@ -225,7 +246,7 @@ namespace AdminSystem_v2.Services
                 Fill                = Brushes.DimGray,
                 HorizontalAlignment = HorizontalAlignment.Stretch
             })
-            { Margin = new Thickness(0, 3, 0, 3) });
+            { Margin = BlockMargin(4, 4) });
         }
     }
 }

@@ -163,4 +163,7 @@ public sealed class User
     /// NULL UserId entries in SystemLog represent automated or system-generated events.
     /// </summary>
     public ICollection<SystemLog> SystemLogs { get; set; } = new List<SystemLog>();
+
+    /// <summary>Active login sessions for this user.</summary>
+    public ICollection<ActiveSession> ActiveSessions { get; set; } = new List<ActiveSession>();
 }

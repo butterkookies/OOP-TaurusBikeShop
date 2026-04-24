@@ -274,6 +274,12 @@ public sealed class CustomerController : Controller
     [HttpGet]
     public async Task<IActionResult> Logout()
     {
+        string? sessionId = User.FindFirstValue("SessionId");
+        if (!string.IsNullOrEmpty(sessionId))
+        {
+            await _userService.RevokeActiveSessionAsync(sessionId);
+        }
+
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         TempData["success"] = "You have been signed out.";
         return RedirectToAction("Index", "Home");
@@ -625,11 +631,16 @@ public sealed class CustomerController : Controller
     /// </summary>
     private async Task SignInUserAsync(User user)
     {
+        string? ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+        string? userAgent = Request.Headers.UserAgent.ToString();
+        string refreshToken = await _userService.RegisterActiveSessionAsync(user.UserId, ip, userAgent);
+
         List<Claim> claims =
         [
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new Claim(ClaimTypes.Name,           $"{user.FirstName} {user.LastName}"),
-            new Claim(ClaimTypes.Email,          user.Email ?? string.Empty)
+            new Claim(ClaimTypes.Email,          user.Email ?? string.Empty),
+            new Claim("SessionId",               refreshToken)
         ];
 
         ClaimsIdentity identity = new(
