@@ -2,7 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:AdminSystem_v2.Converters"
-             Background="#111827">
+             Background="#141414">
 
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
@@ -23,15 +23,15 @@
                                Foreground="#F9FAFB"
                                FontSize="22" FontWeight="Bold"/>
                     <TextBlock Text="Live snapshot of your store performance."
-                               Foreground="#4B5563"
+                               Foreground="#4A4A4A"
                                FontSize="12" Margin="0,4,0,0"/>
                 </StackPanel>
                 <Button Grid.Column="1"
                         Command="{Binding RefreshCommand}"
                         IsEnabled="{Binding IsNotLoading}"
-                        Background="#1A2234"
+                        Background="#1C1C1C"
                         Foreground="#D1D5DB"
-                        BorderBrush="#374151" BorderThickness="1"
+                        BorderBrush="#2E2E2E" BorderThickness="1"
                         Height="36" Padding="12,0"
                         Cursor="Hand" VerticalAlignment="Bottom">
                     <Button.Template>
@@ -50,7 +50,7 @@
                                     <Setter TargetName="Bd" Property="Background" Value="#253352"/>
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="False">
-                                    <Setter TargetName="Bd" Property="Background" Value="#111827"/>
+                                    <Setter TargetName="Bd" Property="Background" Value="#141414"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -76,17 +76,17 @@
 
                 <!-- Total Products -->
                 <Border Grid.Column="0"
-                        Background="#1A2234" CornerRadius="10"
+                        Background="#1C1C1C" CornerRadius="10"
                         Padding="20" BorderThickness="1" BorderBrush="#2D3748">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                             <Border Width="32" Height="32" CornerRadius="8"
-                                    Background="#1E3A5F" Margin="0,0,10,0">
+                                    Background="#1E2E3E" Margin="0,0,10,0">
                                 <TextBlock Text="📦" FontSize="14"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="PRODUCTS" Foreground="#4B5563"
+                            <TextBlock Text="PRODUCTS" Foreground="#4A4A4A"
                                        FontSize="10" FontWeight="SemiBold"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
@@ -94,7 +94,7 @@
                                    Foreground="#F9FAFB"
                                    FontSize="34" FontWeight="Bold" Margin="0,0,0,4"/>
                         <TextBlock Text="Active in catalog"
-                                   Foreground="#374151" FontSize="11"/>
+                                   Foreground="#2E2E2E" FontSize="11"/>
                     </StackPanel>
                 </Border>
 
@@ -104,11 +104,11 @@
                         BorderThickness="1">
                     <Border.Style>
                         <Style TargetType="Border">
-                            <Setter Property="Background"  Value="#1A2234"/>
+                            <Setter Property="Background"  Value="#1C1C1C"/>
                             <Setter Property="BorderBrush" Value="#2D3748"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding LowStockCount}" Value="0">
-                                    <Setter Property="Background"  Value="#1A2234"/>
+                                    <Setter Property="Background"  Value="#1C1C1C"/>
                                     <Setter Property="BorderBrush" Value="#2D3748"/>
                                 </DataTrigger>
                             </Style.Triggers>
@@ -132,7 +132,7 @@
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="LOW STOCK" Foreground="#4B5563"
+                            <TextBlock Text="LOW STOCK" Foreground="#4A4A4A"
                                        FontSize="10" FontWeight="SemiBold"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
@@ -149,7 +149,7 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                        <TextBlock Foreground="#374151" FontSize="11">
+                        <TextBlock Foreground="#2E2E2E" FontSize="11">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Text" Value="Variants below threshold"/>
@@ -166,7 +166,7 @@
 
                 <!-- Orders Today -->
                 <Border Grid.Column="4"
-                        Background="#1A2234" CornerRadius="10"
+                        Background="#1C1C1C" CornerRadius="10"
                         Padding="20" BorderThickness="1" BorderBrush="#2D3748">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
@@ -176,7 +176,7 @@
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="TODAY'S ORDERS" Foreground="#4B5563"
+                            <TextBlock Text="TODAY'S ORDERS" Foreground="#4A4A4A"
                                        FontSize="10" FontWeight="SemiBold"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
@@ -184,13 +184,13 @@
                                    Foreground="#F87171"
                                    FontSize="34" FontWeight="Bold" Margin="0,0,0,4"/>
                         <TextBlock Text="Placed today"
-                                   Foreground="#374151" FontSize="11"/>
+                                   Foreground="#2E2E2E" FontSize="11"/>
                     </StackPanel>
                 </Border>
 
                 <!-- Orders This Week -->
                 <Border Grid.Column="6"
-                        Background="#1A2234" CornerRadius="10"
+                        Background="#1C1C1C" CornerRadius="10"
                         Padding="20" BorderThickness="1" BorderBrush="#2D3748">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
@@ -200,7 +200,7 @@
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="WEEK'S ORDERS" Foreground="#4B5563"
+                            <TextBlock Text="WEEK'S ORDERS" Foreground="#4A4A4A"
                                        FontSize="10" FontWeight="SemiBold"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
@@ -208,13 +208,13 @@
                                    Foreground="#34D399"
                                    FontSize="34" FontWeight="Bold" Margin="0,0,0,4"/>
                         <TextBlock Text="Last 7 days total"
-                                   Foreground="#374151" FontSize="11"/>
+                                   Foreground="#2E2E2E" FontSize="11"/>
                     </StackPanel>
                 </Border>
             </Grid>
 
             <!-- ── ORDERS BAR CHART ── -->
-            <Border Background="#1A2234" CornerRadius="10"
+            <Border Background="#1C1C1C" CornerRadius="10"
                     BorderThickness="1" BorderBrush="#2D3748"
                     Padding="24,20" Margin="0,0,0,20">
                 <StackPanel>
@@ -230,7 +230,7 @@
                                        Foreground="#F9FAFB"
                                        FontSize="14" FontWeight="SemiBold"/>
                             <TextBlock Text="Daily order volume breakdown"
-                                       Foreground="#4B5563"
+                                       Foreground="#4A4A4A"
                                        FontSize="11" Margin="0,2,0,0"/>
                         </StackPanel>
                         <!-- Legend -->
@@ -304,7 +304,7 @@
 
                     <!-- Empty/loading state for chart -->
                     <TextBlock Text="Loading order data..."
-                               Foreground="#374151" FontSize="12"
+                               Foreground="#2E2E2E" FontSize="12"
                                HorizontalAlignment="Center" Margin="0,12,0,0"
                                Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}"/>
 
@@ -312,7 +312,7 @@
             </Border>
 
             <!-- ── LOW STOCK TABLE ── -->
-            <Border Background="#1A2234"
+            <Border Background="#1C1C1C"
                     CornerRadius="10"
                     BorderThickness="1"
                     BorderBrush="#2D3748"
@@ -331,7 +331,7 @@
                                        Foreground="#F9FAFB"
                                        FontSize="14" FontWeight="SemiBold"/>
                             <TextBlock Text="Variants at or below their reorder threshold"
-                                       Foreground="#4B5563"
+                                       Foreground="#4A4A4A"
                                        FontSize="11" Margin="0,2,0,0"/>
                         </StackPanel>
 
@@ -369,7 +369,7 @@
 
                     <!-- Loading indicator -->
                     <TextBlock Text="Loading..."
-                               Foreground="#4B5563"
+                               Foreground="#4A4A4A"
                                FontSize="13"
                                HorizontalAlignment="Center"
                                Margin="0,20"
@@ -423,17 +423,17 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="PRODUCT"   Foreground="#374151" FontSize="10" FontWeight="SemiBold"/>
-                        <TextBlock Grid.Column="1" Text="VARIANT"   Foreground="#374151" FontSize="10" FontWeight="SemiBold"/>
-                        <TextBlock Grid.Column="2" Text="STOCK"     Foreground="#374151" FontSize="10" FontWeight="SemiBold"/>
-                        <TextBlock Grid.Column="3" Text="THRESHOLD" Foreground="#374151" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Column="0" Text="PRODUCT"   Foreground="#2E2E2E" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Column="1" Text="VARIANT"   Foreground="#2E2E2E" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Column="2" Text="STOCK"     Foreground="#2E2E2E" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Column="3" Text="THRESHOLD" Foreground="#2E2E2E" FontSize="10" FontWeight="SemiBold"/>
                     </Grid>
 
                     <!-- Low stock rows -->
                     <ItemsControl ItemsSource="{Binding LowStockItems}" Margin="0,0,0,4">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderThickness="0,1,0,0" BorderBrush="#1E2D45">
+                                <Border BorderThickness="0,1,0,0" BorderBrush="#2A2A2A">
                                     <Grid Margin="24,12">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="2*"/>
@@ -486,7 +486,7 @@
 
                                         <TextBlock Grid.Column="3"
                                                    Text="{Binding ReorderThreshold}"
-                                                   Foreground="#4B5563"
+                                                   Foreground="#4A4A4A"
                                                    FontSize="13"
                                                    VerticalAlignment="Center"/>
                                     </Grid>

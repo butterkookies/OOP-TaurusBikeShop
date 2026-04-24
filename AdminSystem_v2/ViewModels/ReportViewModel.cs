@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows.Input;
 using AdminSystem_v2.Helpers;
 using AdminSystem_v2.Models;
@@ -6,6 +7,7 @@ using AdminSystem_v2.Services;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
+using OxyPlot.Wpf;
 
 namespace AdminSystem_v2.ViewModels
 {
@@ -263,15 +265,29 @@ namespace AdminSystem_v2.ViewModels
             ClearMessages();
             try
             {
+                byte[]? chartPng = null;
+                try
+                {
+                    using var ms = new MemoryStream();
+                    var exporter = new PngExporter { Width = 900, Height = 400 };
+                    exporter.Export(ChartModel, ms);
+                    chartPng = ms.ToArray();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[Reports/Export/Chart] {ex}");
+                }
+
                 var export = new SalesReportExport
                 {
-                    SourceLabel = SourceLabel,
-                    PeriodLabel = Period,
-                    FromDate    = FromDate,
-                    ToDate      = ToDate,
-                    Summary     = SalesSummary,
-                    Breakdown   = DailySales.ToList(),
-                    TopProducts = TopProducts.ToList(),
+                    SourceLabel   = SourceLabel,
+                    PeriodLabel   = Period,
+                    FromDate      = FromDate,
+                    ToDate        = ToDate,
+                    Summary       = SalesSummary,
+                    Breakdown     = DailySales.ToList(),
+                    TopProducts   = TopProducts.ToList(),
+                    ChartImagePng = chartPng,
                 };
 
                 _excelExportService.ExportSalesReport(dialog.FileName, export);

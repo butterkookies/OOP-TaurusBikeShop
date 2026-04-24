@@ -74,6 +74,18 @@ namespace AdminSystem_v2.ViewModels
             set => SetProperty(ref _brands, value);
         }
 
+        // ── Category filter (toolbar ComboBox) ────────────────────────────
+        private Category? _selectedCategoryFilter;
+        public  Category? SelectedCategoryFilter
+        {
+            get => _selectedCategoryFilter;
+            set
+            {
+                if (SetProperty(ref _selectedCategoryFilter, value))
+                    _ = SearchAsync();
+            }
+        }
+
 
 
         private int _adjustQty;
@@ -173,6 +185,7 @@ namespace AdminSystem_v2.ViewModels
         public ICommand CancelEditVariantCommand { get; }
         public ICommand AddImageCommand          { get; }
         public ICommand RemoveImageCommand       { get; }
+        public ICommand ClearCategoryFilterCommand { get; }
 
         public ProductViewModel(IProductService productService)
         {
@@ -192,6 +205,7 @@ namespace AdminSystem_v2.ViewModels
             AddImageCommand          = new RelayCommand(async () => await AddImageAsync(),
                                            () => EditProduct?.ProductId > 0 && !string.IsNullOrWhiteSpace(NewImageUrl));
             RemoveImageCommand       = new RelayCommand<ProductImage>(async img => await RemoveImageAsync(img));
+            ClearCategoryFilterCommand = new RelayCommand(() => SelectedCategoryFilter = null);
         }
 
         // ── Called by MainWindowViewModel when navigating here ────────────
@@ -203,7 +217,8 @@ namespace AdminSystem_v2.ViewModels
             {
                 var (products, categories, brands) = await LoadAllAsync();
                 Products   = new ObservableCollection<Product>(products);
-                Categories = new ObservableCollection<Category>(categories);
+                Categories = new ObservableCollection<Category>(
+                    categories.Where(c => !string.Equals(c.Name, "Bicycle & Parts", StringComparison.OrdinalIgnoreCase)));
                 Brands     = new ObservableCollection<Brand>(brands);
             }
             catch (Exception ex)
@@ -234,6 +249,10 @@ namespace AdminSystem_v2.ViewModels
                 var results = string.IsNullOrWhiteSpace(SearchText)
                     ? await _productService.GetAllAsync()
                     : await _productService.SearchAsync(SearchText);
+
+                // Apply category filter on client side
+                if (_selectedCategoryFilter != null)
+                    results = results.Where(p => p.CategoryId == _selectedCategoryFilter.CategoryId);
 
                 Products = new ObservableCollection<Product>(results);
             }
@@ -508,6 +527,11 @@ namespace AdminSystem_v2.ViewModels
             var products = string.IsNullOrWhiteSpace(SearchText)
                 ? await _productService.GetAllAsync()
                 : await _productService.SearchAsync(SearchText);
+
+            // Apply category filter on client side
+            if (_selectedCategoryFilter != null)
+                products = products.Where(p => p.CategoryId == _selectedCategoryFilter.CategoryId);
+
             Products = new ObservableCollection<Product>(products);
         }
 

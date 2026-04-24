@@ -579,13 +579,6 @@ namespace AdminSystem_v2.ViewModels
                 result.CashierName = CashierName;
                 LastResult         = result;
                 IsReceiptVisible   = true;
-
-                // Auto-print receipt to default printer
-                try { _printService.PrintReceipt(result); }
-                catch (Exception printEx)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[POS] Receipt print failed: {printEx.Message}");
-                }
             }
             catch (InvalidOperationException ex)
             {

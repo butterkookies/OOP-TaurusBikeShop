@@ -61,5 +61,10 @@ namespace AdminSystem_v2.Views
                 VoucherCodeBox.Focus();
             }
         }
+
+        private void OverlayBackground_Click(object sender, MouseButtonEventArgs e)
+        {
+            VM?.NewSaleCommand.Execute(null);
+        }
     }
 }

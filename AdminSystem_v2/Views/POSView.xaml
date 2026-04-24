@@ -2,13 +2,13 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:conv="clr-namespace:AdminSystem_v2.Converters"
-             Background="#111827">
+             Background="#141414">
 
     <UserControl.Resources>
 
         <!-- Payment method toggle button — base style -->
         <Style x:Key="PayBtn" TargetType="Button">
-            <Setter Property="Background"      Value="#374151"/>
+            <Setter Property="Background"      Value="#2E2E2E"/>
             <Setter Property="Foreground"      Value="#D1D5DB"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Height"          Value="36"/>
@@ -28,7 +28,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#4B5563"/>
+                                <Setter Property="Background" Value="#4A4A4A"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -38,7 +38,7 @@
 
         <!-- Qty control button -->
         <Style x:Key="QtyBtn" TargetType="Button">
-            <Setter Property="Background"      Value="#374151"/>
+            <Setter Property="Background"      Value="#2E2E2E"/>
             <Setter Property="Foreground"      Value="#D1D5DB"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Width"           Value="26"/>
@@ -56,7 +56,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#4B5563"/>
+                                <Setter Property="Background" Value="#4A4A4A"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -94,7 +94,7 @@
             <!-- ─────────────────────────────────────────
                  COL 0 — PRODUCT SEARCH PANEL
                  ───────────────────────────────────────── -->
-            <Grid Grid.Column="0" Background="#111827">
+            <Grid Grid.Column="0" Background="#141414">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>  <!-- header -->
                     <RowDefinition Height="Auto"/>  <!-- search -->
@@ -103,8 +103,8 @@
 
                 <!-- Search box -->
                 <Border Grid.Row="0" Grid.RowSpan="2"
-                        Background="#1A2234" Padding="12,8"
-                        BorderBrush="#374151" BorderThickness="0,0,0,1">
+                        Background="#1C1C1C" Padding="12,8"
+                        BorderBrush="#2E2E2E" BorderThickness="0,0,0,1">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -115,7 +115,7 @@
 
                         <!-- Search icon -->
                         <TextBlock Grid.Column="0" Text="&#x1F50D;"
-                                   FontSize="14" Foreground="#4B5563"
+                                   FontSize="14" Foreground="#4A4A4A"
                                    VerticalAlignment="Center"
                                    Margin="4,0,8,0"/>
 
@@ -128,7 +128,7 @@
                                      Foreground="White" FontSize="13"
                                      CaretBrush="White"/>
                             <TextBlock Text="Search by name, variant, or SKU..."
-                                       Foreground="#4B5563" FontSize="13"
+                                       Foreground="#4A4A4A" FontSize="13"
                                        Margin="2,0" VerticalAlignment="Center"
                                        IsHitTestVisible="False">
                                 <TextBlock.Style>
@@ -181,7 +181,7 @@
 
                     <!-- Empty-state hint -->
                     <TextBlock Text="Start typing to search for products"
-                               Foreground="#374151" FontSize="13"
+                               Foreground="#2E2E2E" FontSize="13"
                                HorizontalAlignment="Center"
                                Margin="0,40,0,0">
                         <TextBlock.Style>
@@ -199,8 +199,8 @@
                     <ItemsControl ItemsSource="{Binding SearchResults}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="#1A2234"
-                                        BorderBrush="#374151"
+                                <Border Background="#1C1C1C"
+                                        BorderBrush="#2E2E2E"
                                         BorderThickness="1"
                                         CornerRadius="8"
                                         Padding="12,10"
@@ -220,7 +220,7 @@
                                                 <TextBlock Text="{Binding UnitPrice, StringFormat='₱{0:N2}'}"
                                                            Foreground="#DC2626"
                                                            FontSize="13" FontWeight="Bold"/>
-                                                <Border Background="#374151"
+                                                <Border Background="#2E2E2E"
                                                         CornerRadius="4"
                                                         Padding="6,2"
                                                         Margin="8,0,0,0">
@@ -250,12 +250,12 @@
             </Grid>
 
             <!-- Vertical divider -->
-            <Border Grid.Column="1" Background="#374151"/>
+            <Border Grid.Column="1" Background="#2E2E2E"/>
 
             <!-- ─────────────────────────────────────────
                  COL 2 — CART + PAYMENT PANEL
                  ───────────────────────────────────────── -->
-            <Grid Grid.Column="2" Background="#1A2234">
+            <Grid Grid.Column="2" Background="#1C1C1C">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>   <!-- customer row -->
                     <RowDefinition Height="Auto"/>   <!-- cart header -->
@@ -266,7 +266,7 @@
                 <!-- Customer selector -->
                 <Border Grid.Row="0"
                         BorderThickness="0,0,0,1"
-                        BorderBrush="#374151"
+                        BorderBrush="#2E2E2E"
                         Padding="14,10">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -285,8 +285,8 @@
 
                                 <!-- Selected customer display -->
                                 <Border Grid.Row="0"
-                                        Background="#111827"
-                                        BorderBrush="#374151"
+                                        Background="#141414"
+                                        BorderBrush="#2E2E2E"
                                         BorderThickness="1"
                                         CornerRadius="6"
                                         Padding="10,8"
@@ -317,7 +317,7 @@
                                                      x:Name="CustomerSearchBox"
                                                      Height="36" Padding="12,0" VerticalContentAlignment="Center"/>
                                             <TextBlock Text="Search customers..."
-                                                       Foreground="#4B5563" FontSize="13"
+                                                       Foreground="#4A4A4A" FontSize="13"
                                                        Margin="14,0" VerticalAlignment="Center"
                                                        IsHitTestVisible="False">
                                                 <TextBlock.Style>
@@ -336,8 +336,8 @@
                                             </TextBlock>
                                         </Grid>
                                         <Border Grid.Row="1"
-                                                Background="#111827"
-                                                BorderBrush="#374151"
+                                                Background="#141414"
+                                                BorderBrush="#2E2E2E"
                                                 BorderThickness="1"
                                                 CornerRadius="0,0,6,6"
                                                 MaxHeight="160"
@@ -353,7 +353,7 @@
                                                                 <Setter Property="Background" Value="Transparent"/>
                                                                 <Style.Triggers>
                                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                                        <Setter Property="Background" Value="#374151"/>
+                                                                        <Setter Property="Background" Value="#2E2E2E"/>
                                                                     </Trigger>
                                                                 </Style.Triggers>
                                                             </Style>
@@ -376,7 +376,7 @@
                                                                             <Setter Property="Background" Value="Transparent"/>
                                                                             <Style.Triggers>
                                                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                                                    <Setter Property="Background" Value="#374151"/>
+                                                                                    <Setter Property="Background" Value="#2E2E2E"/>
                                                                                 </Trigger>
                                                                             </Style.Triggers>
                                                                         </Style>
@@ -405,15 +405,15 @@
                 <!-- Cart header -->
                 <Border Grid.Row="1"
                         BorderThickness="0,0,0,1"
-                        BorderBrush="#374151"
+                        BorderBrush="#2E2E2E"
                         Padding="14,8">
                     <Grid>
                         <TextBlock Text="CART"
-                                   Foreground="#4B5563"
+                                   Foreground="#4A4A4A"
                                    FontSize="10" FontWeight="SemiBold"
                                    VerticalAlignment="Center"/>
                         <TextBlock Text="Cart is empty"
-                                   Foreground="#374151" FontSize="12"
+                                   Foreground="#2E2E2E" FontSize="12"
                                    HorizontalAlignment="Right"
                                    VerticalAlignment="Center"
                                    Visibility="{Binding IsCartEmpty, Converter={StaticResource BoolToVis}}"/>
@@ -428,7 +428,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border BorderThickness="0,0,0,1"
-                                        BorderBrush="#374151"
+                                        BorderBrush="#2E2E2E"
                                         Padding="14,10">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -491,14 +491,14 @@
                 <!-- ── Totals + Payment ─────────────────────────────────── -->
                 <Border Grid.Row="3"
                         BorderThickness="0,1,0,0"
-                        BorderBrush="#374151"
-                        Background="#111827"
+                        BorderBrush="#2E2E2E"
+                        Background="#141414"
                         Padding="14,12">
                     <StackPanel>
 
                         <!-- Voucher Code -->
                         <TextBlock Text="VOUCHER CODE"
-                                   Foreground="#4B5563"
+                                   Foreground="#4A4A4A"
                                    FontSize="10" FontWeight="SemiBold"
                                    Margin="0,0,0,4"/>
                         <Grid Margin="0,0,0,4">
@@ -571,8 +571,8 @@
 
                             <!-- ── Row 1: Available vouchers dropdown ── -->
                             <Border Grid.Row="1"
-                                    Background="#111827"
-                                    BorderBrush="#374151"
+                                    Background="#141414"
+                                    BorderBrush="#2E2E2E"
                                     BorderThickness="1,0,1,1"
                                     CornerRadius="0,0,6,6"
                                     MaxHeight="140"
@@ -592,7 +592,7 @@
                                                             <Setter Property="Background" Value="Transparent"/>
                                                             <Style.Triggers>
                                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                                    <Setter Property="Background" Value="#374151"/>
+                                                                    <Setter Property="Background" Value="#2E2E2E"/>
                                                                 </Trigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -694,7 +694,7 @@
 
                         <!-- Payment method label -->
                         <TextBlock Text="PAYMENT METHOD"
-                                   Foreground="#4B5563"
+                                   Foreground="#4A4A4A"
                                    FontSize="10" FontWeight="SemiBold"
                                    Margin="0,0,0,6"/>
 
@@ -729,7 +729,7 @@
                                     <Style TargetType="Button" BasedOn="{StaticResource PayBtn}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding SelectedPaymentMethod}" Value="GCash">
-                                                <Setter Property="Background" Value="#1E3A5F"/>
+                                                <Setter Property="Background" Value="#1E2E3E"/>
                                                 <Setter Property="Foreground" Value="#93C5FD"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -749,7 +749,7 @@
                                     <Style TargetType="Button" BasedOn="{StaticResource PayBtn}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding SelectedPaymentMethod}" Value="BankTransfer">
-                                                <Setter Property="Background" Value="#1E3A5F"/>
+                                                <Setter Property="Background" Value="#1E2E3E"/>
                                                 <Setter Property="Foreground" Value="#93C5FD"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -768,7 +768,7 @@
                                     ToolTip="Card payment — coming soon">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource PayBtn}">
-                                        <Setter Property="Foreground" Value="#4B5563"/>
+                                        <Setter Property="Foreground" Value="#4A4A4A"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding SelectedPaymentMethod}" Value="Card">
                                                 <Setter Property="Background" Value="#2D1B69"/>
@@ -780,7 +780,7 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#x1F4B3;" FontSize="13" Margin="0,0,4,0"/>
                                     <TextBlock Text="Card" FontSize="12"/>
-                                    <Border Background="#374151" CornerRadius="3"
+                                    <Border Background="#2E2E2E" CornerRadius="3"
                                             Padding="4,1" Margin="4,0,0,0">
                                         <TextBlock Text="SOON" FontSize="9"
                                                    Foreground="#6B7280" FontWeight="Bold"/>
@@ -846,7 +846,7 @@
                                             <Setter Property="Background" Value="#B91C1C"/>
                                         </Trigger>
                                         <Trigger Property="IsEnabled" Value="False">
-                                            <Setter Property="Background" Value="#4B5563"/>
+                                            <Setter Property="Background" Value="#4A4A4A"/>
                                             <Setter Property="Foreground" Value="#6B7280"/>
                                         </Trigger>
                                     </Style.Triggers>
@@ -876,12 +876,14 @@
              RECEIPT OVERLAY
              ══════════════════════════════════════════════ -->
         <Grid Visibility="{Binding IsReceiptVisible, Converter={StaticResource BoolToVis}}">
-            <!-- Dark background -->
-            <Rectangle Fill="#D9000000"/>
+            <!-- Dark background — click outside card to dismiss -->
+            <Rectangle Fill="#D9000000"
+                       MouseLeftButtonDown="OverlayBackground_Click"
+                       Cursor="Arrow"/>
 
             <!-- Receipt card -->
-            <Border Background="#1A2234"
-                    BorderBrush="#374151"
+            <Border Background="#1C1C1C"
+                    BorderBrush="#2E2E2E"
                     BorderThickness="1"
                     CornerRadius="12"
                     MaxWidth="500"
@@ -918,7 +920,7 @@
                         </StackPanel>
 
                         <!-- Horizontal rule -->
-                        <Border Height="1" Background="#374151" Margin="0,0,0,14"/>
+                        <Border Height="1" Background="#2E2E2E" Margin="0,0,0,14"/>
 
                         <!-- Meta info -->
                         <Grid Margin="0,0,0,4">
@@ -968,7 +970,7 @@
                             <TextBlock Grid.Column="3" Text="Total"      Style="{StaticResource RLabel}" TextAlignment="Right"/>
                         </Grid>
 
-                        <Border Height="1" Background="#374151" Margin="0,0,0,6"/>
+                        <Border Height="1" Background="#2E2E2E" Margin="0,0,0,6"/>
 
                         <!-- Items list -->
                         <ItemsControl ItemsSource="{Binding LastResult.Items}">
@@ -1002,7 +1004,7 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <Border Height="1" Background="#374151" Margin="0,10,0,8"/>
+                        <Border Height="1" Background="#2E2E2E" Margin="0,10,0,8"/>
 
                         <!-- Totals summary -->
                         <Grid Margin="0,2">
@@ -1042,7 +1044,7 @@
                             </Grid>
                         </StackPanel>
 
-                        <Border Height="1" Background="#374151" Margin="0,12,0,12"/>
+                        <Border Height="1" Background="#2E2E2E" Margin="0,12,0,12"/>
 
                         <!-- Thank you -->
                         <TextBlock Text="Thank you for your purchase!"

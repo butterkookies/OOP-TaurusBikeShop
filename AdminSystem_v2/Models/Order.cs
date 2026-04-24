@@ -40,6 +40,7 @@ namespace AdminSystem_v2.Models
         public List<OrderItem>  Items    { get; set; } = new();
         public DeliveryDetail?  Delivery { get; set; }
         public PickupOrder?     Pickup   { get; set; }
+        public ShippingAddress? Address  { get; set; }
 
         // ── Populated by list query (subquery count) ─────────────────────────
         public int ItemCount { get; set; }

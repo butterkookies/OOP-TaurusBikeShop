@@ -1,3 +1,4 @@
+using System.IO;
 using ClosedXML.Excel;
 
 namespace AdminSystem_v2.Services
@@ -84,14 +85,14 @@ namespace AdminSystem_v2.Services
         private static void BuildBreakdownSheet(XLWorkbook wb, SalesReportExport d)
         {
             var ws = wb.Worksheets.Add("Breakdown");
+            var breakdown = d.Breakdown.ToList();
 
             ws.Cell(1, 1).Value = "Period";
             ws.Cell(1, 2).Value = "Orders";
             ws.Cell(1, 3).Value = "Revenue";
-            StyleHeader(ws.Range(1, 1, 1, 3));
 
             int row = 2;
-            foreach (var item in d.Breakdown)
+            foreach (var item in breakdown)
             {
                 ws.Cell(row, 1).Value = item.SaleDateDisplay;
                 ws.Cell(row, 2).Value = item.OrderCount;
@@ -100,18 +101,32 @@ namespace AdminSystem_v2.Services
                 row++;
             }
 
-            if (row > 2)
+            int lastDataRow = row - 1;
+
+            if (lastDataRow >= 2)
             {
-                ws.Cell(row, 1).Value = "Total";
-                ws.Cell(row, 2).FormulaA1 = $"SUM(B2:B{row - 1})";
-                ws.Cell(row, 3).FormulaA1 = $"SUM(C2:C{row - 1})";
-                ws.Cell(row, 3).Style.NumberFormat.Format = Currency;
-                ws.Range(row, 1, row, 3).Style.Font.Bold = true;
-                ws.Range(row, 1, row, 3).Style.Border.TopBorder = XLBorderStyleValues.Thin;
+                var tbl = ws.Range(1, 1, lastDataRow, 3).CreateTable("BreakdownTable");
+                tbl.Theme = XLTableTheme.TableStyleMedium9;
+                tbl.ShowTotalsRow = true;
+                tbl.Field("Period").TotalsRowLabel           = "Total";
+                tbl.Field("Orders").TotalsRowFunction        = XLTotalsRowFunction.Sum;
+                tbl.Field("Revenue").TotalsRowFunction       = XLTotalsRowFunction.Sum;
+                // Re-apply currency format to the Revenue totals cell
+                ws.Cell(lastDataRow + 1, 3).Style.NumberFormat.Format = Currency;
             }
 
             ws.Columns(1, 3).AdjustToContents();
             ws.SheetView.FreezeRows(1);
+
+            // Embed chart image to the right of the table
+            if (d.ChartImagePng is { Length: > 0 })
+            {
+                using var ms = new MemoryStream(d.ChartImagePng);
+                var pic = ws.AddPicture(ms)
+                             .MoveTo(ws.Cell(1, 5));
+                pic.Width  = 620;
+                pic.Height = 280;
+            }
         }
 
         private static void BuildTopProductsSheet(XLWorkbook wb, SalesReportExport d)
@@ -122,7 +137,6 @@ namespace AdminSystem_v2.Services
             ws.Cell(1, 2).Value = "Product";
             ws.Cell(1, 3).Value = "Units Sold";
             ws.Cell(1, 4).Value = "Revenue";
-            StyleHeader(ws.Range(1, 1, 1, 4));
 
             int row = 2;
             int rank = 1;
@@ -136,17 +150,23 @@ namespace AdminSystem_v2.Services
                 row++;
             }
 
+            int lastDataRow = row - 1;
+
+            if (lastDataRow >= 2)
+            {
+                var tbl = ws.Range(1, 1, lastDataRow, 4).CreateTable("TopProductsTable");
+                tbl.Theme = XLTableTheme.TableStyleMedium9;
+                tbl.ShowTotalsRow = true;
+                tbl.Field("Rank").TotalsRowFunction          = XLTotalsRowFunction.None;
+                tbl.Field("Product").TotalsRowLabel          = "Total";
+                tbl.Field("Units Sold").TotalsRowFunction    = XLTotalsRowFunction.Sum;
+                tbl.Field("Revenue").TotalsRowFunction       = XLTotalsRowFunction.Sum;
+                ws.Cell(lastDataRow + 1, 4).Style.NumberFormat.Format = Currency;
+            }
+
             ws.Columns(1, 4).AdjustToContents();
             ws.Column(2).Width = Math.Max(ws.Column(2).Width, 32);
             ws.SheetView.FreezeRows(1);
-        }
-
-        private static void StyleHeader(IXLRange range)
-        {
-            range.Style.Fill.BackgroundColor = HeaderFill;
-            range.Style.Font.FontColor       = HeaderText;
-            range.Style.Font.Bold            = true;
-            range.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
         }
     }
 }

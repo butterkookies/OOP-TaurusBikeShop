@@ -5,5 +5,7 @@ namespace AdminSystem_v2.Models
         public int    BrandId   { get; set; }
         public string BrandName { get; set; } = string.Empty;
         public bool   IsActive  { get; set; }
+
+        public override string ToString() => BrandName;
     }
 }

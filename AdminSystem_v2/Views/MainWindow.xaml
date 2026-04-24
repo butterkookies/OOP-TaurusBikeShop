@@ -6,7 +6,7 @@
         MinHeight="600" MinWidth="900"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
-        Background="#111827"
+        Background="#141414"
         Closing="Window_Closing">
 
     <Window.Resources>
@@ -36,7 +36,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background"  Value="#1E2D45"/>
+                                <Setter TargetName="Bd" Property="Background"  Value="#252525"/>
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="#DC2626"/>
                                 <Setter Property="Foreground"                   Value="#E5E7EB"/>
                             </Trigger>
@@ -48,7 +48,7 @@
 
         <!-- ── SIDEBAR SECTION LABEL ── -->
         <Style x:Key="SectionLabel" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Foreground" Value="#2E2E2E"/>
             <Setter Property="FontSize"   Value="10"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Margin"     Value="16,12,12,4"/>
@@ -56,7 +56,7 @@
 
         <!-- ── SIDEBAR SEPARATOR ── -->
         <Style x:Key="SidebarSep" TargetType="Separator">
-            <Setter Property="Background" Value="#1E2D45"/>
+            <Setter Property="Background" Value="#2A2A2A"/>
             <Setter Property="Height"     Value="1"/>
             <Setter Property="Margin"     Value="12,6"/>
         </Style>
@@ -82,7 +82,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#1E2D45"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#252525"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -105,9 +105,9 @@
              COL 0 — SIDEBAR
              ═══════════════════════════════ -->
         <Border Grid.Column="0"
-                Background="#0F1829"
+                Background="#0F0F0F"
                 BorderThickness="0,0,1,0"
-                BorderBrush="#1E2D45">
+                BorderBrush="#2A2A2A">
             <DockPanel LastChildFill="True">
 
                 <!-- Brand header -->
@@ -146,9 +146,9 @@
 
                 <!-- Admin profile card -->
                 <Border DockPanel.Dock="Top"
-                        Background="#1A2234"
+                        Background="#1C1C1C"
                         Padding="16,12"
-                        BorderBrush="#1E2D45"
+                        BorderBrush="#2A2A2A"
                         BorderThickness="0,0,0,1">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -181,7 +181,7 @@
                                        TextTrimming="CharacterEllipsis"/>
                             <!-- Role badge -->
                             <Border CornerRadius="3" Padding="5,1"
-                                    Background="#1E3A5F"
+                                    Background="#1E2E3E"
                                     HorizontalAlignment="Left"
                                     Margin="0,3,0,0">
                                 <TextBlock Text="{Binding UserRole}"
@@ -220,7 +220,7 @@
 
                     <!-- Version tag -->
                     <TextBlock Text="Admin System v2"
-                               Foreground="#1E2D45"
+                               Foreground="#2A2A2A"
                                FontSize="10"
                                HorizontalAlignment="Center"
                                Margin="0,6,0,8"/>
@@ -240,7 +240,7 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource NavButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ActivePage}" Value="Dashboard">
-                                            <Setter Property="Background"  Value="#1E3A5F"/>
+                                            <Setter Property="Background"  Value="#1E2E3E"/>
                                             <Setter Property="Foreground"  Value="#F9FAFB"/>
                                             <Setter Property="BorderBrush" Value="#3B82F6"/>
                                         </DataTrigger>
@@ -459,9 +459,9 @@
 
             <!-- Top bar -->
             <Border Grid.Row="0"
-                    Background="#1A2234"
+                    Background="#1C1C1C"
                     BorderThickness="0,0,0,1"
-                    BorderBrush="#1E2D45">
+                    BorderBrush="#2A2A2A">
                 <Grid Margin="24,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -480,10 +480,10 @@
                     <!-- Right side: user info chip -->
                     <Border Grid.Column="1"
                             VerticalAlignment="Center"
-                            Background="#0F1829"
+                            Background="#0F0F0F"
                             CornerRadius="20"
                             Padding="10,6"
-                            BorderBrush="#1E2D45"
+                            BorderBrush="#2A2A2A"
                             BorderThickness="1">
                         <StackPanel Orientation="Horizontal">
                             <Border Width="22" Height="22"

@@ -14,6 +14,30 @@ namespace AdminSystem_v2.ViewModels
         private readonly IOrderService  _orderService;
         private readonly IDialogService _dialog;
 
+        // ── Pagination ─────────────────────────────────────────────────────────
+
+        private List<SelectableOrder> _allOrders = new();
+        private const int DefaultPageSize = 50;
+
+        private int _currentPage = 1;
+        public  int CurrentPage
+        {
+            get => _currentPage;
+            private set => SetProperty(ref _currentPage, value);
+        }
+
+        private int _totalPages = 1;
+        public  int TotalPages
+        {
+            get => _totalPages;
+            private set => SetProperty(ref _totalPages, value);
+        }
+
+        public string PageInfo => $"Page {CurrentPage} of {TotalPages}";
+
+        public bool CanGoNext     => CurrentPage < TotalPages;
+        public bool CanGoPrevious => CurrentPage > 1;
+
         // ── Order list ────────────────────────────────────────────────────────
 
         private ObservableCollection<SelectableOrder> _orders = new();
@@ -250,6 +274,10 @@ namespace AdminSystem_v2.ViewModels
         public ICommand DeselectAllCommand         { get; }
         public ICommand CloseDetailCommand         { get; }
         public ICommand OpenPaymentProofCommand    { get; }
+        public ICommand NextPageCommand            { get; }
+        public ICommand PreviousPageCommand        { get; }
+        public ICommand FirstPageCommand           { get; }
+        public ICommand LastPageCommand            { get; }
 
         // ── Constructor ───────────────────────────────────────────────────────
 
@@ -299,6 +327,11 @@ namespace AdminSystem_v2.ViewModels
                     }
                 }
             });
+
+            NextPageCommand     = new RelayCommand(() => { CurrentPage++; ApplyPagination(); },     () => CanGoNext);
+            PreviousPageCommand = new RelayCommand(() => { CurrentPage--; ApplyPagination(); },     () => CanGoPrevious);
+            FirstPageCommand    = new RelayCommand(() => { CurrentPage = 1; ApplyPagination(); },   () => CanGoPrevious);
+            LastPageCommand     = new RelayCommand(() => { CurrentPage = TotalPages; ApplyPagination(); }, () => CanGoNext);
         }
 
         // ── Load ──────────────────────────────────────────────────────────────
@@ -337,8 +370,11 @@ namespace AdminSystem_v2.ViewModels
 
                 int? previousId  = _selectedRow?.Order.OrderId;
 
-                Orders = new ObservableCollection<SelectableOrder>(
-                    orders.Select(o => new SelectableOrder(o)));
+                // Store the full master list for pagination
+                _allOrders = orders.Select(o => new SelectableOrder(o)).ToList();
+                TotalPages = Math.Max(1, (int)Math.Ceiling(_allOrders.Count / (double)DefaultPageSize));
+                CurrentPage = 1;
+                ApplyPagination();
 
                 BuildStatusBadges(counts);
 
@@ -370,6 +406,19 @@ namespace AdminSystem_v2.ViewModels
             {
                 IsLoading = false;
             }
+        }
+
+        /// <summary>Slices the master list to update the visible page of orders.</summary>
+        private void ApplyPagination()
+        {
+            var page = _allOrders
+                .Skip((CurrentPage - 1) * DefaultPageSize)
+                .Take(DefaultPageSize);
+            Orders = new ObservableCollection<SelectableOrder>(page);
+
+            OnPropertyChanged(nameof(PageInfo));
+            OnPropertyChanged(nameof(CanGoNext));
+            OnPropertyChanged(nameof(CanGoPrevious));
         }
 
         // ── Bulk selection tracking ───────────────────────────────────────────
@@ -479,6 +528,7 @@ namespace AdminSystem_v2.ViewModels
                     order.PaymentProofUrl    = detail.PaymentProofUrl;
                     order.PaymentProofMethod = detail.PaymentProofMethod;
                     order.PaymentStatus      = detail.PaymentStatus;
+                    order.Address            = detail.Address;
                 }
 
                 // Cycle through null so WPF sees a genuine reference change and

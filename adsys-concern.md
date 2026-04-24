@@ -1,0 +1,12 @@
+Concerns:
+1. The UI design are somewhat different and inconsistent throughout all the frontend for AdminSystem_v2.
+    - Maybe, create a more centralized frontend for the AdminSystem_v2.
+    - Issue i immediately saw are the tabs in Vouchers and Orders, completely separated in terms of design and layout.
+2. The current background color of the frontend in the AdminSystem_v2 is dark blue. I want to completely change that color into matte black (not total high contrast black, just a bit lighter than pure black).
+3. In Products tab, the scroll bar rows of the products are compact in a single column. I want to make it more spaced out and organized. Add a combo box that will filter the products based on the category.
+4. Still in Products, the product details card eats too much space leaving an awkward amount of space on the right side of the scroll bar and so much space on the left side of the products card. I want to make it more compact and organized. 
+5. Search Bars across the AdminSystem_v2. I've been having this issue where search bars inputs text as if there's a huge space before the text I input. It's not aligned to the left. Check across the whole AdminSystem_v2 for this issue. 
+6. The Staff part, specifically the Admin account edits, system should allow Admin user to change it's own password, because currently the system disables the ability to edit the Admin account. It just cannot edit the Admin position itself. So admin remains as admin no matter what and cannot go lower than it. Still with other accounts (not an admin), they cannot edit their own information, only Admin. 
+7. In the Orders tab, when an Order is clicked an Order information shows up, but I am not satisfied with how the information is displayed. It's too compact and not organized."Order Details" section is too compact and not organized. I want to make it more spaced out and organized. 
+8. Still in the Orders tab, there's this Delivery/Pickup INFO card in the Order details, but always empty, I want it to display the information of the delivery/pickup customer wrote any in the checkout process through WebApplication (I think it is not yet implemented in the WebApplication as well). 
+9. The Online Orders fetching. Currently, the All Orders tab shows all the orders, but I worry that the system will run slower if the all orders are always fetched and displayed complete in long rows, I am afraid that will make the system run slower, maybe implement a pagination or something to make it more organized and not run slower.

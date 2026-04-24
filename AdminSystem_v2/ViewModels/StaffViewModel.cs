@@ -339,7 +339,9 @@ namespace AdminSystem_v2.ViewModels
             if (NewPasswordText.Length < 8)
             { ShowError("New password must be at least 8 characters."); return; }
 
-            if (!_dialog.PromptCredentials($"reset {_selectedUser.FullName}'s password"))
+            // Only prompt for credentials when resetting someone else's password
+            if (!IsSelectedSelf &&
+                !_dialog.PromptCredentials($"reset {_selectedUser.FullName}'s password"))
                 return;
 
             IsLoading = true;

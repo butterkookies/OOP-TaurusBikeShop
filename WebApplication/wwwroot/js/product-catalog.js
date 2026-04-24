@@ -139,17 +139,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     // PRODUCT DETAIL PAGE — variant selector
     // =========================================================================
-    const variantBtns = document.querySelectorAll('.tbs-variant-btn:not([disabled])');
+    const variantBtns = document.querySelectorAll('.cal-variant-btn:not([disabled])');
     const addToCartBtn = document.getElementById('add-to-cart-btn');
     const displayedPrice = document.getElementById('displayed-price');
 
     variantBtns.forEach(btn => {
         btn.addEventListener('click', async () => {
             variantBtns.forEach(b => {
-                b.classList.remove('tbs-variant-btn--selected');
+                b.classList.remove('cal-variant-btn--selected');
                 b.setAttribute('aria-pressed', 'false');
             });
-            btn.classList.add('tbs-variant-btn--selected');
+            btn.classList.add('cal-variant-btn--selected');
             btn.setAttribute('aria-pressed', 'true');
 
             const variantId = btn.dataset.variantId;

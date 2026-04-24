@@ -46,11 +46,47 @@ namespace AdminSystem_v2.ViewModels
             }
         }
 
+        // ── Status filter ─────────────────────────────────────────────────────
+
+        private string _statusFilter = "All";
+        public  string StatusFilter
+        {
+            get => _statusFilter;
+            private set
+            {
+                if (SetProperty(ref _statusFilter, value))
+                    ApplyFilter();
+            }
+        }
+
+        // ── Summary counts ────────────────────────────────────────────────────
+
+        public int ActiveCount    => Vouchers.Count(v => v.IsActive && !v.IsExpired && v.StatusDisplay != "Scheduled");
+        public int InactiveCount  => Vouchers.Count(v => !v.IsActive);
+        public int ExpiredCount   => Vouchers.Count(v => v.IsExpired);
+        public int ScheduledCount => Vouchers.Count(v => v.StatusDisplay == "Scheduled");
+
         private ObservableCollection<VoucherListItem> _filteredVouchers = new();
         public  ObservableCollection<VoucherListItem> FilteredVouchers
         {
             get => _filteredVouchers;
             private set => SetProperty(ref _filteredVouchers, value);
+        }
+
+        private VoucherListItem? _selectedVoucher;
+        public  VoucherListItem? SelectedVoucher
+        {
+            get => _selectedVoucher;
+            set => SetProperty(ref _selectedVoucher, value);
+        }
+
+        // ── Assignable vouchers (active + not expired) ────────────────────────
+
+        private ObservableCollection<VoucherListItem> _assignableVouchers = new();
+        public  ObservableCollection<VoucherListItem> AssignableVouchers
+        {
+            get => _assignableVouchers;
+            private set => SetProperty(ref _assignableVouchers, value);
         }
 
         // ── Form state ────────────────────────────────────────────────────────
@@ -158,6 +194,9 @@ namespace AdminSystem_v2.ViewModels
 
         // ── Assign tab ────────────────────────────────────────────────────────
 
+        /// <summary>Raised after a user is added so the View can re-focus the search box.</summary>
+        public Action? FocusUserSearchRequested;
+
         private VoucherListItem? _assignVoucher;
         public  VoucherListItem? AssignVoucher
         {
@@ -222,6 +261,7 @@ namespace AdminSystem_v2.ViewModels
 
         public ICommand ShowVouchersTabCommand { get; }
         public ICommand ShowAssignTabCommand   { get; }
+        public ICommand SetStatusFilterCommand { get; }
 
         public ICommand NewVoucherCommand      { get; }
         public ICommand EditVoucherCommand     { get; }
@@ -244,6 +284,7 @@ namespace AdminSystem_v2.ViewModels
 
             ShowVouchersTabCommand = new RelayCommand(() => SwitchTab("Vouchers"));
             ShowAssignTabCommand   = new RelayCommand(() => SwitchTab("Assign"));
+            SetStatusFilterCommand = new RelayCommand<string>(f => StatusFilter = f ?? "All");
 
             NewVoucherCommand   = new RelayCommand(OpenNewForm);
             EditVoucherCommand  = new RelayCommand<VoucherListItem>(OpenEditForm);
@@ -268,6 +309,8 @@ namespace AdminSystem_v2.ViewModels
             {
                 var list = await _svc.GetAllVouchersAsync();
                 Vouchers = new ObservableCollection<VoucherListItem>(list);
+                RefreshSummaryCounts();
+                RefreshAssignableVouchers();
                 ApplyFilter();
             }
             catch (Exception ex)
@@ -292,9 +335,8 @@ namespace AdminSystem_v2.ViewModels
 
             if (tab == "Assign")
             {
-                // Populate ComboBox with active vouchers only
-                var active = Vouchers.Where(v => v.IsActive && !v.IsExpired).ToList();
-                AssignVoucher = active.FirstOrDefault();
+                RefreshAssignableVouchers();
+                AssignVoucher = AssignableVouchers.FirstOrDefault();
             }
         }
 
@@ -302,18 +344,49 @@ namespace AdminSystem_v2.ViewModels
 
         private void ApplyFilter()
         {
-            if (string.IsNullOrWhiteSpace(_listSearch))
-            {
-                FilteredVouchers = new ObservableCollection<VoucherListItem>(Vouchers);
-                return;
-            }
+            IEnumerable<VoucherListItem> source = Vouchers;
 
-            string q = _listSearch.Trim().ToLowerInvariant();
-            FilteredVouchers = new ObservableCollection<VoucherListItem>(
-                Vouchers.Where(v =>
+            // Apply status pill filter
+            source = _statusFilter switch
+            {
+                "Active"    => source.Where(v => v.IsActive && !v.IsExpired && v.StatusDisplay != "Scheduled"),
+                "Inactive"  => source.Where(v => !v.IsActive),
+                "Expired"   => source.Where(v => v.IsExpired),
+                "Scheduled" => source.Where(v => v.StatusDisplay == "Scheduled"),
+                _           => source   // "All"
+            };
+
+            // Apply text search across all visible fields
+            if (!string.IsNullOrWhiteSpace(_listSearch))
+            {
+                string q = _listSearch.Trim().ToLowerInvariant();
+                source = source.Where(v =>
                     v.Code.ToLowerInvariant().Contains(q) ||
                     v.Description.ToLowerInvariant().Contains(q) ||
-                    v.StatusDisplay.ToLowerInvariant().Contains(q)));
+                    v.StatusDisplay.ToLowerInvariant().Contains(q) ||
+                    v.DiscountDisplay.ToLowerInvariant().Contains(q) ||
+                    v.ValidPeriod.ToLowerInvariant().Contains(q) ||
+                    v.MaxUsesDisplay.ToLowerInvariant().Contains(q) ||
+                    v.MinOrderDisplay.ToLowerInvariant().Contains(q) ||
+                    v.TimesUsed.ToString().Contains(q) ||
+                    v.AssignedCount.ToString().Contains(q));
+            }
+
+            FilteredVouchers = new ObservableCollection<VoucherListItem>(source);
+        }
+
+        private void RefreshSummaryCounts()
+        {
+            OnPropertyChanged(nameof(ActiveCount));
+            OnPropertyChanged(nameof(InactiveCount));
+            OnPropertyChanged(nameof(ExpiredCount));
+            OnPropertyChanged(nameof(ScheduledCount));
+        }
+
+        private void RefreshAssignableVouchers()
+        {
+            AssignableVouchers = new ObservableCollection<VoucherListItem>(
+                Vouchers.Where(v => v.IsActive && !v.IsExpired));
         }
 
         // ── Form open/close ───────────────────────────────────────────────────
@@ -496,6 +569,9 @@ namespace AdminSystem_v2.ViewModels
             IsUserDropdownOpen = false;
             UserSearch         = string.Empty;
             OnPropertyChanged(nameof(SelectedUsers));
+
+            // Ask the View to re-focus the search box so the admin can add more customers immediately
+            FocusUserSearchRequested?.Invoke();
         }
 
         private void RemoveUser(VoucherUserRow? user)
@@ -536,6 +612,8 @@ namespace AdminSystem_v2.ViewModels
                 SelectedUsers      = new ObservableCollection<VoucherUserRow>();
                 AssignExpiresAt    = null;
                 UserSearch         = string.Empty;
+                RefreshAssignableVouchers();
+                AssignVoucher      = AssignableVouchers.FirstOrDefault();
                 await LoadAsync();
             }
             catch (Exception ex)

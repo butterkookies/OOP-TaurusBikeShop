@@ -6,6 +6,7 @@ using WebApplication.BusinessLogic.Interfaces;
 using System.Security.Claims;
 using WebApplication.Models;
 using WebApplication.Models.ViewModels;
+using WebApplication.Models.Entities;
 
 namespace WebApplication.Controllers;
 
@@ -16,19 +17,22 @@ namespace WebApplication.Controllers;
 public sealed class HomeController : Controller
 {
     private readonly IProductService _productService;
+    private readonly IBrandService   _brandService;
     private readonly IWishlistService _wishlistService;
     private readonly ILogger<HomeController> _logger;
 
     private const int FeaturedProductCount = 8;
 
     public HomeController(
-        IProductService productService,
+        IProductService  productService,
+        IBrandService    brandService,
         IWishlistService wishlistService,
         ILogger<HomeController> logger)
     {
-        _productService = productService ?? throw new ArgumentNullException(nameof(productService));
+        _productService  = productService  ?? throw new ArgumentNullException(nameof(productService));
+        _brandService    = brandService    ?? throw new ArgumentNullException(nameof(brandService));
         _wishlistService = wishlistService ?? throw new ArgumentNullException(nameof(wishlistService));
-        _logger         = logger         ?? throw new ArgumentNullException(nameof(logger));
+        _logger          = logger          ?? throw new ArgumentNullException(nameof(logger));
     }
 
     // =========================================================================
@@ -47,15 +51,34 @@ public sealed class HomeController : Controller
                 wishlistIds = await _wishlistService.GetProductIdsAsync(userId, cancellationToken);
             }
 
-            IReadOnlyList<ProductViewModel> featured =
-                await _productService.GetFeaturedAsync(FeaturedProductCount, wishlistIds, cancellationToken);
+            Task<IReadOnlyList<ProductViewModel>> featuredTask =
+                _productService.GetFeaturedAsync(FeaturedProductCount, wishlistIds, cancellationToken);
 
-            return View(featured);
+            Task<(IReadOnlyList<ProductViewModel>, int TotalCount)> countTask =
+                _productService.GetFilteredAsync(
+                    null, null, null, null, null,
+                    1, 1, [], false, cancellationToken);
+
+            Task<IReadOnlyList<Brand>> brandsTask =
+                _brandService.GetAllActiveBrandsAsync(cancellationToken);
+
+            Task<IReadOnlyList<Category>> categoriesTask =
+                _productService.GetActiveCategoriesAsync(cancellationToken);
+
+            await Task.WhenAll(featuredTask, countTask, brandsTask, categoriesTask);
+
+            return View(new HomeIndexViewModel
+            {
+                FeaturedProducts = featuredTask.Result,
+                ProductCount     = countTask.Result.TotalCount,
+                BrandCount       = brandsTask.Result.Count,
+                CategoryCount    = categoriesTask.Result.Count,
+            });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to load featured products for homepage.");
-            return View(Array.Empty<ProductViewModel>());
+            return View(new HomeIndexViewModel());
         }
     }
 

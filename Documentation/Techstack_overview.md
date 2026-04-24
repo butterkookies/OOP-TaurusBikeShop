@@ -44,7 +44,7 @@ graph TB
 | **Runtime** | .NET 8.0 (LTS) |
 | **Language** | C# (Nullable enabled, Implicit usings enabled) |
 | **Architecture** | MVC + Repository + Service Layer (3-tier) |
-| **IDE** | Visual Studio 2022 (v17.5+) |
+| **IDE** | Visual Studio 2026 |
 
 ### Backend NuGet Packages
 
@@ -137,16 +137,17 @@ graph TB
 | `Microsoft.Extensions.Configuration.EnvironmentVariables` | 8.0.0 | Environment variable config |
 | `Microsoft.Extensions.Configuration.UserSecrets` | 8.0.0 | Secret management (dev-time) |
 | `OxyPlot.Wpf` | 2.1.0 | Data charting and report visualizations |
+| `ClosedXML` | 0.102.3 | Excel report generation / export |
 
-### Admin Views (9 XAML screens)
+### Admin Views (12 XAML screens)
 
-`LoginView`, `MainWindow`, `DashboardView`, `OrdersView`, `POSView`, `ProductsView`, `ReportsView`, `StaffView`, `VoucherView`
+`LoginView`, `MainWindow`, `DashboardView`, `OrdersView`, `POSView`, `ProductsView`, `ReportsView`, `StaffView`, `VoucherView`, `CredentialDialog`, `StorePaymentAccountView`, `SupportTicketsView`
 
 ### MVVM Components
 
 | Layer | Directory | Purpose |
 |-------|-----------|---------|
-| **Models** | `Models/` | 25 entity/DTO classes + POS-specific models |
+| **Models** | `Models/` | 30 entity/DTO classes + POS-specific models |
 | **ViewModels** | `ViewModels/` | UI state + commands |
 | **Views** | `Views/` | 9 XAML screens |
 | **Repositories** | `Repositories/` | Data access via Dapper |

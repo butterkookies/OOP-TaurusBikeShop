@@ -7,7 +7,7 @@
         MinHeight="500" MinWidth="380"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
-        Background="#111827">
+        Background="#141414">
 
     <Window.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
@@ -16,7 +16,7 @@
         <Style x:Key="InputStyle" TargetType="TextBox">
             <Setter Property="Background"             Value="#0D1526"/>
             <Setter Property="Foreground"             Value="#F9FAFB"/>
-            <Setter Property="BorderBrush"            Value="#374151"/>
+            <Setter Property="BorderBrush"            Value="#2E2E2E"/>
             <Setter Property="BorderThickness"        Value="1"/>
             <Setter Property="Padding"                Value="12,0"/>
             <Setter Property="FontSize"               Value="13"/>
@@ -43,7 +43,7 @@
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="#3B82F6"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4B5563"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4A4A4A"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -54,7 +54,7 @@
         <Style x:Key="PasswordStyle" TargetType="PasswordBox">
             <Setter Property="Background"             Value="#0D1526"/>
             <Setter Property="Foreground"             Value="#F9FAFB"/>
-            <Setter Property="BorderBrush"            Value="#374151"/>
+            <Setter Property="BorderBrush"            Value="#2E2E2E"/>
             <Setter Property="BorderThickness"        Value="1"/>
             <Setter Property="Padding"                Value="12,0"/>
             <Setter Property="FontSize"               Value="13"/>
@@ -78,7 +78,7 @@
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="#3B82F6"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4B5563"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4A4A4A"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -112,7 +112,7 @@
                                 <Setter TargetName="Bd" Property="Background" Value="#991B1B"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bd" Property="Background" Value="#374151"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#2E2E2E"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -142,7 +142,7 @@
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                 <GradientStop Color="#0F172A" Offset="0"/>
-                <GradientStop Color="#111827" Offset="0.5"/>
+                <GradientStop Color="#141414" Offset="0.5"/>
                 <GradientStop Color="#0F172A" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
@@ -154,7 +154,7 @@
                 <Border HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Width="380"
-                        Background="#1A2234"
+                        Background="#1C1C1C"
                         CornerRadius="12"
                         BorderThickness="1"
                         BorderBrush="#2D3748">
@@ -211,7 +211,7 @@
                                                FontSize="18"
                                                FontWeight="Bold"/>
                                     <TextBlock Text="BIKE SHOP ADMIN"
-                                               Foreground="#4B5563"
+                                               Foreground="#4A4A4A"
                                                FontSize="10"
                                                FontWeight="SemiBold"
                                                Margin="1,3,0,0"/>
@@ -341,7 +341,7 @@
 
                 <!-- FOOTER -->
                 <TextBlock Text="Taurus Bike Shop  •  Admin System  •  v2"
-                           Foreground="#374151"
+                           Foreground="#2E2E2E"
                            FontSize="10"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Bottom"

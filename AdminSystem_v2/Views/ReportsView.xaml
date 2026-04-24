@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:AdminSystem_v2.Converters"
              xmlns:oxy="http://oxyplot.org/wpf"
-             Background="#111827">
+             Background="#141414">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -42,7 +42,7 @@
 
         <!-- ── Toggle pill button (source / period) ── -->
         <Style x:Key="PillBtn" TargetType="Button">
-            <Setter Property="Background"      Value="#374151"/>
+            <Setter Property="Background"      Value="#2E2E2E"/>
             <Setter Property="Foreground"      Value="#9CA3AF"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="14,6"/>
@@ -60,7 +60,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#4B5563"/>
+                                <Setter Property="Background" Value="#4A4A4A"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -82,7 +82,7 @@
 
         <!-- ── Stat card ── -->
         <Style x:Key="StatCard" TargetType="Border">
-            <Setter Property="Background"      Value="#1A2234"/>
+            <Setter Property="Background"      Value="#1C1C1C"/>
             <Setter Property="CornerRadius"    Value="10"/>
             <Setter Property="Padding"         Value="20"/>
             <Setter Property="BorderBrush"     Value="#2D3748"/>
@@ -93,14 +93,14 @@
         <Style x:Key="ReportGrid" TargetType="DataGrid">
             <Setter Property="AutoGenerateColumns"      Value="False"/>
             <Setter Property="IsReadOnly"               Value="True"/>
-            <Setter Property="Background"               Value="#1A2234"/>
+            <Setter Property="Background"               Value="#1C1C1C"/>
             <Setter Property="Foreground"               Value="#E5E7EB"/>
             <Setter Property="BorderBrush"              Value="#2D3748"/>
             <Setter Property="BorderThickness"          Value="1"/>
-            <Setter Property="RowBackground"            Value="#1A2234"/>
-            <Setter Property="AlternatingRowBackground" Value="#0F1829"/>
+            <Setter Property="RowBackground"            Value="#1C1C1C"/>
+            <Setter Property="AlternatingRowBackground" Value="#0F0F0F"/>
             <Setter Property="GridLinesVisibility"      Value="Horizontal"/>
-            <Setter Property="HorizontalGridLinesBrush" Value="#374151"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#2E2E2E"/>
             <Setter Property="HeadersVisibility"        Value="Column"/>
             <Setter Property="CanUserResizeRows"        Value="False"/>
             <Setter Property="SelectionMode"            Value="Single"/>
@@ -108,12 +108,12 @@
             <Setter Property="ColumnHeaderStyle">
                 <Setter.Value>
                     <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background"      Value="#111827"/>
+                        <Setter Property="Background"      Value="#141414"/>
                         <Setter Property="Foreground"      Value="#9CA3AF"/>
                         <Setter Property="FontSize"        Value="11"/>
                         <Setter Property="FontWeight"      Value="SemiBold"/>
                         <Setter Property="Padding"         Value="12,8"/>
-                        <Setter Property="BorderBrush"     Value="#374151"/>
+                        <Setter Property="BorderBrush"     Value="#2E2E2E"/>
                         <Setter Property="BorderThickness" Value="0,0,0,1"/>
                     </Style>
                 </Setter.Value>
@@ -126,7 +126,7 @@
                         <Setter Property="Foreground"      Value="#E5E7EB"/>
                         <Style.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#1E3A5F"/>
+                                <Setter Property="Background" Value="#1E2E3E"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -146,8 +146,8 @@
         <!-- ══════════════════════════════════════
              ROW 0 — SECTION TAB BAR
              ══════════════════════════════════════ -->
-        <Border Grid.Row="0" Background="#1A2234"
-                BorderBrush="#374151" BorderThickness="0,0,0,1">
+        <Border Grid.Row="0" Background="#1C1C1C"
+                BorderBrush="#2E2E2E" BorderThickness="0,0,0,1">
             <StackPanel Orientation="Horizontal">
 
                 <Button Command="{Binding ShowSalesTabCommand}" Content="Sales Report">
@@ -197,7 +197,7 @@
         <Grid Grid.Row="2">
 
             <!-- Loading overlay -->
-            <Border Background="#80111827" Panel.ZIndex="10"
+            <Border Background="#80141414" Panel.ZIndex="10"
                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
                 <TextBlock Text="Loading..." Foreground="#9CA3AF"
                            FontSize="14" HorizontalAlignment="Center"
@@ -240,7 +240,7 @@
                     </Grid>
 
                     <!-- ── Source toggle + Period toggle ── -->
-                    <Border Background="#1A2234" CornerRadius="10" Padding="16,12"
+                    <Border Background="#1C1C1C" CornerRadius="10" Padding="16,12"
                             BorderThickness="1" BorderBrush="#2D3748" Margin="0,0,0,16">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -398,7 +398,7 @@
                                 <DatePicker SelectedDate="{Binding FromDate}"
                                             Width="150" Height="36"
                                             Background="#0D1526" Foreground="#F9FAFB"
-                                            BorderBrush="#374151" FontSize="13"
+                                            BorderBrush="#2E2E2E" FontSize="13"
                                             Margin="0,0,16,0"/>
                                 <TextBlock Text="TO" Foreground="#6B7280"
                                            FontSize="10" FontWeight="SemiBold"
@@ -406,7 +406,7 @@
                                 <DatePicker SelectedDate="{Binding ToDate}"
                                             Width="150" Height="36"
                                             Background="#0D1526" Foreground="#F9FAFB"
-                                            BorderBrush="#374151" FontSize="13"
+                                            BorderBrush="#2E2E2E" FontSize="13"
                                             Margin="0,0,16,0"/>
                                 <Button Content="Run Report"
                                         Command="{Binding RunSalesReportCommand}"
@@ -430,7 +430,7 @@
                                            Foreground="#F9FAFB"
                                            FontSize="36" FontWeight="Bold" Margin="0,8,0,4"/>
                                 <TextBlock Text="{Binding OrdersCardLabel}"
-                                           Foreground="#4B5563" FontSize="11"/>
+                                           Foreground="#4A4A4A" FontSize="11"/>
                             </StackPanel>
                         </Border>
 
@@ -443,7 +443,7 @@
                                                StringFormat='₱{0:N0}', FallbackValue='—'}"
                                            Foreground="#34D399"
                                            FontSize="28" FontWeight="Bold" Margin="0,8,0,4"/>
-                                <TextBlock Foreground="#4B5563" FontSize="11">
+                                <TextBlock Foreground="#4A4A4A" FontSize="11">
                                     <Run Text="Avg "/>
                                     <Run Text="{Binding SalesSummary.AvgOrderValue,
                                                 StringFormat='₱{0:N2}', FallbackValue='—', Mode=OneWay}"/>
@@ -461,7 +461,7 @@
                                                StringFormat='₱{0:N0}', FallbackValue='—'}"
                                            Foreground="#F9FAFB"
                                            FontSize="28" FontWeight="Bold" Margin="0,8,0,4"/>
-                                <TextBlock Foreground="#4B5563" FontSize="11">
+                                <TextBlock Foreground="#4A4A4A" FontSize="11">
                                     <Run Text="Discounts "/>
                                     <Run Foreground="#EF4444"
                                          Text="{Binding SalesSummary.TotalDiscounts,
@@ -519,7 +519,7 @@
                                 </DataGrid>
 
                                 <TextBlock Text="No data — select a period or run a custom report."
-                                           Foreground="#4B5563" FontSize="12"
+                                           Foreground="#4A4A4A" FontSize="12"
                                            HorizontalAlignment="Center" Margin="0,16"
                                            Visibility="{Binding DailySales.Count,
                                                Converter={StaticResource BoolToVis},
@@ -550,7 +550,7 @@
                                 </DataGrid>
 
                                 <TextBlock Text="No data for selected range."
-                                           Foreground="#4B5563" FontSize="12"
+                                           Foreground="#4A4A4A" FontSize="12"
                                            HorizontalAlignment="Center" Margin="0,16"
                                            Visibility="{Binding TopProducts.Count,
                                                Converter={StaticResource BoolToVis},

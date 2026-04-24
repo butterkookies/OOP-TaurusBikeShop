@@ -125,6 +125,16 @@ namespace AdminSystem_v2.Repositories
                 order.PaymentStatus      = proof.PaymentStatus;
             }
 
+            // 6 — shipping address (if delivery order with a linked address)
+            if (order.ShippingAddressId.HasValue)
+            {
+                order.Address = await conn.QueryFirstOrDefaultAsync<ShippingAddress>(
+                    @"SELECT AddressId, Label, Street, City, Province, PostalCode, Country
+                      FROM Address
+                      WHERE AddressId = @Id",
+                    new { Id = order.ShippingAddressId.Value });
+            }
+
             return order;
         }
 

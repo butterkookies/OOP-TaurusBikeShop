@@ -11,6 +11,7 @@ namespace AdminSystem_v2.Services
         public SalesSummary? Summary { get; set; }
         public IEnumerable<DailySales> Breakdown   { get; set; } = Array.Empty<DailySales>();
         public IEnumerable<TopProduct> TopProducts { get; set; } = Array.Empty<TopProduct>();
+        public byte[]? ChartImagePng { get; set; }
     }
 
     public interface IExcelExportService

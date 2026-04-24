@@ -1,5 +1,5 @@
 @* WebApplication/Views/Home/Index.cshtml *@
-@model IEnumerable<WebApplication.Models.ViewModels.ProductViewModel>
+@model WebApplication.Models.ViewModels.HomeIndexViewModel
 @{
     ViewData["Title"] = "Home";
 }
@@ -59,15 +59,15 @@
 
         <div class="mt-16 flex gap-12 md:gap-16" data-reveal="delay-3">
             <div>
-                <p class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">148</p>
+                <p class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">@Model.ProductCount</p>
                 <p class="text-sm text-mid-gray mt-1">Products</p>
             </div>
             <div>
-                <p class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">43</p>
+                <p class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">@Model.BrandCount</p>
                 <p class="text-sm text-mid-gray mt-1">Brands</p>
             </div>
             <div>
-                <p class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">13</p>
+                <p class="font-display text-3xl md:text-4xl font-semibold text-charcoal dark:text-white">@Model.CategoryCount</p>
                 <p class="text-sm text-mid-gray mt-1">Categories</p>
             </div>
         </div>
@@ -154,7 +154,7 @@
 @* ═══════════════════════════════════════════════════════════════
    FEATURED PRODUCTS
    ═══════════════════════════════════════════════════════════════ *@
-@if (Model != null && Model.Any())
+@if (Model.FeaturedProducts.Any())
 {
     <section class="bg-white dark:bg-midnight py-20 md:py-24">
         <div class="max-w-[1200px] mx-auto px-6">
@@ -168,7 +168,7 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" data-reveal="delay-1">
-                @foreach (WebApplication.Models.ViewModels.ProductViewModel product in Model)
+                @foreach (WebApplication.Models.ViewModels.ProductViewModel product in Model.FeaturedProducts)
                 {
                     @await Html.PartialAsync("~/Views/Customer/Partials/_ProductCard.cshtml", product)
                 }
@@ -204,15 +204,15 @@
             @* Right: 2x2 stat cards *@
             <div class="grid grid-cols-2 gap-5">
                 <div class="cal-card-static p-6 text-center" data-reveal="delay-1">
-                    <p class="font-display text-4xl font-semibold text-charcoal dark:text-white">148</p>
+                    <p class="font-display text-4xl font-semibold text-charcoal dark:text-white">@Model.ProductCount</p>
                     <p class="text-sm text-mid-gray mt-2">Products in Stock</p>
                 </div>
                 <div class="cal-card-static p-6 text-center" data-reveal="delay-2">
-                    <p class="font-display text-4xl font-semibold text-charcoal dark:text-white">43</p>
+                    <p class="font-display text-4xl font-semibold text-charcoal dark:text-white">@Model.BrandCount</p>
                     <p class="text-sm text-mid-gray mt-2">Premium Brands</p>
                 </div>
                 <div class="cal-card-static p-6 text-center" data-reveal="delay-3">
-                    <p class="font-display text-4xl font-semibold text-charcoal dark:text-white">13</p>
+                    <p class="font-display text-4xl font-semibold text-charcoal dark:text-white">@Model.CategoryCount</p>
                     <p class="text-sm text-mid-gray mt-2">Categories</p>
                 </div>
                 <div class="cal-card-static p-6 text-center" data-reveal="delay-3">
@@ -306,12 +306,12 @@
             @* Right: stat column *@
             <div class="flex lg:flex-col gap-8 lg:gap-6 shrink-0" data-reveal="delay-1" aria-hidden="true">
                 <div class="text-center">
-                    <p class="font-display text-4xl font-semibold text-white">148</p>
+                    <p class="font-display text-4xl font-semibold text-white">@Model.ProductCount</p>
                     <p class="text-xs text-white/40 mt-1">Products</p>
                 </div>
                 <div class="w-px lg:w-12 h-12 lg:h-px bg-white/10"></div>
                 <div class="text-center">
-                    <p class="font-display text-4xl font-semibold text-white">43</p>
+                    <p class="font-display text-4xl font-semibold text-white">@Model.BrandCount</p>
                     <p class="text-xs text-white/40 mt-1">Brands</p>
                 </div>
                 <div class="w-px lg:w-12 h-12 lg:h-px bg-white/10"></div>

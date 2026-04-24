@@ -10,6 +10,9 @@ namespace AdminSystem_v2.Models
 
         public string TypeLabel => IsWalkIn ? "Walk-in" : "Online";
 
+        /// <summary>First letter of Name, shown in the avatar circle.</summary>
+        public string Initial => string.IsNullOrWhiteSpace(Name) ? "?" : Name.Trim()[0].ToString().ToUpperInvariant();
+
         public override string ToString() => $"{Name} ({Email})";
     }
 }
